@@ -1,0 +1,367 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Printer Setup | {{ request.user.tenant.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .ps-wrap { max-width: 560px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
+
+    .ps-step {
+        border: 1px solid var(--border-color);
+        background: var(--panel-bg);
+        margin-bottom: 1.25rem;
+        overflow: hidden;
+        transition: border-color 0.2s;
+    }
+    .ps-step.done   { border-color: #22c55e; }
+    .ps-step.active { border-color: var(--accent-gold); }
+
+    .ps-step-head { display: flex; align-items: center; gap: 1rem; padding: 1.1rem 1.4rem; }
+    .ps-num {
+        width: 28px; height: 28px; border-radius: 50%;
+        border: 1.5px solid var(--border-color);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.7rem; font-weight: 700; flex-shrink: 0;
+        color: var(--text-muted); transition: all 0.2s;
+    }
+    .ps-step.done  .ps-num { background: #22c55e; border-color: #22c55e; color: #fff; }
+    .ps-step.active .ps-num { background: var(--accent-gold); border-color: var(--accent-gold); color: #fff; }
+
+    .ps-step-title { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+    .ps-step-sub   { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+
+    .ps-body { padding: 1.25rem 1.4rem 1.4rem; border-top: 1px solid var(--border-color); }
+
+    /* How-it-works explainer */
+    .ps-explain {
+        border: 1px solid var(--border-color); background: rgba(197,160,89,0.05);
+        border-left: 3px solid var(--accent-gold); padding: 1.1rem 1.3rem; margin-bottom: 1.5rem;
+    }
+    .ps-explain h5 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent-gold); margin: 0 0 0.5rem; font-weight: 700; }
+    .ps-explain p  { font-size: 0.78rem; color: var(--text-muted); line-height: 1.7; margin: 0; }
+    .ps-explain strong { color: var(--text-main); }
+
+    /* IP / text inputs */
+    .ip-input {
+        width: 100%; background: transparent; border: none;
+        border-bottom: 2px solid var(--border-color); color: var(--text-main);
+        padding: 0.6rem 0; font-size: 1.4rem; font-family: 'Space Mono', monospace;
+        letter-spacing: 2px; outline: none; text-align: center;
+        transition: border-color 0.2s;
+    }
+    .ip-input:focus { border-bottom-color: var(--accent-gold); }
+
+    .field-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 0.4rem; }
+    .field-input {
+        width: 100%; background: transparent; border: none;
+        border-bottom: 1px solid var(--border-color); color: var(--text-main);
+        padding: 0.5rem 0; font-size: 1rem; font-family: 'Space Mono', monospace;
+        outline: none; transition: border-color 0.2s;
+    }
+    .field-input:focus { border-bottom-color: var(--accent-gold); }
+
+    .hint {
+        margin-top: 1rem; padding: 0.75rem 1rem;
+        background: rgba(197,160,89,0.06); border-left: 2px solid var(--accent-gold);
+        font-size: 0.75rem; color: var(--text-muted); line-height: 1.7;
+    }
+    .hint strong { color: var(--text-main); }
+
+    /* Paper width cards */
+    .width-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1rem; }
+    .width-card {
+        border: 1.5px solid var(--border-color); padding: 1.1rem 1rem;
+        cursor: pointer; transition: all 0.15s; display: flex;
+        flex-direction: column; align-items: center; gap: 0.4rem; user-select: none;
+    }
+    .width-card:hover { border-color: var(--accent-gold); }
+    .width-card.selected { border-color: var(--accent-gold); background: rgba(197,160,89,0.07); }
+    .width-num { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--accent-gold); line-height: 1; }
+    .width-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 700; }
+    .width-badge { font-size: 0.6rem; padding: 1px 6px; background: rgba(16,185,129,0.1); color: #10b981; border-radius: 3px; }
+
+    /* Advanced toggle */
+    .adv-toggle { font-size: 0.72rem; color: var(--text-muted); cursor: pointer; user-select: none; margin-top: 0.5rem; display: inline-flex; align-items: center; gap: 0.35rem; }
+    .adv-toggle:hover { color: var(--accent-gold); }
+    .adv-row { display: none; margin-top: 1rem; }
+    .adv-row.show { display: block; }
+
+    /* Actions */
+    .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1.5rem; }
+    @media (max-width: 400px) { .action-row { grid-template-columns: 1fr; } }
+    .btn-save {
+        padding: 1rem; background: var(--accent-gold); border: none; color: #fff;
+        font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px;
+        font-weight: 700; cursor: pointer; font-family: 'Outfit', sans-serif; transition: background 0.2s;
+    }
+    .btn-save:hover { background: #b59250; }
+    .btn-test {
+        padding: 1rem; background: transparent; border: 1px solid var(--border-color); color: var(--text-main);
+        font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px;
+        font-weight: 700; cursor: pointer; font-family: 'Outfit', sans-serif; transition: all 0.2s;
+    }
+    .btn-test:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+    .btn-test:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .test-result { margin-top: 0.75rem; font-size: 0.78rem; min-height: 20px; text-align: center; line-height: 1.6; }
+
+    .success-banner {
+        text-align: center; padding: 1.5rem;
+        border: 1px solid #22c55e; background: rgba(34,197,94,0.06); margin-bottom: 1.25rem;
+    }
+    .success-banner i { font-size: 1.6rem; color: #22c55e; }
+    .success-banner h4 { font-family: 'DM Serif Display', serif; margin: 0.4rem 0 0.2rem; }
+    .success-banner p { font-size: 0.78rem; color: var(--text-muted); margin: 0; }
+</style>
+{% endblock %}
+
+{% block header_left %}
+<div>
+    <a href="{% url 'outlet_settings' %}" class="brand-title" style="font-size:1.1rem;">
+        <i class="bi bi-arrow-left" style="color:var(--text-muted); font-size:0.9rem;"></i>
+        <span style="color:var(--accent-gold);">Printer Setup</span>
+    </a>
+    <p class="brand-subtitle">{{ request.user.outlet.name }}</p>
+</div>
+{% endblock %}
+
+{% block header_right %}
+<a href="{% url 'setup_kitchen_stations' %}" class="btn-luxury d-none d-sm-inline-flex">Kitchen Stations</a>
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="ps-wrap">
+
+    {% if saved %}
+    <div class="success-banner">
+        <i class="bi bi-check-circle-fill"></i>
+        <h4>Saved</h4>
+        <p>Printer IP stored. Tap <strong>Test Print</strong> below to confirm — make sure the Lexnorax app is open and logged in on the counter device.</p>
+    </div>
+    {% endif %}
+
+    <!-- Android App Download -->
+    <div class="ps-step active">
+        <div class="ps-step-head" style="justify-content:space-between; flex-wrap:wrap; gap:0.75rem;">
+            <div style="display:flex; align-items:center; gap:1rem;">
+                <div class="ps-num" style="background:var(--accent-gold); border-color:var(--accent-gold); color:#fff; font-size:0.65rem;">APK</div>
+                <div>
+                    <div class="ps-step-title">Install Lexnorax on Android</div>
+                    <div class="ps-step-sub">Scan to download · No Play Store needed</div>
+                </div>
+            </div>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https://lexnorax.net/android/lexnorax.apk&bgcolor=161616&color=c5a059&margin=4"
+                 alt="Scan to download Lexnorax Android app"
+                 style="border:1px solid var(--border-color); flex-shrink:0;">
+        </div>
+        <div class="ps-body" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.75rem; padding-top:1rem;">
+            <p style="font-size:0.75rem; color:var(--text-muted); margin:0; line-height:1.6;">
+                Scan with your phone camera → tap the link → install.<br>
+                After install: open app → login → printing starts automatically.
+            </p>
+            <a href="/android/lexnorax.apk" download
+               style="font-size:0.72rem; text-transform:uppercase; letter-spacing:1.5px; font-weight:700;
+                      color:var(--accent-gold); text-decoration:none; white-space:nowrap;">
+                Direct download →
+            </a>
+        </div>
+    </div>
+
+    <!-- Device Setup QR -->
+    <div class="ps-step active">
+        <div class="ps-step-head" style="justify-content:space-between; flex-wrap:wrap; gap:0.75rem;">
+            <div style="display:flex; align-items:center; gap:1rem;">
+                <div class="ps-num" style="background:var(--accent-gold); border-color:var(--accent-gold); color:#fff; font-size:0.6rem;">URL</div>
+                <div>
+                    <div class="ps-step-title">Connect App to This Restaurant</div>
+                    <div class="ps-step-sub">After installing — open app → tap "Scan QR Code" → scan this</div>
+                </div>
+            </div>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https://{{ request.user.tenant.slug }}.lexnorax.net/login/&bgcolor=161616&color=c5a059&margin=4"
+                 alt="Scan to connect app to this restaurant"
+                 style="border:1px solid var(--border-color); flex-shrink:0;">
+        </div>
+        <div class="ps-body" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.75rem; padding-top:1rem;">
+            <p style="font-size:0.75rem; color:var(--text-muted); margin:0; line-height:1.6;">
+                Points the app to <strong style="color:var(--text-main)">https://{{ request.user.tenant.slug }}.lexnorax.net/login/</strong>.<br>
+                Each phone only needs to scan this once.
+            </p>
+        </div>
+    </div>
+
+    <!-- How printing works -->
+    <div class="ps-explain">
+        <h5><i class="bi bi-info-circle me-1"></i> How printing works</h5>
+        <p>
+            Your <strong>Lexnorax app is the print agent</strong>. When you print a receipt, the app sends it
+            over WiFi to your network printer at the IP below. Keep the app <strong>open and logged in</strong>
+            on a device that stays on the counter, on the <strong>same WiFi</strong> as the printer.
+        </p>
+    </div>
+
+    <form method="post" id="printerForm">
+        {% csrf_token %}
+
+        <!-- ── Step 1: Printer IP ──────────────────────────────────────── -->
+        <div class="ps-step {% if station.printer_ip %}done{% else %}active{% endif %}">
+            <div class="ps-step-head">
+                <div class="ps-num">{% if station.printer_ip %}<i class="bi bi-check-lg" style="font-size:0.75rem;"></i>{% else %}1{% endif %}</div>
+                <div>
+                    <div class="ps-step-title">Printer IP address</div>
+                    <div class="ps-step-sub">The network address of your thermal printer</div>
+                </div>
+            </div>
+            <div class="ps-body">
+                <input type="text" class="ip-input" name="printer_ip" id="ipInput"
+                       value="{{ station.printer_ip|default:'' }}"
+                       placeholder="192.168.1.100"
+                       inputmode="decimal" autocomplete="off" spellcheck="false">
+
+                <div class="hint">
+                    <strong>How to find it:</strong> hold the printer's <strong>Feed</strong> button for ~3 seconds —
+                    it prints a self-test page showing its current <strong>IP address</strong>.<br><br>
+                    Or open your router's admin page (<strong>192.168.1.1</strong>) and look at the connected-devices list.
+                </div>
+
+                <!-- Advanced: port -->
+                <div class="adv-toggle" onclick="document.getElementById('advRow').classList.toggle('show')">
+                    <i class="bi bi-sliders"></i> Advanced — port
+                </div>
+                <div class="adv-row" id="advRow">
+                    <label class="field-label">Printer port</label>
+                    <input type="text" class="field-input" name="printer_port" id="portInput"
+                           value="{{ station.printer_port|default:9100 }}" placeholder="9100"
+                           inputmode="numeric" autocomplete="off">
+                    <div style="font-size:0.7rem; color:var(--text-muted); margin-top:0.4rem;">
+                        Almost always <strong>9100</strong> for thermal printers. Only change if your printer's manual says otherwise.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Step 2: Paper width ─────────────────────────────────────── -->
+        <div class="ps-step {% if station.paper_width_mm %}done{% endif %}">
+            <div class="ps-step-head">
+                <div class="ps-num">{% if station.paper_width_mm %}<i class="bi bi-check-lg" style="font-size:0.75rem;"></i>{% else %}2{% endif %}</div>
+                <div>
+                    <div class="ps-step-title">Paper roll width</div>
+                    <div class="ps-step-sub">Check the width printed on your paper roll packaging</div>
+                </div>
+            </div>
+            <div class="ps-body">
+                <input type="hidden" name="paper_width_mm" id="h_width" value="{{ station.paper_width_mm|default:80 }}">
+                <div class="width-grid">
+                    <div class="width-card {% if station.paper_width_mm == 80 or not station.paper_width_mm %}selected{% endif %}" id="w80" onclick="selectWidth(80)">
+                        <div class="width-num">80</div>
+                        <div class="width-label">mm</div>
+                        <div class="width-badge">Standard</div>
+                    </div>
+                    <div class="width-card {% if station.paper_width_mm == 58 %}selected{% endif %}" id="w58" onclick="selectWidth(58)">
+                        <div class="width-num">58</div>
+                        <div class="width-label">mm</div>
+                        <div class="width-label" style="color:var(--text-muted);">Narrow</div>
+                    </div>
+                </div>
+                <div style="font-size:0.72rem;color:var(--text-muted);margin-top:0.75rem;">
+                    Not sure? Most QSR printers use <strong style="color:var(--text-main);">80mm</strong>.
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Step 3: Printer MAC (for router reservation) ────────────── -->
+        <div class="ps-step">
+            <div class="ps-step-head">
+                <div class="ps-num">3</div>
+                <div>
+                    <div class="ps-step-title">Printer MAC <span style="color:var(--text-muted); font-weight:400; text-transform:none; letter-spacing:0;">— optional</span></div>
+                    <div class="ps-step-sub">Permanent ID — used to lock the IP in your router</div>
+                </div>
+            </div>
+            <div class="ps-body">
+                <label class="field-label">MAC address</label>
+                <input type="text" class="field-input" name="printer_mac" id="macInput"
+                       value="{{ outlet.printer_mac|default:'' }}"
+                       maxlength="17" placeholder="00:57:27:10:ED:46"
+                       oninput="onMacInput(this)" autocomplete="off" spellcheck="false"
+                       style="font-size:1.05rem; letter-spacing:2px;">
+                <div class="hint">
+                    The printer's IP can <strong>change</strong> when the router restarts. To stop that,
+                    set a <strong>DHCP reservation</strong> in your router: tie this MAC to the IP above so it
+                    never moves. The MAC is on the printer's self-test page (Feed button) and its bottom sticker.
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Actions ─────────────────────────────────────────────────── -->
+        <div class="action-row">
+            <button type="submit" class="btn-save">
+                <i class="bi bi-check2-circle me-2"></i>Save
+            </button>
+            <button type="button" class="btn-test" id="testBtn" onclick="testPrint()">
+                <i class="bi bi-printer me-2"></i>Test Print
+            </button>
+        </div>
+        <div class="test-result" id="testResult"></div>
+    </form>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function selectWidth(w) {
+        document.getElementById('w80').classList.toggle('selected', w === 80);
+        document.getElementById('w58').classList.toggle('selected', w === 58);
+        document.getElementById('h_width').value = w;
+    }
+
+    function onMacInput(el) {
+        let v = el.value.replace(/[^0-9a-fA-F]/g, '').toUpperCase();
+        let out = '';
+        for (let i = 0; i < Math.min(v.length, 12); i++) {
+            if (i > 0 && i % 2 === 0) out += ':';
+            out += v[i];
+        }
+        el.value = out;
+    }
+
+    // Test print — queues a PrintJob the phone agent picks up (no direct socket)
+    async function testPrint() {
+        const btn    = document.getElementById('testBtn');
+        const result = document.getElementById('testResult');
+        const ip     = document.getElementById('ipInput').value.trim();
+
+        if (!ip) {
+            result.style.color = '#ef4444';
+            result.textContent = 'Enter a printer IP and Save first.';
+            return;
+        }
+
+        btn.disabled = true;
+        result.style.color = 'var(--text-muted)';
+        result.textContent = 'Queuing test print…';
+
+        try {
+            const csrf = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const resp = await fetch("{% url 'printer_test_print' %}", {
+                method: 'POST',
+                headers: { 'X-CSRFToken': csrf, 'Content-Type': 'application/json' },
+            });
+            const data = await resp.json();
+            if (resp.ok && data.success) {
+                result.style.color = '#22c55e';
+                result.textContent = '✓ ' + data.message;
+            } else {
+                result.style.color = '#ef4444';
+                result.textContent = '✗ ' + (data.error || 'Could not queue test print.');
+            }
+        } catch (e) {
+            result.style.color = '#ef4444';
+            result.textContent = '✗ Network error — try again.';
+        } finally {
+            btn.disabled = false;
+        }
+    }
+</script>
+{% endblock %}

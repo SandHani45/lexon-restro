@@ -1,0 +1,127 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Agency Analytics | Global Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card-elegant { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 2rem; box-shadow: var(--shadow-soft); border-radius: 0; height: 100%; transition: var(--transition-smooth); }
+    .card-elegant:hover { border-color: var(--accent-gold); transform: translateY(-3px); }
+    .metric-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 0.5rem; }
+    .metric-value { font-family: 'DM Serif Display', serif; font-size: 2rem; margin: 0; color: var(--accent-gold); }
+    .table-luxury { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    .table-luxury th { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); padding: 1.2rem 1rem; border-bottom: 1px solid var(--border-color); text-align: left; }
+    .table-luxury td { padding: 1.2rem 1rem; border-bottom: 1px dashed var(--border-color); font-size: 0.95rem; }
+    .agent-name { font-weight: 600; color: var(--text-main); }
+    .revenue-pill { background: rgba(197,160,89,0.1); color: var(--accent-gold); padding: 4px 12px; font-weight: 700; font-family: 'Space Mono', monospace; font-size: 0.85rem; }
+    .progress { height: 6px; border-radius: 10px; background: var(--border-color); margin-top: 8px; }
+    .progress-bar { background: var(--accent-gold); }
+</style>
+{% endblock %}
+
+{% block header_left %}
+<div>
+    <a href="/dashboard/" class="brand-title">
+        <i class="bi bi-diagram-3" style="color:var(--accent-gold);"></i>
+        <span>Channel Administration</span>
+    </a>
+    <p class="brand-subtitle">Global Performance Matrix</p>
+</div>
+{% endblock %}
+
+{% block header_right %}
+<a href="/sales/" class="btn-luxury d-none d-sm-inline-flex"><i class="bi bi-arrow-left me-2"></i> Back to Agents</a>
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <div class="mb-5">
+        <h2 style="font-family:'DM Serif Display',serif; margin-bottom:0.25rem;">Global Performance Matrix</h2>
+        <p class="text-muted" style="letter-spacing:1px; font-size:0.85rem; text-transform:uppercase;">Reporting across all registered partners and clients</p>
+    </div>
+
+    <!-- Metrics -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card-elegant">
+                <span class="metric-label">Collective Ecosystem Revenue</span>
+                <p class="metric-value">₹{{ overall_revenue|floatformat:2 }}</p>
+                <div class="progress"><div class="progress-bar w-100"></div></div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card-elegant">
+                <span class="metric-label">Networked Restaurants</span>
+                <p class="metric-value">{{ total_tenants }}</p>
+                <p class="small text-muted mt-2">Total active tenants in system</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card-elegant">
+                <span class="metric-label">Direct (Unassigned) Accounts</span>
+                <p class="metric-value" style="color:var(--text-main);">{{ unassigned_tenants }}</p>
+                <p class="small text-muted mt-2">Brought in directly without agent</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agent ranking -->
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card-elegant">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 style="font-family:'DM Serif Display',serif; font-size:1.5rem;">Partner Performance Ranking</h5>
+                    <button class="btn-luxury" onclick="location.reload()"><i class="bi bi-arrow-clockwise me-2"></i> Sync Data</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table-luxury">
+                        <thead>
+                            <tr>
+                                <th>Partner Profile</th>
+                                <th>Portfolio Size</th>
+                                <th>Contribution Share</th>
+                                <th class="text-end">Value Generated (Total)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stat in agent_stats %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div style="width:40px; height:40px; background:var(--bg-color); border:1px solid var(--border-color); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--accent-gold);">
+                                            {{ stat.agent|slice:":1"|upper }}
+                                        </div>
+                                        <div>
+                                            <div class="agent-name">{{ stat.full_name }}</div>
+                                            <div class="small text-muted">@{{ stat.agent }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><strong>{{ stat.client_count }}</strong> <span class="text-muted small ms-1">Restaurants</span></td>
+                                <td style="width:300px;">
+                                    {% if total_global_revenue > 0 %}
+                                        {% widthratio stat.revenue total_global_revenue 100 as share %}
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="progress flex-grow-1" style="height:4px;">
+                                                <div class="progress-bar" style="width:{{ share }}%;"></div>
+                                            </div>
+                                            <span class="small fw-bold">{{ share }}%</span>
+                                        </div>
+                                    {% else %}
+                                        <div class="small text-muted">No contribution yet</div>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end"><span class="revenue-pill">₹{{ stat.revenue|floatformat:2 }}</span></td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center py-5 text-muted small">No agency data has been registered in the system yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

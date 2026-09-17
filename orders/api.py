@@ -1,0 +1,355 @@
+import json
+import hmac
+import hashlib
+import logging
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.db.models import Prefetch, Q
+from django.core.serializers.json import DjangoJSONEncoder
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+from django.db import transaction, IntegrityError
+from django.conf import settings
+from django.utils import timezone
+
+from core.decorators import tenant_required
+from notifications.models import Notification
+from kitchen.models import KitchenMessage
+from waiter.models import WaiterCall
+
+@login_required
+@tenant_required
+def notification_api(request):
+    """
+    Unified endpoint for real-time notifications (Waiter Calls + Kitchen Messages).
+    Used by the 8s global poller in base.html and standalone templates.
+    """
+    outlet = request.user.outlet
+    tenant = request.user.tenant
+
+    # 1. Active Waiter Calls (not resolved)
+    waiter_calls_qs = WaiterCall.objects.filter(
+        tenant=tenant, outlet=outlet, is_resolved=False
+    ).select_related('table').order_by('-created_at')
+    wc_count = waiter_calls_qs.count()
+    waiter_calls = waiter_calls_qs[:20]   # cap items returned; count is real total
+
+    # 2. Active Kitchen Messages (not acknowledged)
+    # Waiters only see messages for orders they created (their own tables).
+    # Managers / owners / cashiers see all messages for the outlet.
+    kitchen_msgs_qs = KitchenMessage.objects.filter(
+        tenant=tenant, outlet=outlet, is_resolved=False
+    ).select_related('order', 'order__table').order_by('-created_at')
+    if request.user.role == 'waiter':
+        kitchen_msgs_qs = kitchen_msgs_qs.filter(order__created_by=request.user)
+    km_count = kitchen_msgs_qs.count()
+    kitchen_msgs = kitchen_msgs_qs[:20]
+
+    # 3. Unread System Notifications — capped at 50.
+    # Without a limit, low-stock alerts accumulate and this query returns
+    # thousands of rows on every 8-second poll across all open browser tabs.
+    unread_system = Notification.objects.filter(
+        tenant=tenant, outlet=outlet, is_read=False
+    ).order_by('-created_at')[:50]
+
+    # 4. QR orders awaiting staff approval (guest-placed items land as
+    # status="review" — see orders/services/order_service.py). Distinct order
+    # count, not item count, so one order with 5 review items shows as "1".
+    qr_orders_qs = (
+        Order.objects.filter(
+            tenant=tenant, outlet=outlet, items__status="review"
+        )
+        .distinct()
+        .select_related("table")
+        .order_by("-created_at")
+    )
+    qr_count = qr_orders_qs.count()
+    qr_orders = qr_orders_qs[:20]
+
+    return JsonResponse({
+        "waiter_calls": {
+            "count": wc_count,
+            "items": [{"id": c.id, "table": c.table.name} for c in waiter_calls]
+        },
+        "kitchen_messages": {
+            "count": km_count,
+            "items": [{
+                "id": m.id,
+                "table": m.order.table.name if m.order.table else "Takeaway",
+                "message": m.message
+            } for m in kitchen_msgs]
+        },
+        "qr_orders": {
+            "count": qr_count,
+            "items": [{
+                "id": o.id,
+                "table": o.table.name if o.table else "Takeaway",
+            } for o in qr_orders]
+        },
+        "notifications": [
+            {"id": n.id, "message": n.message} for n in unread_system
+        ]
+    })
+
+from orders.models import Table, Order, OrderItem, Payment
+from tenants.models import Tenant, Outlet
+from setup.models import AggregatorConfig
+from menu.models import MenuItem
+
+logger = logging.getLogger("pos.api")
+
+def is_ip_allowed(request):
+    """
+    Validates if the incoming request is from an allowed aggregator IP.
+    HIGH-4: Implementation of IP allowlist.
+    """
+    if settings.DEBUG:
+        return True
+
+    # Reuses the same client-IP resolution already relied on for rate
+    # limiting/axes lockouts (core/utils.py) -- checks Cloudflare's own
+    # CF-Connecting-IP header first, which the client cannot spoof, rather
+    # than trusting the first hop of X-Forwarded-For on its own (a header
+    # any caller can set to whatever it likes).
+    from core.utils import get_client_ip
+    ip = get_client_ip(request)
+
+    # Placeholder for Zomato/Swiggy CIDR ranges
+    # In production, these should be moved to settings.py
+    ALLOWED_IPS = getattr(settings, 'AGGREGATOR_IP_ALLOWLIST', ['127.0.0.1'])
+    
+    # Simple check for now, can be expanded to CIDR range check
+    return ip in ALLOWED_IPS
+
+@login_required
+@tenant_required
+def api_tables(request):
+    """
+    Real-time tables state checking.
+    """
+    tables = Table.objects.filter(
+        tenant=request.user.tenant,
+        outlet=request.user.outlet,
+        is_active=True
+    ).order_by('name')
+
+    data = []
+    for table in tables:
+        data.append({
+            "id": table.id,
+            "name": table.name,
+            "state": table.state,
+            "is_active": table.is_active
+        })
+
+    return JsonResponse({"success": True, "data": data}, encoder=DjangoJSONEncoder)
+
+
+@login_required
+@tenant_required
+def api_active_orders(request):
+    """
+    Returns full order/ticket data for the active outlet avoiding race-condition deadlocks.
+    """
+    orders = Order.objects.filter(
+        tenant=request.user.tenant,
+        outlet=request.user.outlet,
+        status__in=["open", "billing"]
+    ).prefetch_related(
+        Prefetch("items", queryset=OrderItem.objects.select_related("menu_item"))
+    ).select_related("table")
+
+    data = []
+    for order in orders:
+        items_data = []
+        for item in order.items.all():
+            items_data.append({
+                "id": item.id,
+                "name": item.menu_item.name if item.menu_item else "Unknown (Deleted)",
+                "quantity": item.quantity,
+                "status": item.status,
+                "price": item.price,
+                "total_price": item.total_price,
+                "is_complimentary": item.is_complimentary,
+                "void_reason": item.void_reason
+            })
+            
+        data.append({
+            "id": order.id,
+            "order_number": order.order_number,
+            "table_id": order.table_id if order.table else None,
+            "table_name": order.table.name if order.table else "Walk-in",
+            "status": order.status,
+            "subtotal": order.subtotal,
+            "gst_total": order.gst_total,
+            "discount_total": order.discount_total,
+            "grand_total": order.grand_total,
+            "created_at": str(order.created_at),
+            "items": items_data
+        })
+
+    return JsonResponse({"success": True, "data": data}, encoder=DjangoJSONEncoder)
+
+
+
+@csrf_exempt
+@require_POST
+def api_ingest_order(request):
+    """
+    Simulates a Webhook ingestion endpoint for Zomato / Swiggy / Online Orders.
+    Validates HMAC signature and IP Allowlist (HIGH-4).
+    """
+    if not is_ip_allowed(request):
+        logger.warning("Rejected ingest attempt from unauthorized IP: %s", request.META.get('REMOTE_ADDR'))
+        return JsonResponse({"error": "Unauthorized IP"}, status=403)
+
+    try:
+        data = json.loads(request.body)
+        
+        tenant_id = request.GET.get("tenant_id") or data.get("tenant_id")
+        outlet_id = request.GET.get("outlet_id") or data.get("outlet_id")
+        source = request.GET.get("source") or data.get("source", "web")
+        aggregator_id = data.get("aggregator_order_id")
+        items = data.get("items", [])
+        
+        tenant = Tenant.objects.get(id=tenant_id)
+        outlet = Outlet.objects.get(id=outlet_id, tenant=tenant)
+        config = AggregatorConfig.objects.get(tenant=tenant, outlet=outlet)
+        
+        # Verify HMAC Signature
+        signature = request.headers.get("X-Signature")
+        if not signature:
+            return JsonResponse({"error": "Missing signature"}, status=401)
+            
+        # Explicit allowlist, not an if/else fallback -- an else-branch here
+        # meant any unrecognized `source` (a typo, "web", "uber_eats") would
+        # silently validate against the swiggy secret instead of being
+        # rejected outright.
+        if source == "zomato":
+            secret = config.zomato_webhook_secret
+        elif source == "swiggy":
+            secret = config.swiggy_webhook_secret
+        else:
+            return JsonResponse({"error": "Unknown aggregator source"}, status=401)
+        if not secret:
+            return JsonResponse({"error": "Aggregator not configured"}, status=401)
+            
+        expected_sig = hmac.new(
+            secret.encode(), 
+            request.body, 
+            hashlib.sha256
+        ).hexdigest()
+        
+        if not hmac.compare_digest(expected_sig, signature):
+            return JsonResponse({"error": "Invalid signature"}, status=401)
+        
+        # Validate every item BEFORE any writes happen. A `return` from inside
+        # `transaction.atomic()` does NOT roll back — atomic() only rolls back
+        # on an exception propagating out of the block, and a plain `return`
+        # is a normal exit, not an exception. Bailing out mid-loop after the
+        # Order (and some OrderItems) were already created used to commit a
+        # broken, half-built, status="paid" order while telling the caller
+        # the request had failed. Resolving every menu item up front means
+        # any early return here happens before a single row is written, so
+        # there's nothing left half-done to roll back.
+        menu_items_by_id = {}
+        for i in items:
+            menu_item_id = i.get("menu_item_id")
+            try:
+                menu_items_by_id[menu_item_id] = MenuItem.objects.get(
+                    id=menu_item_id, tenant=tenant, outlet=outlet
+                )
+            except MenuItem.DoesNotExist:
+                return JsonResponse(
+                    {"error": f"Menu item id={menu_item_id} not found or not available at this outlet"},
+                    status=422
+                )
+
+        try:
+            with transaction.atomic():
+                # Check if order already ingested
+                if aggregator_id and Order.objects.filter(tenant=tenant, outlet=outlet, aggregator_order_id=aggregator_id).exists():
+                    return JsonResponse({"error": "Order already exists"}, status=400)
+
+                # Create Order
+                order = Order.objects.create(
+                    tenant=tenant,
+                    outlet=outlet,
+                    source=source,
+                    aggregator_order_id=aggregator_id,
+                    status="paid",  # Aggregator orders usually come pre-paid
+                )
+
+                # When auto-KOT is on we route items through create_kot below,
+                # which only picks up status="pending" items and transitions
+                # them to "sent" itself (while deducting inventory + printing).
+                # Creating them as "sent" up front would make create_kot find
+                # nothing to do. When auto-KOT is off, mark them "sent" directly.
+                auto_kot = config.auto_accept_orders
+                initial_item_status = "pending" if auto_kot else "sent"
+
+                # Add Items — every menu_item_id was already resolved above.
+                for i in items:
+                    menu_item = menu_items_by_id[i.get("menu_item_id")]
+                    qty = i.get("quantity", 1)
+                    order_item = OrderItem.objects.create(
+                        order=order,
+                        menu_item=menu_item,
+                        quantity=qty,
+                        price=menu_item.price,
+                        gst_percentage=menu_item.gst_percentage,
+                        total_price=menu_item.price * qty,
+                        status=initial_item_status,
+                    )
+
+                # Re-calculate
+                order.recalculate_totals()
+
+                # FIX: Create a Payment row so revenue appears in daily_sales reports.
+                # Aggregator orders arrive pre-paid — the platform has already collected
+                # the money. We record it as a single payment at the order's grand_total
+                # using a method name that matches the aggregator source.
+                payment_method = source if source in ("zomato", "swiggy", "uber_eats", "web") else "cash"
+                Payment.objects.create(
+                    order=order,
+                    method=payment_method,
+                    amount=order.grand_total,
+                    reference=aggregator_id or None,
+                    created_by=None,
+                )
+
+                # Auto KOT Gen — create the kitchen ticket, deduct inventory,
+                # and queue printing. create_kot() takes user=None here (there
+                # is no logged-in staff member for a webhook order) and derives
+                # tenant/outlet from the order itself.
+                if auto_kot:
+                    from kitchen.services.kot_service import create_kot
+                    create_kot(None, order)
+
+                # Assign online token if tenant uses token_system
+                from core.features import has_feature
+                if has_feature(tenant, "token_system"):
+                    from tokens.views import assign_online_token
+                    from core.utils import get_business_date
+                    business_date = get_business_date(timezone.now(), outlet)
+                    tok = assign_online_token(order, outlet, tenant, business_date)
+                    logger.info(
+                        "Online token %s assigned to order %s (source=%s)",
+                        tok.display_number, order.id, source,
+                    )
+
+            return JsonResponse({"success": True, "order_id": order.id, "order_number": order.order_number})
+
+        except IntegrityError:
+            # A genuine simultaneous-delivery race: two webhook deliveries for
+            # the same aggregator order both passed the .exists() check above
+            # before either committed. The database-level unique constraint on
+            # (outlet, aggregator_order_id) caught what that check-then-act
+            # pattern missed — without this, the caller got a raw 500 instead
+            # of the same clean "already exists" response as the normal path.
+            return JsonResponse({"error": "Order already exists"}, status=400)
+
+    except Exception as e:
+        logger.exception("Failed to ingest order via API")
+        return JsonResponse({"error": "Internal Server Error"}, status=500)
+

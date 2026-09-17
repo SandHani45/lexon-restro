@@ -1,0 +1,193 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Waiter Calls | {{ request.user.tenant.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ── Call cards ── */
+    .call-card {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        padding: 2rem;
+        text-align: center;
+        transition: var(--transition-smooth);
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border-top: 4px solid #ef4444;
+        animation: pulse-shadow 2s infinite;
+    }
+
+    @keyframes pulse-shadow {
+        0%   { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.1); }
+        70%  { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    @keyframes pulse-warning {
+        0%   { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.1); }
+        70%  { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    }
+
+    .call-card:hover { transform: translateY(-3px); }
+
+    .table-name {
+        font-family: 'DM Serif Display', serif;
+        font-size: 2.2rem;
+        color: var(--text-main);
+        margin: 0.5rem 0;
+        line-height: 1;
+    }
+
+    .call-time {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 2rem;
+    }
+
+    .btn-resolve {
+        border: 1px dashed #10b981;
+        background: transparent;
+        color: var(--text-main);
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        font-weight: 600;
+        padding: 0.8rem;
+        border-radius: 4px;
+        transition: var(--transition-smooth);
+        width: 100%;
+        cursor: pointer;
+    }
+    .btn-resolve:hover {
+        background: #10b981;
+        color: #fff;
+        border-style: solid;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 5rem 1rem;
+        color: var(--text-muted);
+    }
+    .empty-state i { font-size: 4rem; margin-bottom: 1rem; opacity: 0.5; display: block; }
+</style>
+{% endblock %}
+
+{% block header_left %}
+<div>
+    <a href="/dashboard/" style="text-decoration:none;color:inherit;">
+        <h1 class="brand-title mb-0">
+            <i class="bi bi-diamond-half" style="color:var(--accent-gold);"></i>
+            {{ request.user.tenant.name }}
+        </h1>
+    </a>
+    <p class="brand-subtitle">Waiter Calls — {{ request.user.outlet.name }}</p>
+</div>
+{% endblock %}
+
+{% block header_right %}
+{% if 'floor_plan' in tenant_features %}
+<a href="/tables/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Floor Plan</a>
+<a href="/billing/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Billing</a>
+{% endif %}
+{% if 'kitchen_display' in tenant_features %}
+<a href="/kitchen/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Kitchen</a>
+{% endif %}
+<a href="/logout/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Logout</a>
+<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme">
+    <i class="bi bi-moon" id="themeIcon"></i>
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mx-auto py-5" style="max-width: 1400px; padding: 2rem;">
+
+    {% if calls or kitchen_messages %}
+    <div class="row g-4">
+        {% for call in calls %}
+        <div class="col-12 col-md-4 col-xl-3">
+            <div class="call-card">
+                <div>
+                    <div class="text-uppercase text-danger fw-bold" style="font-size:0.7rem;letter-spacing:2px;">Service Request</div>
+                    <div class="table-name">Table {{ call.table.name }}</div>
+                    <div class="call-time"><i class="bi bi-clock me-1"></i> {{ call.created_at|time:"H:i" }}</div>
+                </div>
+                <button class="btn-resolve" onclick="resolveCall('{{ call.id }}')">
+                    <i class="bi bi-check2-circle fs-5 d-block mb-1"></i> Mark Resolved
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% for msg in kitchen_messages %}
+        <div class="col-12 col-md-4 col-xl-3">
+            <div class="call-card" style="border-top-color:#f59e0b;animation:pulse-warning 2s infinite;">
+                <div>
+                    <div class="text-uppercase text-warning fw-bold" style="font-size:0.7rem;letter-spacing:2px;">Kitchen Message</div>
+                    <div class="table-name" style="font-size:1.8rem;">Table {{ msg.order.table.name|default:"Walk-in" }}</div>
+                    <div class="mb-2 fw-semibold text-danger">{{ msg.message }}</div>
+                    <div class="call-time"><i class="bi bi-clock me-1"></i> {{ msg.created_at|time:"H:i" }}</div>
+                </div>
+                <button class="btn-resolve" style="color:#f59e0b;border-color:#f59e0b;"
+                    onmouseover="this.style.backgroundColor='#f59e0b';this.style.color='#fff';"
+                    onmouseout="this.style.backgroundColor='transparent';this.style.color='#f59e0b';"
+                    onclick="resolveKitchenMsg('{{ msg.id }}')">
+                    <i class="bi bi-check2-circle fs-5 d-block mb-1"></i> Acknowledge
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-cup-hot"></i>
+        <h3 style="font-family:'DM Serif Display',serif;">Everything is Calm</h3>
+        <p class="text-uppercase" style="letter-spacing:2px;font-size:0.8rem;">No active waiter calls right now.</p>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    async function resolveCall(callId) {
+        try {
+            const url = "{% url 'resolve-waiter' 0 %}".replace('0', callId);
+            const data = await apiClient.post(url, {});
+            if (data.success) location.reload();
+        } catch (e) { /* apiClient showed error toast */ }
+    }
+
+    async function resolveKitchenMsg(msgId) {
+        try {
+            const url = "{% url 'resolve-kitchen-message' 0 %}".replace('0', msgId);
+            const data = await apiClient.post(url, {});
+            if (data.success) location.reload();
+        } catch (e) { /* apiClient showed error toast */ }
+    }
+
+    // Smart live-reload: diff-check every 10s, only reload if content changed
+    setInterval(function () {
+        fetch(window.location.href)
+            .then(r => r.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newGrid = doc.querySelector('.row.g-4') || doc.querySelector('.empty-state');
+                const currentGrid = document.querySelector('.row.g-4') || document.querySelector('.empty-state');
+                if (newGrid && newGrid.innerHTML !== currentGrid?.innerHTML) {
+                    location.reload();
+                }
+            });
+    }, 10000);
+</script>
+{% endblock %}

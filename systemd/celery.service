@@ -1,0 +1,24 @@
+[Unit]
+Description=Lexnorax POS — Celery Worker
+After=network.target redis.service
+
+# -B embeds the beat scheduler in this same worker process rather than a
+# second systemd service. Normally risky (double-scheduling if you run
+# multiple worker replicas) -- safe here because production is a single
+# worker process on one small EC2 instance. Revisit if that ever changes.
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/lexnorax
+EnvironmentFile=/home/ubuntu/lexnorax/.env
+ExecStart=/home/ubuntu/lexnorax/.venv/bin/celery \
+    -A core worker -B \
+    --queues=default,printing \
+    --concurrency=2 \
+    --loglevel=warning \
+    --logfile=/home/ubuntu/lexnorax/logs/celery.log
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

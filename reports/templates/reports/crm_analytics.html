@@ -1,0 +1,149 @@
+{% extends 'core/base.html' %}
+{% block title %}CRM Analytics | {{ request.user.tenant.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .report-subnav {
+    background: var(--panel-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 1.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.75rem; flex-wrap: wrap;
+  }
+  .report-subnav-left  { display: flex; align-items: center; gap: 0; }
+  .report-subnav-right { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; padding: 0.5rem 0; }
+  .report-tab {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--text-muted); text-decoration: none; padding: 0.9rem 1rem;
+    border-bottom: 2px solid transparent; white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s; display: inline-block;
+  }
+  .report-tab:hover   { color: var(--text-main); }
+  .report-tab.active  { color: var(--accent-gold); border-bottom-color: var(--accent-gold); font-weight: 600; }
+  .subnav-select {
+    background: transparent; border: none; border-bottom: 1px solid var(--border-color);
+    color: var(--text-main); font-size: 0.82rem; font-family: inherit;
+    padding: 0.3rem 1.2rem 0.3rem 0; cursor: pointer; outline: none;
+  }
+  .subnav-select:focus { border-color: var(--accent-gold); }
+
+  .page-wrap { max-width: 900px; margin: 0 auto; padding: 2.5rem 2rem; }
+  .section-title {
+    font-size: 1.2rem; color: var(--text-main); margin-bottom: 0.5rem;
+    text-transform: uppercase; letter-spacing: 3px; text-align: center;
+  }
+  .section-sub { text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-bottom: 2rem; }
+
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap: 0.75rem; margin-bottom: 2rem; }
+  .stat-card { padding: 0.9rem; border-left: 3px solid var(--accent-gold); background: var(--panel-bg); }
+  .stat-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); }
+  .stat-value { font-family: 'DM Serif Display', serif; font-size: 1.4rem; margin-top: 0.2rem; }
+
+  .trend-table { width: 100%; border-collapse: collapse; margin-bottom: 2rem; }
+  .trend-table th {
+    font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted);
+    font-weight: 600; padding: 0.75rem 0.5rem; border-bottom: 1px solid var(--border-color); text-align: left;
+  }
+  .trend-table td { padding: 0.7rem 0.5rem; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; }
+  .trend-table td.num { text-align: right; font-family: 'Space Mono', monospace; }
+  .earn-badge { color: #10b981; } .redeem-badge { color: #ef4444; } .adjust-badge { color: var(--text-muted); }
+  .schema-note { font-size: 0.72rem; color: var(--text-muted); padding: 0.75rem 1rem; border-left: 2px solid var(--border-color); margin-bottom: 1.5rem; }
+</style>
+{% endblock %}
+
+{% block header_left %}
+<a href="/dashboard/" class="brand-title">
+  <i class="bi bi-diamond-half"></i>
+  <span>{{ request.user.tenant.name }}</span>
+</a>
+<p class="brand-subtitle"><i class="bi bi-geo-alt me-1"></i>{{ request.user.outlet.name }}</p>
+{% endblock %}
+
+{% block header_right %}
+<a href="/dashboard/" class="btn-icon" title="Back to POS"><i class="bi bi-arrow-left"></i></a>
+<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme"><i class="bi bi-moon" id="themeIcon"></i></button>
+<a href="/logout/" class="btn-icon" title="Logout"><i class="bi bi-box-arrow-right"></i></a>
+{% endblock %}
+
+{% block content %}
+<nav class="report-subnav">
+  <div class="report-subnav-left">
+    {% include "reports/_report_tabs.html" %}
+  </div>
+  <div class="report-subnav-right">
+    <a href="/setup/report-subscriptions/" class="report-tab" title="Daily digest email settings" style="padding:0.5rem 0.6rem;"><i class="bi bi-envelope"></i></a>
+    <form id="filterForm" method="GET" class="d-flex align-items-center gap-2 flex-wrap m-0">
+      {% if request.user.role == "owner" and outlets|length > 1 %}
+      <select name="outlet" class="subnav-select" onchange="document.getElementById('filterForm').submit()">
+        <option value="">All Branches</option>
+        {% for o in outlets %}
+        <option value="{{ o.id }}" {% if current_outlet and current_outlet.id == o.id %}selected{% endif %}>{{ o.name }}</option>
+        {% endfor %}
+      </select>
+      {% endif %}
+      <select name="date_filter" class="subnav-select" onchange="document.getElementById('filterForm').submit()">
+        <option value="today"     {% if date_filter == 'today'     %}selected{% endif %}>Today</option>
+        <option value="yesterday" {% if date_filter == 'yesterday' %}selected{% endif %}>Yesterday</option>
+        <option value="weekly"    {% if date_filter == 'weekly'    %}selected{% endif %}>Last 7 Days</option>
+        <option value="monthly"   {% if date_filter == 'monthly'   %}selected{% endif %}>Last 30 Days</option>
+      </select>
+    </form>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <h1 class="section-title">CRM Analytics</h1>
+  <p class="section-sub">Repeat customers, loyalty activity, feedback — {{ start_date }} to {{ end_date }}</p>
+
+  <div class="schema-note">
+    <i class="bi bi-info-circle me-1"></i>
+    Repeat rate and loyalty trend are tenant-wide (the loyalty program isn't tracked per outlet). Only feedback below is filtered to the selected branch.
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-label">Repeat Customer Rate</div>
+      <div class="stat-value">{{ report.repeat_rate_pct }}%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Active Guests</div>
+      <div class="stat-value">{{ report.active_guests }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Average Rating</div>
+      <div class="stat-value">{% if report.avg_rating %}{{ report.avg_rating }}★{% else %}—{% endif %}</div>
+    </div>
+  </div>
+
+  <table class="trend-table">
+    <thead><tr><th>Date</th><th>Type</th><th class="num">Points</th><th class="num">Count</th></tr></thead>
+    <tbody>
+      {% for row in report.loyalty_trend %}
+      <tr>
+        <td>{{ row.day|date:"d M" }}</td>
+        <td class="{{ row.transaction_type }}-badge">{{ row.transaction_type|capfirst }}</td>
+        <td class="num">{{ row.points }}</td>
+        <td class="num">{{ row.count }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:2rem 0;">No loyalty activity in this period.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <table class="trend-table">
+    <thead><tr><th>Date</th><th class="num">Avg Rating</th><th class="num">Count</th></tr></thead>
+    <tbody>
+      {% for row in report.feedback_trend %}
+      <tr>
+        <td>{{ row.day|date:"d M" }}</td>
+        <td class="num">{{ row.avg_rating|floatformat:2 }}★</td>
+        <td class="num">{{ row.count }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="3" style="text-align:center;color:var(--text-muted);padding:2rem 0;">No feedback in this period.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

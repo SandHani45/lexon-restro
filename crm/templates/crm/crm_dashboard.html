@@ -1,0 +1,89 @@
+{% extends 'core/base.html' %}
+
+{% block title %}CRM — Guest Loyalty | {{ request.user.tenant.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    ::placeholder { color: var(--text-muted) !important; opacity: 0.7 !important; }
+    .dashboard-card { background: var(--panel-bg); border: 1px solid var(--border-color); }
+    .section-title { font-family: 'DM Serif Display', serif; font-size: 1rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 1.5rem; }
+    .search-bar { background: transparent; border: none; border-bottom: 1px solid var(--border-color); color: var(--text-main); border-radius: 0; padding: 0.6rem 0; font-size: 0.9rem; outline: none; width: 100%; max-width: 280px; }
+    .search-bar:focus { border-color: var(--accent-gold); }
+    .guest-table { width: 100%; border-collapse: collapse; }
+    .guest-table th { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); padding: 0.8rem 1rem; border-bottom: 1px solid var(--border-color); text-align: left; }
+    .guest-table td { padding: 0.9rem 1rem; border-bottom: 1px dashed var(--border-color); font-size: 0.9rem; vertical-align: middle; }
+    .guest-table tr:hover td { background: rgba(197,160,89,0.04); }
+    .pts-badge { background: rgba(197,160,89,0.12); color: var(--accent-gold); font-size: 0.72rem; font-weight: 600; letter-spacing: 1px; padding: 3px 8px; border-radius: 3px; }
+    .stat-box { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 1.5rem; text-align: center; }
+    .stat-val { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--accent-gold); }
+    .stat-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-top: 0.3rem; }
+</style>
+{% endblock %}
+
+{% block header_left %}
+<div>
+    <a href="/dashboard/" class="brand-title">
+        <i class="bi bi-people" style="color:var(--accent-gold);"></i>
+        <span>{{ request.user.tenant.name }}</span>
+    </a>
+    <p class="brand-subtitle">{{ request.user.outlet.name }} · Guest Relations</p>
+</div>
+{% endblock %}
+
+{% block header_right %}
+<form method="GET" class="m-0">
+    <input type="search" name="q" value="{{ query }}" placeholder="Search guests…" class="search-bar" onchange="this.form.submit()">
+</form>
+<a href="/dashboard/" class="btn-luxury d-none d-sm-inline-flex">Dashboard</a>
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mx-auto" style="max-width:1200px; padding:1.5rem;">
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="stat-box">
+                <div class="stat-val">{{ guests|length }}</div>
+                <div class="stat-label">Total Guests</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-box">
+                <div class="stat-val">{{ guests|length }}</div>
+                <div class="stat-label">Registered</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-card p-0 mb-5">
+        <div class="table-responsive">
+            <table class="guest-table">
+                <thead>
+                    <tr>
+                        <th>Name</th><th>Phone</th><th>Visits</th><th>Total Spent</th>
+                        <th>Points</th><th>Joined</th><th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for g in guests %}
+                    <tr>
+                        <td><strong>{{ g.name|default:"—" }}</strong></td>
+                        <td>{{ g.phone }}</td>
+                        <td>{{ g.visit_count }}</td>
+                        <td>₹{{ g.total_spent|floatformat:0 }}</td>
+                        <td><span class="pts-badge">{{ g.total_points }} pts</span></td>
+                        <td style="color:var(--text-muted); font-size:0.8rem;">{{ g.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <a href="/crm/guest/{{ g.id }}/" class="btn-luxury" style="padding:0.35rem 0.8rem; font-size:0.65rem;">View</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" style="text-align:center; padding:3rem; color:var(--text-muted);">No guests yet. Link a guest during checkout to get started.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

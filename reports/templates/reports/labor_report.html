@@ -1,0 +1,147 @@
+{% extends 'core/base.html' %}
+{% block title %}Labor Cost | {{ request.user.tenant.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .report-subnav {
+    background: var(--panel-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 1.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.75rem; flex-wrap: wrap;
+  }
+  .report-subnav-left  { display: flex; align-items: center; gap: 0; }
+  .report-subnav-right { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; padding: 0.5rem 0; }
+  .report-tab {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--text-muted); text-decoration: none; padding: 0.9rem 1rem;
+    border-bottom: 2px solid transparent; white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s; display: inline-block;
+  }
+  .report-tab:hover   { color: var(--text-main); }
+  .report-tab.active  { color: var(--accent-gold); border-bottom-color: var(--accent-gold); font-weight: 600; }
+  .subnav-select {
+    background: transparent; border: none; border-bottom: 1px solid var(--border-color);
+    color: var(--text-main); font-size: 0.82rem; font-family: inherit;
+    padding: 0.3rem 1.2rem 0.3rem 0; cursor: pointer; outline: none;
+  }
+  .subnav-select:focus { border-color: var(--accent-gold); }
+
+  .page-wrap { max-width: 1000px; margin: 0 auto; padding: 2.5rem 2rem; }
+  .section-title {
+    font-size: 1.2rem; color: var(--text-main); margin-bottom: 0.5rem;
+    text-transform: uppercase; letter-spacing: 3px; text-align: center;
+  }
+  .section-sub { text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-bottom: 2rem; }
+
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap: 0.75rem; margin-bottom: 2rem; }
+  .stat-card { padding: 0.9rem; border-left: 3px solid var(--accent-gold); background: var(--panel-bg); }
+  .stat-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); }
+  .stat-value { font-family: 'DM Serif Display', serif; font-size: 1.4rem; margin-top: 0.2rem; }
+
+  .labor-table { width: 100%; border-collapse: collapse; }
+  .labor-table th {
+    font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted);
+    font-weight: 600; padding: 0.75rem 0.5rem; border-bottom: 1px solid var(--border-color); text-align: left;
+  }
+  .labor-table td { padding: 0.9rem 0.5rem; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; }
+  .labor-table td.num { text-align: right; font-family: 'Space Mono', monospace; }
+  .pay-type-badge {
+    font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1px;
+    padding: 3px 9px; border-radius: 20px; font-weight: 600;
+    background: var(--border-color); color: var(--text-muted);
+  }
+</style>
+{% endblock %}
+
+{% block header_left %}
+<a href="/dashboard/" class="brand-title">
+  <i class="bi bi-diamond-half"></i>
+  <span>{{ request.user.tenant.name }}</span>
+</a>
+<p class="brand-subtitle"><i class="bi bi-geo-alt me-1"></i>{{ request.user.outlet.name }}</p>
+{% endblock %}
+
+{% block header_right %}
+<a href="/dashboard/" class="btn-icon" title="Back to POS"><i class="bi bi-arrow-left"></i></a>
+<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme"><i class="bi bi-moon" id="themeIcon"></i></button>
+<a href="/logout/" class="btn-icon" title="Logout"><i class="bi bi-box-arrow-right"></i></a>
+{% endblock %}
+
+{% block content %}
+<nav class="report-subnav">
+  <div class="report-subnav-left">
+    {% include "reports/_report_tabs.html" %}
+  </div>
+  <div class="report-subnav-right">
+    <a href="/setup/report-subscriptions/" class="report-tab" title="Daily digest email settings" style="padding:0.5rem 0.6rem;"><i class="bi bi-envelope"></i></a>
+    <form id="filterForm" method="GET" class="d-flex align-items-center gap-2 flex-wrap m-0">
+      {% if request.user.role == "owner" and outlets|length > 1 %}
+      <select name="outlet" class="subnav-select" onchange="document.getElementById('filterForm').submit()">
+        <option value="">All Branches</option>
+        {% for o in outlets %}
+        <option value="{{ o.id }}" {% if current_outlet and current_outlet.id == o.id %}selected{% endif %}>{{ o.name }}</option>
+        {% endfor %}
+      </select>
+      {% endif %}
+      <select name="date_filter" class="subnav-select" onchange="document.getElementById('filterForm').submit()">
+        <option value="today"     {% if date_filter == 'today'     %}selected{% endif %}>Today</option>
+        <option value="yesterday" {% if date_filter == 'yesterday' %}selected{% endif %}>Yesterday</option>
+        <option value="weekly"    {% if date_filter == 'weekly'    %}selected{% endif %}>Last 7 Days</option>
+        <option value="monthly"   {% if date_filter == 'monthly'   %}selected{% endif %}>Last 30 Days</option>
+      </select>
+    </form>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <h1 class="section-title">Labor Cost</h1>
+  <p class="section-sub">Staff cost vs. revenue — {{ start_date }} to {{ end_date }}</p>
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-label">Total Labor Cost</div>
+      <div class="stat-value">₹{{ report.total_labor_cost|floatformat:0 }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Labor Cost %</div>
+      <div class="stat-value">{{ report.labor_cost_pct }}%</div>
+    </div>
+    {% if report.staff_with_unknown_cost %}
+    <div class="stat-card" style="border-left-color:var(--text-muted);">
+      <div class="stat-label">Staff Missing Pay Rate</div>
+      <div class="stat-value" style="color:var(--text-muted);">{{ report.staff_with_unknown_cost }}</div>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if report.staff_with_unknown_cost %}
+  <div style="font-size:0.78rem;color:var(--text-muted);padding:0.75rem 1rem;border-left:2px solid var(--border-color);margin-bottom:1.5rem;">
+    <i class="bi bi-info-circle me-1"></i>
+    {{ report.staff_with_unknown_cost }} staff member{{ report.staff_with_unknown_cost|pluralize }} clocked a shift this period with no pay rate on file, so their cost is excluded from the total above.
+    Set it from <a href="/setup/staff/" style="color:var(--accent-gold);">Setup → Staff</a> (Edit Pay Rate).
+  </div>
+  {% endif %}
+
+  <table class="labor-table">
+    <thead>
+      <tr>
+        <th>Staff</th><th>Pay Type</th><th class="num">Hours</th><th class="num">Tips</th><th class="num">Cost</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in report.rows %}
+      <tr>
+        <td>{{ row.username }}</td>
+        <td>{% if row.pay_type %}<span class="pay-type-badge">{{ row.pay_type }}</span>{% else %}<span style="color:var(--text-muted);font-size:0.78rem;">not set</span>{% endif %}</td>
+        <td class="num">{{ row.hours }}</td>
+        <td class="num">₹{{ row.tips|floatformat:0 }}</td>
+        <td class="num">{% if row.cost_known %}₹{{ row.cost|floatformat:0 }}{% else %}<span style="color:var(--text-muted);">unknown</span>{% endif %}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:3rem 0;">No shifts clocked in this period.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

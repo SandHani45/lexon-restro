@@ -1,0 +1,494 @@
+{% extends 'core/base.html' %}
+{% block title %}Inventory Reports | {{ request.user.tenant.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ── Report sub-nav ────────────────────────────── */
+    .report-subnav {
+      background: var(--panel-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 0.75rem; flex-wrap: wrap;
+    }
+    .report-subnav-left  { display: flex; align-items: center; gap: 0; }
+    .report-subnav-right { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; padding: 0.5rem 0; }
+    .report-tab {
+      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--text-muted); text-decoration: none; padding: 0.9rem 1rem;
+      border-bottom: 2px solid transparent; white-space: nowrap;
+      transition: color 0.2s, border-color 0.2s; display: inline-block;
+    }
+    .report-tab:hover  { color: var(--text-main); }
+    .report-tab.active { color: var(--accent-gold); border-bottom-color: var(--accent-gold); font-weight: 600; }
+    .subnav-select {
+      background: transparent; border: 1px solid var(--border-color);
+      color: var(--text-main); border-radius: 6px;
+      padding: 0.3rem 0.6rem; font-size: 0.8rem; font-family: inherit;
+    }
+    .subnav-select:focus { border-color: var(--accent-gold); outline: none; }
+    .subnav-btn {
+      background: none; border: 1px solid var(--border-color);
+      color: var(--text-muted); border-radius: 6px;
+      padding: 0.3rem 0.75rem; font-size: 0.8rem;
+      cursor: pointer; font-family: inherit;
+      transition: var(--transition-smooth);
+    }
+    .subnav-btn:hover, .subnav-btn.gold { border-color: var(--accent-gold); color: var(--accent-gold); }
+    .subnav-sep { width: 1px; height: 20px; background: var(--border-color); margin: 0 0.25rem; }
+
+    /* ── Panels ─────────────────────────────────────── */
+    .main-content { padding: 1.5rem; }
+    .panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .panel-header {
+      padding: 0.9rem 1.2rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .panel-title {
+      font-size: 0.75rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+    .panel-body { padding: 1rem; }
+
+    /* ── Stat cards ─────────────────────────────────── */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .stat-card {
+      background: var(--panel-bg); border: 1px solid var(--border-color);
+      border-radius: 10px; padding: 1rem 1.2rem;
+    }
+    .stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 0.25rem; }
+    .stat-value { font-size: 1.4rem; font-weight: 700; color: var(--text-main); }
+    .stat-unit { font-size: 0.75rem; color: var(--text-muted); }
+
+    /* ── Table ──────────────────────────────────────── */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .data-table th {
+      padding: 0.6rem 0.8rem; text-align: left;
+      font-size: 0.7rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--text-muted); border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+    .data-table td {
+      padding: 0.65rem 0.8rem;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(197,160,89,0.04); }
+    .mono { font-family: 'Space Mono', monospace; }
+    .text-gold { color: var(--accent-gold); }
+    .badge-type {
+      display: inline-block; padding: 0.15rem 0.5rem;
+      border-radius: 4px; font-size: 0.7rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .badge-consume  { background: rgba(34,197,94,0.12);  color: #16a34a; }
+    .badge-restock  { background: rgba(59,130,246,0.12); color: #2563eb; }
+    .badge-wastage  { background: rgba(239,68,68,0.12);  color: #dc2626; }
+    .badge-adjustment { background: rgba(234,179,8,0.12); color: #ca8a04; }
+    .empty-state { text-align: center; padding: 2.5rem; color: var(--text-muted); font-size: 0.9rem; }
+
+    /* ── Section tabs ───────────────────────────────── */
+    .section-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border-color); margin-bottom: 0; }
+    .section-tab {
+      padding: 0.7rem 1.1rem; font-size: 0.8rem; font-weight: 500;
+      cursor: pointer; border: none; background: none;
+      color: var(--text-muted); border-bottom: 2px solid transparent;
+      transition: var(--transition-smooth);
+    }
+    .section-tab.active { color: var(--accent-gold); border-bottom-color: var(--accent-gold); }
+
+    @media print {
+      .pos-header, .report-subnav, .section-tabs, .subnav-btn { display: none !important; }
+      body { background: #fff !important; color: #000 !important; }
+      .panel { border: none !important; }
+      #tab-closing { display: block !important; }
+      .data-table th, .data-table td { color: #000 !important; border-color: #ccc !important; }
+      #tab-ledger, #tab-usage, #tab-wastage, #tab-cost, #tab-canmake { display: none !important; }
+      .stat-grid { display: none !important; }
+    }
+
+    @media (max-width: 768px) {
+      .main-content { padding: 1rem; }
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+      .subnav-hide-sm { display: none !important; }
+    }
+</style>
+{% endblock %}
+
+{% block header_left %}
+<a href="/dashboard/" class="brand-title">
+  <i class="bi bi-diamond-half"></i>
+  <span>{{ request.user.tenant.name }}</span>
+</a>
+<p class="brand-subtitle"><i class="bi bi-geo-alt me-1"></i>{{ request.user.outlet.name }}</p>
+{% endblock %}
+
+{% block header_right %}
+<a href="/dashboard/" class="btn-icon" title="Back to POS"><i class="bi bi-arrow-left"></i></a>
+<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme"><i class="bi bi-moon" id="themeIcon"></i></button>
+<a href="/logout/" class="btn-icon" title="Logout"><i class="bi bi-box-arrow-right"></i></a>
+{% endblock %}
+
+{% block content %}
+
+<!-- Sub-nav with report tabs and filters -->
+<nav class="report-subnav">
+  <div class="report-subnav-left">
+    {% include "reports/_report_tabs.html" %}
+  </div>
+
+  <div class="report-subnav-right">
+    <a href="/setup/report-subscriptions/" class="report-tab" title="Daily digest email settings" style="padding:0.5rem 0.6rem;"><i class="bi bi-envelope"></i></a>
+    <form id="filterForm" method="GET" class="d-flex align-items-center gap-2 flex-wrap m-0">
+
+      {% if outlets|length > 1 %}
+      <select name="outlet" class="subnav-select subnav-hide-sm" onchange="document.getElementById('filterForm').submit()">
+        {% for o in outlets %}
+        <option value="{{ o.id }}" {% if current_outlet and current_outlet.id == o.id %}selected{% endif %}>{{ o.name }}</option>
+        {% endfor %}
+      </select>
+      <div class="subnav-sep subnav-hide-sm"></div>
+      {% endif %}
+
+      <select name="date_filter" class="subnav-select" onchange="
+        var val=this.value;
+        document.getElementById('customRange').style.display=(val==='custom'?'flex':'none');
+        if(val!=='custom') document.getElementById('filterForm').submit();
+      ">
+        <option value="today"     {% if date_filter == 'today'     %}selected{% endif %}>Today</option>
+        <option value="yesterday" {% if date_filter == 'yesterday' %}selected{% endif %}>Yesterday</option>
+        <option value="weekly"    {% if date_filter == 'weekly'    %}selected{% endif %}>Last 7 Days</option>
+        <option value="monthly"   {% if date_filter == 'monthly'   %}selected{% endif %}>Last 30 Days</option>
+        <option value="custom"    {% if date_filter == 'custom'    %}selected{% endif %}>Custom</option>
+      </select>
+
+      <div id="customRange" class="d-flex gap-1 align-items-center" style="display:{% if date_filter == 'custom' %}flex{% else %}none{% endif %} !important;">
+        <input type="date" name="start_date" class="subnav-select" value="{{ start_date|date:'Y-m-d' }}" style="width:130px;">
+        <input type="date" name="end_date"   class="subnav-select" value="{{ end_date|date:'Y-m-d' }}"   style="width:130px;">
+        <button type="submit" class="subnav-btn gold"><i class="bi bi-check2"></i></button>
+      </div>
+
+      <!-- Item filter -->
+      <div class="subnav-sep"></div>
+      <select name="item" class="subnav-select subnav-hide-sm" onchange="document.getElementById('filterForm').submit()">
+        <option value="">All Items</option>
+        {% for i in items %}
+        <option value="{{ i.id }}" {% if selected_item == i.id|stringformat:"s" %}selected{% endif %}>{{ i.name }}</option>
+        {% endfor %}
+      </select>
+
+    </form>
+  </div>
+</nav>
+
+<!-- Main content -->
+<div class="main-content">
+
+  <!-- Summary cards -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Items Consumed</div>
+      <div class="stat-value">{{ usage|length }}</div>
+      <div class="stat-unit">unique ingredients</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Consumption Cost</div>
+      <div class="stat-value mono">₹{{ total_cost|floatformat:2 }}</div>
+      <div class="stat-unit">at cost price</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Wastage Items</div>
+      <div class="stat-value text-danger">{{ wastage|length }}</div>
+      <div class="stat-unit">unique ingredients</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Ledger Entries</div>
+      <div class="stat-value">{{ ledger|length }}</div>
+      <div class="stat-unit">transactions shown</div>
+    </div>
+  </div>
+
+  <!-- Section tabs + panels -->
+  <div class="panel">
+    <div class="section-tabs" id="sectionTabs">
+      <button class="section-tab active" onclick="showTab('ledger',this)">Stock Ledger</button>
+      <button class="section-tab"        onclick="showTab('usage',this)">Consumption</button>
+      <button class="section-tab"        onclick="showTab('wastage',this)">Wastage</button>
+      <button class="section-tab"        onclick="showTab('cost',this)">Cost Analysis</button>
+      <button class="section-tab"        onclick="showTab('canmake',this)">Can Make</button>
+      <button class="section-tab"        onclick="showTab('closing',this)">Closing Stock</button>
+    </div>
+
+    <!-- Stock Ledger -->
+    <div id="tab-ledger">
+      {% if ledger %}
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date &amp; Time</th>
+              <th>Item</th>
+              <th>Type</th>
+              <th class="text-end">Qty</th>
+              <th>Reference</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for txn in ledger %}
+            <tr>
+              <td class="mono" style="font-size:0.8rem;">{{ txn.created_at|date:"d M Y H:i" }}</td>
+              <td>{{ txn.item.name }}</td>
+              <td>
+                <span class="badge-type badge-{{ txn.transaction_type }}">
+                  {{ txn.get_transaction_type_display }}
+                </span>
+              </td>
+              <td class="text-end mono">
+                {% if txn.transaction_type == "restock" %}+{% elif txn.transaction_type == "adjustment" %}±{% else %}-{% endif %}{{ txn.quantity|floatformat:3 }}
+                <span style="font-size:0.75rem; color:var(--text-muted);">{{ txn.item.unit }}</span>
+              </td>
+              <td style="color:var(--text-muted); font-size:0.8rem;">{{ txn.reference|default:"—" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty-state"><i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>No transactions for this period.</div>
+      {% endif %}
+    </div>
+
+    <!-- Consumption -->
+    <div id="tab-usage" style="display:none;">
+      {% if usage %}
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th class="text-end">Total Consumed</th>
+              <th class="text-end">Unit</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in usage %}
+            <tr>
+              <td>{{ row.item__name }}</td>
+              <td class="text-end mono">{{ row.total_qty|floatformat:3 }} <span style="font-size:0.75rem;color:var(--text-muted);">{{ row.item__unit }}</span></td>
+              <td class="text-end" style="color:var(--text-muted);font-size:0.82rem;">{{ row.item__unit }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty-state"><i class="bi bi-graph-down" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>No consumption data for this period.</div>
+      {% endif %}
+    </div>
+
+    <!-- Wastage -->
+    <div id="tab-wastage" style="display:none;">
+      {% if wastage %}
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th class="text-end">Qty Wasted</th>
+              <th class="text-end">Unit</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in wastage %}
+            <tr>
+              <td>{{ row.item__name }}</td>
+              <td class="text-end mono text-danger">{{ row.total_qty|floatformat:3 }}</td>
+              <td class="text-end" style="color:var(--text-muted);">{{ row.item__unit }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty-state"><i class="bi bi-check2-circle" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>No wastage recorded for this period.</div>
+      {% endif %}
+    </div>
+
+    <!-- Cost Analysis -->
+    <div id="tab-cost" style="display:none;">
+      {% if costs %}
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th class="text-end">Qty Consumed</th>
+              <th class="text-end">Cost / Unit</th>
+              <th class="text-end">Total Cost</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in costs %}
+            <tr>
+              <td>{{ row.item__name }}</td>
+              <td class="text-end mono">{{ row.total_qty|floatformat:3 }} <span style="font-size:0.75rem;color:var(--text-muted);">{{ row.item__unit }}</span></td>
+              <td class="text-end mono">₹{{ row.item__cost_price|floatformat:2 }}</td>
+              <td class="text-end mono text-gold">₹{{ row.total_cost|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr style="border-top:2px solid var(--border-color);">
+              <td colspan="3" style="text-align:right; padding:0.7rem 0.8rem; font-weight:600; color:var(--text-muted); font-size:0.8rem; text-transform:uppercase;">Total Consumption Cost</td>
+              <td class="text-end mono text-gold" style="font-weight:700; font-size:1rem; padding:0.7rem 0.8rem;">₹{{ total_cost|floatformat:2 }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty-state"><i class="bi bi-currency-rupee" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>No cost data available. Set cost prices on inventory items first.</div>
+      {% endif %}
+    </div>
+    <!-- Can Make -->
+    <div id="tab-canmake" style="display:none;">
+      {% if capacity %}
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Menu Item</th>
+              <th>Category</th>
+              <th class="text-end">Can Make</th>
+              <th>Limiting Ingredient</th>
+              <th class="text-end">Stock Left</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in capacity %}
+            <tr>
+              <td style="font-weight:500;">{{ row.menu_item }}</td>
+              <td style="color:var(--text-muted);font-size:0.82rem;">{{ row.category }}</td>
+              <td class="text-end">
+                {% if row.max_portions == 0 %}
+                  <span style="color:#dc2626;font-weight:700;font-size:1rem;">0</span>
+                  <span style="font-size:0.72rem;color:#dc2626;display:block;">OUT OF STOCK</span>
+                {% elif row.max_portions <= 5 %}
+                  <span style="color:#ca8a04;font-weight:700;font-size:1rem;">{{ row.max_portions }}</span>
+                  <span style="font-size:0.72rem;color:#ca8a04;display:block;">LOW</span>
+                {% else %}
+                  <span style="color:#16a34a;font-weight:700;font-size:1rem;">{{ row.max_portions }}</span>
+                  <span style="font-size:0.72rem;color:var(--text-muted);display:block;">portions</span>
+                {% endif %}
+              </td>
+              <td style="color:var(--text-muted);font-size:0.85rem;">
+                <i class="bi bi-funnel-fill" style="font-size:0.7rem;opacity:0.5;"></i>
+                {{ row.bottleneck }}
+              </td>
+              <td class="text-end mono" style="font-size:0.85rem;">
+                {{ row.bottleneck_stock|floatformat:3 }}
+                <span style="color:var(--text-muted);font-size:0.72rem;">{{ row.bottleneck_unit }}</span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div style="padding:0.75rem 1rem;border-top:1px solid var(--border-color);font-size:0.75rem;color:var(--text-muted);">
+        <i class="bi bi-info-circle"></i>
+        Sorted by lowest portions first. Based on current live stock levels — not date-filtered.
+        <span style="float:right;">{{ capacity|length }} items with recipes</span>
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <i class="bi bi-journal-x" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>
+        No recipes configured. Add recipes to menu items under Inventory → Recipes.
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Closing Stock -->
+    <div id="tab-closing" style="display:none;">
+      {% if closing %}
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1rem;border-bottom:1px solid var(--border-color);">
+        <span style="font-size:0.75rem;color:var(--text-muted);">
+          Snapshot as of <strong style="color:var(--text-main);">now</strong> &mdash; {{ closing|length }} items
+        </span>
+        <button onclick="window.print()" class="subnav-btn gold" style="padding:0.3rem 0.8rem;">
+          <i class="bi bi-printer"></i> Print
+        </button>
+      </div>
+      <div style="overflow-x:auto;" id="closing-stock-body">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Ingredient</th>
+              <th class="text-end">Closing Stock</th>
+              <th class="text-end">Low Stock Threshold</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in closing %}
+            <tr>
+              <td style="font-weight:500;">{{ item.name }}</td>
+              <td class="text-end mono" style="font-size:1rem;font-weight:600;
+                {% if item.stock == 0 %}color:#dc2626;
+                {% elif item.stock <= item.low_stock_threshold %}color:#dc2626;
+                {% else %}color:#16a34a;{% endif %}">
+                {{ item.stock|floatformat:3 }} <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;">{{ item.unit }}</span>
+              </td>
+              <td class="text-end mono" style="color:var(--text-muted);font-size:0.85rem;">
+                {{ item.low_stock_threshold|floatformat:3 }} {{ item.unit }}
+              </td>
+              <td>
+                {% if item.stock == 0 %}
+                  <span class="badge-type badge-wastage">OUT OF STOCK</span>
+                {% elif item.stock <= item.low_stock_threshold %}
+                  <span class="badge-type badge-adjustment">LOW — REORDER</span>
+                {% else %}
+                  <span class="badge-type badge-consume">OK</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div style="padding:0.75rem 1rem;border-top:1px solid var(--border-color);font-size:0.75rem;color:var(--text-muted);">
+        Items in <span style="color:#dc2626;font-weight:600;">red</span> are at or below threshold.
+        Use the Print button to hand this to your store manager at end of day.
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <i class="bi bi-box-seam" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>
+        No inventory items found. Add items under Inventory first.
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+
+</div><!-- /.main-content -->
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showTab(name, btn) {
+  ['ledger','usage','wastage','cost','canmake','closing'].forEach(function(t) {
+    document.getElementById('tab-'+t).style.display = (t===name ? '' : 'none');
+  });
+  document.querySelectorAll('.section-tab').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+}
+</script>
+{% endblock %}

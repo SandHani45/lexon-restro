@@ -1,0 +1,369 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Token Board | {{ request.user.outlet.name }} — {{ request.user.tenant.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        /* Shorthand aliases → luxury theme vars */
+        --bg: var(--bg-color);
+        --panel: var(--panel-bg);
+        --text: var(--text-main);
+        --muted: var(--text-muted);
+        --border: var(--border-color);
+        --gold: var(--accent-gold);
+        --gold-hover: var(--accent-hover);
+        --transition: var(--transition-smooth);
+        /* Page-specific colors */
+        --danger: #ef4444;
+        --success: #22c55e;
+        --warning: #f59e0b;
+        --online: #fc8019;
+        --zomato: #e23744;
+    }
+
+    .dashboard-container { max-width: 1400px; margin: 0 auto; padding: 1.75rem 1.5rem; }
+
+    /* ── Aggregator bar (header) ── */
+    .aggregator-bar { background: var(--panel); border: 1px solid var(--border); padding: 0.25rem; border-radius: 4px; display: flex; align-items: center; }
+    .aggregator-bar span { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin: 0 0.5rem; }
+    .btn-agg { padding: 0.3rem 0.6rem; font-size: 0.7rem; border-radius: 3px; border: none; background: transparent; color: var(--muted); cursor: pointer; transition: var(--transition); }
+
+    /* ── Gold primary button (New Order) ── */
+    .btn-lux-primary { background: var(--gold); border-color: var(--gold); color: #fff; font-size: 0.8rem; padding: 0.65rem 1.4rem; }
+    .btn-lux-primary:hover { background: var(--gold-hover); border-color: var(--gold-hover); color: #fff; }
+    .btn-lux-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── Stats row ── */
+    .stats-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 480px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+    .stat-card { background: var(--panel); border: 1px solid var(--border); padding: 1.25rem; text-align: center; }
+    .stat-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 0.4rem; }
+    .stat-value { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--gold); line-height: 1; }
+    .stat-value.neutral { color: var(--text); }
+    .stat-value.online-color { color: var(--online); }
+
+    /* ── Section header ── */
+    .section-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 1rem; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; }
+    .section-header h2 { font-family: 'DM Serif Display', serif; font-size: 1.3rem; display: flex; align-items: center; gap: 0.5rem; margin: 0; }
+    .section-tag { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; padding: 0.2rem 0.5rem; border-radius: 2px; font-family: 'Outfit', sans-serif; font-weight: 600; }
+    .section-tag.counter { background: rgba(197,160,89,0.12); color: var(--gold); }
+    .section-tag.online-tag { background: rgba(252,128,25,0.12); color: var(--online); }
+
+    /* ── Token grid ── */
+    .token-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 1rem; }
+
+    /* ── Token card ── */
+    .token-wrap { position: relative; }
+    .token-card { background: var(--panel); border: 1px solid var(--border); padding: 1.25rem 1rem; text-align: center; cursor: pointer; text-decoration: none; display: block; color: var(--text); transition: var(--transition); }
+    .token-card:hover { border-color: var(--gold); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); color: var(--text); }
+    .token-card.status-billing { border-left: 3px solid var(--warning); }
+    .token-card.status-open { border-left: 3px solid var(--border); }
+    .token-card.is-online { border-left: 3px solid var(--online); }
+    .token-card.is-online:hover { border-color: var(--online); }
+
+    .token-number { font-family: 'DM Serif Display', serif; font-size: 2.2rem; line-height: 1; margin-bottom: 0.4rem; }
+    .token-amount { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.4rem; }
+    .token-badge { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; padding: 0.15rem 0.5rem; border: 1px solid var(--border); display: inline-block; color: var(--muted); }
+    .token-badge.billing { border-color: var(--warning); color: var(--warning); }
+    .token-badge.paid { border-color: var(--success); color: var(--success); }
+    .token-badge.platform { border: none; padding: 0.2rem 0.5rem; border-radius: 2px; font-weight: 600; }
+    .token-badge.zomato { background: var(--zomato); color: #fff; }
+    .token-badge.swiggy { background: var(--online); color: #fff; }
+    .token-badge.web { background: #6366f1; color: #fff; }
+    .token-time { font-size: 0.68rem; color: var(--muted); margin-top: 0.35rem; }
+
+    /* ── Cancel button (hover reveal) ── */
+    .btn-cancel-token { position: absolute; top: 4px; right: 4px; background: transparent; border: none; color: var(--muted); opacity: 0; font-size: 1rem; line-height: 1; padding: 2px 4px; cursor: pointer; transition: var(--transition); z-index: 10; }
+    .token-wrap:hover .btn-cancel-token { opacity: 0.5; }
+    .btn-cancel-token:hover { color: var(--danger); opacity: 1 !important; }
+
+    /* ── Empty state ── */
+    .empty-state { text-align: center; padding: 3rem 2rem; color: var(--muted); }
+    .empty-state i { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+    .empty-state p { text-transform: uppercase; letter-spacing: 1.5px; font-size: 0.78rem; }
+
+    .online-section { margin-top: 2.5rem; }
+
+    /* ── Auto-refresh progress bar ── */
+    .refresh-bar { height: 2px; background: var(--border); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1000; }
+    .refresh-bar-fill { height: 100%; background: var(--gold); width: 100%; transform-origin: left; animation: countdown 15s linear infinite; }
+    @keyframes countdown { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+</style>
+{% endblock %}
+
+{% block header_left %}
+<div>
+    <a href="/dashboard/" style="text-decoration:none;color:inherit;">
+        <h1 class="brand-title mb-0">
+            <i class="bi bi-diamond-half" style="color:var(--accent-gold);"></i>
+            {{ request.user.tenant.name }}
+        </h1>
+    </a>
+    <p class="brand-subtitle">Tokens — {{ request.user.outlet.name }}</p>
+</div>
+{% endblock %}
+
+{% block header_right %}
+{% if 'platform_sync' in tenant_features %}
+<div class="aggregator-bar d-none d-md-flex me-1">
+    <span>Online:</span>
+    <button id="toggle-zomato" class="btn-agg" style="{% if aggregator.zomato_enabled %}background:#e23744;color:#fff;{% endif %}" onclick="toggleAggregator('zomato', {% if aggregator.zomato_enabled %}false{% else %}true{% endif %})">Zomato</button>
+    <button id="toggle-swiggy" class="btn-agg" style="{% if aggregator.swiggy_enabled %}background:#fc8019;color:#fff;{% endif %}" onclick="toggleAggregator('swiggy', {% if aggregator.swiggy_enabled %}false{% else %}true{% endif %})">Swiggy</button>
+</div>
+{% endif %}
+{% if request.user.role == 'owner' or request.user.role == 'manager' %}
+<a href="/shifts/sessions/" class="btn-luxury text-decoration-none d-inline-flex align-items-center" title="Open / close the cash register & end-of-day">
+    <i class="bi bi-cash-stack"></i><span class="d-none d-sm-inline ms-1">Cash Register</span>
+</a>
+{% endif %}
+{% if 'reports' in tenant_features %}
+<a href="/reports/dashboard/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Reports</a>
+{% endif %}
+<a href="/logout/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Logout</a>
+<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme">
+    <i class="bi bi-moon" id="themeIcon"></i>
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+
+    <!-- Stats row -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-label">Next Token</div>
+            <div class="stat-value">#{{ next_token }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Counter Active</div>
+            <div class="stat-value neutral" id="activeCount">{{ counter_tokens|length }}</div>
+        </div>
+        <div class="stat-card" style="{% if online_count > 0 %}border-color:var(--online);{% endif %}">
+            <div class="stat-label">Online Active</div>
+            <div class="stat-value online-color">{{ online_count }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Completed</div>
+            <div class="stat-value neutral">{{ closed_tokens }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Revenue</div>
+            <div class="stat-value">₹{{ today_revenue|floatformat:0 }}</div>
+        </div>
+        <div class="stat-card" style="{% if cancelled_tokens > 0 %}border-color:var(--danger);{% endif %}">
+            <div class="stat-label">Cancelled</div>
+            <div class="stat-value" style="{% if cancelled_tokens > 0 %}color:var(--danger);{% else %}color:var(--muted);{% endif %}">{{ cancelled_tokens }}</div>
+        </div>
+    </div>
+
+    <!-- Counter Tokens -->
+    <div class="section-header">
+        <h2>Counter Tokens <span class="section-tag counter">Walk-in</span></h2>
+        {% if can_create %}
+        <button onclick="createNewToken()" class="btn-luxury btn-lux-primary" id="newOrderBtn">
+            <i class="bi bi-plus-lg"></i> New Order
+        </button>
+        {% endif %}
+    </div>
+
+    <div class="token-grid" id="tokenGrid">
+        {% for token in counter_tokens %}
+        <div class="token-wrap" id="wrap-{{ token.order.id }}">
+            <a href="{% url 'token-bill' token.order.id %}"
+               class="token-card status-{{ token.order.status }}"
+               id="token-card-{{ token.order.id }}">
+                <div class="token-number" style="color:var(--accent-gold);">{{ token.token_number }}</div>
+                <div class="token-amount">{% if token.order.grand_total %}₹{{ token.order.grand_total|floatformat:0 }}{% else %}—{% endif %}</div>
+                <div class="token-badge {% if token.order.status == 'billing' %}billing{% elif token.order.status == 'closed' %}paid{% endif %}">
+                    {{ token.order.get_status_display }}
+                </div>
+                <div class="token-time">{{ token.order.created_at|date:"g:i A" }}{% if token.order.customer_name %} · {{ token.order.customer_name }}{% endif %}</div>
+            </a>
+            {% if can_create %}
+            <button class="btn-cancel-token" onclick="cancelTokenOrder(event, {{ token.order.id }}, {{ token.token_number }})" title="Cancel #{{ token.token_number }}">
+                <i class="bi bi-x-circle-fill"></i>
+            </button>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="empty-state" style="grid-column:1/-1;" id="emptyState">
+            <i class="bi bi-inbox"></i>
+            <p>No active counter tokens — press New Order to start</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Order Pickup -->
+    {% if pickup_tokens %}
+    <div class="section-header" style="margin-top:2.5rem;">
+        <h2>Order Pickup <span class="section-tag counter" style="background:rgba(34,197,94,0.12);color:var(--success);">Ready Board</span></h2>
+    </div>
+    <div class="token-grid" id="pickupGrid">
+        {% for token in pickup_tokens %}
+        <div class="token-wrap" id="pickup-wrap-{{ token.id }}">
+            <div class="token-card {% if token.is_online %}is-online{% endif %}" style="cursor:default;">
+                <div class="token-number" style="color:{% if token.is_online %}var(--online){% else %}var(--accent-gold){% endif %};">{{ token.display_number }}</div>
+                <div class="token-badge {% if token.ready_at %}paid{% else %}billing{% endif %}">
+                    {% if token.ready_at %}Ready{% else %}Preparing{% endif %}
+                </div>
+                <div class="token-time">{{ token.order.created_at|date:"g:i A" }}</div>
+                {% if token.ready_at %}
+                <button class="btn-luxury btn-lux-primary" style="margin-top:0.75rem;width:100%;" onclick="markCollected({{ token.id }})">Picked Up</button>
+                {% elif 'kitchen_display' in tenant_features %}
+                <!-- Kitchen Display is on for this outlet -- readiness is
+                     decided there (kitchen.services.kitchen_service.set_item_ready
+                     sets TokenOrder.ready_at itself once every item on the
+                     order is ready), not here, so a second manual button
+                     with no clear ownership would just invite double-taps
+                     or staff not knowing which screen is authoritative. -->
+                <div style="margin-top:0.75rem;text-align:center;font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);padding:0.6rem 0;">
+                    <i class="bi bi-hourglass-split me-1"></i>Preparing in kitchen
+                </div>
+                {% else %}
+                <button class="btn-luxury" style="margin-top:0.75rem;width:100%;" onclick="markReady({{ token.id }})">Mark Ready</button>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Online Tokens -->
+    {% if online_tokens or aggregator.zomato_enabled or aggregator.swiggy_enabled %}
+    <div class="online-section">
+        <div class="section-header">
+            <h2>Online Orders <span class="section-tag online-tag">Aggregator</span></h2>
+            <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">
+                Next: O-{{ next_online_token }}
+            </div>
+        </div>
+
+        <div class="token-grid" id="onlineTokenGrid">
+            {% for token in online_tokens %}
+            <div class="token-wrap" id="wrap-{{ token.order.id }}">
+                <a href="{% url 'token-bill' token.order.id %}"
+                   class="token-card is-online status-{{ token.order.status }}"
+                   id="token-card-{{ token.order.id }}">
+                    <div class="token-number" style="color:var(--online);">O-{{ token.token_number }}</div>
+                    <div class="token-amount">{% if token.order.grand_total %}₹{{ token.order.grand_total|floatformat:0 }}{% else %}—{% endif %}</div>
+                    <div class="token-badge platform {% if token.order.source == 'zomato' %}zomato{% elif token.order.source == 'swiggy' %}swiggy{% else %}web{% endif %}">
+                        {{ token.order.get_source_display }}
+                    </div>
+                    <div class="token-time">{{ token.order.created_at|date:"g:i A" }}</div>
+                </a>
+            </div>
+            {% empty %}
+            <div class="empty-state" style="grid-column:1/-1;">
+                <i class="bi bi-wifi-off"></i>
+                <p>No online orders yet today</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+<div class="refresh-bar"><div class="refresh-bar-fill" id="refreshBar"></div></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    async function createNewToken() {
+        const btn = document.getElementById('newOrderBtn');
+        if (!btn) return;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Creating…';
+        try {
+            const data = await apiClient.post('{% url "create-token-order" %}', {});
+            if (data.success) {
+                window.location.href = `/token/${data.order_id}/bill/`;
+            } else {
+                ui.toast(data.error || 'Failed to create order', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-plus-lg"></i> New Order';
+            }
+        } catch (e) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-plus-lg"></i> New Order';
+        }
+    }
+
+    async function cancelTokenOrder(event, orderId, tokenNumber) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!await ui.confirm(`Cancel Token #${tokenNumber}? This cannot be undone.`)) return;
+        const wrap = document.getElementById(`wrap-${orderId}`);
+        if (wrap) wrap.style.opacity = '0.4';
+        try {
+            const data = await apiClient.post(`/cancel-order/${orderId}/`, {});
+            if (data.success) {
+                if (wrap) {
+                    wrap.style.transition = 'opacity 0.3s, transform 0.3s';
+                    wrap.style.opacity = '0';
+                    wrap.style.transform = 'scale(0.9)';
+                    setTimeout(() => { wrap.remove(); updateActiveCount(); }, 300);
+                }
+                ui.toast(`Token #${tokenNumber} cancelled`, 'success');
+            } else {
+                if (wrap) wrap.style.opacity = '1';
+                ui.toast(data.error || 'Cancel failed', 'error');
+            }
+        } catch (e) {
+            if (wrap) wrap.style.opacity = '1';
+        }
+    }
+
+    function updateActiveCount() {
+        const remaining = document.querySelectorAll('#tokenGrid .token-wrap').length;
+        const countEl = document.getElementById('activeCount');
+        if (countEl) countEl.textContent = remaining;
+        if (remaining === 0) {
+            const grid = document.getElementById('tokenGrid');
+            if (grid && !document.getElementById('emptyState')) {
+                grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;" id="emptyState"><i class="bi bi-inbox"></i><p>No active counter tokens — press New Order to start</p></div>`;
+            }
+        }
+    }
+
+    async function toggleAggregator(platform, enable) {
+        try {
+            const data = await apiClient.post('/setup/aggregators/toggle/', { platform, enabled: enable });
+            if (data.success) {
+                ui.toast(`${platform.toUpperCase()} ${enable ? 'ON' : 'OFF'}`, 'success');
+                setTimeout(() => window.location.reload(), 500);
+            }
+        } catch (e) { /* apiClient already showed error toast */ }
+    }
+
+    const READY_URL_TPL = "{% url 'mark-token-ready' 0 %}";
+    const COLLECTED_URL_TPL = "{% url 'mark-token-collected' 0 %}";
+
+    async function markReady(tokenId) {
+        try {
+            const data = await apiClient.post(READY_URL_TPL.replace('0', tokenId), {});
+            if (data.success) window.location.reload();
+        } catch (e) { /* apiClient already showed error toast */ }
+    }
+
+    async function markCollected(tokenId) {
+        try {
+            const data = await apiClient.post(COLLECTED_URL_TPL.replace('0', tokenId), {});
+            if (data.success) window.location.reload();
+        } catch (e) { /* apiClient already showed error toast */ }
+    }
+
+    // Auto-refresh every 15s; any user interaction resets the timer
+    let refreshTimer = setTimeout(() => window.location.reload(), 15000);
+    ['click', 'keydown', 'touchstart'].forEach(evt => {
+        document.addEventListener(evt, () => {
+            clearTimeout(refreshTimer);
+            const bar = document.getElementById('refreshBar');
+            if (bar) { bar.style.animation = 'none'; bar.offsetHeight; bar.style.animation = 'countdown 15s linear infinite'; }
+            refreshTimer = setTimeout(() => window.location.reload(), 15000);
+        }, { passive: true });
+    });
+</script>
+{% endblock %}

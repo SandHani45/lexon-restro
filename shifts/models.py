@@ -1,0 +1,256 @@
+# shifts/models.py
+from django.db import models
+from django.db.models import Q, UniqueConstraint
+from core.models import TenantScopedModel
+from django.utils import timezone
+
+
+class Shift(TenantScopedModel):
+    """
+    Records a staff member's clock-in and clock-out for a given day.
+    Tips can be recorded at clock-out by a manager.
+    """
+
+    tenant = models.ForeignKey("tenants.Tenant", on_delete=models.CASCADE)
+    outlet = models.ForeignKey("tenants.Outlet", on_delete=models.CASCADE)
+
+    staff = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.CASCADE,
+        related_name="shifts"
+    )
+
+    clocked_in_at = models.DateTimeField(default=timezone.now)
+    clocked_out_at = models.DateTimeField(null=True, blank=True)
+
+    tips = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    notes = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["tenant", "outlet", "staff"]),
+            models.Index(fields=["clocked_in_at"]),
+        ]
+        ordering = ["-clocked_in_at"]
+
+    @property
+    def is_active(self):
+        return self.clocked_out_at is None
+
+    @property
+    def duration_hours(self):
+        if not self.clocked_out_at:
+            return None
+        delta = self.clocked_out_at - self.clocked_in_at
+        return round(delta.total_seconds() / 3600, 2)
+
+    @property
+    def overtime_hours(self):
+        """
+        Calculates overtime hours based on the assigned schedule.
+        If no schedule exists, uses a default 9-hour limit.
+        """
+        if not self.clocked_out_at:
+            return 0
+            
+        # Try to find the schedule for this staff on this day
+        schedule = StaffSchedule.objects.filter(
+            staff=self.staff,
+            date=self.clocked_in_at.date(),
+            is_active=True
+        ).first()
+        
+        actual_hours = self.duration_hours
+        
+        if schedule:
+            scheduled_hours = schedule.duration_hours
+            if actual_hours > scheduled_hours:
+                return round(float(actual_hours) - float(scheduled_hours), 2)
+        elif actual_hours > 9:
+            return round(float(actual_hours) - 9, 2)
+            
+        return 0
+
+    def __str__(self):
+        return f"{self.staff.username} – {self.clocked_in_at.date()}"
+
+
+class ShiftTemplate(TenantScopedModel):
+    """
+    Predefined shift patterns (e.g. 'Morning Shift', 'Kitchen Opening').
+    """
+    tenant = models.ForeignKey("tenants.Tenant", on_delete=models.CASCADE)
+    outlet = models.ForeignKey("tenants.Outlet", on_delete=models.CASCADE)
+    
+    name = models.CharField(max_length=100)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    
+    # Optional: Standard pay rate for this shift
+    base_pay = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    
+    class Meta:
+        unique_together = ("tenant", "outlet", "name")
+
+    def __str__(self):
+        return f"{self.name} ({self.start_time}-{self.end_time})"
+
+
+class StaffSchedule(TenantScopedModel):
+    """
+    Assigns a staff member to a shift on a specific date.
+    Used for labor cost forecasting and overtime detection.
+    """
+    tenant = models.ForeignKey("tenants.Tenant", on_delete=models.CASCADE)
+    outlet = models.ForeignKey("tenants.Outlet", on_delete=models.CASCADE)
+    
+    staff = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="schedules")
+    date = models.DateField()
+    
+    template = models.ForeignKey(ShiftTemplate, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    # Overrides if template is not used
+    start_time = models.TimeField(null=True, blank=True)
+    end_time = models.TimeField(null=True, blank=True)
+    
+    is_active = models.BooleanField(default=True)
+    notes = models.TextField(blank=True)
+
+    @property
+    def duration_hours(self):
+        start = self.template.start_time if self.template else self.start_time
+        end = self.template.end_time if self.template else self.end_time
+
+        if not start or not end:
+            return 0
+
+        from datetime import datetime, date, timedelta
+        # Use a fixed sentinel date for pure time arithmetic so that the
+        # result never accidentally inherits today's date in display/logging.
+        _sentinel = date(2000, 1, 1)
+        d1 = datetime.combine(_sentinel, start)
+        d2 = datetime.combine(_sentinel, end)
+        if d2 < d1:
+            d2 += timedelta(days=1)
+
+        return round((d2 - d1).total_seconds() / 3600, 2)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["tenant", "outlet", "date"]),
+            models.Index(fields=["staff", "date"]),
+        ]
+
+    def __str__(self):
+        return f"{self.staff.username} - {self.date}"
+
+
+class CashSession(TenantScopedModel):
+    """
+    Manages the cash drawer for an entire outlet shift/day.
+    Reconciles physical cash with digital payment records.
+    """
+    STATUS_CHOICES = (
+        ("open", "Open"),
+        ("closed", "Closed"),
+    )
+
+    tenant = models.ForeignKey("tenants.Tenant", on_delete=models.CASCADE)
+    outlet = models.ForeignKey("tenants.Outlet", on_delete=models.CASCADE)
+
+    # Business date this session belongs to (may differ from opened_at.date() for
+    # outlets whose business day crosses midnight — see Outlet.business_day_start_hour).
+    date = models.DateField(null=True, blank=True)
+
+    opened_at = models.DateTimeField(auto_now_add=True)
+    closed_at = models.DateTimeField(null=True, blank=True)
+
+    opened_by = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="opened_sessions")
+    closed_by = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="closed_sessions")
+
+    opening_balance = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    
+    # Financials populated at closing
+    expected_cash = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    actual_cash = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    discrepancy = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    
+    total_digital_payments = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    total_sales = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="open")
+    notes = models.TextField(blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["tenant", "outlet", "status"]),
+            models.Index(fields=["opened_at"]),
+            models.Index(fields=["tenant", "outlet", "date"], name="cashsession_outlet_date"),
+        ]
+        constraints = [
+            UniqueConstraint(
+                fields=["outlet"],
+                condition=Q(status="open"),
+                name="one_open_session_per_outlet"
+            )
+        ]
+        ordering = ["-opened_at"]
+
+    def save(self, *args, **kwargs):
+        if not self.date and self.outlet_id:
+            from core.utils import get_business_date
+            from django.utils import timezone as _tz
+            self.date = get_business_date(_tz.now(), self.outlet)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Session {self.id} ({self.status}) - {self.opened_at.date()}"
+
+    @property
+    def cash_sales(self):
+        """total_sales is cash+digital combined; this isolates the cash
+        portion, which is what the Opening/Expected/Actual/Diff columns
+        next to it in the cash-session table are all reconciling."""
+        return self.total_sales - self.total_digital_payments
+
+
+class StaffPayRate(TenantScopedModel):
+    """
+    How a staff member is actually paid -- a flat monthly salary (the
+    common case for Indian restaurant staff) or an hourly rate. Deliberately
+    NOT derived from ShiftTemplate.base_pay: that's a flat amount per shift
+    *template*, with no link to actual clocked hours, so it can't answer
+    "what did this person cost this period" for either pay type on its own.
+    One active row per staff member; no rate history in v1 -- editing this
+    changes the rate going forward, past reports already computed keep
+    whatever numbers they showed.
+    """
+    PAY_TYPE_CHOICES = (
+        ("monthly", "Monthly Salary"),
+        ("hourly", "Hourly Rate"),
+    )
+
+    tenant = models.ForeignKey("tenants.Tenant", on_delete=models.CASCADE)
+    staff = models.OneToOneField(
+        "accounts.User", on_delete=models.CASCADE, related_name="pay_rate"
+    )
+
+    pay_type = models.CharField(max_length=10, choices=PAY_TYPE_CHOICES)
+    monthly_salary = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    hourly_rate = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.ForeignKey(
+        "accounts.User", on_delete=models.SET_NULL, null=True, related_name="+"
+    )
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["tenant", "staff"]),
+        ]
+
+    def __str__(self):
+        if self.pay_type == "monthly":
+            return f"{self.staff.username} — ₹{self.monthly_salary}/month"
+        return f"{self.staff.username} — ₹{self.hourly_rate}/hour"

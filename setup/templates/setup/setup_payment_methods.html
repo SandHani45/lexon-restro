@@ -1,0 +1,175 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Payment Methods | {{ request.user.tenant.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-body { max-width: 680px; margin: 4rem auto; padding: 0 2rem; }
+
+    .page-eyebrow { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 4px; color: var(--accent-gold); margin-bottom: 0.5rem; }
+    .page-title { font-family: 'DM Serif Display', serif; font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .page-sub { color: var(--text-muted); font-size: 0.85rem; line-height: 1.6; margin-bottom: 2.5rem; }
+    .divider { width: 40px; height: 1px; background: var(--accent-gold); margin: 1.5rem 0; }
+
+    .method-card { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 1.5rem 2rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; transition: border-color 0.2s; }
+    .method-card:has(input:checked) { border-color: var(--accent-gold); }
+    .method-icon { font-size: 1.4rem; color: var(--accent-gold); width: 36px; }
+    .method-info { flex: 1; }
+    .method-name { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; }
+    .method-desc { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+    .method-label-input { background: transparent; border: none; border-bottom: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.75rem; width: 130px; padding: 4px 0; outline: none; font-family: inherit; }
+    .method-label-input:focus { border-bottom-color: var(--accent-gold); color: var(--text-main); }
+
+    /* Toggle switch */
+    .toggle { position: relative; width: 44px; height: 24px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; inset: 0; background: var(--border-color); border-radius: 24px; cursor: pointer; transition: 0.3s; }
+    .slider::before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; bottom: 3px; background: var(--text-muted); border-radius: 50%; transition: 0.3s; }
+    input:checked + .slider { background: var(--accent-gold); }
+    input:checked + .slider::before { transform: translateX(20px); background: #fff; }
+
+    .btn-save { width: 100%; padding: 1rem; background: var(--accent-gold); border: none; color: #fff; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 700; cursor: pointer; margin-top: 2rem; transition: background 0.2s; }
+    .btn-save:hover { background: var(--accent-hover); }
+
+    @media (max-width: 600px) {
+        .page-body { margin: 2rem auto; padding: 0 1.1rem; }
+        .method-card { padding: 1.1rem 1.25rem; flex-wrap: wrap; gap: 0.85rem; }
+        .method-label-input { width: 100%; }
+        .toggle { flex-shrink: 0; }
+    }
+</style>
+{% endblock %}
+
+{% block header_left %}
+<div>
+    <a href="/dashboard/" style="text-decoration:none;color:inherit;">
+        <h1 class="brand-title mb-0">
+            <i class="bi bi-diamond-half" style="color:var(--accent-gold);"></i>
+            {{ request.user.tenant.name }}
+        </h1>
+    </a>
+    <p class="brand-subtitle">Setup — {{ request.user.outlet.name }}</p>
+</div>
+{% endblock %}
+
+{% block header_right %}
+<a href="/setup/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Setup Area</a>
+<a href="/logout/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Logout</a>
+<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme">
+    <i class="bi bi-moon" id="themeIcon"></i>
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="page-body">
+    <p class="page-eyebrow">Configuration</p>
+    <h1 class="page-title">Payment Methods</h1>
+    <div class="divider"></div>
+    <p class="page-sub">Enable the payment types your outlet accepts. You can customise label names (e.g. show "GPay" instead of "UPI").</p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="method-card">
+            <div class="method-icon"><i class="bi bi-cash-coin"></i></div>
+            <div class="method-info">
+                <div class="method-name">Cash</div>
+                <div class="method-desc">Physical currency payment</div>
+                <input type="text" name="cash_label" class="method-label-input mt-2" value="{{ config.cash_label }}" placeholder="Label (e.g. Cash)">
+            </div>
+            <label class="toggle">
+                <input type="checkbox" name="methods" value="cash" {% if config.cash_enabled %}checked{% endif %}>
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="method-card" style="flex-wrap:wrap;gap:1rem;">
+            <div class="method-icon"><i class="bi bi-qr-code-scan"></i></div>
+            <div class="method-info" style="flex:1;min-width:200px;">
+                <div class="method-name">UPI</div>
+                <div class="method-desc">Google Pay, PhonePe, Paytm</div>
+                <input type="text" name="upi_label" class="method-label-input mt-2" value="{{ config.upi_label }}" placeholder="Label (e.g. GPay / UPI)">
+            </div>
+            <label class="toggle">
+                <input type="checkbox" name="methods" value="upi" {% if config.upi_enabled %}checked{% endif %}>
+                <span class="slider"></span>
+            </label>
+            <div style="width:100%;padding-top:0.75rem;border-top:1px dashed var(--border-color);display:flex;align-items:center;gap:0.75rem;">
+                <i class="bi bi-at" style="color:var(--accent-gold);font-size:1.1rem;"></i>
+                <div style="flex:1;">
+                    <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:4px;">UPI ID (shows as QR on bill)</div>
+                    <input type="text" name="upi_id" value="{{ config.upi_id }}"
+                           placeholder="e.g. myrestaurant@okaxis"
+                           style="width:100%;background:transparent;border:none;border-bottom:1px solid var(--border-color);color:var(--text-main);padding:4px 0;font-size:0.85rem;outline:none;font-family:inherit;">
+                </div>
+            </div>
+        </div>
+
+        <div class="method-card">
+            <div class="method-icon"><i class="bi bi-credit-card"></i></div>
+            <div class="method-info">
+                <div class="method-name">Card</div>
+                <div class="method-desc">Debit / Credit card via POS machine</div>
+                <input type="text" name="card_label" class="method-label-input mt-2" value="{{ config.card_label }}" placeholder="Label (e.g. Card)">
+            </div>
+            <label class="toggle">
+                <input type="checkbox" name="methods" value="card" {% if config.card_enabled %}checked{% endif %}>
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        {% if razorpay_feature_enabled %}
+        <div class="method-card" style="flex-wrap:wrap;gap:1rem;">
+            <div class="method-icon"><i class="bi bi-qr-code-scan"></i></div>
+            <div class="method-info" style="flex:1;min-width:200px;">
+                <div class="method-name">Razorpay (UPI QR)</div>
+                <div class="method-desc">Dynamic QR via your own Razorpay account — auto-confirms via webhook, money settles straight to your bank account.</div>
+            </div>
+            <label class="toggle">
+                <input type="checkbox" name="razorpay_enabled" {% if config.razorpay_enabled %}checked{% endif %}>
+                <span class="slider"></span>
+            </label>
+            <div style="width:100%;padding-top:0.75rem;border-top:1px dashed var(--border-color);display:flex;flex-direction:column;gap:0.75rem;">
+                <div>
+                    <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:4px;">Key ID</div>
+                    <input type="text" name="razorpay_key_id" value="{{ config.razorpay_key_id }}"
+                           placeholder="rzp_live_..."
+                           style="width:100%;background:transparent;border:none;border-bottom:1px solid var(--border-color);color:var(--text-main);padding:4px 0;font-size:0.85rem;outline:none;font-family:inherit;">
+                </div>
+                <div>
+                    <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:4px;">Key Secret</div>
+                    <input type="password" name="razorpay_key_secret"
+                           placeholder="{% if config.razorpay_key_secret %}•••••••••• (saved — leave blank to keep){% else %}Paste your key secret{% endif %}"
+                           style="width:100%;background:transparent;border:none;border-bottom:1px solid var(--border-color);color:var(--text-main);padding:4px 0;font-size:0.85rem;outline:none;font-family:inherit;">
+                </div>
+                <div>
+                    <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:4px;">Webhook Secret</div>
+                    <input type="password" name="razorpay_webhook_secret"
+                           placeholder="{% if config.razorpay_webhook_secret %}•••••••••• (saved — leave blank to keep){% else %}From Razorpay → Settings → Webhooks{% endif %}"
+                           style="width:100%;background:transparent;border:none;border-bottom:1px solid var(--border-color);color:var(--text-main);padding:4px 0;font-size:0.85rem;outline:none;font-family:inherit;">
+                </div>
+                {% if razorpay_webhook_url %}
+                <div>
+                    <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:4px;">Webhook URL — paste this into Razorpay → Settings → Webhooks</div>
+                    <input type="text" readonly value="{{ razorpay_webhook_url }}" onclick="this.select()"
+                           style="width:100%;background:transparent;border:none;border-bottom:1px solid var(--border-color);color:var(--text-muted);padding:4px 0;font-size:0.78rem;outline:none;font-family:monospace;">
+                </div>
+                {% endif %}
+                <div style="font-size:0.7rem;color:var(--text-muted);">Find your keys at Razorpay Dashboard → Settings → API Keys.</div>
+            </div>
+        </div>
+        {% else %}
+        <div class="method-card" style="opacity:0.6;">
+            <div class="method-icon"><i class="bi bi-qr-code-scan"></i></div>
+            <div class="method-info">
+                <div class="method-name">Razorpay (UPI QR)</div>
+                <div class="method-desc">Not enabled for your account yet — ask Lexnorax support to turn this on for you.</div>
+            </div>
+        </div>
+        {% endif %}
+
+        <button type="submit" class="btn-save">Save Configuration</button>
+    </form>
+</div>
+{% endblock %}

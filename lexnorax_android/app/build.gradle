@@ -1,0 +1,57 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.lexnorax.pos'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.lexnorax.pos"
+        minSdk 26          // Android 8.0+ — covers 95%+ of active devices
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+
+        // Empty by default — release builds get the URL from SharedPreferences
+        // (user types it or scans a QR on first launch).
+        buildConfigField "String", "SERVER_URL", '""'
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    buildTypes {
+        debug {
+            // Blank — like release. First launch shows the setup screen so each
+            // restaurant scans its own QR (encodes https://<slug>.lexnorax.net) or
+            // types its subdomain. Hardcoding lexnorax.net here short-circuited the
+            // setup flow and dumped every device on the marketing landing page.
+            buildConfigField "String", "SERVER_URL", '""'
+        }
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    // OkHttp: makes HTTP requests (poll for jobs, mark done/failed)
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    // Coroutines: lets us write the polling loop without freezing the app
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0'
+    // ZXing: QR code scanner used on first-launch setup screen
+    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+}

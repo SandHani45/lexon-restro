@@ -1,0 +1,73 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual env
+.venv/
+venv/
+env/
+
+# Django
+db.sqlite3
+media/
+staticfiles/
+
+# Environment — NEVER commit secrets
+.env
+.env.*
+# ...except the template itself, which only ever holds placeholder values
+# and is meant to be committed so anyone cloning the repo knows what env
+# vars exist. Was being silently swallowed by .env.* above -- never once
+# actually tracked in git until now.
+!.env.example
+*.pem
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+
+# Logs & rotation files
+pos.log
+logs/*
+pos.log.*
+
+# Build artifacts — never commit zips
+*.zip
+*.tar.gz
+
+# Android build output & device log dumps
+lexnorax_android/app/bin/
+lexnorax_android/log cat/
+*.logcat
+
+# Dev tools output (ER diagrams etc)
+er_diagrams_pos/
+
+
+pem/
+
+md_files/
+js/
+
+# Load-test run logs (generated, not source)
+loadtest_logs/
+
+.dockerignore
+Dockerfile
+docker-compose.yml
+POS_System_Architecture_and_Documentation.md
+
+
+.claude/*
+# Was blanket-ignoring every *.md, including root product docs -- silently
+# swallowing any new one (CHANGELOG.md never got tracked because of this).
+# md_files/ above already excludes the actual intended target (scratch/
+# personal markdown); root docs are meant to be committed.

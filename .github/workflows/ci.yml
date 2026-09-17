@@ -1,0 +1,159 @@
+name: Lexnorax CI/CD
+
+on:
+  push:
+    branches: [ main, qsr ]
+  pull_request:
+    branches: [ main ]
+
+# Default GITHUB_TOKEN permissions are broad (effectively read/write on
+# most of the repo) unless a workflow says otherwise. This workflow only
+# checks out code and runs tests -- it never pushes, comments, or opens
+# anything -- so read-only contents access is all it actually needs.
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB:       lexnorax_test
+          POSTGRES_USER:     lexnorax
+          POSTGRES_PASSWORD: testpass
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5.3.0
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Django system check
+        env:
+          SECRET_KEY:    ci-test-secret-key-not-real-replace-in-prod
+          FIELD_ENCRYPTION_KEY: K_XCqmy_iTNLU_imyLyNX0_CVDTlGSQR-kgTQK1ZOno=
+          DEBUG:         "True"
+          ALLOWED_HOSTS: "localhost,127.0.0.1"
+          DB_ENGINE:     django.db.backends.postgresql
+          DB_NAME:       lexnorax_test
+          DB_USER:       lexnorax
+          DB_PASSWORD:   testpass
+          DB_HOST:       127.0.0.1
+          DB_PORT:       "5432"
+          REDIS_URL:     redis://127.0.0.1:6379/0
+        run: python manage.py check
+
+      - name: Run migrations
+        env:
+          SECRET_KEY:    ci-test-secret-key-not-real-replace-in-prod
+          FIELD_ENCRYPTION_KEY: K_XCqmy_iTNLU_imyLyNX0_CVDTlGSQR-kgTQK1ZOno=
+          DEBUG:         "True"
+          ALLOWED_HOSTS: "localhost,127.0.0.1"
+          DB_ENGINE:     django.db.backends.postgresql
+          DB_NAME:       lexnorax_test
+          DB_USER:       lexnorax
+          DB_PASSWORD:   testpass
+          DB_HOST:       127.0.0.1
+          DB_PORT:       "5432"
+          REDIS_URL:     redis://127.0.0.1:6379/0
+        run: python manage.py migrate --run-syncdb
+
+      - name: Collect static files
+        env:
+          SECRET_KEY:    ci-test-secret-key-not-real-replace-in-prod
+          FIELD_ENCRYPTION_KEY: K_XCqmy_iTNLU_imyLyNX0_CVDTlGSQR-kgTQK1ZOno=
+          DEBUG:         "True"
+          ALLOWED_HOSTS: "localhost,127.0.0.1"
+          DB_ENGINE:     django.db.backends.postgresql
+          DB_NAME:       lexnorax_test
+          DB_USER:       lexnorax
+          DB_PASSWORD:   testpass
+          DB_HOST:       127.0.0.1
+          DB_PORT:       "5432"
+          REDIS_URL:     redis://127.0.0.1:6379/0
+        run: python manage.py collectstatic --noinput
+
+      - name: Run test suite
+        env:
+          SECRET_KEY:    ci-test-secret-key-not-real-replace-in-prod
+          FIELD_ENCRYPTION_KEY: K_XCqmy_iTNLU_imyLyNX0_CVDTlGSQR-kgTQK1ZOno=
+          DEBUG:         "True"
+          ALLOWED_HOSTS: "localhost,127.0.0.1"
+          DB_ENGINE:     django.db.backends.postgresql
+          DB_NAME:       lexnorax_test
+          DB_USER:       lexnorax
+          DB_PASSWORD:   testpass
+          DB_HOST:       127.0.0.1
+          DB_PORT:       "5432"
+          REDIS_URL:     redis://127.0.0.1:6379/0
+        run: |
+          # Every first-party app with test coverage. This used to list only
+          # 7 apps (accounts orders tenants inventory menu setup
+          # notifications) and was never updated when the orders-app-split
+          # carved 7 new satellite apps out of orders (promos, printing,
+          # tokens, kitchen, waiter, tablemerge, payments) -- meaning CI had
+          # been silently not testing any of them (plus crm, finance,
+          # reports, shifts, agency, portal, core, which were never in the
+          # list either), while still gating the auto-deploy job below.
+          #
+          # --keepdb: with all 22 apps running together for the first time,
+          # the run itself passed clean but the job still failed -- Django's
+          # final DROP DATABASE at teardown hit "database is being accessed
+          # by other users" (2 lingering sessions), unrelated to any test.
+          # The Postgres service container is thrown away at the end of
+          # every CI run regardless, so skipping that drop costs nothing and
+          # sidesteps the race entirely.
+          python manage.py test \
+            accounts agency billing core crm finance inventory \
+            kitchen menu notifications orders payments \
+            portal printing promos reports setup shifts \
+            tablemerge tenants tokens waiter \
+            --verbosity=1 --keepdb
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/qsr' && github.event_name == 'push'
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host:        ${{ secrets.EC2_HOST }}
+          username:    ${{ secrets.EC2_USER }}
+          key:         ${{ secrets.EC2_KEY }}
+          port:        22
+          timeout:         120s     # SSH connection establish timeout
+          command_timeout: 20m      # full deploy.sh runs long on t3.micro (collectstatic etc.)
+          script: |
+            # Set git credentials so fetch works
+            cd /home/ubuntu/lexnorax
+            git remote set-url origin https://${{ secrets.GH_PAT }}@github.com/Rajathtuesday/restaurant-pos.git
+            # Run the deploy script — setsid handles celery detachment
+            bash /home/ubuntu/lexnorax/deploy.sh

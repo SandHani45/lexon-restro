@@ -1,0 +1,169 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Reservations | {{ request.user.tenant.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-card { background: var(--panel-bg); border: 1px solid var(--border-color); }
+    .section-title { font-family: 'DM Serif Display', serif; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 1.5rem; }
+    .booking-table { width: 100%; border-collapse: collapse; }
+    .booking-table th { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); padding: 0.8rem 1rem; border-bottom: 1px solid var(--border-color); text-align: left; }
+    .booking-table td { padding: 0.9rem 1rem; border-bottom: 1px dashed var(--border-color); font-size: 0.9rem; vertical-align: middle; }
+    .booking-table tr:hover td { background: rgba(197,160,89,0.04); }
+    .status-badge { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; padding: 2px 8px; border-radius: 2px; font-weight: 600; }
+    .status-pending   { background: #fff3cd; color: #856404; }
+    .status-confirmed { background: #d4edda; color: #155724; }
+    .status-seated    { background: #d1ecf1; color: #0c5460; }
+    .status-cancelled { background: #f8d7da; color: #721c24; }
+    .status-no_show   { background: #e2e3e5; color: #383d41; }
+    .modal-content { border-radius: 0; border: 1px solid var(--border-color); background: var(--panel-bg); color: var(--text-main); }
+    .form-control { border-radius: 0; border: 1px solid var(--border-color); background: transparent; color: var(--text-main); }
+    .form-control:focus { border-color: var(--accent-gold); box-shadow: none; background: transparent; color: var(--text-main); }
+    html.dark .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+</style>
+{% endblock %}
+
+{% block header_left %}
+<div>
+    <a href="/dashboard/" class="brand-title">
+        <i class="bi bi-calendar-check" style="color:var(--accent-gold);"></i>
+        <span>Reservations</span>
+    </a>
+    <p class="brand-subtitle">{{ request.user.outlet.name }}</p>
+</div>
+{% endblock %}
+
+{% block header_right %}
+<input type="date" value="{{ view_date|date:'Y-m-d' }}" class="form-control d-none d-sm-block" style="width:160px; border-radius:0; background:transparent; border-color:var(--border-color); color:var(--text-main);" onchange="window.location.href='?date='+encodeURIComponent(this.value)">
+<button class="btn-luxury" data-bs-toggle="modal" data-bs-target="#newBookingModal">New Booking</button>
+<a href="/dashboard/" class="btn-luxury d-none d-sm-inline-flex">Exit</a>
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto" style="max-width:1100px; padding:1.5rem;">
+
+    <!-- Mobile date picker -->
+    <div class="d-sm-none mb-3">
+        <input type="date" value="{{ view_date|date:'Y-m-d' }}" class="form-control w-100" onchange="window.location.href='?date='+encodeURIComponent(this.value)">
+    </div>
+
+    <div class="dashboard-card p-0">
+        <div class="table-responsive">
+            <table class="booking-table">
+                <thead>
+                    <tr>
+                        <th>Time</th><th>Guest</th><th>Phone</th><th>Table</th><th>Guests</th><th>Status</th><th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for res in reservations %}
+                    <tr>
+                        <td style="font-family:'Space Mono',monospace; font-size:0.85rem;">{{ res.reservation_time|date:"H:i" }}</td>
+                        <td><strong>{{ res.guest.name|default:"—" }}</strong></td>
+                        <td>{{ res.guest.phone }}</td>
+                        <td>{{ res.table.name|default:"TBD" }}</td>
+                        <td>{{ res.number_of_guests }} pax</td>
+                        <td><span class="status-badge status-{{ res.status }}">{{ res.status }}</span></td>
+                        <td>
+                            {% if res.status == "pending" %}
+                            <button class="btn-icon" title="Confirm" onclick="updateReservationStatus('{{ res.id }}', 'confirmed')"><i class="bi bi-check-lg"></i></button>
+                            <button class="btn-icon" title="Cancel" onclick="updateReservationStatus('{{ res.id }}', 'cancelled')"><i class="bi bi-x-lg"></i></button>
+                            {% elif res.status == "confirmed" %}
+                            <button class="btn-icon" title="Seat Guest" onclick="seatGuest('{{ res.id }}')"><i class="bi bi-box-arrow-in-right"></i></button>
+                            <button class="btn-icon" title="No Show" onclick="updateReservationStatus('{{ res.id }}', 'no_show')"><i class="bi bi-person-dash"></i></button>
+                            <button class="btn-icon" title="Cancel" onclick="updateReservationStatus('{{ res.id }}', 'cancelled')"><i class="bi bi-x-lg"></i></button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" style="text-align:center; padding:5rem; color:var(--text-muted);">No bookings for this date.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- New Booking Modal -->
+<div class="modal fade" id="newBookingModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="section-title">New Reservation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label text-muted small text-uppercase fw-bold">Phone Number*</label>
+                    <input type="text" id="node-phone" class="form-control" placeholder="Phone">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small text-uppercase fw-bold">Guest Name</label>
+                    <input type="text" id="node-name" class="form-control" placeholder="Name">
+                </div>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label class="form-label text-muted small text-uppercase fw-bold">Time*</label>
+                        <input type="datetime-local" id="node-time" class="form-control">
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label text-muted small text-uppercase fw-bold">Table</label>
+                        <select id="node-table" class="form-control">
+                            <option value="">Any Free Table</option>
+                            {% for t in tables %}
+                            <option value="{{ t.id }}">{{ t.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small text-uppercase fw-bold">Covers (Guests)</label>
+                    <input type="number" id="node-pax" class="form-control" value="2">
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button class="btn-luxury" onclick="saveBooking()">Confirm Booking</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function saveBooking() {
+    const data = {
+        phone: document.getElementById('node-phone').value,
+        name: document.getElementById('node-name').value,
+        reservation_time: document.getElementById('node-time').value,
+        table_id: document.getElementById('node-table').value,
+        guests: document.getElementById('node-pax').value
+    };
+    const res = await fetch('/crm/reservations/create/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+        body: JSON.stringify(data)
+    });
+    if (res.ok) { window.location.reload(); }
+    else { alert('Error saving booking'); }
+}
+
+async function updateReservationStatus(reservationId, newStatus) {
+    const res = await fetch(`/crm/reservations/${reservationId}/status/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+        body: JSON.stringify({ status: newStatus })
+    });
+    if (res.ok) { window.location.reload(); }
+    else {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || 'Could not update reservation.');
+    }
+}
+
+function seatGuest(reservationId) {
+    updateReservationStatus(reservationId, 'seated');
+}
+</script>
+{% endblock %}

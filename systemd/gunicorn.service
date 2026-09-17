@@ -1,0 +1,34 @@
+[Unit]
+Description=Lexnorax POS — Gunicorn
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/lexnorax
+EnvironmentFile=/home/ubuntu/lexnorax/.env
+ExecStartPre=/bin/mkdir -p /home/ubuntu/lexnorax/logs
+ExecStart=/home/ubuntu/lexnorax/.venv/bin/gunicorn \
+    --bind 127.0.0.1:8000 \
+    --workers 2 \
+    --threads 4 \
+    --worker-class gthread \
+    --timeout 120 \
+    --access-logfile /home/ubuntu/lexnorax/logs/gunicorn_access.log \
+    --error-logfile /home/ubuntu/lexnorax/logs/gunicorn_error.log \
+    core.wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=30
+Restart=always
+RestartSec=5
+# NOTE: gunicorn already writes access/error to the two files above via its own
+# --access-logfile/--error-logfile flags (as user ubuntu). Do NOT also add
+# StandardOutput=append:/StandardError=append: for the SAME files — systemd
+# (root) opens those first and creates them root-owned, after which gunicorn
+# (ubuntu) can't write and crash-loops. gunicorn's own console output goes to
+# journald (journalctl -u gunicorn), which is fine.
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,803 @@
+from core.decorators import tenant_required, feature_required, role_required
+# reports/views.py
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from django.http import HttpResponseForbidden
+from reports.services.sales_reports import daily_sales, hourly_sales
+from reports.services.item_reports import top_items
+from reports.services.table_reports import table_turnover
+from reports.services.category_reports import category_sales
+from reports.services.waiter_reports import waiter_performance
+from tenants.models import Outlet
+from django.utils import timezone
+from datetime import timedelta
+import csv
+from django.core.serializers.json import DjangoJSONEncoder
+from django.http import HttpResponse, JsonResponse
+
+from reports.services.kitchen_reports import kitchen_performance, top_kitchen_items
+from reports.services.comparison_reports import period_comparison
+from reports.services.pl_reports import gross_margin_report, net_profit_report
+from core.features import has_feature
+
+@login_required
+@feature_required("reports")
+@role_required("owner", "manager", "agent")
+def dashboard(request):
+    # NOTE: @tenant_required is deliberately NOT applied here. Sales agents are
+    # modelled via Tenant.sales_agent and have User.tenant = None, so
+    # tenant_required would 403 them before the agent tenant-resolution logic
+    # below ever runs — making the dashboard dead code for its intended users.
+    # This view instead resolves the tenant itself and hard-403s if none is
+    # found. Owners/managers still only ever see their own request.user.tenant.
+    # Determine which tenant we are viewing
+    tenant = request.user.tenant
+    
+    # If superuser or agent, they can specify a tenant_id to view
+    target_tenant_id = request.GET.get("tenant_id")
+    if target_tenant_id and (request.user.role == "agent" or request.user.is_superuser):
+        from tenants.models import Tenant
+        if request.user.is_superuser:
+            from django.http import Http404
+            try:
+                tenant = Tenant.objects.get(id=target_tenant_id)
+            except Tenant.DoesNotExist:
+                raise Http404("Tenant not found")
+        else:
+            # Agent can ONLY see tenants assigned to them
+            tenant = Tenant.objects.filter(id=target_tenant_id, sales_agent=request.user).first()
+            if not tenant:
+                return HttpResponseForbidden("You are not the sales agent for this restaurant.")
+    
+    if not tenant:
+        return HttpResponseForbidden("No tenant context found.")
+
+    # outlet selection — resolved BEFORE the date default below, since each
+    # outlet can have its own business_day_start_hour and "today" depends
+    # on which one (or None, for the cross-outlet default) is in scope.
+    date_filter = request.GET.get("date_filter", "today")
+    outlet_id = request.GET.get("outlet")
+
+    if request.user.role == "owner":
+        outlets = Outlet.objects.filter(tenant=tenant)
+
+        if outlet_id:
+            outlet = outlets.filter(id=outlet_id).first()
+
+            # 🔴 IMPORTANT FIX (security + correctness)
+            if not outlet:
+                return HttpResponseForbidden("Invalid outlet")
+        else:
+            outlet = None  # means ALL outlets
+
+    else:
+        outlet = request.user.outlet
+        outlets = [outlet]
+
+    selected_outlet = outlet
+
+    from core.utils import get_business_date
+    start_date = get_business_date(timezone.now(), selected_outlet)
+    end_date = get_business_date(timezone.now(), selected_outlet)
+
+    if date_filter == "yesterday":
+        start_date = start_date - timedelta(days=1)
+        end_date = start_date
+    elif date_filter == "weekly":
+        start_date = start_date - timedelta(days=7)
+    elif date_filter == "monthly":
+        start_date = start_date - timedelta(days=30)
+    elif date_filter == "custom":
+        custom_start = request.GET.get("start_date")
+        custom_end = request.GET.get("end_date")
+        if custom_start and custom_end:
+            from datetime import datetime
+            try:
+                start_date = datetime.strptime(custom_start, "%Y-%m-%d").date()
+                end_date = datetime.strptime(custom_end, "%Y-%m-%d").date()
+            except ValueError:
+                pass # fallback to today
+
+    sales      = daily_sales(tenant, selected_outlet, start_date, end_date)
+    items      = top_items(tenant, selected_outlet, start_date, end_date)
+    hourly     = hourly_sales(tenant, selected_outlet, start_date, end_date)
+    table_stats = table_turnover(tenant, selected_outlet, start_date, end_date)
+    categories = category_sales(tenant, selected_outlet, start_date, end_date)
+    waiters    = waiter_performance(tenant, selected_outlet, start_date, end_date)
+    comparison = period_comparison(tenant, selected_outlet, start_date, end_date)
+    pl         = gross_margin_report(tenant, selected_outlet, start_date, end_date)
+    net_pl     = (
+        net_profit_report(tenant, selected_outlet, start_date, end_date)
+        if has_feature(tenant, "advanced_reports") else None
+    )
+
+    if request.GET.get("export") == "csv":
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="pos_report_{start_date}_{end_date}.csv"'
+        writer = csv.writer(response)
+        
+        writer.writerow(['SALES SUMMARY', f'Period: {start_date} to {end_date}'])
+        writer.writerow(['Gross Subtotal', f"Rs {sales.get('subtotal', 0)}"])
+        writer.writerow(['Total Discount', f"Rs {sales.get('discount', 0)}"])
+        writer.writerow(['GST Collected', f"Rs {sales.get('gst_total', 0)}"])
+        writer.writerow(['Round Off', f"Rs {sales.get('round_off', 0)}"])
+        writer.writerow(['Total Refunds', f"Rs {sales.get('net_refunds', 0)}"])
+        writer.writerow(['NET REVENUE', f"Rs {sales.get('total_sales', 0)}"])
+        writer.writerow(['Total Orders', sales.get('orders', 0)])
+        writer.writerow([])
+        
+        writer.writerow(['PAYMENT METHODS'])
+        writer.writerow(['Method', 'Total Amount'])
+        for pm in sales.get('payments', []):
+            writer.writerow([pm.get('method', 'Unknown').upper(), pm.get('total', 0)])
+        writer.writerow([])
+        
+        # Privacy check for CSV
+        if not (request.user.role == 'agent' and not request.user.is_superuser):
+            writer.writerow(['DETAILED ITEM SALES'])
+            writer.writerow(['Item Name', 'Quantity Sold', 'Gross Revenue', 'Avg Rate'])
+            for item in items:
+                qty = item.get('total', 0)
+                rev = item.get('total_rev', 0)
+                avg = rev / qty if qty > 0 else 0
+                writer.writerow([item.get('menu_item__name', 'Item'), qty, rev, round(avg, 2)])
+            writer.writerow([])
+            
+            writer.writerow(['CATEGORY WISE BREAKDOWN'])
+            writer.writerow(['Category', 'Revenue'])
+            for c in categories:
+                writer.writerow([c.get('menu_item__category__name', 'Misc'), c.get('revenue', 0)])
+            writer.writerow([])
+            
+            writer.writerow(['STAFF PERFORMANCE'])
+            writer.writerow(['Staff', 'Orders Handled', 'Revenue Handled'])
+            for w in waiters:
+                writer.writerow([w.get('created_by__username', 'Staff'), w.get('total_orders', 0), w.get('total_rev', 0)])
+        
+        return response
+
+    if request.GET.get('format') == 'json':
+        # Privacy check for JSON
+        is_limited = (request.user.role == 'agent' and not request.user.is_superuser)
+        
+        data = {
+            "sales": sales,
+            "hourly_sales": hourly,
+            "date_filter": date_filter,
+            "start_date": str(start_date),
+            "end_date": str(end_date)
+        }
+        
+        if not is_limited:
+            data.update({
+                "items": list(items),
+                "table_stats": list(table_stats),
+                "categories": categories,
+                "waiters": list(waiters),
+            })
+            
+        return JsonResponse({"success": True, "data": data}, encoder=DjangoJSONEncoder)
+
+    is_limited_view = (request.user.role == "agent" and not request.user.is_superuser)
+
+    gst_inclusive = getattr(outlet, "gst_inclusive", False) if outlet else False
+
+    return render(request, "reports/dashboard.html", {
+        "sales":          sales,
+        "items":          items if not is_limited_view else [],
+        "hourly_sales":   hourly,
+        "table_stats":    table_stats if not is_limited_view else [],
+        "categories":     categories if not is_limited_view else [],
+        "waiters":        waiters if not is_limited_view else [],
+        "comparison":     comparison if not is_limited_view else {},
+        "pl":             pl         if not is_limited_view else {},
+        "net_pl":         net_pl     if not is_limited_view else None,
+        "outlets":        outlets,
+        "current_outlet": outlet,
+        "date_filter":    date_filter,
+        "start_date":     start_date,
+        "end_date":       end_date,
+        "is_limited_view": is_limited_view,
+        "gst_inclusive":   gst_inclusive,
+    })
+
+@login_required
+@tenant_required
+@feature_required("reports", "kitchen_display")
+@role_required("owner", "manager")
+def kitchen_dashboard(request):
+    tenant = request.user.tenant
+
+    # outlet selection — resolved before the date default, same reasoning
+    # as dashboard() above.
+    date_filter = request.GET.get("date_filter", "today")
+    outlet_id = request.GET.get("outlet")
+
+    if request.user.role == "owner":
+        outlets = Outlet.objects.filter(tenant=tenant)
+        if outlet_id:
+            outlet = outlets.filter(id=outlet_id).first()
+            if not outlet:
+                return HttpResponseForbidden("Invalid outlet")
+        else:
+            outlet = None
+    else:
+        outlet = request.user.outlet
+        outlets = [outlet]
+
+    selected_outlet = outlet
+
+    from core.utils import get_business_date
+    start_date = get_business_date(timezone.now(), selected_outlet)
+    end_date = get_business_date(timezone.now(), selected_outlet)
+
+    if date_filter == "yesterday":
+        start_date = start_date - timedelta(days=1)
+        end_date = start_date
+    elif date_filter == "weekly":
+        start_date = start_date - timedelta(days=7)
+    elif date_filter == "monthly":
+        start_date = start_date - timedelta(days=30)
+    elif date_filter == "custom":
+        custom_start = request.GET.get("start_date")
+        custom_end = request.GET.get("end_date")
+        if custom_start and custom_end:
+            from datetime import datetime
+            try:
+                start_date = datetime.strptime(custom_start, "%Y-%m-%d").date()
+                end_date = datetime.strptime(custom_end, "%Y-%m-%d").date()
+            except ValueError:
+                pass
+
+    k_perf = kitchen_performance(tenant, selected_outlet, start_date, end_date)
+    k_items = top_kitchen_items(tenant, selected_outlet, start_date, end_date)
+
+    if request.GET.get('format') == 'json':
+        return JsonResponse({
+            "success": True,
+            "data": {
+                "kitchen_performance": k_perf,
+                "top_items": list(k_items),
+                "date_filter": date_filter,
+                "start_date": str(start_date),
+                "end_date": str(end_date)
+            }
+        }, encoder=DjangoJSONEncoder)
+
+    return render(request, "reports/kitchen_dashboard.html", {
+        "k_perf": k_perf,
+        "k_items": k_items,
+        "outlets": outlets,
+        "current_outlet": outlet,
+        "date_filter": date_filter,
+        "start_date": start_date,
+        "end_date": end_date
+    })
+
+@login_required
+@tenant_required
+@role_required("owner", "manager")
+def inspection_report(request):
+    """
+    Government / tax inspection view — hardcoded to TODAY only.
+    No date controls. No history. Owner shows this screen to the inspector.
+    Accessible to owner and manager only.
+    """
+    from decimal import Decimal
+    from django.db.models import Sum, Count
+    from orders.models import Order, Payment
+    from reports.services.item_reports import top_items
+    from core.utils import get_business_date, get_business_date_range
+
+    tenant = request.user.tenant
+    outlet = request.user.outlet
+    today  = get_business_date(timezone.now(), outlet)
+    range_start, range_end = get_business_date_range(today, outlet)
+
+    orders = (
+        Order.objects
+        .filter(
+            tenant=tenant,
+            outlet=outlet,
+            created_at__gte=range_start, created_at__lt=range_end,
+            status__in=["paid", "closed"],
+        )
+        .order_by("created_at")
+        .select_related("table", "token")
+        .prefetch_related("payments")
+    )
+
+    agg = orders.aggregate(
+        gross=Sum("grand_total"),
+        gst=Sum("gst_total"),
+        discounts=Sum("discount_total"),
+        count=Count("id"),
+    )
+    gross       = agg["gross"]     or Decimal("0")
+    gst         = agg["gst"]       or Decimal("0")
+    discounts   = agg["discounts"] or Decimal("0")
+    order_count = agg["count"]     or 0
+    net         = gross - gst
+
+    # GST breakdown by rate — read from each order's stored cache
+    gst_by_rate = {}
+    for order in orders:
+        for row in (order.gst_breakdown or []):
+            rate = str(row["rate"])
+            if rate not in gst_by_rate:
+                gst_by_rate[rate] = {
+                    "rate":    row["rate"],
+                    "taxable": Decimal("0"),
+                    "cgst":    Decimal("0"),
+                    "sgst":    Decimal("0"),
+                }
+            gst_by_rate[rate]["cgst"] += row["cgst_amount"]
+            gst_by_rate[rate]["sgst"] += row["sgst_amount"]
+    for r in gst_by_rate.values():
+        r["taxable"] = r["cgst"] + r["sgst"]
+
+    items_today = top_items(tenant, outlet, start_date=today, end_date=today)[:10]
+
+    payments = (
+        Payment.objects
+        .filter(order__in=orders)
+        .exclude(method="refund")
+        .values("method")
+        .annotate(total=Sum("amount"), count=Count("id"))
+        .order_by("-total")
+    )
+
+    is_composition = getattr(outlet, "is_composition_scheme", False)
+
+    return render(request, "reports/inspect.html", {
+        "today":         today,
+        "outlet":        outlet,
+        "tenant":        tenant,
+        "orders":        orders,
+        "order_count":   order_count,
+        "gross":         gross,
+        "gst":           gst,
+        "net":           net,
+        "discounts":     discounts,
+        "gst_by_rate":   sorted(gst_by_rate.values(), key=lambda r: r["rate"]),
+        "items_today":   items_today,
+        "payments":      payments,
+        "is_composition": is_composition,
+    })
+
+
+@login_required
+@tenant_required
+@feature_required("reports")
+@role_required("owner", "manager", "agent")
+def inventory_report(request):
+    from reports.services.inventory_reports import inventory_usage, inventory_wastage, inventory_cost, stock_ledger, production_capacity, closing_stock
+    from inventory.models import InventoryItem
+
+    tenant = request.user.tenant
+
+    date_filter = request.GET.get("date_filter", "today")
+    outlet_id = request.GET.get("outlet")
+    if request.user.role == "owner":
+        outlets = Outlet.objects.filter(tenant=tenant)
+        outlet = outlets.filter(id=outlet_id).first() if outlet_id else outlets.first()
+    else:
+        outlets = Outlet.objects.filter(id=request.user.outlet_id)
+        outlet = request.user.outlet
+
+    from core.utils import get_business_date
+    start_date = get_business_date(timezone.now(), outlet)
+    end_date = get_business_date(timezone.now(), outlet)
+
+    if date_filter == "yesterday":
+        start_date = start_date - timedelta(days=1)
+        end_date = start_date
+    elif date_filter == "weekly":
+        start_date = start_date - timedelta(days=7)
+    elif date_filter == "monthly":
+        start_date = start_date - timedelta(days=30)
+    elif date_filter == "custom":
+        custom_start = request.GET.get("start_date")
+        custom_end = request.GET.get("end_date")
+        if custom_start and custom_end:
+            from datetime import datetime
+            try:
+                start_date = datetime.strptime(custom_start, "%Y-%m-%d").date()
+                end_date = datetime.strptime(custom_end, "%Y-%m-%d").date()
+            except ValueError:
+                pass
+
+    item_id = request.GET.get("item") or None
+
+    usage = inventory_usage(tenant, outlet, start_date, end_date) if outlet else []
+    wastage = inventory_wastage(tenant, outlet, start_date, end_date) if outlet else []
+    costs = inventory_cost(tenant, outlet, start_date, end_date) if outlet else []
+    ledger = stock_ledger(tenant, outlet, start_date, end_date, item_id) if outlet else []
+    items = InventoryItem.objects.filter(tenant=tenant, outlet=outlet).order_by("name") if outlet else []
+
+    total_cost = sum(r["total_cost"] for r in costs if r["total_cost"])
+    total_wastage_qty = {r["item__name"]: r["total_qty"] for r in wastage}
+    capacity = production_capacity(tenant, outlet) if outlet else []
+    closing = list(closing_stock(tenant, outlet)) if outlet else []
+
+    return render(request, "reports/inventory_report.html", {
+        "outlets": outlets,
+        "current_outlet": outlet,
+        "date_filter": date_filter,
+        "start_date": start_date,
+        "end_date": end_date,
+        "usage": usage,
+        "wastage": wastage,
+        "costs": costs,
+        "ledger": ledger,
+        "items": items,
+        "selected_item": item_id,
+        "total_cost": total_cost,
+        "total_wastage_qty": total_wastage_qty,
+        "capacity": capacity,
+        "closing": closing,
+    })
+
+
+@login_required
+@tenant_required
+@feature_required("reports")
+@role_required("owner", "manager", "agent")
+def export_reports(request):
+    """
+    Handles CSV and Excel exports.
+    Types: 'orders', 'items', 'gstr1'
+    """
+    tenant = request.user.tenant
+    outlet_id = request.GET.get("outlet")
+    export_type = request.GET.get("type", "orders")
+
+    date_filter = request.GET.get("date_filter", "today")
+
+    outlet = None
+    if request.user.role == "owner":
+        if outlet_id:
+            outlet = Outlet.objects.filter(tenant=tenant, id=outlet_id).first()
+    else:
+        outlet = request.user.outlet
+
+    from core.utils import get_business_date
+    start_date = get_business_date(timezone.now(), outlet)
+    end_date = get_business_date(timezone.now(), outlet)
+
+    if date_filter == "yesterday":
+        start_date = start_date - timedelta(days=1)
+        end_date = start_date
+    elif date_filter == "weekly":
+        start_date = start_date - timedelta(days=7)
+    elif date_filter == "monthly":
+        start_date = start_date - timedelta(days=30)
+    elif date_filter == "custom":
+        custom_start = request.GET.get("start_date")
+        custom_end = request.GET.get("end_date")
+        if custom_start and custom_end:
+            from datetime import datetime
+            try:
+                start_date = datetime.strptime(custom_start, "%Y-%m-%d").date()
+                end_date = datetime.strptime(custom_end, "%Y-%m-%d").date()
+            except ValueError:
+                pass
+
+    from .services.export_services import (
+        generate_orders_csv,
+        generate_items_csv,
+        generate_gstr1_excel,
+        generate_waiter_csv,
+        generate_category_csv,
+        generate_pl_csv,
+        generate_menu_engineering_csv,
+        generate_labor_csv,
+        generate_audit_csv,
+        generate_crm_analytics_csv,
+    )
+    
+    if export_type == "orders":
+        csv_data = generate_orders_csv(tenant, outlet, start_date, end_date)
+        response = HttpResponse(csv_data, content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="orders_{start_date}_to_{end_date}.csv"'
+        return response
+        
+    elif export_type == "items":
+        csv_data = generate_items_csv(tenant, outlet, start_date, end_date)
+        response = HttpResponse(csv_data, content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="items_{start_date}_to_{end_date}.csv"'
+        return response
+        
+    elif export_type == "waiters":
+        csv_data = generate_waiter_csv(tenant, outlet, start_date, end_date)
+        response = HttpResponse(csv_data, content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="staff_performance_{start_date}_to_{end_date}.csv"'
+        return response
+        
+    elif export_type == "categories":
+        csv_data = generate_category_csv(tenant, outlet, start_date, end_date)
+        response = HttpResponse(csv_data, content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="category_sales_{start_date}_to_{end_date}.csv"'
+        return response
+        
+    elif export_type == "gstr1":
+        excel_data = generate_gstr1_excel(tenant, outlet, start_date, end_date)
+        response = HttpResponse(excel_data, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = f'attachment; filename="gstr1_b2cs_{start_date}_to_{end_date}.xlsx"'
+        return response
+
+    elif export_type == "pl":
+        if not has_feature(tenant, "advanced_reports"):
+            return HttpResponseForbidden("Feature not enabled")
+        csv_data = generate_pl_csv(tenant, outlet, start_date, end_date)
+        response = HttpResponse(csv_data, content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="net_profit_{start_date}_to_{end_date}.csv"'
+        return response
+
+    elif export_type == "menu_engineering":
+        if not has_feature(tenant, "advanced_reports"):
+            return HttpResponseForbidden("Feature not enabled")
+        csv_data = generate_menu_engineering_csv(tenant, outlet, start_date, end_date)
+        response = HttpResponse(csv_data, content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="menu_engineering_{start_date}_to_{end_date}.csv"'
+        return response
+
+    elif export_type == "labor":
+        if not has_feature(tenant, "advanced_reports"):
+            return HttpResponseForbidden("Feature not enabled")
+        csv_data = generate_labor_csv(tenant, outlet, start_date, end_date)
+        response = HttpResponse(csv_data, content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="labor_cost_{start_date}_to_{end_date}.csv"'
+        return response
+
+    elif export_type == "audit":
+        if not has_feature(tenant, "advanced_reports"):
+            return HttpResponseForbidden("Feature not enabled")
+        csv_data = generate_audit_csv(tenant, outlet, start_date, end_date)
+        response = HttpResponse(csv_data, content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="discount_void_audit_{start_date}_to_{end_date}.csv"'
+        return response
+
+    elif export_type == "crm_analytics":
+        if not has_feature(tenant, "advanced_reports"):
+            return HttpResponseForbidden("Feature not enabled")
+        csv_data = generate_crm_analytics_csv(tenant, outlet, start_date, end_date)
+        response = HttpResponse(csv_data, content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="crm_analytics_{start_date}_to_{end_date}.csv"'
+        return response
+
+    return HttpResponseForbidden("Invalid export type")
+
+
+@login_required
+@tenant_required
+@feature_required("advanced_reports")
+@role_required("owner", "manager")
+def menu_engineering_report_view(request):
+    """
+    Popularity x profitability quadrant per menu item (stars/plowhorses/
+    puzzles/dogs). Owner/manager only, no agent -- per-item cost/margin data
+    is at least as sensitive as the agent-suppressed items/waiters sections
+    on the main dashboard.
+    """
+    from reports.services.menu_engineering import menu_engineering_report
+
+    tenant = request.user.tenant
+    date_filter = request.GET.get("date_filter", "today")
+    outlet_id = request.GET.get("outlet")
+
+    if request.user.role == "owner":
+        outlets = Outlet.objects.filter(tenant=tenant)
+        outlet = outlets.filter(id=outlet_id).first() if outlet_id else None
+    else:
+        outlets = Outlet.objects.filter(id=request.user.outlet_id)
+        outlet = request.user.outlet
+
+    from core.utils import get_business_date
+    start_date = get_business_date(timezone.now(), outlet)
+    end_date = get_business_date(timezone.now(), outlet)
+
+    if date_filter == "yesterday":
+        start_date = start_date - timedelta(days=1)
+        end_date = start_date
+    elif date_filter == "weekly":
+        start_date = start_date - timedelta(days=7)
+    elif date_filter == "monthly":
+        start_date = start_date - timedelta(days=30)
+    elif date_filter == "custom":
+        custom_start = request.GET.get("start_date")
+        custom_end = request.GET.get("end_date")
+        if custom_start and custom_end:
+            from datetime import datetime
+            try:
+                start_date = datetime.strptime(custom_start, "%Y-%m-%d").date()
+                end_date = datetime.strptime(custom_end, "%Y-%m-%d").date()
+            except ValueError:
+                pass
+
+    report = menu_engineering_report(tenant, outlet, start_date, end_date)
+
+    return render(request, "reports/menu_engineering.html", {
+        "report": report,
+        "outlets": outlets,
+        "current_outlet": outlet,
+        "date_filter": date_filter,
+        "start_date": start_date,
+        "end_date": end_date,
+    })
+
+
+@login_required
+@tenant_required
+@feature_required("advanced_reports")
+@role_required("owner", "manager")
+def labor_report_view(request):
+    """
+    Labor cost vs revenue, per staff member. Owner/manager only, no agent,
+    no cashier/captain -- this is the most personally sensitive of the new
+    reports (coworkers' pay), heavier than the money-only reports above.
+    """
+    from reports.services.labor_reports import labor_cost_report
+
+    tenant = request.user.tenant
+    date_filter = request.GET.get("date_filter", "today")
+    outlet_id = request.GET.get("outlet")
+
+    if request.user.role == "owner":
+        outlets = Outlet.objects.filter(tenant=tenant)
+        outlet = outlets.filter(id=outlet_id).first() if outlet_id else None
+    else:
+        outlets = Outlet.objects.filter(id=request.user.outlet_id)
+        outlet = request.user.outlet
+
+    from core.utils import get_business_date
+    start_date = get_business_date(timezone.now(), outlet)
+    end_date = get_business_date(timezone.now(), outlet)
+
+    if date_filter == "yesterday":
+        start_date = start_date - timedelta(days=1)
+        end_date = start_date
+    elif date_filter == "weekly":
+        start_date = start_date - timedelta(days=7)
+    elif date_filter == "monthly":
+        start_date = start_date - timedelta(days=30)
+    elif date_filter == "custom":
+        custom_start = request.GET.get("start_date")
+        custom_end = request.GET.get("end_date")
+        if custom_start and custom_end:
+            from datetime import datetime
+            try:
+                start_date = datetime.strptime(custom_start, "%Y-%m-%d").date()
+                end_date = datetime.strptime(custom_end, "%Y-%m-%d").date()
+            except ValueError:
+                pass
+
+    report = labor_cost_report(tenant, outlet, start_date, end_date)
+
+    return render(request, "reports/labor_report.html", {
+        "report": report,
+        "outlets": outlets,
+        "current_outlet": outlet,
+        "date_filter": date_filter,
+        "start_date": start_date,
+        "end_date": end_date,
+    })
+
+
+@login_required
+@tenant_required
+@feature_required("advanced_reports")
+@role_required("owner", "manager")
+def audit_report_view(request):
+    """
+    Discount/void staff audit -- who is discounting, comping, and voiding.
+    Owner/manager only, no agent -- this is a staff-conduct report, at least
+    as sensitive as the financial reports above it.
+    """
+    from reports.services.audit_reports import discount_void_audit
+
+    tenant = request.user.tenant
+    date_filter = request.GET.get("date_filter", "today")
+    outlet_id = request.GET.get("outlet")
+
+    if request.user.role == "owner":
+        outlets = Outlet.objects.filter(tenant=tenant)
+        outlet = outlets.filter(id=outlet_id).first() if outlet_id else None
+    else:
+        outlets = Outlet.objects.filter(id=request.user.outlet_id)
+        outlet = request.user.outlet
+
+    from core.utils import get_business_date
+    start_date = get_business_date(timezone.now(), outlet)
+    end_date = get_business_date(timezone.now(), outlet)
+
+    if date_filter == "yesterday":
+        start_date = start_date - timedelta(days=1)
+        end_date = start_date
+    elif date_filter == "weekly":
+        start_date = start_date - timedelta(days=7)
+    elif date_filter == "monthly":
+        start_date = start_date - timedelta(days=30)
+    elif date_filter == "custom":
+        custom_start = request.GET.get("start_date")
+        custom_end = request.GET.get("end_date")
+        if custom_start and custom_end:
+            from datetime import datetime
+            try:
+                start_date = datetime.strptime(custom_start, "%Y-%m-%d").date()
+                end_date = datetime.strptime(custom_end, "%Y-%m-%d").date()
+            except ValueError:
+                pass
+
+    report = discount_void_audit(tenant, outlet, start_date, end_date)
+
+    return render(request, "reports/audit_report.html", {
+        "report": report,
+        "outlets": outlets,
+        "current_outlet": outlet,
+        "date_filter": date_filter,
+        "start_date": start_date,
+        "end_date": end_date,
+    })
+
+
+@login_required
+@tenant_required
+@feature_required("advanced_reports", "crm")
+@role_required("owner", "manager", "agent")
+def crm_analytics_report_view(request):
+    """
+    Repeat-customer rate, loyalty trend, feedback trend. Unlike the other new
+    reports, agent CAN see this one -- loyalty-program health is a reasonable
+    thing for a support agent to check, unlike money or individual staff pay.
+    """
+    from reports.services.crm_reports import crm_analytics_report
+
+    tenant = request.user.tenant
+    date_filter = request.GET.get("date_filter", "today")
+    outlet_id = request.GET.get("outlet")
+
+    if request.user.role == "owner":
+        outlets = Outlet.objects.filter(tenant=tenant)
+        outlet = outlets.filter(id=outlet_id).first() if outlet_id else None
+    elif request.user.role == "agent":
+        outlets = Outlet.objects.filter(tenant=tenant)
+        outlet = outlets.filter(id=outlet_id).first() if outlet_id else None
+    else:
+        outlets = Outlet.objects.filter(id=request.user.outlet_id)
+        outlet = request.user.outlet
+
+    from core.utils import get_business_date
+    start_date = get_business_date(timezone.now(), outlet)
+    end_date = get_business_date(timezone.now(), outlet)
+
+    if date_filter == "yesterday":
+        start_date = start_date - timedelta(days=1)
+        end_date = start_date
+    elif date_filter == "weekly":
+        start_date = start_date - timedelta(days=7)
+    elif date_filter == "monthly":
+        start_date = start_date - timedelta(days=30)
+    elif date_filter == "custom":
+        custom_start = request.GET.get("start_date")
+        custom_end = request.GET.get("end_date")
+        if custom_start and custom_end:
+            from datetime import datetime
+            try:
+                start_date = datetime.strptime(custom_start, "%Y-%m-%d").date()
+                end_date = datetime.strptime(custom_end, "%Y-%m-%d").date()
+            except ValueError:
+                pass
+
+    report = crm_analytics_report(tenant, outlet, start_date, end_date)
+
+    return render(request, "reports/crm_analytics.html", {
+        "report": report,
+        "outlets": outlets,
+        "current_outlet": outlet,
+        "date_filter": date_filter,
+        "start_date": start_date,
+        "end_date": end_date,
+    })
+
+

@@ -1,0 +1,89 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Menu Setup | {{ request.user.tenant.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-body { max-width: 900px; margin: 0 auto; padding: 4rem 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
+    @media(max-width: 640px) { .page-body { grid-template-columns: 1fr; } }
+
+    .page-eyebrow { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 4px; color: var(--accent-gold); margin-bottom: 0.5rem; }
+    .page-title { font-family: 'DM Serif Display', serif; font-size: 1.8rem; font-weight: 700; }
+    .divider { width: 40px; height: 1px; background: var(--accent-gold); margin: 1.2rem 0; }
+    .page-sub { color: var(--text-muted); font-size: 0.8rem; line-height: 1.6; margin-bottom: 2rem; }
+
+    .form-label { display: block; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; margin-bottom: 0.5rem; }
+    .setup-input { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border-color); color: var(--text-main); padding: 0.6rem 0; font-size: 0.9rem; outline: none; margin-bottom: 1.5rem; font-family: inherit; }
+    .setup-input:focus { border-bottom-color: var(--accent-gold); }
+
+    .btn-add { width: 100%; padding: 0.9rem; background: var(--accent-gold); border: none; color: #fff; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+    .btn-add:hover { background: var(--accent-hover); }
+
+    .alert { padding: 0.8rem 1.2rem; margin-bottom: 1.5rem; font-size: 0.8rem; border-left: 3px solid var(--accent-gold); background: rgba(197,160,89,0.08); }
+
+    .section-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; margin-bottom: 1rem; display: block; }
+    .category-card { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 1.2rem 1.5rem; margin-bottom: 0.75rem; display: flex; align-items: center; }
+    .category-icon { color: var(--accent-gold); margin-right: 0.75rem; }
+    .category-name { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; }
+    .empty-state { color: var(--text-muted); font-size: 0.8rem; font-style: italic; padding: 1.5rem 0; }
+</style>
+{% endblock %}
+
+{% block header_left %}
+<div>
+    <a href="/dashboard/" style="text-decoration:none;color:inherit;">
+        <h1 class="brand-title mb-0">
+            <i class="bi bi-diamond-half" style="color:var(--accent-gold);"></i>
+            {{ request.user.tenant.name }}
+        </h1>
+    </a>
+    <p class="brand-subtitle">Setup — {{ request.user.outlet.name }}</p>
+</div>
+{% endblock %}
+
+{% block header_right %}
+<a href="/setup/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Setup Area</a>
+<a href="/logout/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Logout</a>
+<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme">
+    <i class="bi bi-moon" id="themeIcon"></i>
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="page-body">
+    <!-- LEFT: ADD CATEGORY -->
+    <div>
+        <p class="page-eyebrow">Configuration</p>
+        <h1 class="page-title">Categories</h1>
+        <div class="divider"></div>
+        <p class="page-sub">Establish the hierarchy of your menu. You can add items to these categories in the main Menu Management section.</p>
+
+        {% if messages %}
+        {% for msg in messages %}
+        <div class="alert">{{ msg }}</div>
+        {% endfor %}
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <label class="form-label">Category Name</label>
+            <input type="text" name="category_name" class="setup-input" placeholder="e.g. Starters, Main Course, Drinks" required>
+            <button type="submit" class="btn-add"><i class="bi bi-plus-lg me-2"></i>Create Category</button>
+        </form>
+    </div>
+
+    <!-- RIGHT: EXISTING CATEGORIES -->
+    <div>
+        <span class="section-label">Defined Categories</span>
+        {% for category in categories %}
+        <div class="category-card">
+            <i class="bi bi-tag category-icon"></i>
+            <div class="category-name">{{ category.name }}</div>
+        </div>
+        {% empty %}
+        <p class="empty-state">No categories defined yet. Start by defining your high-level menu sections.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
