@@ -26,12 +26,26 @@ class Table(TenantScopedModel):
         ("cleaning", "Cleaning"),
     )
 
+    SHAPES = (
+        ("square", "Square"),
+        ("round", "Round"),
+        ("rect", "Rectangle"),
+        ("wall", "Wall"),
+    )
+
     tenant = models.ForeignKey("tenants.Tenant", on_delete=models.CASCADE)
     outlet = models.ForeignKey("tenants.Outlet", on_delete=models.CASCADE)
 
     name = models.CharField(max_length=100)
 
     section = models.CharField(max_length=100, default="Main Hall", blank=True)
+
+    capacity = models.PositiveSmallIntegerField(default=4)
+    shape = models.CharField(max_length=20, choices=SHAPES, default="square")
+    pos_x = models.IntegerField(null=True, blank=True)
+    pos_y = models.IntegerField(null=True, blank=True)
+    width = models.IntegerField(null=True, blank=True)
+    height = models.IntegerField(null=True, blank=True)
 
     qr_token = models.UUIDField(default=uuid.uuid4, unique=True)
 
@@ -52,6 +66,28 @@ class Table(TenantScopedModel):
         return self.name
 
 
+class FloorSection(TenantScopedModel):
+    tenant = models.ForeignKey("tenants.Tenant", on_delete=models.CASCADE)
+    outlet = models.ForeignKey("tenants.Outlet", on_delete=models.CASCADE)
+
+    name = models.CharField(max_length=100)
+    width = models.IntegerField(default=900)
+    height = models.IntegerField(default=500)
+    grid_size = models.IntegerField(default=40)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("tenant", "outlet", "name")
+        indexes = [
+            models.Index(fields=["tenant", "outlet"]),
+        ]
+
+    def __str__(self):
+        return f"{self.name} ({self.outlet.name})"
+
+
 # =====================================================
 # ORDER
 # =====================================================
@@ -69,6 +105,7 @@ class Order(TenantScopedModel):
     SOURCE_CHOICES = (
         ("dine_in",   "Dine In"),
         ("takeaway",  "Takeaway"),
+        ("delivery",  "Delivery"),        # in-house delivery, not via an aggregator
         ("counter",   "Counter / QSR"),   # franchise / cafe token orders
         ("zomato",    "Zomato"),
         ("swiggy",    "Swiggy"),

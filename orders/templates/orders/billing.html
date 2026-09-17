@@ -283,12 +283,17 @@
         <select id="sourceSelectDesktop" class="form-select-luxury mb-2" onchange="toggleAggregator(this.value, 'desktop')">
           <option value="dine_in">Dine-in</option>
           <option value="takeaway">Takeaway</option>
+          <option value="delivery">Delivery</option>
           <option value="zomato">Zomato</option>
           <option value="swiggy">Swiggy</option>
           <option value="uber_eats">Uber Eats</option>
           <option value="web">Website</option>
         </select>
         <input type="text" id="aggregatorIdDesktop" class="form-control-minimal mb-2 d-none" placeholder="Aggregator Order ID">
+        <div id="deliveryInfoDesktop" class="d-none">
+          <input type="text" id="customerNameDesktop" class="form-control-minimal mb-2" placeholder="Customer Name" maxlength="100">
+          <input type="tel" id="customerPhoneDesktop" class="form-control-minimal mb-2" placeholder="Customer Phone" maxlength="10">
+        </div>
       </div>
       <div id="cartItemsContainerDesktop" style="min-height:200px;"></div>
     </div>
@@ -363,12 +368,17 @@
         <select id="sourceSelectMobile" class="form-select-luxury mb-2" onchange="toggleAggregator(this.value, 'mobile')">
           <option value="dine_in">Dine-in</option>
           <option value="takeaway">Takeaway</option>
+          <option value="delivery">Delivery</option>
           <option value="zomato">Zomato</option>
           <option value="swiggy">Swiggy</option>
           <option value="uber_eats">Uber Eats</option>
           <option value="web">Website</option>
         </select>
         <input type="text" id="aggregatorIdMobile" class="form-control-minimal mb-2 d-none" placeholder="Aggregator Order ID">
+        <div id="deliveryInfoMobile" class="d-none">
+          <input type="text" id="customerNameMobile" class="form-control-minimal mb-2" placeholder="Customer Name" maxlength="100">
+          <input type="tel" id="customerPhoneMobile" class="form-control-minimal mb-2" placeholder="Customer Phone" maxlength="10">
+        </div>
       </div>
       <div id="cartItemsContainerMobile"></div>
       <div class="cart-page-breakdown">
@@ -510,6 +520,19 @@
       el.classList.toggle('d-none', !isAggregator);
       if (!isAggregator) el.value = '';
     }
+
+    // Delivery needs a name/phone to actually deliver to — dine-in has the
+    // table selector for this, takeaway has the parcel-charge toggle, but
+    // delivery had nothing until now.
+    const deliveryBox = document.getElementById(view === 'desktop' ? 'deliveryInfoDesktop' : 'deliveryInfoMobile');
+    if (deliveryBox) {
+      const isDelivery = val === 'delivery';
+      deliveryBox.classList.toggle('d-none', !isDelivery);
+      if (!isDelivery) {
+        deliveryBox.querySelectorAll('input').forEach(i => i.value = '');
+      }
+    }
+
     updateOrderSummaryText(view);
   }
 
@@ -854,7 +877,9 @@
     const isMobile = window.innerWidth < 992;
     const source   = document.getElementById(isMobile ? "sourceSelectMobile"  : "sourceSelectDesktop").value;
     const aggId    = document.getElementById(isMobile ? "aggregatorIdMobile"   : "aggregatorIdDesktop").value;
-    const orderPayload = { cart, table_id: tableId, source, aggregator_id: aggId, customer_name: '', customer_phone: '' };
+    const custName = document.getElementById(isMobile ? "customerNameMobile"  : "customerNameDesktop").value;
+    const custPhone = document.getElementById(isMobile ? "customerPhoneMobile" : "customerPhoneDesktop").value;
+    const orderPayload = { cart, table_id: tableId, source, aggregator_id: aggId, customer_name: custName, customer_phone: custPhone };
     if (currentOrderId) orderPayload.order_id = currentOrderId;
 
     // Edge case: already offline before the cashier even hits submit — don't
