@@ -1,13 +1,17 @@
 # orders/views/order_views.py
+import json
 import logging
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_POST
+from django.utils import timezone
+from django.db.models import Q
 
 from django.db import transaction
 from core.decorators import tenant_required, feature_required
-from orders.models import Order, OrderItem
+from orders.models import Order, OrderItem, Table, FloorSection
+from waiter.models import WaiterCall
 from tablemerge.models import TableMerge
 from orders.services.event_service import log_event
 
@@ -300,3 +304,335 @@ def approve_item(request, item_id):
     except Exception:
         logger.exception("approve_item error")
         return JsonResponse({"error": "Could not approve the item. Please try again."}, status=400)
+
+
+@login_required
+@tenant_required
+@require_POST
+def accept_order_view(request, order_id):
+    """
+    Accept an order (from QR code, takeaway, table, etc.) with estimated prep time.
+    1. Validates order belongs to user tenant/outlet.
+    2. Parses prep_time (minutes, default 15) from request JSON.
+    3. Saves prep_time_minutes and calculates estimated_ready_at.
+    4. Approves any items in 'review' status -> 'pending'.
+    5. Sends pending items to kitchen via create_kot() and marks them 'sent'.
+    6. Logs event for auditing.
+    """
+    tenant = request.user.tenant
+    outlet = request.user.outlet
+
+    try:
+        data = json.loads(request.body.decode("utf-8")) if request.body else {}
+    except Exception:
+        data = {}
+
+    try:
+        prep_time_minutes = int(data.get("prep_time", 15))
+        if prep_time_minutes <= 0 or prep_time_minutes > 300:
+            prep_time_minutes = 15
+    except (ValueError, TypeError):
+        prep_time_minutes = 15
+
+    try:
+        with transaction.atomic():
+            order = (
+                Order.objects
+                .select_for_update()
+                .filter(id=order_id, tenant=tenant, outlet=outlet)
+                .first()
+            )
+            if not order:
+                return JsonResponse({"error": "Order not found"}, status=404)
+
+            now = timezone.now()
+            order.prep_time_minutes = prep_time_minutes
+            order.estimated_ready_at = now + timezone.timedelta(minutes=prep_time_minutes)
+            order.save(update_fields=["prep_time_minutes", "estimated_ready_at"])
+
+            # 1. Update any review items (QR code guests) to pending
+            review_items = OrderItem.objects.filter(
+                order=order, status="review"
+            ).select_for_update()
+            if review_items.exists():
+                review_items.update(status="pending")
+
+            # 2. Send pending items to kitchen
+            pending_items = OrderItem.objects.filter(
+                order=order, status="pending"
+            ).select_for_update()
+
+            kot_created = False
+            if pending_items.exists():
+                try:
+                    from kitchen.services.kot_service import create_kot
+                    create_kot(request.user, order)
+                    kot_created = True
+                except Exception as kot_err:
+                    logger.warning("KOT creation on accept order #%s: %s", order.id, kot_err)
+                    pending_items.update(status="sent")
+
+            # Update table state to busy if dine-in
+            if order.table and order.table.state != "busy":
+                order.table.state = "busy"
+                order.table.save(update_fields=["state"])
+
+            log_event(order, "status_changed", request.user, {
+                "action": "order_accepted",
+                "prep_time_minutes": prep_time_minutes,
+                "kot_created": kot_created
+            })
+
+            logger.info("Order #%s accepted with %s min prep time by %s", order.id, prep_time_minutes, request.user.username)
+
+        return JsonResponse({
+            "success": True,
+            "order_id": order.id,
+            "prep_time_minutes": prep_time_minutes,
+            "category": "accepted"
+        })
+    except Exception as e:
+        logger.exception("accept_order_view error for order #%s", order_id)
+        return JsonResponse({"error": "Could not accept order: " + str(e)}, status=400)
+
+
+@login_required
+@tenant_required
+@require_POST
+def serve_order_view(request, order_id):
+    """Marks all non-voided items of an order as 'served'."""
+    order = Order.objects.filter(id=order_id, tenant=request.user.tenant, outlet=request.user.outlet).first()
+    if not order:
+        return JsonResponse({"error": "Order not found"}, status=404)
+    with transaction.atomic():
+        order.items.exclude(status__in=["served", "voided"]).update(status="served")
+        from orders.services.order_service import update_table_state
+        update_table_state(order)
+    return JsonResponse({"success": True})
+
+
+@login_required
+@tenant_required
+def orders_page_view(request):
+    """
+    Main Orders Management dashboard matching modern POS design.
+    """
+    tenant = request.user.tenant
+    outlet = request.user.outlet
+    
+    sections = list(FloorSection.objects.filter(tenant=tenant, outlet=outlet).values_list("name", flat=True))
+    table_sections = list(Table.objects.filter(tenant=tenant, outlet=outlet, is_active=True).values_list("section", flat=True).distinct())
+    all_sections = sorted(list(set(filter(None, sections + table_sections))))
+    if not all_sections:
+        all_sections = ["Floor 1"]
+
+    return render(request, "orders/orders_dashboard.html", {
+        "sections": all_sections,
+    })
+
+
+@login_required
+@tenant_required
+def orders_feed_data(request):
+    """
+    JSON feed providing live orders, metrics, service requests, and mini-map tables.
+    """
+    tenant = request.user.tenant
+    outlet = request.user.outlet
+    now = timezone.now()
+    today_start = timezone.localtime(now).replace(hour=0, minute=0, second=0, microsecond=0)
+
+    # 1. Metrics
+    today_orders_qs = Order.objects.filter(tenant=tenant, outlet=outlet, created_at__gte=today_start)
+    today_count = today_orders_qs.count()
+    
+    active_orders_qs = Order.objects.filter(
+        tenant=tenant, outlet=outlet, status__in=["open", "billing"]
+    ).select_related("table", "created_by").prefetch_related("items__menu_item")
+
+    active_count = active_orders_qs.count()
+    
+    # 2. Service Requests (unresolved Waiter Calls)
+    service_requests = []
+    try:
+        calls = WaiterCall.objects.filter(
+            tenant=tenant, outlet=outlet, is_resolved=False
+        ).select_related("table").order_by("-created_at")
+        for c in calls:
+            service_requests.append({
+                "id": c.id,
+                "table_id": c.table.id if c.table else None,
+                "table_name": c.table.name if c.table else "Unknown",
+                "reason": "Water / Assistance",
+                "time": timezone.localtime(c.created_at).strftime("%I:%M %p"),
+            })
+    except Exception as e:
+        logger.warning("Failed to fetch waiter calls: %s", e)
+
+    # 3. Active Orders List (Currently live: open or billing)
+    active_orders_qs = Order.objects.filter(
+        tenant=tenant, outlet=outlet, status__in=["open", "billing"]
+    ).select_related("table", "created_by").prefetch_related("items__menu_item", "payments").order_by("-created_at")
+
+    orders_data = []
+    served_count = 0
+
+    for o in active_orders_qs:
+        items_list = [i for i in o.items.all() if i.status != "voided"]
+        
+        # Determine order category
+        category = "new"
+        if o.status == "billing":
+            category = "served"
+            served_count += 1
+        elif any(i.status == "review" for i in items_list):
+            category = "new"
+        elif any(i.status == "pending" for i in items_list) and not any(i.status in ["sent", "preparing", "ready", "served"] for i in items_list):
+            category = "new"
+        elif any(i.status == "sent" for i in items_list):
+            category = "accepted"
+        elif any(i.status == "preparing" for i in items_list):
+            category = "preparing"
+        elif any(i.status == "ready" for i in items_list):
+            category = "ready"
+        elif any(i.status == "served" for i in items_list):
+            category = "served"
+            served_count += 1
+        else:
+            category = "new"
+
+        serialized_items = []
+        for i in items_list:
+            unit_price = float(i.price or 0)
+            tot_price = float(i.total_price) if i.total_price is not None else round(unit_price * i.quantity, 2)
+            serialized_items.append({
+                "id": i.id,
+                "name": i.menu_item.name if i.menu_item else "Item",
+                "quantity": i.quantity,
+                "price": unit_price,
+                "total_price": tot_price,
+                "status": i.status,
+            })
+
+        order_short_id = (o.order_number.split("-")[-1] if o.order_number else str(o.id).zfill(4))
+        if o.table:
+            tname = o.table.name.strip()
+            display_name = tname if tname.lower().startswith("table") else f"Table {tname}"
+        else:
+            display_name = "Takeaway"
+
+        orders_data.append({
+            "id": o.id,
+            "order_number": o.order_number or f"#{o.id}",
+            "short_id": order_short_id,
+            "table_id": o.table.id if o.table else None,
+            "table_name": display_name,
+            "time": timezone.localtime(o.created_at).strftime("%I:%M %p"),
+            "category": category,
+            "status": o.status,
+            "is_paid": False,
+            "prep_time_minutes": o.prep_time_minutes or 15,
+            "subtotal": float(o.subtotal or 0),
+            "gst_total": float(o.gst_total or 0),
+            "grand_total": float(o.grand_total or 0),
+            "created_at": o.created_at.isoformat(),
+            "elapsed_seconds": int((now - o.created_at).total_seconds()),
+            "items": serialized_items,
+        })
+
+    # 4. Recent Completed Orders (Top 5 most recently paid / closed)
+    recent_completed_qs = Order.objects.filter(
+        tenant=tenant, outlet=outlet, status__in=["paid", "closed"]
+    ).select_related("table", "created_by").prefetch_related("items__menu_item", "payments").order_by("-closed_at", "-updated_at", "-created_at")[:5]
+
+    recent_orders_data = []
+    for o in recent_completed_qs:
+        items_list = [i for i in o.items.all() if i.status != "voided"]
+        serialized_items = []
+        for i in items_list:
+            unit_price = float(i.price or 0)
+            tot_price = float(i.total_price) if i.total_price is not None else round(unit_price * i.quantity, 2)
+            serialized_items.append({
+                "id": i.id,
+                "name": i.menu_item.name if i.menu_item else "Item",
+                "quantity": i.quantity,
+                "price": unit_price,
+                "total_price": tot_price,
+                "status": i.status,
+            })
+
+        order_short_id = (o.order_number.split("-")[-1] if o.order_number else str(o.id).zfill(4))
+        if o.table:
+            tname = o.table.name.strip()
+            display_name = tname if tname.lower().startswith("table") else f"Table {tname}"
+        else:
+            display_name = "Takeaway"
+
+        valid_payments = [p for p in o.payments.all() if p.method != "refund"]
+        payment_method = valid_payments[0].method.upper() if valid_payments else "CASH"
+
+        time_dt = o.closed_at or o.updated_at or o.created_at
+        time_str = timezone.localtime(time_dt).strftime("%I:%M %p")
+
+        recent_orders_data.append({
+            "id": o.id,
+            "order_number": o.order_number or f"#{o.id}",
+            "short_id": order_short_id,
+            "table_id": o.table.id if o.table else None,
+            "table_name": display_name,
+            "time": time_str,
+            "category": "served",
+            "status": o.status,
+            "is_paid": True,
+            "payment_method": payment_method,
+            "subtotal": float(o.subtotal or 0),
+            "gst_total": float(o.gst_total or 0),
+            "grand_total": float(o.grand_total or 0),
+            "created_at": o.created_at.isoformat(),
+            "items": serialized_items,
+        })
+
+    # 4. Tables for the mini-map
+    tables = Table.objects.filter(tenant=tenant, outlet=outlet, is_active=True).order_by("name")
+    active_order_map = {o.table_id: o for o in active_orders_qs if o.table_id}
+
+    tables_data_list = []
+    for t in tables:
+        t_order = active_order_map.get(t.id)
+        is_busy = (t_order is not None or t.state not in ["free", "cleaning"])
+        elapsed_sec = int((now - t_order.created_at).total_seconds()) if t_order else 0
+        tables_data_list.append({
+            "id": t.id,
+            "name": t.name,
+            "section": t.section or "Floor 1",
+            "capacity": t.capacity or 4,
+            "shape": t.shape or "square",
+            "pos_x": t.pos_x,
+            "pos_y": t.pos_y,
+            "width": t.width,
+            "height": t.height,
+            "status": "busy" if is_busy else "free",
+            "elapsed_seconds": elapsed_sec,
+            "is_busy": is_busy,
+            "order_id": t_order.id if t_order else None,
+        })
+
+    sections = list(FloorSection.objects.filter(tenant=tenant, outlet=outlet).values_list("name", flat=True))
+    table_sections = list(tables.values_list("section", flat=True).distinct())
+    all_sections = sorted(list(set(filter(None, sections + table_sections))))
+    if not all_sections:
+        all_sections = ["Floor 1"]
+
+    return JsonResponse({
+        "metrics": {
+            "active_orders": len(orders_data),
+            "served": served_count,
+            "todays_orders": today_count,
+        },
+        "service_requests": service_requests,
+        "orders": orders_data,
+        "recent_orders": recent_orders_data,
+        "tables": tables_data_list,
+        "sections": all_sections,
+    })
+

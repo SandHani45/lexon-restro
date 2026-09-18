@@ -28,7 +28,7 @@ def generate_bill(request, order_id):
         order = (
             Order.objects.select_for_update()
             .filter(tenant=request.user.tenant, outlet=request.user.outlet,
-                    id=order_id, status="open")
+                    id=order_id, status__in=["open", "billing"])
             .first()
         )
         if not order:

@@ -10,22 +10,14 @@
         --text:   var(--text-main);
         --muted:  var(--text-muted);
         --border: var(--border-color);
-        --gold:   var(--accent-gold);
         --green:  #10b981;
         --red:    #ef4444;
         --amber:  #f59e0b;
         --smooth: var(--transition-smooth);
     }
 
-    .btn-lux {
-        border:1px solid var(--border); background:transparent; color:var(--text);
-        border-radius:0; text-transform:uppercase; font-size:0.72rem; letter-spacing:2px;
-        padding:0.6rem 1.3rem; transition:var(--smooth); cursor:pointer;
-        text-decoration:none; display:inline-block;
-    }
-    .btn-lux:hover, .btn-lux.active { border-color:var(--gold); background:var(--gold); color:#fff; }
-    .btn-lux.danger { border-color:var(--red); color:var(--red); }
-    .btn-lux.danger:hover { background:var(--red); color:#fff; }
+    .btn-luxuryury.danger { border-color:var(--red); color:var(--red); }
+    .btn-luxuryury.danger:hover { background:var(--red); color:#fff; }
     .section-title { font-family:'DM Serif Display',serif; font-size:1rem; text-transform:uppercase; letter-spacing:3px; margin-bottom:1.25rem; }
     .card-lux { background:var(--panel); border:1px solid var(--border); }
 
@@ -49,11 +41,11 @@
     /* Filter tabs */
     .filter-tabs { display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1.5rem; }
     .filter-tab { font-size:0.7rem; text-transform:uppercase; letter-spacing:1.5px; padding:0.4rem 0.9rem; border:1px solid var(--border); cursor:pointer; text-decoration:none; color:var(--text); transition:var(--smooth); }
-    .filter-tab:hover, .filter-tab.active { border-color:var(--gold); color:var(--gold); }
+    .filter-tab:hover, .filter-tab.active { border-color:var(--accent-gold); color:var(--accent-gold); }
 
     /* Toast */
     .toast-container { position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999; }
-    .toast-msg { background:#111; color:#fff; padding:0.75rem 1.25rem; margin-top:0.5rem; font-size:0.82rem; border-left:3px solid var(--gold); }
+    .toast-msg { background:#111; color:#fff; padding:0.75rem 1.25rem; margin-top:0.5rem; font-size:0.82rem; border-left:3px solid var(--accent-gold); }
     .toast-msg.err { border-left-color:var(--red); }
 
     /* New PO drawer */
@@ -71,7 +63,7 @@
         width:100%; background:transparent; border:none; border-bottom:1px solid var(--border);
         color:var(--text); padding:0.4rem 0; font-size:0.88rem; font-family:'Outfit',sans-serif; outline:none; appearance:none;
     }
-    .form-field select:focus, .form-field input:focus { border-color:var(--gold); }
+    .form-field select:focus, .form-field input:focus { border-color:var(--accent-gold); }
     .form-field select option { background:var(--panel); color:var(--text); }
 
     /* Line items */
@@ -95,9 +87,9 @@
 {% endblock %}
 
 {% block header_right %}
-<button class="btn-lux" onclick="openDrawer()"><i class="bi bi-plus-lg me-1"></i>New PO</button>
-<a href="{% url 'supplier_list' %}" class="btn-lux d-none d-sm-inline-block">Suppliers</a>
-<a href="{% url 'inventory_board' %}" class="btn-lux d-none d-sm-inline-block">Inventory</a>
+<button class="btn-luxury" onclick="openDrawer()"><i class="bi bi-plus-lg me-1"></i>New PO</button>
+<a href="{% url 'supplier_list' %}" class="btn-luxury d-none d-sm-inline-block">Suppliers</a>
+<a href="{% url 'inventory_board' %}" class="btn-luxury d-none d-sm-inline-block">Inventory</a>
 {{ block.super }}
 {% endblock %}
 
@@ -183,26 +175,26 @@
                 <td>
                     <div class="d-flex gap-1 flex-wrap">
                     {% if po.status == "draft" %}
-                        <button class="btn-lux" style="font-size:0.65rem; padding:0.3rem 0.7rem;" onclick="openEditDrawer({{ po.id }}, '{{ po.po_number|default:po.id|escapejs }}', {{ po.supplier.id }}, '{{ po.notes|escapejs }}')">
+                        <button class="btn-luxury" style="font-size:0.65rem; padding:0.3rem 0.7rem;" onclick="openEditDrawer({{ po.id }}, '{{ po.po_number|default:po.id|escapejs }}', {{ po.supplier.id }}, '{{ po.notes|escapejs }}')">
                             <i class="bi bi-pencil me-1"></i>Edit
                         </button>
-                        <button class="btn-lux" style="font-size:0.65rem; padding:0.3rem 0.7rem;" onclick="markOrdered({{ po.id }})">
+                        <button class="btn-luxury" style="font-size:0.65rem; padding:0.3rem 0.7rem;" onclick="markOrdered({{ po.id }})">
                             <i class="bi bi-send me-1"></i>Order
                         </button>
-                        <button class="btn-lux danger" style="font-size:0.65rem; padding:0.3rem 0.7rem;" onclick="cancelPO({{ po.id }})">Cancel</button>
+                        <button class="btn-luxury danger" style="font-size:0.65rem; padding:0.3rem 0.7rem;" onclick="cancelPO({{ po.id }})">Cancel</button>
                     {% elif po.status == "ordered" or po.status == "partially_received" %}
-                        <button class="btn-lux" style="font-size:0.65rem; padding:0.3rem 0.7rem; border-color:var(--green); color:var(--green);" onclick="openReceiveModal({{ po.id }})">
+                        <button class="btn-luxury" style="font-size:0.65rem; padding:0.3rem 0.7rem; border-color:var(--green); color:var(--green);" onclick="openReceiveModal({{ po.id }})">
                             <i class="bi bi-box-arrow-in-down me-1"></i>{% if po.status == "partially_received" %}Continue Receiving{% else %}Receive{% endif %}
                         </button>
                         {% if po.status == "ordered" %}
-                        <button class="btn-lux danger" style="font-size:0.65rem; padding:0.3rem 0.7rem;" onclick="cancelPO({{ po.id }})">Cancel</button>
+                        <button class="btn-luxury danger" style="font-size:0.65rem; padding:0.3rem 0.7rem;" onclick="cancelPO({{ po.id }})">Cancel</button>
                         {% endif %}
                     {% elif po.status == "received" %}
                         <span style="font-size:0.75rem; color:var(--green);"><i class="bi bi-check-circle-fill me-1"></i>Stock Updated</span>
                     {% else %}
                         <span style="font-size:0.75rem; color:var(--muted);">—</span>
                     {% endif %}
-                        <a href="{% url 'po_print' po.id %}" target="_blank" class="btn-lux" style="font-size:0.65rem; padding:0.3rem 0.7rem; text-decoration:none;">
+                        <a href="{% url 'po_print' po.id %}" target="_blank" class="btn-luxury" style="font-size:0.65rem; padding:0.3rem 0.7rem; text-decoration:none;">
                             <i class="bi bi-printer"></i> Print
                         </a>
                     </div>
@@ -256,7 +248,7 @@
         <div id="lineItems"></div>
     </div>
 
-    <button class="btn-lux mb-3" style="font-size:0.68rem;" onclick="addLineItem()">
+    <button class="btn-luxury mb-3" style="font-size:0.68rem;" onclick="addLineItem()">
         <i class="bi bi-plus-lg me-1"></i>Add Item
     </button>
 
@@ -264,7 +256,7 @@
         Total: ₹<span id="poTotal">0.00</span>
     </div>
 
-    <button class="btn-lux w-100" id="submitPoBtn" onclick="submitPO()">
+    <button class="btn-luxury w-100" id="submitPoBtn" onclick="submitPO()">
         <i class="bi bi-check-lg me-1"></i>Create Draft PO
     </button>
 
@@ -290,7 +282,7 @@
 
     <div id="receiveLines"></div>
 
-    <button class="btn-lux w-100 mt-2" onclick="submitReceive()">
+    <button class="btn-luxury w-100 mt-2" onclick="submitReceive()">
         <i class="bi bi-box-arrow-in-down me-1"></i>Confirm Receipt
     </button>
 </div>

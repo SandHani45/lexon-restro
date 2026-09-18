@@ -12,7 +12,6 @@
         --text: var(--text-main);
         --muted: var(--text-muted);
         --border: var(--border-color);
-        --gold: var(--accent-gold);
         --success: #16a34a;
         --danger: #dc2626;
         --warning: #d97706;
@@ -21,11 +20,11 @@
     }
 
     .page { max-width: 1000px; margin: 2.5rem auto; padding: 0 1.5rem 4rem; }
-    .eyebrow { font-size: .62rem; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); margin-bottom: .4rem; }
+    .eyebrow { font-size: .62rem; letter-spacing: 4px; text-transform: uppercase; color: var(--accent-gold); margin-bottom: .4rem; }
     .page-title { font-family: 'DM Serif Display', serif; font-size: 2rem; margin-bottom: .4rem; }
-    .divider { width: 36px; height: 2px; background: var(--gold); margin: 1rem 0 2rem; }
+    .divider { width: 36px; height: 2px; background: var(--accent-gold); margin: 1rem 0 2rem; }
 
-    .alert { padding: .7rem 1rem; margin-bottom: 1rem; border-left: 3px solid var(--gold); font-size: .78rem; border-radius: 0 4px 4px 0; }
+    .alert { padding: .7rem 1rem; margin-bottom: 1rem; border-left: 3px solid var(--accent-gold); font-size: .78rem; border-radius: 0 4px 4px 0; }
     .alert-s { border-left-color: var(--success); background: rgba(22,163,74,.08); color: var(--success); }
     .alert-e { border-left-color: var(--danger);  background: rgba(220,38,38,.08);  color: var(--danger); }
 
@@ -33,7 +32,7 @@
     .stat-card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.1rem 1.3rem; }
     .stat-label { font-size: .6rem; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: .3rem; }
     .stat-val   { font-size: 1.8rem; font-weight: 700; color: var(--text); }
-    .stat-val.gold  { color: var(--gold); }
+    .stat-val.gold  { color: var(--accent-gold); }
     .stat-val.green { color: var(--success); }
 
     .layout { display: grid; grid-template-columns: 1fr 360px; gap: 1.5rem; align-items: start; }
@@ -46,7 +45,7 @@
     .card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
     .card-hdr { padding: .9rem 1.2rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: .5rem; }
     .card-hdr-title { font-size: .68rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; }
-    .card-hdr i { color: var(--gold); }
+    .card-hdr i { color: var(--accent-gold); }
     .card-body { padding: 1.2rem; }
 
     .promo-table { width: 100%; border-collapse: collapse; }
@@ -80,7 +79,7 @@
     .field:last-of-type { margin-bottom: 0; }
     .field label { display: block; font-size: .6rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: .35rem; font-weight: 600; }
     .field input, .field select, .field textarea { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border); color: var(--text); padding: .4rem 0; font-size: .9rem; font-family: 'Outfit', sans-serif; outline: none; transition: border-color .2s; }
-    .field input:focus, .field select:focus, .field textarea:focus { border-bottom-color: var(--gold); }
+    .field input:focus, .field select:focus, .field textarea:focus { border-bottom-color: var(--accent-gold); }
     .field textarea { resize: vertical; min-height: 52px; font-size: .82rem; }
     .field-hint { font-size: .62rem; color: var(--muted); margin-top: .25rem; }
     .two { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
@@ -92,12 +91,12 @@
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; inset: 0; background: #ccc; border-radius: 34px; transition: .3s; cursor: pointer; }
     .slider::before { content: ""; position: absolute; height: 16px; width: 16px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: .3s; }
-    input:checked + .slider { background: var(--gold); }
+    input:checked + .slider { background: var(--accent-gold); }
     input:checked + .slider::before { transform: translateX(16px); }
 
-    .btn-create { width: 100%; padding: 1rem; background: var(--gold); border: none; color: #fff; font-size: .72rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 700; cursor: pointer; border-radius: 6px; margin-top: 1.2rem; font-family: 'Outfit', sans-serif; transition: var(--trans); }
-    .btn-create:hover { background: var(--accent-hover); }
-    .btn-create:disabled { opacity: .5; cursor: not-allowed; }
+    /* Layout modifier + missing interaction state for the shared primary button */
+    .btn-create { width: 100%; margin-top: 1.2rem; }
+    .btn-luxury.btn-luxury-primary:disabled { opacity: .5; cursor: not-allowed; }
 
     #form-msg { margin-top: .6rem; font-size: .75rem; display: none; }
     .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; flex-shrink: 0; }
@@ -122,7 +121,6 @@
 {% block header_right %}
 <a href="{% url 'outlet_settings' %}" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Outlet Settings</a>
 <a href="/setup/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Setup</a>
-<a href="/logout/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Logout</a>
 <button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme">
     <i class="bi bi-moon" id="themeIcon"></i>
 </button>
@@ -334,7 +332,7 @@
                     <textarea id="f-desc" placeholder="e.g. Valid only on dine-in orders, weekdays 3–7 PM"></textarea>
                 </div>
 
-                <button class="btn-create" id="create-btn" onclick="createPromo()">
+                <button class="btn-luxury btn-luxury-primary btn-create" id="create-btn" onclick="createPromo()">
                     <i class="bi bi-plus-lg"></i> Create Campaign
                 </button>
                 <div id="form-msg"></div>

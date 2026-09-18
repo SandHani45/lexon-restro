@@ -109,8 +109,8 @@
     .btn-bump {
         width: 100%; padding: 1rem; background: transparent;
         border: none; border-top: 1px solid var(--border-color);
-        font-size: 1rem; font-weight: 700; text-transform: uppercase;
-        letter-spacing: 2px; cursor: pointer; color: var(--c-fresh);
+        font-size: 1rem; font-weight: 600; text-transform: uppercase;
+        letter-spacing: 1px; cursor: pointer; color: var(--c-fresh);
         transition: background .2s;
         min-height: 56px;
     }
@@ -144,15 +144,17 @@
     /* ── Action buttons — BIG for kitchen gloves ─────── */
     .btn-status {
         background: transparent;
-        font-size: 0.8rem;
+        font-size: var(--text-xs);
         text-transform: uppercase;
         letter-spacing: 1px;
-        padding: 0.6rem 1rem;
+        font-weight: 600;
+        padding: 0.6rem 1.1rem;
         border: 1px solid var(--border-color);
+        border-radius: 0;
         color: var(--text-main);
         transition: var(--transition-smooth);
         width: 100%;
-        min-height: 44px;
+        min-height: var(--min-tap-target);
         cursor: pointer;
     }
     .btn-start:hover { border-color: var(--c-warn); color: var(--c-warn); }
@@ -195,27 +197,18 @@
 {% endblock %}
 
 {% block header_left %}
-<a href="/dashboard/" style="text-decoration:none;color:inherit;">
-    <h1 class="brand-title mb-0">
-        <i class="bi bi-diamond-half" style="color:var(--c-fresh);"></i>
-        {{ request.user.tenant.name }}
-    </h1>
-</a>
-<p class="brand-subtitle">Kitchen Display — {{ request.user.outlet.name }}</p>
+<div class="d-flex align-items-center gap-2">
+    <div style="width:34px;height:34px;border-radius:8px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;color:#10b981;flex-shrink:0;">
+        <i class="bi bi-egg-fried" style="font-size:1.1rem;"></i>
+    </div>
+    <div>
+        <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.5px;color:var(--text-main);">Kitchen Display</h1>
+        <div class="text-muted" style="font-size:0.72rem;letter-spacing:1px;text-transform:uppercase;">{{ request.user.outlet.name }}</div>
+    </div>
+</div>
 {% endblock %}
 
 {% block header_right %}
-{% if 'floor_plan' in tenant_features %}
-<a href="/tables/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Tables</a>
-<a href="/tables/" class="btn-icon d-sm-none" title="Tables"><i class="bi bi-grid-3x3"></i></a>
-{% endif %}
-{% if 'token_system' in tenant_features %}
-<a href="/token/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Tokens</a>
-<a href="/token/" class="btn-icon d-sm-none" title="Tokens"><i class="bi bi-123"></i></a>
-{% else %}
-<a href="/billing/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Billing</a>
-<a href="/billing/" class="btn-icon d-sm-none" title="Billing"><i class="bi bi-receipt"></i></a>
-{% endif %}
 {% if request.user.role == 'owner' or request.user.role == 'manager' %}
 <button class="btn-luxury text-decoration-none d-none d-sm-inline-flex" style="border-color:#ef4444;color:#ef4444;" onclick="clearAllKitchen()" title="Clear every ticket off this screen">Clear All</button>
 <button class="btn-icon d-sm-none" style="color:#ef4444;" onclick="clearAllKitchen()" title="Clear All"><i class="bi bi-trash3"></i></button>

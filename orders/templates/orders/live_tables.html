@@ -1,0 +1,823 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+  /* ── FULLSCREEN LIVE TABLES OVERVIEW (Matches Reference Screenshot) ── */
+  :root {
+    --live-bg: #090c10;
+    --live-panel-bg: #0f131a;
+    --live-card-dark: #141822;
+    --live-card-dark-border: rgba(255, 255, 255, 0.09);
+    --live-card-light: #fffdf5;
+    --live-card-light-border: #fed7aa;
+    --live-text-main: #f8fafc;
+    --live-text-muted: #717e94;
+    --live-accent-amber: #f59e0b;
+    --live-accent-orange: #ea580c;
+    --live-accent-red: #ef4444;
+  }
+
+  /* Page wrapper */
+  .live-overview-page {
+    background: var(--live-bg);
+    min-height: calc(100vh - var(--topbar-height));
+    color: var(--live-text-main);
+    padding: 1.5rem 2rem 3rem 2rem;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+  }
+
+  /* ── Header ── */
+  .live-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .live-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+  .live-header-icon {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: rgba(245, 158, 11, 0.12);
+    color: var(--live-accent-amber);
+    font-size: 1.25rem;
+  }
+  .live-header-titles h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin: 0;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .live-header-sub {
+    font-size: 0.8rem;
+    color: var(--live-text-muted);
+    margin-top: 2px;
+  }
+
+  /* Right controls: Party size + Close */
+  .live-header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+  .party-filter-box {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 0.4rem 0.85rem;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .party-filter-box:focus-within {
+    border-color: var(--live-accent-amber);
+    background: rgba(245, 158, 11, 0.05);
+  }
+  .party-filter-box svg, .party-filter-box i {
+    color: var(--live-text-muted);
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .party-filter-box input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #ffffff;
+    font-size: 0.85rem;
+    width: 90px;
+    font-family: inherit;
+  }
+  .party-filter-box input::placeholder {
+    color: var(--live-text-muted);
+  }
+  .party-clear-btn {
+    background: transparent;
+    border: none;
+    color: var(--live-text-muted);
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0 2px;
+    display: none;
+  }
+  .party-clear-btn:hover { color: #ffffff; }
+
+  .live-close-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--live-text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+  .live-close-btn:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+
+  /* ── Multi-Floor Row ── */
+  .floors-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  @media (max-width: 540px) {
+    .floors-grid-container {
+      grid-template-columns: 1fr;
+    }
+    .live-overview-page {
+      padding: 1rem;
+    }
+  }
+
+  .floor-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+  .floor-block-title {
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--live-accent-amber);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .floor-canvas-frame {
+    background: #0a0d13;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    height: 320px;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+    /* Graph paper grid background */
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .floor-canvas-content {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* ── Canvas Table Nodes ── */
+  .canvas-table-node {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-main, sans-serif);
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.15s, box-shadow 0.2s;
+  }
+  .canvas-table-node:hover {
+    transform: scale(1.05);
+    z-index: 10;
+  }
+
+  /* Shapes */
+  .canvas-table-node.shape-square {
+    border-radius: 8px;
+    width: 62px;
+    height: 62px;
+  }
+  .canvas-table-node.shape-round {
+    border-radius: 50%;
+    width: 62px;
+    height: 62px;
+  }
+  .canvas-table-node.shape-rect {
+    border-radius: 8px;
+    width: 86px;
+    height: 56px;
+  }
+  .canvas-table-node.shape-wall {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 4px;
+    cursor: default;
+  }
+
+  /* State: Free */
+  .canvas-table-node.state-free {
+    background: #131722;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #e2e8f0;
+  }
+  .canvas-table-node.state-free .node-name {
+    font-weight: 700;
+    font-size: 0.92rem;
+  }
+
+  /* State: Busy (<= 15 min) */
+  .canvas-table-node.state-busy {
+    background: rgba(234, 88, 12, 0.09);
+    border: 1.5px solid var(--live-accent-orange);
+    color: #fdba74;
+    box-shadow: 0 0 10px rgba(234, 88, 12, 0.25);
+  }
+  .canvas-table-node.state-busy .node-name {
+    font-weight: 800;
+    font-size: 0.92rem;
+    color: var(--live-accent-orange);
+  }
+  .canvas-table-node.state-busy .node-timer {
+    font-size: 0.68rem;
+    font-family: var(--font-mono, monospace);
+    font-weight: 700;
+    color: #fdba74;
+    margin-top: 1px;
+  }
+
+  /* State: >15 min Urgent (Matches T2 31:32 and B3 47:32 in screenshot!) */
+  .canvas-table-node.state-urgent {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1.5px solid var(--live-accent-red);
+    color: #fca5a5;
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.35), inset 0 0 8px rgba(239, 68, 68, 0.15);
+    animation: urgentPulse 3s infinite alternate ease-in-out;
+  }
+  @keyframes urgentPulse {
+    0% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.25); }
+    100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.45); }
+  }
+  .canvas-table-node.state-urgent .node-name {
+    font-weight: 800;
+    font-size: 0.92rem;
+    color: var(--live-accent-red);
+  }
+  .canvas-table-node.state-urgent .node-timer {
+    font-size: 0.68rem;
+    font-family: var(--font-mono, monospace);
+    font-weight: 700;
+    color: var(--live-accent-red);
+    margin-top: 1px;
+  }
+
+  /* Dimmed state when party size doesn't fit */
+  .canvas-table-node.party-unfit {
+    opacity: 0.22 !important;
+    filter: grayscale(80%);
+  }
+
+  /* ── Legend Row ── */
+  .live-legend-bar {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+    padding-left: 0.25rem;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8rem;
+    color: var(--live-text-muted);
+    font-weight: 500;
+  }
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-busy { background: var(--live-accent-orange); }
+  .dot-urgent {
+    background: var(--live-accent-red);
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
+  }
+  .dot-free { background: #475569; }
+
+  /* ── Bottom Section: ALL TABLES (N) ── */
+  .all-tables-section {
+    margin-top: 1.5rem;
+  }
+  .all-tables-heading {
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--live-text-muted);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .all-tables-cards-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  /* Card Base */
+  .live-table-card {
+    width: 124px;
+    min-height: 84px;
+    border-radius: 10px;
+    padding: 0.65rem 0.85rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
+    text-decoration: none;
+  }
+  .live-table-card:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Card: Free Table (Dark theme) */
+  .live-table-card.card-free {
+    background: var(--live-card-dark);
+    border: 1px solid var(--live-card-dark-border);
+  }
+  .live-table-card.card-free .card-label {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--live-text-muted);
+  }
+  .live-table-card.card-free .card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.1;
+  }
+  .live-table-card.card-free .card-meta {
+    font-size: 0.68rem;
+    color: var(--live-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Card: Occupied Table (Illuminated Cream theme matching screenshot!) */
+  .live-table-card.card-occupied {
+    background: var(--live-card-light);
+    border: 1.5px solid var(--live-card-light-border);
+    box-shadow: 0 4px 14px rgba(234, 88, 12, 0.12);
+  }
+  .live-table-card.card-occupied .card-badge-occ {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: var(--live-accent-orange);
+    color: #ffffff;
+    font-size: 0.56rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+  .live-table-card.card-occupied .card-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #ea580c;
+    opacity: 0.9;
+  }
+  .live-table-card.card-occupied .card-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--live-accent-orange);
+    line-height: 1.1;
+  }
+  .live-table-card.card-occupied .card-meta {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #c2410c;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Dimmed card for party size */
+  .live-table-card.party-unfit {
+    opacity: 0.22 !important;
+    filter: grayscale(80%);
+  }
+
+  /* Highlighted party fit card */
+  .live-table-card.party-fit {
+    outline: 2px solid var(--live-accent-amber);
+    outline-offset: 1px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="live-overview-page">
+
+  <!-- ── TOP HEADER ── -->
+  <div class="live-header">
+    <div class="live-header-left">
+      <div class="live-header-icon">
+        <i class="bi bi-grid-fill"></i>
+      </div>
+      <div class="live-header-titles">
+        <h1>All Tables</h1>
+        <div class="live-header-sub">Press F3 to open, Esc to close</div>
+      </div>
+    </div>
+
+    <div class="live-header-right">
+      <!-- Party size filter -->
+      <div class="party-filter-box" title="Filter tables by number of guests">
+        <i class="bi bi-people"></i>
+        <input type="number" id="partySizeInput" placeholder="Party size" min="1" max="50" oninput="filterByPartySize(this.value)">
+        <button class="party-clear-btn" id="btnClearParty" onclick="clearPartySize()">&times;</button>
+      </div>
+
+      <!-- Close button -->
+      <button class="live-close-btn" onclick="closeLiveOverview()" title="Close (Esc)">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── MULTI-FLOOR VIEW (CANVASES) ── -->
+  <div class="floors-grid-container" id="floorsGridContainer">
+    <!-- Populated by JavaScript with each Floor / Section -->
+    <div class="text-center text-muted py-5" style="letter-spacing:1px;font-size:0.85rem;">
+      <div class="spinner-border spinner-border-sm text-warning me-2" role="status"></div>
+      Loading live floor plans...
+    </div>
+  </div>
+
+  <!-- ── STATUS LEGEND ── -->
+  <div class="live-legend-bar">
+    <div class="legend-item">
+      <span class="legend-dot dot-busy"></span>
+      <span>Busy</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-dot dot-urgent"></span>
+      <span>&gt;15min</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-dot dot-free"></span>
+      <span>Free</span>
+    </div>
+  </div>
+
+  <!-- ── ALL TABLES (N) GRID ── -->
+  <div class="all-tables-section">
+    <div class="all-tables-heading">
+      <span>ALL TABLES (<span id="totalTableCount">0</span>)</span>
+    </div>
+
+    <div class="all-tables-cards-grid" id="allTablesCardsGrid">
+      <!-- Populated by JavaScript -->
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  let allTablesData = [];
+  let floorSections = [];
+  let currentPartyFilter = 0;
+  let pollInterval = null;
+  let timerInterval = null;
+  let pollTimeOffset = 0; // ms offset between local client clock and server now
+
+  // ── Keyboard shortcuts: F3 to reopen/toggle, Esc to close ──
+  window.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      closeLiveOverview();
+    } else if (e.key === 'F3') {
+      e.preventDefault();
+      // If on this page, flash or refresh
+      fetchLiveTablesData();
+    }
+  });
+
+  window.closeLiveOverview = function() {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = '/tables/';
+    }
+  };
+
+  // ── Party Size Filter ──
+  window.filterByPartySize = function(val) {
+    const num = parseInt(val, 10);
+    currentPartyFilter = (!isNaN(num) && num > 0) ? num : 0;
+    const clearBtn = document.getElementById('btnClearParty');
+    if (clearBtn) clearBtn.style.display = currentPartyFilter > 0 ? 'inline-block' : 'none';
+    applyPartyFilterUI();
+  };
+
+  window.clearPartySize = function() {
+    const inp = document.getElementById('partySizeInput');
+    if (inp) inp.value = '';
+    filterByPartySize('');
+  };
+
+  function applyPartyFilterUI() {
+    // Canvas nodes
+    document.querySelectorAll('.canvas-table-node').forEach(node => {
+      const cap = parseInt(node.getAttribute('data-capacity') || '4', 10);
+      if (currentPartyFilter > 0) {
+        if (cap < currentPartyFilter) {
+          node.classList.add('party-unfit');
+        } else {
+          node.classList.remove('party-unfit');
+        }
+      } else {
+        node.classList.remove('party-unfit');
+      }
+    });
+
+    // Bottom cards
+    document.querySelectorAll('.live-table-card').forEach(card => {
+      const cap = parseInt(card.getAttribute('data-capacity') || '4', 10);
+      if (currentPartyFilter > 0) {
+        if (cap < currentPartyFilter) {
+          card.classList.add('party-unfit');
+          card.classList.remove('party-fit');
+        } else {
+          card.classList.remove('party-unfit');
+          card.classList.add('party-fit');
+        }
+      } else {
+        card.classList.remove('party-unfit');
+        card.classList.remove('party-fit');
+      }
+    });
+  }
+
+  // ── Fetch table data ──
+  function fetchLiveTablesData() {
+    fetch('/tables-data/')
+      .then(r => r.json())
+      .then(d => {
+        if (!d || !d.tables) return;
+        allTablesData = d.tables;
+        floorSections = d.sections || [];
+        renderAll();
+      })
+      .catch(err => {
+        console.error("Live tables poll error:", err);
+      });
+  }
+
+  // ── Format MM:SS ──
+  function formatMMSS(totalSeconds) {
+    if (totalSeconds < 0) totalSeconds = 0;
+    const m = Math.floor(totalSeconds / 60);
+    const s = totalSeconds % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  }
+
+  // ── Render everything ──
+  function renderAll() {
+    renderFloorCanvases();
+    renderAllTableCards();
+    applyPartyFilterUI();
+  }
+
+  // ── Render Floor Canvases ──
+  function renderFloorCanvases() {
+    const container = document.getElementById('floorsGridContainer');
+    if (!container) return;
+
+    // Group tables by section
+    const secMap = {};
+    allTablesData.forEach(t => {
+      const sec = (t.section || 'Floor 1').trim();
+      if (!secMap[sec]) secMap[sec] = [];
+      secMap[sec].push(t);
+    });
+
+    const secKeys = Object.keys(secMap).sort();
+    if (secKeys.length === 0) secKeys.push('Floor 1');
+
+    let html = '';
+    secKeys.forEach(secName => {
+      const secId = 'canvas-sec-' + encodeURIComponent(secName).replace(/%/g, '_');
+      html += `
+        <div class="floor-block">
+          <div class="floor-block-title">
+            <i class="bi bi-diagram-3-fill"></i> ${escapeHtml(secName).toUpperCase()}
+          </div>
+          <div class="floor-canvas-frame">
+            <div class="floor-canvas-content" id="${secId}"></div>
+          </div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+
+    // Place table nodes on each floor canvas
+    secKeys.forEach(secName => {
+      const secId = 'canvas-sec-' + encodeURIComponent(secName).replace(/%/g, '_');
+      const canvasEl = document.getElementById(secId);
+      if (!canvasEl) return;
+
+      const tables = secMap[secName] || [];
+      // Calculate bounding box or use fixed scale
+      const frameW = canvasEl.clientWidth || 460;
+      const frameH = canvasEl.clientHeight || 320;
+
+      // Find max x and y to normalize/scale if tables are placed further
+      let maxX = 600, maxY = 400;
+      tables.forEach(t => {
+        if (t.pos_x && t.pos_x > maxX) maxX = t.pos_x + 120;
+        if (t.pos_y && t.pos_y > maxY) maxY = t.pos_y + 120;
+      });
+
+      const scaleX = (frameW - 80) / maxX;
+      const scaleY = (frameH - 80) / maxY;
+      const scale = Math.min(Math.max(scaleX, scaleY), 1.0);
+
+      tables.forEach((t, idx) => {
+        let x = t.pos_x;
+        let y = t.pos_y;
+        if (x == null || y == null) {
+          // Auto-arrange if coordinates not yet configured in floor editor
+          const cols = 4;
+          const col = idx % cols;
+          const row = Math.floor(idx / cols);
+          x = 40 + col * 95;
+          y = 35 + row * 85;
+        } else {
+          x = Math.round(x * scale) + 20;
+          y = Math.round(y * scale) + 20;
+        }
+
+        const isBusy = (t.status && t.status !== 'free' && t.status !== 'cleaning' && t.status !== 'merged');
+        const elapsedSec = t.elapsed_seconds || ((t.elapsed || 0) * 60);
+        const isUrgent = isBusy && (elapsedSec >= 900); // >15 min
+
+        let stateClass = 'state-free';
+        if (isUrgent) stateClass = 'state-urgent';
+        else if (isBusy) stateClass = 'state-busy';
+
+        const shape = t.shape || 'square';
+        const node = document.createElement('div');
+        node.className = `canvas-table-node shape-${shape} ${stateClass}`;
+        node.id = `node-table-${t.id}`;
+        node.setAttribute('data-id', t.id);
+        node.setAttribute('data-capacity', t.capacity || 4);
+        node.setAttribute('data-elapsed-sec', elapsedSec);
+        node.setAttribute('data-is-busy', isBusy ? '1' : '0');
+        node.style.left = x + 'px';
+        node.style.top = y + 'px';
+
+        if (shape === 'wall') {
+          node.style.cursor = 'default';
+        } else {
+          let timerMarkup = '';
+          if (isBusy) {
+            timerMarkup = `<div class="node-timer" id="node-timer-${t.id}">${formatMMSS(elapsedSec)}</div>`;
+          }
+          node.innerHTML = `
+            <div class="node-name">${escapeHtml(t.name)}</div>
+            ${timerMarkup}
+          `;
+
+          node.addEventListener('click', () => {
+            if (isBusy) {
+              window.location.href = `/billing/?table=${t.id}`;
+            } else {
+              window.location.href = `/billing/?table=${t.id}`;
+            }
+          });
+        }
+
+        canvasEl.appendChild(node);
+      });
+    });
+  }
+
+  // ── Render Bottom Table Cards ──
+  function renderAllTableCards() {
+    const gridEl = document.getElementById('allTablesCardsGrid');
+    const countEl = document.getElementById('totalTableCount');
+    if (!gridEl) return;
+
+    if (countEl) countEl.textContent = allTablesData.length;
+
+    let html = '';
+    allTablesData.forEach(t => {
+      const isBusy = (t.status && t.status !== 'free' && t.status !== 'cleaning' && t.status !== 'merged');
+      const capacity = t.capacity || 4;
+      const section = t.section || 'Floor 1';
+
+      if (isBusy) {
+        // Warm cream illuminated card (Matches reference screenshot T2 and B3!)
+        html += `
+          <a href="/billing/?table=${t.id}" class="live-table-card card-occupied" data-id="${t.id}" data-capacity="${capacity}">
+            <span class="card-badge-occ">OCCUPIED</span>
+            <div class="card-label">Table</div>
+            <div class="card-title">${escapeHtml(t.name)}</div>
+            <div class="card-meta">${capacity} seats &bull; ${escapeHtml(section)}</div>
+          </a>
+        `;
+      } else {
+        // Dark card for Free table (Matches reference screenshot T1, T3, T4...!)
+        html += `
+          <a href="/billing/?table=${t.id}" class="live-table-card card-free" data-id="${t.id}" data-capacity="${capacity}">
+            <div class="card-label">Table</div>
+            <div class="card-title">${escapeHtml(t.name)}</div>
+            <div class="card-meta">${capacity} seats &bull; ${escapeHtml(section)}</div>
+          </a>
+        `;
+      }
+    });
+
+    gridEl.innerHTML = html;
+  }
+
+  // ── Live Second-by-Second Timer Ticker ──
+  function tickTimers() {
+    document.querySelectorAll('.canvas-table-node[data-is-busy="1"]').forEach(node => {
+      let sec = parseInt(node.getAttribute('data-elapsed-sec') || '0', 10);
+      sec += 1;
+      node.setAttribute('data-elapsed-sec', sec);
+
+      const tableId = node.getAttribute('data-id');
+      const timerEl = document.getElementById(`node-timer-${tableId}`);
+      if (timerEl) {
+        timerEl.textContent = formatMMSS(sec);
+      }
+
+      // If transition over 15 minutes (900 seconds), switch to state-urgent
+      if (sec >= 900 && !node.classList.contains('state-urgent')) {
+        node.classList.remove('state-busy');
+        node.classList.add('state-urgent');
+      }
+    });
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  // Initial load
+  fetchLiveTablesData();
+
+  // Background polling every 6 seconds
+  pollInterval = setInterval(fetchLiveTablesData, 6000);
+
+  // Live timer tick every 1 second
+  timerInterval = setInterval(tickTimers, 1000);
+
+  // Cleanup on unload
+  window.addEventListener('beforeunload', () => {
+    if (pollInterval) clearInterval(pollInterval);
+    if (timerInterval) clearInterval(timerInterval);
+  });
+})();
+</script>
+{% endblock %}
+

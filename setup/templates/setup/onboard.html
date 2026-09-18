@@ -66,15 +66,25 @@
     input:checked + .slider::before { transform: translateX(20px); background: #fff; }
 
     /* Buttons */
-    .btn-next { width: 100%; padding: 1rem; background: var(--gold); border: none; color: #fff; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 700; cursor: pointer; margin-top: 2rem; min-height: 52px; transition: opacity 0.2s; }
-    .btn-next:hover { opacity: 0.88; }
+    .btn-next {
+        width: 100%; padding: 0.6rem 1.1rem; background: var(--gold); border: none; color: #fff;
+        font-size: var(--text-xs, 0.78rem); text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
+        border-radius: 0; cursor: pointer; margin-top: 2rem; min-height: var(--min-tap-target, 48px);
+        transition: var(--transition-smooth, opacity 0.2s); font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .btn-next:hover { opacity: 0.9; }
     .btn-skip { display: block; text-align: center; margin-top: 1rem; font-size: 0.75rem; color: var(--muted); text-decoration: none; letter-spacing: 1px; }
     .btn-skip:hover { color: var(--text); }
 
     /* Logo preview */
     .logo-preview { width: 80px; height: 80px; object-fit: contain; border: 1px solid var(--border); margin-bottom: 0.75rem; display: none; }
     .logo-preview.show { display: block; }
-    .file-btn { display: inline-block; border: 1px dashed var(--border); padding: 0.5rem 1rem; font-size: 0.75rem; cursor: pointer; color: var(--muted); transition: border-color 0.2s; }
+    .file-btn {
+        display: inline-block; border: 1px dashed var(--border); padding: 0.6rem 1.1rem;
+        font-size: var(--text-xs, 0.75rem); text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
+        border-radius: 0; cursor: pointer; color: var(--muted); min-height: var(--min-tap-target, 48px);
+        transition: var(--transition-smooth, border-color 0.2s); font-family: var(--font-main, 'Outfit', sans-serif);
+    }
     .file-btn:hover { border-color: var(--gold); color: var(--gold); }
 </style>
 {% endblock %}

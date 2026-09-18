@@ -22,10 +22,18 @@ from .views import (
     pay_order,
     table_dashboard,
     tables_data,
+    floor_editor_view,
+    floor_data_api,
+    save_floor_layout,
+    live_tables_view,
     mark_table_cleaned,
     running_order_items,
     running_order_view,
     running_order_data,
+    orders_page_view,
+    orders_feed_data,
+    accept_order_view,
+    serve_order_view,
     generate_bill,
     transfer_table_view,
     print_bill_action,
@@ -40,12 +48,18 @@ from .views import (
     order_detail_api,
     export_orders_csv,
 )
+from setup.views.core_views import setup_qr_codes
 
 
 urlpatterns = [
 
     # Token System routes moved to tokens/urls.py (Phase 2 of the orders app
     # split) -- same exact paths.
+
+    path("orders/", orders_page_view, name="orders-dashboard"),
+    path("orders/data/", orders_feed_data, name="orders-feed-data"),
+    path("orders/<int:order_id>/accept/", accept_order_view, name="accept-order"),
+    path("orders/<int:order_id>/serve/", serve_order_view, name="serve-order"),
 
     path("billing/", billing_view ,name="billing-view"),
 
@@ -72,8 +86,14 @@ urlpatterns = [
     path("history/export/",               export_orders_csv,  name="export-orders-csv"),
 
     path("tables/", table_dashboard, name="table-dashboard"),
+    path("tables/live/", live_tables_view, name="live-tables"),
+    path("tables/all/", live_tables_view, name="all-tables"),
+    path("tables/qr/", setup_qr_codes, name="tables-qr"),
     path("tables-data/", tables_data ,name="tables-data"),
     path("manage-table/", manage_table_view, name="manage-table"),
+    path("floor-editor/", floor_editor_view, name="floor-editor"),
+    path("floor-data/", floor_data_api, name="floor-data-api"),
+    path("floor-save/", save_floor_layout, name="floor-save-layout"),
 
     path("clean-table/<int:table_id>/", mark_table_cleaned ,name="clean-table"),
 

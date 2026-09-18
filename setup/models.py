@@ -139,6 +139,7 @@ class AggregatorConfig(TenantScopedModel):
     zomato_enabled = models.BooleanField(default=False)
     swiggy_enabled = models.BooleanField(default=False)
     uber_eats_enabled = models.BooleanField(default=False)
+    inhouse_delivery_enabled = models.BooleanField(default=True, help_text="Enable in-house direct deliveries")
     
     # Store aggregator sync API keys or webhook secrets.
     # These are genuine secrets — used to validate inbound Zomato/Swiggy

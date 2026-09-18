@@ -202,14 +202,14 @@
 {% endblock %}
 
 {% block header_left %}
-<div>
-    <a href="/dashboard/" style="text-decoration:none;color:inherit;">
-        <h1 class="brand-title mb-0">
-            <i class="bi bi-diamond-half" style="color:var(--accent-gold);"></i>
-            {{ request.user.tenant.name }}
-        </h1>
-    </a>
-    <p class="brand-subtitle">Dashboard — {{ request.user.outlet.name }}</p>
+<div class="d-flex align-items-center gap-2">
+    <div style="width:34px;height:34px;border-radius:8px;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex-shrink:0;">
+        <i class="bi bi-speedometer2" style="font-size:1.05rem;"></i>
+    </div>
+    <div>
+        <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.5px;color:var(--text-main);">Dashboard</h1>
+        <div class="text-muted" style="font-size:0.72rem;letter-spacing:1px;text-transform:uppercase;">{{ request.user.outlet.name }}</div>
+    </div>
 </div>
 {% endblock %}
 
@@ -219,13 +219,10 @@
     <span>Online:</span>
     <button id="toggle-zomato" class="btn-luxury" style="padding:0.3rem 0.6rem;font-size:0.7rem;{% if aggregator.zomato_enabled %}background:#e23744;color:#fff;border-color:#e23744;{% endif %}" onclick="toggleAggregator('zomato', {% if aggregator.zomato_enabled %}false{% else %}true{% endif %})">Zomato</button>
     <button id="toggle-swiggy" class="btn-luxury" style="padding:0.3rem 0.6rem;font-size:0.7rem;{% if aggregator.swiggy_enabled %}background:#fc8019;color:#fff;border-color:#fc8019;{% endif %}" onclick="toggleAggregator('swiggy', {% if aggregator.swiggy_enabled %}false{% else %}true{% endif %})">Swiggy</button>
+    <button id="toggle-inhouse" class="btn-luxury" style="padding:0.3rem 0.6rem;font-size:0.7rem;{% if aggregator.inhouse_delivery_enabled %}background:#10b981;color:#fff;border-color:#10b981;{% endif %}" onclick="toggleAggregator('inhouse', {% if aggregator.inhouse_delivery_enabled %}false{% else %}true{% endif %})">Delivery</button>
 </div>
 {% endif %}
-{% if 'reports' in tenant_features %}
-<a href="/reports/dashboard/" class="btn-luxury text-decoration-none d-none d-md-inline-flex">Reports</a>
-{% endif %}
-<a href="/logout/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Logout</a>
-<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme">
+<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Dark / Light Mode">
     <i class="bi bi-moon" id="themeIcon"></i>
 </button>
 {% endblock %}
@@ -530,7 +527,8 @@
         try {
             const data = await apiClient.post('/setup/aggregators/toggle/', { platform, enabled: enable });
             if (data.success) {
-                ui.toast(`${platform.toUpperCase()} ${enable ? 'ON' : 'OFF'}`, 'success');
+                const label = platform === 'inhouse' ? 'DELIVERY' : platform.toUpperCase();
+                ui.toast(`${label} ${enable ? 'ON' : 'OFF'}`, 'success');
                 setTimeout(() => window.location.reload(), 600);
             }
         } catch (e) { /* apiClient already showed error toast */ }

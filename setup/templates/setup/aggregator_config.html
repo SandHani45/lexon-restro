@@ -59,7 +59,6 @@
 
 {% block header_right %}
 <a href="/setup/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Setup Area</a>
-<a href="/logout/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Logout</a>
 <button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme">
     <i class="bi bi-moon" id="themeIcon"></i>
 </button>
@@ -155,6 +154,17 @@
                 </div>
                 <label class="switch">
                     <input type="checkbox" name="uber_eats_enabled" {% if config.uber_eats_enabled %}checked{% endif %}>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="switch-wrapper">
+                <div>
+                    <strong style="font-size:1rem;">In-House Delivery Channel</strong>
+                    <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Enable direct in-house delivery orders for this outlet</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" name="inhouse_delivery_enabled" {% if config.inhouse_delivery_enabled %}checked{% endif %}>
                     <span class="slider"></span>
                 </label>
             </div>

@@ -195,15 +195,21 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 
 
+_db_engine = os.getenv('DB_ENGINE', 'django.db.backends.sqlite3')
+_db_options = {}
+if 'postgresql' in _db_engine:
+    _db_options['connect_timeout'] = int(os.getenv('DB_CONNECT_TIMEOUT', '5'))
+
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.sqlite3'),
+        'ENGINE': _db_engine,
         'NAME': os.getenv('DB_NAME', BASE_DIR / 'db.sqlite3'),
         'USER': os.getenv('DB_USER', ''),
         'PASSWORD': os.getenv('DB_PASSWORD', ''),
         'HOST': os.getenv('DB_HOST', ''),
         'PORT': os.getenv('DB_PORT', ''),
         'CONN_MAX_AGE': int(os.getenv('DB_CONN_MAX_AGE', '60')),
+        'OPTIONS': _db_options,
     }
 }
 
@@ -703,6 +709,10 @@ if _HAS_REDIS:
             "BACKEND":  "django.core.cache.backends.redis.RedisCache",
             "LOCATION": REDIS_URL,
             "TIMEOUT":  300,
+            "OPTIONS": {
+                "socket_connect_timeout": 2,
+                "socket_timeout": 2,
+            },
         }
     }
     SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
@@ -752,6 +762,10 @@ CELERY_TIMEZONE = "Asia/Kolkata"
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_BROKER_CONNECTION_RETRY = True
 CELERY_BROKER_CONNECTION_MAX_RETRIES = 3
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    "socket_timeout": 3,
+    "socket_connect_timeout": 3,
+}
 
 # Printing tasks should be fast; kill them if they run over 60 seconds.
 CELERY_TASK_SOFT_TIME_LIMIT = 30   # raises SoftTimeLimitExceeded

@@ -19,11 +19,6 @@
   .brand-title { font-size: 1.5rem; margin: 0; color: var(--text-main); font-weight: 700; letter-spacing: 0.5px; }
   .brand-title i { color: var(--accent-gold); font-size: 1.2rem; }
 
-  .btn-gold { background: var(--accent-gold); border-color: var(--accent-gold); color: #fff; }
-  .btn-gold:hover { background: #b59250; border-color: #b59250; color: #fff; }
-  .btn-gold-solid { background: var(--accent-gold); border-color: var(--accent-gold); color: #000; font-weight: 700; }
-  .btn-gold-solid:hover { background: #b59250; border-color: #b59250; color: #000; }
-
   .category-card {
     background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 0;
     padding: 2.5rem 2rem; height: 100%; transition: var(--transition-smooth);
@@ -121,9 +116,9 @@
 
 {% block header_right %}
 <div class="d-flex align-items-center gap-2">
-  <button class="btn-luxury btn-gold desktop-nav-links" onclick="openAiImportModal()"><i class="bi bi-magic me-1"></i> AI Import</button>
+  <button class="btn-luxury btn-luxury-primary desktop-nav-links" onclick="openAiImportModal()"><i class="bi bi-magic me-1"></i> AI Import</button>
   <button class="btn-luxury" onclick="openCategoryModal()"><i class="bi bi-folder-plus me-1"></i><span class="d-none d-sm-inline"> Category</span></button>
-  <button class="btn-luxury btn-gold-solid" onclick="openItemModal()"><i class="bi bi-plus-lg me-1"></i><span class="d-none d-sm-inline"> Add Item</span></button>
+  <button class="btn-luxury btn-luxury-primary" onclick="openItemModal()"><i class="bi bi-plus-lg me-1"></i><span class="d-none d-sm-inline"> Add Item</span></button>
 
   <div class="desktop-nav-links d-flex align-items-center gap-2">
     <a href="/inventory/board/" class="btn-luxury"><i class="bi bi-box-seam me-1"></i> Inventory</a>
@@ -200,7 +195,7 @@
       <div class="category-card">
         <div class="d-flex justify-content-between align-items-center mb-4">
           <h5 class="category-title mb-0">{{ category.name }}</h5>
-          <button class="btn-action-icon btn-delete" title="Delete Category" onclick="deleteCategory('{{ category.id }}', '{{ category.name|escapejs }}')">
+          <button class="btn-icon btn-delete" title="Delete Category" onclick="deleteCategory('{{ category.id }}', '{{ category.name|escapejs }}')">
             <i class="bi bi-trash3"></i>
           </button>
         </div>
@@ -229,13 +224,13 @@
                 </div>
               </div>
               <div class="btn-group-luxury">
-                <button class="btn-action-icon" title="Edit Item" onclick="openItemModal({id:'{{ item.id }}', name:'{{ item.name|escapejs }}', price:'{{ item.price }}', description:'{{ item.description|escapejs }}', category:'{{ item.category.id }}', station:'{% if item.station %}{{ item.station.id }}{% endif %}', prepTime:{{ item.estimated_prep_time }}, isVeg:{{ item.is_veg|lower }}, parcelCharge:'{{ item.parcel_charge }}'})"><i class="bi bi-pencil-square"></i></button>
-                <button class="btn-action-icon" title="Toggle Available" onclick="toggleItem('{{ item.id }}')"><i class="bi {% if item.is_available %}bi-toggle-on{% else %}bi-toggle-off{% endif %}"></i></button>
-                <button class="btn-action-icon" title="View Recipe" onclick="openRecipeModal('{{ item.id }}')"><i class="bi bi-journal-text"></i></button>
+                <button class="btn-icon" title="Edit Item" onclick="openItemModal({id:'{{ item.id }}', name:'{{ item.name|escapejs }}', price:'{{ item.price }}', description:'{{ item.description|escapejs }}', category:'{{ item.category.id }}', station:'{% if item.station %}{{ item.station.id }}{% endif %}', prepTime:{{ item.estimated_prep_time }}, isVeg:{{ item.is_veg|lower }}, parcelCharge:'{{ item.parcel_charge }}'})"><i class="bi bi-pencil-square"></i></button>
+                <button class="btn-icon" title="Toggle Available" onclick="toggleItem('{{ item.id }}')"><i class="bi {% if item.is_available %}bi-toggle-on{% else %}bi-toggle-off{% endif %}"></i></button>
+                <button class="btn-icon" title="View Recipe" onclick="openRecipeModal('{{ item.id }}')"><i class="bi bi-journal-text"></i></button>
                 {% if 'ai_recipe_import' in tenant_features %}
-                <button class="btn-action-icon" title="Import Recipe with AI" onclick="openRecipeImportModal('{{ item.id }}', '{{ item.name|escapejs }}')"><i class="bi bi-stars"></i></button>
+                <button class="btn-icon" title="Import Recipe with AI" onclick="openRecipeImportModal('{{ item.id }}', '{{ item.name|escapejs }}')"><i class="bi bi-stars"></i></button>
                 {% endif %}
-                <button class="btn-action-icon btn-delete" title="Remove Item" onclick="deleteItem('{{ item.id }}')"><i class="bi bi-trash"></i></button>
+                <button class="btn-icon btn-delete" title="Remove Item" onclick="deleteItem('{{ item.id }}')"><i class="bi bi-trash"></i></button>
               </div>
             </div>
             <div class="recipe-block">
@@ -269,7 +264,7 @@
         <input id="categoryName" class="form-control form-input-luxury" placeholder="e.g. Appetizers, Beverage, Mains"/>
       </div>
       <div class="modal-footer pt-0 border-0">
-        <button class="btn-luxury btn-gold w-100 justify-content-center" onclick="createCategory()">Establish Category</button>
+        <button class="btn-luxury btn-luxury-primary w-100 justify-content-center" onclick="createCategory()">Establish Category</button>
       </div>
     </div>
   </div>
@@ -344,7 +339,7 @@
         </div>
       </div>
       <div class="modal-footer pt-0 border-0">
-        <button class="btn-luxury btn-gold w-100 justify-content-center" id="saveItemBtn" onclick="saveItem()">Add to Collection</button>
+        <button class="btn-luxury btn-luxury-primary w-100 justify-content-center" id="saveItemBtn" onclick="saveItem()">Add to Collection</button>
       </div>
     </div>
   </div>
@@ -369,7 +364,7 @@
         <textarea id="aiMenuText" class="form-control form-input-luxury" rows="8" placeholder="Example:&#10;APPETIZERS&#10;Spring Rolls 120&#10;Paneer Tikka 250"></textarea>
       </div>
       <div class="modal-footer pt-0 border-0">
-        <button class="btn-luxury btn-gold w-100 justify-content-center" id="aiProcessBtn" onclick="runAiImport()">Process with Smart AI</button>
+        <button class="btn-luxury btn-luxury-primary w-100 justify-content-center" id="aiProcessBtn" onclick="runAiImport()">Process with Smart AI</button>
       </div>
     </div>
   </div>
@@ -398,7 +393,7 @@
         </div>
       </div>
       <div class="modal-footer pt-0 border-0">
-        <button class="btn-luxury btn-gold w-100 justify-content-center" onclick="createRecipe()">Integrate Ingredient</button>
+        <button class="btn-luxury btn-luxury-primary w-100 justify-content-center" onclick="createRecipe()">Integrate Ingredient</button>
       </div>
     </div>
   </div>
@@ -424,7 +419,7 @@
         <textarea id="recipeImportText" class="form-control form-input-luxury" rows="6" placeholder="Example:&#10;2 cups Basmati Rice&#10;500g Chicken&#10;1 tbsp Ginger Garlic Paste&#10;Salt to taste"></textarea>
       </div>
       <div class="modal-footer pt-0 border-0">
-        <button class="btn-luxury btn-gold w-100 justify-content-center" id="recipeImportBtn" onclick="runRecipeImport()">Extract Ingredients</button>
+        <button class="btn-luxury btn-luxury-primary w-100 justify-content-center" id="recipeImportBtn" onclick="runRecipeImport()">Extract Ingredients</button>
       </div>
     </div>
   </div>

@@ -23,6 +23,13 @@
     --danger:            #ef4444;
     --success:           #10b981;
 
+    /* ── Sidebar layout tokens ── */
+    --sidebar-width:        220px;
+    --sidebar-collapsed:     56px;
+    --topbar-height:         56px;
+    --sidebar-active-bg:    rgba(197,160,89,0.10);
+    --sidebar-active-color: var(--accent-gold);
+
     /* ── Font families ── */
     --font-display:  'DM Serif Display', Georgia, serif;
     --font-mono:     'Space Mono', 'Courier New', monospace;
@@ -54,6 +61,7 @@ html.dark {
     --accent-hover:#e5c45e;
     --shadow-soft: 0 4px 15px rgba(0,0,0,0.3);
     --shadow-hover:0 10px 30px rgba(0,0,0,0.5);
+    --sidebar-active-bg: rgba(212,175,55,0.12);
 }
 
 /* ── Base Typography ─────────────────────────────────────── */

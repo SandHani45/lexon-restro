@@ -28,6 +28,7 @@ def aggregator_setup(request):
         config.zomato_enabled = request.POST.get("zomato_enabled") == "on"
         config.swiggy_enabled = request.POST.get("swiggy_enabled") == "on"
         config.uber_eats_enabled = request.POST.get("uber_eats_enabled") == "on"
+        config.inhouse_delivery_enabled = request.POST.get("inhouse_delivery_enabled") == "on"
         config.auto_accept_orders = request.POST.get("auto_accept_orders") == "on"
 
         # Only overwrite a secret when a non-blank value is posted. This lets
@@ -82,21 +83,25 @@ def toggle_aggregator(request):
     platform = data.get("platform", "").strip().lower()
     enabled  = bool(data.get("enabled", False))
 
-    if platform not in ("zomato", "swiggy", "all"):
-        return JsonResponse({"error": "Invalid platform. Use zomato, swiggy, or all."}, status=400)
+    if platform not in ("zomato", "swiggy", "inhouse", "delivery", "all"):
+        return JsonResponse({"error": "Invalid platform. Use zomato, swiggy, inhouse, or all."}, status=400)
 
     config, _ = AggregatorConfig.for_outlet(request.user.outlet, request.user.tenant)
 
     if platform == "all":
         config.zomato_enabled  = enabled
         config.swiggy_enabled  = enabled
-        config.save(update_fields=["zomato_enabled", "swiggy_enabled"])
+        config.inhouse_delivery_enabled = enabled
+        config.save(update_fields=["zomato_enabled", "swiggy_enabled", "inhouse_delivery_enabled"])
     elif platform == "zomato":
         config.zomato_enabled = enabled
         config.save(update_fields=["zomato_enabled"])
     elif platform == "swiggy":
         config.swiggy_enabled = enabled
         config.save(update_fields=["swiggy_enabled"])
+    elif platform in ("inhouse", "delivery"):
+        config.inhouse_delivery_enabled = enabled
+        config.save(update_fields=["inhouse_delivery_enabled"])
 
     logging.getLogger("pos.orders").info(
         "Aggregator toggle | outlet=%s | platform=%s | enabled=%s | user=%s",
@@ -104,7 +109,8 @@ def toggle_aggregator(request):
     )
 
     return JsonResponse({
-        "success":        True,
+        "success": True,
         "zomato_enabled": config.zomato_enabled,
         "swiggy_enabled": config.swiggy_enabled,
+        "inhouse_delivery_enabled": config.inhouse_delivery_enabled,
     })

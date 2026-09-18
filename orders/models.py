@@ -185,6 +185,17 @@ class Order(TenantScopedModel):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     closed_at = models.DateTimeField(null=True, blank=True)
+    prep_time_minutes = models.PositiveIntegerField(
+        default=15,
+        null=True,
+        blank=True,
+        help_text="Estimated preparation time in minutes set at order confirmation"
+    )
+    estimated_ready_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Target completion time calculated from prep_time_minutes"
+    )
 
 
 

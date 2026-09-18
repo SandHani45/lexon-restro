@@ -52,24 +52,29 @@
         margin-bottom: 2rem;
     }
 
-    .btn-resolve {
-        border: 1px dashed #10b981;
-        background: transparent;
-        color: var(--text-main);
-        text-transform: uppercase;
-        font-size: 0.8rem;
-        letter-spacing: 1px;
-        font-weight: 600;
-        padding: 0.8rem;
-        border-radius: 4px;
-        transition: var(--transition-smooth);
+    /* Success/warning color modifiers for the shared .btn-luxury shape */
+    .btn-luxury-success {
         width: 100%;
-        cursor: pointer;
+        border-style: dashed;
+        border-color: var(--success);
     }
-    .btn-resolve:hover {
-        background: #10b981;
-        color: #fff;
+    .btn-luxury-success:hover {
+        background: var(--success);
         border-style: solid;
+        border-color: var(--success);
+        color: #fff;
+    }
+    .btn-luxury-warn {
+        width: 100%;
+        border-style: dashed;
+        color: #f59e0b;
+        border-color: #f59e0b;
+    }
+    .btn-luxury-warn:hover {
+        background: #f59e0b;
+        border-style: solid;
+        border-color: #f59e0b;
+        color: #fff;
     }
 
     .empty-state {
@@ -82,27 +87,19 @@
 {% endblock %}
 
 {% block header_left %}
-<div>
-    <a href="/dashboard/" style="text-decoration:none;color:inherit;">
-        <h1 class="brand-title mb-0">
-            <i class="bi bi-diamond-half" style="color:var(--accent-gold);"></i>
-            {{ request.user.tenant.name }}
-        </h1>
-    </a>
-    <p class="brand-subtitle">Waiter Calls — {{ request.user.outlet.name }}</p>
+<div class="d-flex align-items-center gap-2">
+    <div style="width:34px;height:34px;border-radius:8px;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex-shrink:0;">
+        <i class="bi bi-bell-fill" style="font-size:1.05rem;"></i>
+    </div>
+    <div>
+        <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.5px;color:var(--text-main);">Waiter Calls</h1>
+        <div class="text-muted" style="font-size:0.72rem;letter-spacing:1px;text-transform:uppercase;">{{ request.user.outlet.name }}</div>
+    </div>
 </div>
 {% endblock %}
 
 {% block header_right %}
-{% if 'floor_plan' in tenant_features %}
-<a href="/tables/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Floor Plan</a>
-<a href="/billing/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Billing</a>
-{% endif %}
-{% if 'kitchen_display' in tenant_features %}
-<a href="/kitchen/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Kitchen</a>
-{% endif %}
-<a href="/logout/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Logout</a>
-<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme">
+<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Dark / Light Mode">
     <i class="bi bi-moon" id="themeIcon"></i>
 </button>
 {% endblock %}
@@ -120,7 +117,7 @@
                     <div class="table-name">Table {{ call.table.name }}</div>
                     <div class="call-time"><i class="bi bi-clock me-1"></i> {{ call.created_at|time:"H:i" }}</div>
                 </div>
-                <button class="btn-resolve" onclick="resolveCall('{{ call.id }}')">
+                <button class="btn-luxury btn-luxury-success" onclick="resolveCall('{{ call.id }}')">
                     <i class="bi bi-check2-circle fs-5 d-block mb-1"></i> Mark Resolved
                 </button>
             </div>
@@ -136,9 +133,7 @@
                     <div class="mb-2 fw-semibold text-danger">{{ msg.message }}</div>
                     <div class="call-time"><i class="bi bi-clock me-1"></i> {{ msg.created_at|time:"H:i" }}</div>
                 </div>
-                <button class="btn-resolve" style="color:#f59e0b;border-color:#f59e0b;"
-                    onmouseover="this.style.backgroundColor='#f59e0b';this.style.color='#fff';"
-                    onmouseout="this.style.backgroundColor='transparent';this.style.color='#f59e0b';"
+                <button class="btn-luxury btn-luxury-warn"
                     onclick="resolveKitchenMsg('{{ msg.id }}')">
                     <i class="bi bi-check2-circle fs-5 d-block mb-1"></i> Acknowledge
                 </button>

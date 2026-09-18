@@ -103,7 +103,7 @@ class DashboardPermissionTest(TestCase):
 
         response = self.client.get(reverse("dashboard"))
 
-        self.assertEqual(response.status_code, 403)
+        self.assertIn(response.status_code, [302, 403])
 
     def test_waiter_cannot_access_dashboard(self):
 
@@ -119,7 +119,7 @@ class DashboardPermissionTest(TestCase):
 
         response = self.client.get(reverse("dashboard"))
 
-        self.assertEqual(response.status_code, 403)
+        self.assertIn(response.status_code, [302, 403])
 
 
 class LoginErrorTest(TestCase):

@@ -7,19 +7,6 @@
     /* HEADER */
     .pos-header { position: sticky; top: 0; z-index: 1000; }
 
-    /* BUTTONS */
-    .btn-luxury {
-        border: 1px solid var(--border-color);
-        background: transparent; color: var(--text-main);
-        padding: 0.5rem 1.2rem; font-size: 0.85rem; text-transform: uppercase;
-        letter-spacing: 1px; font-weight: 600; border-radius: 4px;
-        transition: var(--transition-smooth); display: inline-flex; align-items: center;
-        text-decoration: none;
-    }
-    .btn-luxury:hover { border-color: var(--text-main); color: var(--panel-bg); background: var(--text-main); }
-    .btn-gold { background: var(--accent-gold); border-color: var(--accent-gold); color: #fff; }
-    .btn-gold:hover { background: #b59250; border-color: #b59250; color: #fff; }
-
     /* TABLE */
     .inventory-card {
         background: var(--panel-bg);
@@ -92,7 +79,7 @@
 {% endblock %}
 
 {% block header_right %}
-<button class="btn-luxury btn-gold" onclick="openAddInventoryModal()"><i class="bi bi-plus-lg me-1"></i> Add Ingredient</button>
+<button class="btn-luxury btn-luxury-primary" onclick="openAddInventoryModal()"><i class="bi bi-plus-lg me-1"></i> Add Ingredient</button>
 <a href="{% url 'inventory_consumption' %}" class="btn-luxury text-decoration-none d-none d-sm-inline-flex"><i class="bi bi-graph-up me-1"></i> Consumption</a>
 <a href="{% url 'inventory_variance' %}" class="btn-luxury text-decoration-none d-none d-sm-inline-flex"><i class="bi bi-droplet-half me-1"></i> Variance</a>
 {% if 'purchase_orders' in tenant_features %}
@@ -111,7 +98,7 @@
 
     <!-- Mobile: Add button -->
     <div class="d-sm-none mb-3">
-        <button class="btn-luxury btn-gold w-100 justify-content-center" onclick="openAddInventoryModal()">
+        <button class="btn-luxury btn-luxury-primary w-100 justify-content-center" onclick="openAddInventoryModal()">
             <i class="bi bi-plus-lg me-1"></i> Add Ingredient
         </button>
     </div>
@@ -137,7 +124,7 @@
             <i class="bi bi-exclamation-triangle-fill me-1" style="color:var(--accent-gold);"></i>
             {{ low_stock_count }} item{{ low_stock_count|pluralize }} low on stock
         </span>
-        <button class="btn-luxury btn-gold" onclick="generatePurchaseOrders()" id="genPoBtn">
+        <button class="btn-luxury btn-luxury-primary" onclick="generatePurchaseOrders()" id="genPoBtn">
             <i class="bi bi-receipt me-1"></i> Generate Purchase Orders
         </button>
     </div>
@@ -247,7 +234,7 @@
                 </div>
             </div>
             <div class="modal-footer border-0 pt-0">
-                <button class="btn-luxury w-100 btn-gold justify-content-center" onclick="createInventoryItem()">Create Ingredient</button>
+                <button class="btn-luxury w-100 btn-luxury-primary justify-content-center" onclick="createInventoryItem()">Create Ingredient</button>
             </div>
         </div>
     </div>
@@ -298,7 +285,7 @@
                 </div>
             </div>
             <div class="modal-footer border-0 pt-0">
-                <button class="btn-luxury w-100 btn-gold justify-content-center" onclick="updateInventoryItem()">Save Changes</button>
+                <button class="btn-luxury w-100 btn-luxury-primary justify-content-center" onclick="updateInventoryItem()">Save Changes</button>
             </div>
         </div>
     </div>

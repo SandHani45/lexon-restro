@@ -1,0 +1,1905 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --ord-bg: #090c10;
+    --ord-panel-bg: #0f131a;
+    --ord-card-bg: #11151f;
+    --ord-border: rgba(255, 255, 255, 0.08);
+    --ord-text-main: #f8fafc;
+    --ord-text-muted: #78859b;
+    --ord-accent-gold: #f59e0b;
+    --ord-accent-orange: #ea580c;
+    --ord-accent-red: #ef4444;
+    --ord-accent-green: #10b981;
+    --ord-accent-blue: #3b82f6;
+  }
+
+  html:not(.dark) {
+    --ord-bg: #f8fafc;
+    --ord-panel-bg: #ffffff;
+    --ord-card-bg: #ffffff;
+    --ord-border: #e2e8f0;
+    --ord-text-main: #0f172a;
+    --ord-text-muted: #64748b;
+  }
+
+  .orders-page-container {
+    background: var(--ord-bg);
+    min-height: calc(100vh - var(--topbar-height));
+    color: var(--ord-text-main);
+    padding: 1.25rem 1.5rem 3rem 1.5rem;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+  }
+
+  /* ── Top Bar Metrics & Actions Strip ── */
+  .orders-top-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid var(--ord-border);
+  }
+
+  .metrics-cluster {
+    display: flex;
+    align-items: center;
+    gap: 1.75rem;
+  }
+  .metric-item {
+    display: flex;
+    flex-direction: column;
+  }
+  .metric-item-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--ord-text-muted);
+  }
+  .metric-item-val {
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.2;
+    font-family: var(--font-mono, monospace);
+  }
+  .metric-active { color: #f59e0b; }
+  .metric-served { color: #38bdf8; }
+  .metric-today  { color: #34d399; }
+
+  .actions-cluster {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  /* Density Sizing Switcher */
+  .density-group {
+    display: inline-flex;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--ord-border);
+    border-radius: 8px;
+    padding: 2px;
+  }
+  .density-btn {
+    border: none;
+    background: transparent;
+    color: var(--ord-text-muted);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .density-btn.active, .density-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--ord-text-main);
+  }
+
+  .btn-ord-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--ord-border);
+    color: var(--ord-text-main);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.45rem 0.85rem;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-ord-action:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--ord-text-main);
+  }
+
+  .btn-ord-primary {
+    background: var(--ord-accent-gold);
+    border-color: var(--ord-accent-gold);
+    color: #111827;
+    font-weight: 700;
+  }
+  .btn-ord-primary:hover {
+    background: #d97706;
+    border-color: #d97706;
+    color: #000000;
+  }
+
+  /* ── Filter Tabs Row ── */
+  .orders-filter-tabs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .orders-filter-tabs::-webkit-scrollbar { height: 3px; }
+  .orders-filter-tabs::-webkit-scrollbar-thumb { background: var(--ord-border); border-radius: 3px; }
+
+  .order-tab {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--ord-border);
+    border-radius: 20px;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--ord-text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.15s;
+  }
+  .order-tab:hover {
+    color: var(--ord-text-main);
+    border-color: rgba(255,255,255,0.2);
+  }
+  .order-tab.active {
+    background: var(--ord-accent-gold);
+    color: #111827;
+    border-color: var(--ord-accent-gold);
+    font-weight: 700;
+  }
+  .tab-count {
+    background: rgba(0, 0, 0, 0.25);
+    color: inherit;
+    font-size: 0.65rem;
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-weight: 700;
+  }
+  .order-tab.active .tab-count {
+    background: rgba(0, 0, 0, 0.35);
+    color: #ffffff;
+  }
+
+  /* ── Main Two-Column Layout (Orders Feed + Right Mini Floor) ── */
+  .orders-layout-row {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
+  .orders-main-col {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .orders-side-col {
+    width: 320px;
+    flex-shrink: 0;
+    position: sticky;
+    top: calc(var(--topbar-height) + 1rem);
+  }
+  @media (max-width: 1024px) {
+    .orders-layout-row {
+      flex-direction: column;
+    }
+    .orders-side-col {
+      width: 100%;
+      position: static;
+    }
+  }
+
+  /* ── Service Requests (Waiter Calls) ── */
+  .service-requests-section {
+    background: rgba(239, 68, 68, 0.04);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+  }
+  .service-requests-heading {
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #ef4444;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 0.85rem;
+  }
+  .service-requests-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 0.85rem;
+  }
+  .service-card {
+    background: var(--ord-card-bg);
+    border: 1px solid var(--ord-border);
+    border-radius: 8px;
+    padding: 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .service-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .service-table-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--ord-text-main);
+  }
+  .service-badge-pending {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    font-size: 0.6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+  .service-reason {
+    font-size: 0.82rem;
+    color: var(--ord-text-muted);
+  }
+  .service-card-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+  }
+  .btn-service-accept {
+    flex: 1;
+    background: #f59e0b;
+    border: none;
+    color: #000000;
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 0.35rem 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .btn-service-done {
+    flex: 1;
+    background: #10b981;
+    border: none;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 0.35rem 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  /* ── Orders Categorized Sections & Cards Grid ── */
+  .orders-group-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .orders-group-header {
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    color: var(--ord-text-main);
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .orders-group-badge {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--ord-text-muted);
+    font-size: 0.65rem;
+    padding: 1px 6px;
+    border-radius: 10px;
+  }
+
+  .orders-cards-container {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+  /* Card density controls */
+  .density-sm .orders-cards-container { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  .density-md .orders-cards-container { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+  .density-lg .orders-cards-container { grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); }
+
+  /* ── Order Card (Pixel-Perfect from Screenshot) ── */
+  .order-card {
+    background: var(--ord-card-bg);
+    border: 1px solid var(--ord-border);
+    border-radius: 12px;
+    padding: 1rem 1.15rem;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transition: transform 0.15s, border-color 0.15s;
+  }
+  .order-card:hover {
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+
+  .order-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 0.65rem;
+  }
+  .order-card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    line-height: 1.2;
+  }
+  html:not(.dark) .order-card-title { color: #0f172a; }
+
+  .order-card-meta {
+    font-size: 0.72rem;
+    color: var(--ord-text-muted);
+    margin-top: 2px;
+    font-family: var(--font-mono, monospace);
+  }
+
+  .order-chips-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.85rem;
+    flex-wrap: wrap;
+  }
+  .ord-chip {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .chip-placed    { background: #2a2215; color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); }
+  .chip-accepted  { background: rgba(59, 130, 246, 0.12); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+  .chip-preparing { background: rgba(249, 115, 22, 0.12); color: #f97316; border: 1px solid rgba(249, 115, 22, 0.3); }
+  .chip-ready     { background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+  .chip-served    { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); }
+  .chip-unpaid    { background: #2b161b; color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.35); }
+  .chip-paid      { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4); }
+  .chip-method    { background: rgba(245, 158, 11, 0.12); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); font-weight: 700; }
+
+  .btn-print-bill-pill {
+    background: transparent;
+    border: 1px solid var(--ord-accent-gold);
+    color: var(--ord-accent-gold);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    line-height: 1.2;
+  }
+  .btn-print-bill-pill:hover {
+    background: var(--ord-accent-gold);
+    color: #000000;
+  }
+
+  .btn-mark-paid-chip {
+    background: #10b981;
+    color: #ffffff;
+    border: none;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 3px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: opacity 0.15s;
+  }
+  .btn-mark-paid-chip:hover { opacity: 0.9; }
+
+  .order-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    max-height: 180px;
+    overflow-y: auto;
+    margin-bottom: 0.85rem;
+    padding-right: 0.25rem;
+  }
+  .order-items-list::-webkit-scrollbar { width: 3px; }
+  .order-items-list::-webkit-scrollbar-thumb { background: var(--ord-border); border-radius: 3px; }
+
+  .order-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.86rem;
+  }
+  .order-item-qty {
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    border: 1.5px solid #10b981;
+    color: #10b981;
+    font-weight: 800;
+    font-size: 0.72rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-right: 0.5rem;
+  }
+  .order-item-name {
+    font-weight: 600;
+    color: var(--ord-text-main);
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .order-item-price {
+    font-weight: 700;
+    color: var(--ord-text-main);
+    font-family: var(--font-mono, monospace);
+  }
+
+  .order-summary-box {
+    border-top: 1px solid var(--ord-border);
+    padding-top: 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .order-summary-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: var(--ord-text-muted);
+  }
+  .order-summary-line strong {
+    color: var(--ord-text-main);
+  }
+  .order-total-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-top: 0.4rem;
+    margin-top: 0.3rem;
+    border-top: 1px dashed var(--ord-border);
+  }
+  .order-total-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--ord-text-main);
+  }
+  .order-total-val {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #ffffff;
+    font-family: var(--font-mono, monospace);
+  }
+  html:not(.dark) .order-total-val { color: #0f172a; }
+
+  .order-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+  }
+  .btn-order-cancel {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    background: #231215;
+    color: #ef4444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-order-cancel:hover {
+    background: #ef4444;
+    color: #ffffff;
+  }
+  .btn-order-primary {
+    flex: 1;
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #0d1524;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+  .btn-order-primary:hover {
+    background: var(--ord-accent-gold);
+    color: #111111;
+    border-color: var(--ord-accent-gold);
+  }
+
+  /* ── Recent Orders Section (Bottom) ── */
+  .recent-orders-section {
+    margin-top: 1.75rem;
+    padding-top: 1.5rem;
+    border-top: 1px dashed var(--ord-border);
+  }
+  .recent-orders-heading {
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: var(--ord-text-main);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .recent-orders-heading i {
+    color: #f59e0b;
+    font-size: 1.1rem;
+  }
+  .recent-orders-badge {
+    color: var(--ord-text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .recent-orders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+  .density-sm .recent-orders-grid {
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 0.85rem;
+  }
+  .density-lg .recent-orders-grid {
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.5rem;
+  }
+  .recent-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .recent-action-icon {
+    background: transparent;
+    border: none;
+    color: var(--ord-text-muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 4px;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .recent-action-icon.undo-icon {
+    color: #f59e0b;
+  }
+  .recent-action-icon:hover {
+    color: #ffffff;
+    transform: scale(1.1);
+  }
+
+  /* ── Prep Time Modal (media_1789682100573.png) ── */
+  .prep-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    z-index: 1060;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .prep-modal-dialog {
+    background: #181c24;
+    border: 1px solid var(--ord-border);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 440px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+  }
+  .prep-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.35rem;
+  }
+  .prep-modal-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .prep-modal-close {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 1.4rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+  }
+  .prep-modal-close:hover { color: #ffffff; }
+  .prep-modal-subtitle {
+    font-size: 0.82rem;
+    color: #94a3b8;
+    margin-bottom: 1.25rem;
+  }
+  .prep-time-presets {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .prep-preset-btn {
+    background: #222834;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #cbd5e1;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.6rem 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .prep-preset-btn:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+  }
+  .prep-preset-btn.active {
+    background: var(--ord-accent-gold);
+    color: #000000;
+    font-weight: 700;
+    border-color: var(--ord-accent-gold);
+  }
+  .prep-input-label {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+  }
+  .prep-time-input {
+    background: #11141a;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: center;
+    border-radius: 8px;
+    padding: 0.55rem;
+    width: 100%;
+  }
+  .prep-time-input:focus {
+    background: #11141a;
+    border-color: var(--ord-accent-gold);
+    color: #ffffff;
+    box-shadow: none;
+    outline: none;
+  }
+  .prep-modal-footer {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+  .btn-prep-cancel {
+    flex: 1;
+    background: #222834;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #cbd5e1;
+    font-weight: 600;
+    padding: 0.65rem;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .btn-prep-cancel:hover {
+    background: #2c3444;
+    color: #ffffff;
+  }
+  .btn-prep-accept {
+    flex: 1.2;
+    background: var(--ord-accent-gold);
+    border: none;
+    color: #000000;
+    font-weight: 700;
+    padding: 0.65rem;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .btn-prep-accept:hover {
+    filter: brightness(1.08);
+  }
+
+  .chip-prep-time {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    font-weight: 700;
+  }
+
+  /* ── Live Toast Notification ── */
+  .orders-dashboard-toast {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: #181c24;
+    color: #ffffff;
+    border: 1px solid var(--ord-accent-gold);
+    border-radius: 10px;
+    padding: 12px 22px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.25s ease;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .orders-dashboard-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── Right Column: Table View Mini-Map Widget ── */
+  .table-view-widget {
+    background: var(--ord-card-bg);
+    border: 1px solid var(--ord-border);
+    border-radius: 12px;
+    padding: 1rem 1.15rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  }
+  .table-view-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.85rem;
+  }
+  .table-view-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--ord-text-main);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .table-view-title:hover {
+    color: var(--ord-accent-gold);
+  }
+
+  /* Floor Switcher Pills */
+  .mini-floor-tabs {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.85rem;
+    overflow-x: auto;
+  }
+  .mini-floor-tab {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--ord-border);
+    color: var(--ord-text-muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.25rem 0.7rem;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .mini-floor-tab.active {
+    background: var(--ord-accent-gold);
+    color: #111827;
+    border-color: var(--ord-accent-gold);
+  }
+
+  /* Mini Canvas */
+  .mini-canvas-frame {
+    background: #090c12;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    height: 220px;
+    position: relative;
+    overflow: hidden;
+    /* Grid lines */
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 22px 22px;
+    margin-bottom: 0.75rem;
+  }
+
+  .mini-node {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .mini-node:hover { transform: scale(1.08); }
+  .mini-node.shape-square { width: 38px; height: 38px; border-radius: 6px; }
+  .mini-node.shape-round  { width: 38px; height: 38px; border-radius: 50%; }
+  .mini-node.shape-rect   { width: 54px; height: 36px; border-radius: 6px; }
+
+  .mini-node.state-free {
+    background: #131722;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #e2e8f0;
+  }
+  .mini-node.state-busy {
+    background: rgba(234, 88, 12, 0.1);
+    border: 1.5px solid var(--ord-accent-orange);
+    color: var(--ord-accent-orange);
+  }
+  .mini-node.state-urgent {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1.5px solid var(--ord-accent-red);
+    color: var(--ord-accent-red);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.35);
+  }
+  .mini-node-timer {
+    font-size: 0.58rem;
+    font-family: var(--font-mono, monospace);
+    line-height: 1;
+    margin-top: 1px;
+  }
+
+  /* Mini Legend */
+  .mini-legend {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    font-size: 0.72rem;
+    color: var(--ord-text-muted);
+  }
+  .legend-dot-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .min-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .min-dot-busy   { background: var(--ord-accent-orange); }
+  .min-dot-urgent { background: var(--ord-accent-red); box-shadow: 0 0 4px rgba(239, 68, 68, 0.8); }
+  .min-dot-free   { background: #475569; }
+
+  /* ── Quick Panel Slide Drawer ── */
+  .quick-panel-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1050;
+    display: none;
+  }
+  .quick-panel-drawer {
+    position: fixed;
+    top: 0;
+    right: -360px;
+    width: 360px;
+    height: 100vh;
+    background: var(--ord-panel-bg);
+    border-left: 1px solid var(--ord-border);
+    z-index: 1060;
+    padding: 1.5rem;
+    transition: right 0.25s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+  }
+  .quick-panel-drawer.open { right: 0; }
+  .quick-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid var(--ord-border);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="orders-page-container" id="ordersPageRoot">
+
+  <!-- ── TOP BAR METRICS & ACTIONS ── -->
+  <div class="orders-top-strip">
+    <!-- Left: Metrics Cluster -->
+    <div class="metrics-cluster">
+      <div class="metric-item">
+        <span class="metric-item-label">ACTIVE ORDERS</span>
+        <span class="metric-item-val metric-active" id="valActiveOrders">0</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-item-label">SERVED</span>
+        <span class="metric-item-val metric-served" id="valServedOrders">0</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-item-label">TODAY'S ORDERS</span>
+        <span class="metric-item-val metric-today" id="valTodayOrders">0</span>
+      </div>
+    </div>
+
+    <!-- Right: Actions Cluster -->
+    <div class="actions-cluster">
+      <!-- Card Density Sizing -->
+      <div class="density-group" title="Adjust order card sizing">
+        <button type="button" class="density-btn" data-density="density-sm" onclick="setDensity('density-sm', this)">Small</button>
+        <button type="button" class="density-btn active" data-density="density-md" onclick="setDensity('density-md', this)">Medium</button>
+        <button type="button" class="density-btn" data-density="density-lg" onclick="setDensity('density-lg', this)">Large</button>
+        <button type="button" class="density-btn" data-density="" onclick="setDensity('', this)">Auto</button>
+      </div>
+
+      <!-- All Tables (F3) Link -->
+      <a href="/tables/live/" class="btn-ord-action" title="All Tables Live Overview (Press F3)">
+        <i class="bi bi-grid-fill text-warning"></i> All Tables
+      </a>
+
+      <!-- Quick Panel Drawer Toggle -->
+      <button type="button" class="btn-ord-action" onclick="toggleQuickPanel()" title="Quick Actions Panel">
+        <i class="bi bi-sliders"></i> Quick Panel
+      </button>
+
+      <!-- Create Order Primary Button -->
+      <a href="/billing/" class="btn-ord-action btn-ord-primary" title="Create New Order">
+        <i class="bi bi-plus-lg"></i> Create Order
+      </a>
+
+      <!-- Order History Button -->
+      <a href="/history/" class="btn-ord-action" title="View Order History">
+        <i class="bi bi-clock-history"></i> Order History
+      </a>
+    </div>
+  </div>
+
+  <!-- ── STATUS FILTER TABS ── -->
+  <div class="orders-filter-tabs" id="ordersFilterTabs">
+    <button class="order-tab active" data-filter="all" onclick="setOrdersFilter('all', this)">
+      All Orders <span class="tab-count" id="tabCount-all">0</span>
+    </button>
+    <button class="order-tab" data-filter="new" onclick="setOrdersFilter('new', this)">
+      New <span class="tab-count" id="tabCount-new">0</span>
+    </button>
+    <button class="order-tab" data-filter="accepted" onclick="setOrdersFilter('accepted', this)">
+      Accepted <span class="tab-count" id="tabCount-accepted">0</span>
+    </button>
+    <button class="order-tab" data-filter="preparing" onclick="setOrdersFilter('preparing', this)">
+      Preparing <span class="tab-count" id="tabCount-preparing">0</span>
+    </button>
+    <button class="order-tab" data-filter="ready" onclick="setOrdersFilter('ready', this)">
+      Ready <span class="tab-count" id="tabCount-ready">0</span>
+    </button>
+    <button class="order-tab" data-filter="served" onclick="setOrdersFilter('served', this)">
+      Served <span class="tab-count" id="tabCount-served">0</span>
+    </button>
+  </div>
+
+  <!-- ── TWO COLUMN MAIN LAYOUT ── -->
+  <div class="orders-layout-row">
+    
+    <!-- LEFT/CENTER: Service Requests & Categorized Orders Feed -->
+    <div class="orders-main-col">
+
+      <!-- Service Requests (Waiter Calls) Section -->
+      <div class="service-requests-section" id="serviceRequestsSection" style="display:none;">
+        <div class="service-requests-heading">
+          <i class="bi bi-bell-fill"></i> Service Requests (<span id="serviceRequestsCount">0</span>)
+        </div>
+        <div class="service-requests-grid" id="serviceRequestsGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Categorized Order Feeds (New Orders, Accepted, Preparing, Ready, Served) -->
+      <div id="ordersFeedContainer">
+        <div class="text-center text-muted py-5">
+          <div class="spinner-border spinner-border-sm text-warning me-2" role="status"></div>
+          Loading live orders...
+        </div>
+      </div>
+
+      <!-- Recent Completed Orders Section (Top 5) -->
+      <div class="recent-orders-section" id="recentOrdersSection" style="display:none;">
+        <div class="recent-orders-heading">
+          <i class="bi bi-clock-history"></i> Recent Orders <span class="recent-orders-badge" id="recentOrdersCount">(0)</span>
+        </div>
+        <div class="recent-orders-grid" id="recentOrdersGrid"></div>
+      </div>
+
+    </div><!-- /.orders-main-col -->
+
+    <!-- RIGHT: Sticky Mini Floor Plan ("Table View >") -->
+    <div class="orders-side-col">
+      <div class="table-view-widget">
+        <div class="table-view-header">
+          <a href="/tables/live/" class="table-view-title" title="Open Full Screen All Tables">
+            <i class="bi bi-grid-3x3-gap text-warning"></i> Table View <i class="bi bi-chevron-right ms-1 small"></i>
+          </a>
+        </div>
+
+        <!-- Floor Switcher Tabs -->
+        <div class="mini-floor-tabs" id="miniFloorTabs">
+          <!-- Populated by JS (Floor 1, Floor 2, etc.) -->
+        </div>
+
+        <!-- Mini Canvas Frame -->
+        <div class="mini-canvas-frame">
+          <div id="miniCanvasContent" style="position:absolute;inset:0;"></div>
+        </div>
+
+        <!-- Mini Legend -->
+        <div class="mini-legend">
+          <div class="legend-dot-item">
+            <span class="min-dot min-dot-busy"></span>
+            <span>Busy</span>
+          </div>
+          <div class="legend-dot-item">
+            <span class="min-dot min-dot-urgent"></span>
+            <span>&gt;15min</span>
+          </div>
+          <div class="legend-dot-item">
+            <span class="min-dot min-dot-free"></span>
+            <span>Free</span>
+          </div>
+        </div>
+      </div>
+    </div><!-- /.orders-side-col -->
+
+  </div><!-- /.orders-layout-row -->
+
+</div><!-- /.orders-page-container -->
+
+<!-- ── QUICK PANEL DRAWER ── -->
+<div class="quick-panel-overlay" id="quickPanelOverlay" onclick="toggleQuickPanel()"></div>
+<div class="quick-panel-drawer" id="quickPanelDrawer">
+  <div class="quick-panel-header">
+    <h5 class="m-0 fw-bold"><i class="bi bi-sliders me-2 text-warning"></i>Quick Panel</h5>
+    <button class="btn btn-sm btn-outline-secondary" onclick="toggleQuickPanel()">&times;</button>
+  </div>
+  <div class="d-flex flex-column gap-3">
+    <a href="/billing/" class="btn btn-outline-warning w-100 text-start py-2">
+      <i class="bi bi-plus-circle me-2"></i>New Dine-in Order
+    </a>
+    <a href="/billing/?type=takeaway" class="btn btn-outline-info w-100 text-start py-2">
+      <i class="bi bi-bag me-2"></i>New Takeaway Order
+    </a>
+    <a href="/tables/live/" class="btn btn-outline-light w-100 text-start py-2">
+      <i class="bi bi-grid-fill me-2"></i>All Tables (F3)
+    </a>
+    <a href="/kitchen/" class="btn btn-outline-danger w-100 text-start py-2">
+      <i class="bi bi-fire me-2"></i>Kitchen Display (KDS)
+    </a>
+    <a href="/history/" class="btn btn-outline-secondary w-100 text-start py-2">
+      <i class="bi bi-clock-history me-2"></i>Order History &amp; Reprints
+    </a>
+  </div>
+</div>
+
+<!-- ── ESTIMATED PREP TIME MODAL (Matches Screenshot media_1789682100573.png) ── -->
+<div class="prep-modal-overlay" id="prepModalOverlay" style="display:none;" onclick="closePrepModal()">
+  <div class="prep-modal-dialog" onclick="event.stopPropagation()">
+    <div class="prep-modal-header">
+      <div class="prep-modal-title">
+        <i class="bi bi-clock text-warning"></i> Estimated Prep Time
+      </div>
+      <button type="button" class="prep-modal-close" onclick="closePrepModal()">&times;</button>
+    </div>
+    <div class="prep-modal-subtitle" id="prepModalSubtitle">
+      Enter preparation time for Order #
+    </div>
+    <div class="prep-time-presets">
+      <button type="button" class="prep-preset-btn" onclick="selectPrepPreset(10, this)">10 min</button>
+      <button type="button" class="prep-preset-btn active" onclick="selectPrepPreset(15, this)">15 min</button>
+      <button type="button" class="prep-preset-btn" onclick="selectPrepPreset(20, this)">20 min</button>
+      <button type="button" class="prep-preset-btn" onclick="selectPrepPreset(30, this)">30 min</button>
+      <button type="button" class="prep-preset-btn" onclick="selectPrepPreset(45, this)">45 min</button>
+      <button type="button" class="prep-preset-btn" onclick="selectPrepPreset(60, this)">60 min</button>
+    </div>
+    <div class="mb-3">
+      <label class="form-label prep-input-label">Custom Time (Minutes)</label>
+      <input type="number" id="prepTimeInput" class="form-control prep-time-input" value="15" min="1" max="240">
+    </div>
+    <div class="prep-modal-footer">
+      <button type="button" class="btn btn-prep-cancel" onclick="closePrepModal()">Cancel</button>
+      <button type="button" class="btn btn-prep-accept" id="btnConfirmAccept" onclick="confirmAcceptOrder()">Accept Order</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  let ordersFeedStore = {
+    metrics: { active_orders: 0, served: 0, todays_orders: 0 },
+    service_requests: [],
+    orders: [],
+    tables: [],
+    sections: []
+  };
+
+  let activeFilter = 'all';
+  let activeMiniFloor = '';
+  let pollInterval = null;
+  let timerInterval = null;
+
+  // ── Density selector ──
+  window.setDensity = function(densityClass, btn) {
+    const root = document.getElementById('ordersPageRoot');
+    if (!root) return;
+    root.classList.remove('density-sm', 'density-md', 'density-lg');
+    if (densityClass) root.classList.add(densityClass);
+    document.querySelectorAll('.density-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+  };
+
+  // ── Quick Panel Drawer ──
+  window.toggleQuickPanel = function() {
+    const overlay = document.getElementById('quickPanelOverlay');
+    const drawer = document.getElementById('quickPanelDrawer');
+    if (!drawer) return;
+    const isOpen = drawer.classList.contains('open');
+    if (isOpen) {
+      drawer.classList.remove('open');
+      if (overlay) overlay.style.display = 'none';
+    } else {
+      drawer.classList.add('open');
+      if (overlay) overlay.style.display = 'block';
+    }
+  };
+
+  // ── Filter Tabs ──
+  window.setOrdersFilter = function(filter, btn) {
+    activeFilter = filter;
+    document.querySelectorAll('.order-tab').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    renderOrdersFeed();
+  };
+
+  let knownNewOrderIds = new Set();
+  let isFirstLoad = true;
+
+  // ── Fetch Live Data ──
+  function fetchOrdersData() {
+    fetch('/orders/data/')
+      .then(r => r.json())
+      .then(data => {
+        if (!data) return;
+
+        // Incoming new orders check (from QR code or waiter)
+        if (!isFirstLoad) {
+          const currentNew = (data.orders || []).filter(o => o.category === 'new');
+          const incoming = currentNew.filter(o => !knownNewOrderIds.has(o.id));
+          if (incoming.length > 0) {
+            playNewOrderChime();
+            showOrdersToast(`New Order received: #${incoming[0].short_id} (${incoming[0].table_name})`);
+            if (incoming.length === 1 && !pendingAcceptOrderId) {
+              openPrepModal(incoming[0].id, incoming[0].order_number, incoming[0].table_id);
+            }
+          }
+        }
+        knownNewOrderIds = new Set((data.orders || []).filter(o => o.category === 'new').map(o => o.id));
+        isFirstLoad = false;
+
+        ordersFeedStore = data;
+        renderMetrics();
+        renderServiceRequests();
+        renderFilterTabCounts();
+        renderOrdersFeed();
+        renderRecentOrders();
+        renderMiniFloorWidget();
+      })
+      .catch(err => {
+        console.error("Orders feed poll error:", err);
+      });
+  }
+
+  // ── Render Top Metrics ──
+  function renderMetrics() {
+    const m = ordersFeedStore.metrics || {};
+    const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    setVal('valActiveOrders', m.active_orders || 0);
+    setVal('valServedOrders', m.served || 0);
+    setVal('valTodayOrders', m.todays_orders || 0);
+  }
+
+  // ── Render Service Requests ──
+  function renderServiceRequests() {
+    const section = document.getElementById('serviceRequestsSection');
+    const grid = document.getElementById('serviceRequestsGrid');
+    const countEl = document.getElementById('serviceRequestsCount');
+    if (!section || !grid) return;
+
+    const reqs = ordersFeedStore.service_requests || [];
+    if (reqs.length === 0) {
+      section.style.display = 'none';
+      return;
+    }
+
+    section.style.display = 'block';
+    if (countEl) countEl.textContent = reqs.length;
+
+    let html = '';
+    reqs.forEach(req => {
+      html += `
+        <div class="service-card" id="service-card-${req.id}">
+          <div class="service-card-header">
+            <span class="service-table-title">${escapeHtml(req.table_name)}</span>
+            <span class="service-badge-pending">PENDING</span>
+          </div>
+          <div class="service-reason">${escapeHtml(req.reason)} &bull; ${req.time}</div>
+          <div class="service-card-actions">
+            <button class="btn-service-accept" onclick="acceptServiceRequest(${req.id})">Accept</button>
+            <button class="btn-service-done" onclick="resolveServiceRequest(${req.id})">Mark Done</button>
+          </div>
+        </div>
+      `;
+    });
+    grid.innerHTML = html;
+  }
+
+  window.resolveServiceRequest = function(callId) {
+    fetch(`/waiter/resolve-waiter/${callId}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(r => r.json())
+    .then(d => {
+      fetchOrdersData();
+    })
+    .catch(() => {
+      // Optimistic remove
+      const el = document.getElementById(`service-card-${callId}`);
+      if (el) el.remove();
+    });
+  };
+
+  window.acceptServiceRequest = function(callId) {
+    resolveServiceRequest(callId);
+  };
+
+  // ── Filter Counts ──
+  function renderFilterTabCounts() {
+    const orders = ordersFeedStore.orders || [];
+    const counts = { all: orders.length, new: 0, accepted: 0, preparing: 0, ready: 0, served: 0 };
+    orders.forEach(o => {
+      const cat = o.category || 'new';
+      if (cat in counts) counts[cat]++;
+    });
+
+    Object.keys(counts).forEach(k => {
+      const el = document.getElementById(`tabCount-${k}`);
+      if (el) el.textContent = counts[k];
+    });
+  }
+
+  // ── Render Orders Feed ──
+  function renderOrdersFeed() {
+    const container = document.getElementById('ordersFeedContainer');
+    if (!container) return;
+
+    const allOrders = ordersFeedStore.orders || [];
+    const filtered = activeFilter === 'all'
+      ? allOrders
+      : allOrders.filter(o => (o.category || 'new') === activeFilter);
+
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div class="text-center py-5" style="color:var(--ord-text-muted);">
+          <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
+          <span style="letter-spacing:1px;font-size:0.85rem;text-transform:uppercase;">No orders in <strong>${activeFilter}</strong> category</span>
+        </div>
+      `;
+      return;
+    }
+
+    // Group filtered orders by category
+    const categoriesOrder = ['new', 'accepted', 'preparing', 'ready', 'served'];
+    const categoryLabels = {
+      'new': 'New Orders',
+      'accepted': 'Accepted',
+      'preparing': 'Preparing',
+      'ready': 'Ready',
+      'served': 'Served'
+    };
+
+    const grouped = {};
+    categoriesOrder.forEach(c => grouped[c] = []);
+    filtered.forEach(o => {
+      const cat = o.category || 'new';
+      if (!grouped[cat]) grouped[cat] = [];
+      grouped[cat].push(o);
+    });
+
+    let fullHtml = '';
+    categoriesOrder.forEach(cat => {
+      const items = grouped[cat] || [];
+      if (items.length === 0) return;
+
+      fullHtml += `
+        <div class="orders-group-block">
+          <div class="orders-group-header">
+            <span>${categoryLabels[cat]}</span>
+            <span class="orders-group-badge">${items.length}</span>
+          </div>
+          <div class="orders-cards-container">
+      `;
+
+      items.forEach(o => {
+        fullHtml += buildOrderCardHtml(o);
+      });
+
+      fullHtml += `
+          </div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = fullHtml;
+  }
+
+  // ── Build Single Order Card HTML (Matches Verified Screenshot) ──
+  function buildOrderCardHtml(o) {
+    const cutlerySvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.85;margin-right:6px;vertical-align:-2px;"><path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8Z"/><path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7"/><path d="m2.1 21.8 6.4-6.3"/><path d="m19 5-7 7"/></svg>`;
+    const checkSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:2px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>`;
+    const banSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>`;
+
+    // Status chips
+    let chipClass = "chip-placed";
+    let chipText = "PLACED";
+    if (o.category === "accepted") { chipClass = "chip-accepted"; chipText = "ACCEPTED"; }
+    else if (o.category === "preparing") { chipClass = "chip-preparing"; chipText = "PREPARING"; }
+    else if (o.category === "ready") { chipClass = "chip-ready"; chipText = "READY"; }
+    else if (o.category === "served") { chipClass = "chip-served"; chipText = "SERVED"; }
+
+    const paidChip = o.is_paid 
+      ? `<span class="ord-chip chip-paid"><i class="bi bi-check-circle-fill"></i> PAID</span>`
+      : `<span class="ord-chip chip-unpaid">UNPAID</span>`;
+
+    const markPaidBtn = !o.is_paid && o.table_id
+      ? `<button class="btn-mark-paid-chip" onclick="window.location.href='/billing/?table=${o.table_id}'" title="Pay Order">${checkSvg}MARK PAID</button>`
+      : ``;
+
+    let itemsHtml = `<div class="order-items-list">`;
+    (o.items || []).forEach(it => {
+      itemsHtml += `
+        <div class="order-item-row">
+          <div class="d-flex align-items-center gap-1 overflow-hidden">
+            <span class="order-item-qty">${it.quantity}</span>
+            <span class="order-item-name" title="${escapeHtml(it.name)}">${escapeHtml(it.name)}</span>
+          </div>
+          <span class="order-item-price">&#8377;${it.total_price.toFixed(2)}</span>
+        </div>
+      `;
+    });
+    itemsHtml += `</div>`;
+
+    const subtotalStr = o.subtotal ? o.subtotal.toFixed(2) : "0.00";
+    const gstStr = o.gst_total ? o.gst_total.toFixed(2) : "0.00";
+    const totalStr = o.grand_total ? o.grand_total.toFixed(2) : "0.00";
+
+    // Primary Action
+    let primaryBtnText = "Accept Order &rarr;";
+    let primaryBtnClick = `openPrepModal(${o.id}, '${escapeHtml(o.order_number)}', ${o.table_id || 'null'})`;
+
+    if (o.category === "accepted") {
+      primaryBtnText = "Send to Kitchen &rarr;";
+      primaryBtnClick = `window.location.href='/kitchen/'`;
+    } else if (o.category === "preparing") {
+      primaryBtnText = "View Kitchen &rarr;";
+      primaryBtnClick = `window.location.href='/kitchen/'`;
+    } else if (o.category === "ready") {
+      primaryBtnText = "Mark Served &rarr;";
+      primaryBtnClick = `markOrderServed(${o.id})`;
+    } else if (o.category === "served" || o.status === "billing") {
+      primaryBtnText = "Complete Payment";
+      primaryBtnClick = `window.location.href='/bill/${o.id}/'`;
+    }
+
+    const printBillBtn = (o.category === "served" || o.status === "billing")
+      ? `<button class="btn-print-bill-pill" onclick="window.location.href='/bill/${o.id}/'" title="Print Bill (F8)"><i class="bi bi-printer me-1"></i>F8 PRINT BILL</button>`
+      : ``;
+
+    const prepTimeChip = (o.category !== "new" && o.prep_time_minutes)
+      ? `<span class="ord-chip chip-prep-time"><i class="bi bi-clock"></i> ${o.prep_time_minutes} MIN</span>`
+      : ``;
+
+    return `
+      <div class="order-card" id="order-card-${o.id}">
+        <div class="order-card-header d-flex justify-content-between align-items-start">
+          <div>
+            <div class="order-card-title">${cutlerySvg}${escapeHtml(o.table_name)}</div>
+            <div class="order-card-meta">${o.time} &bull; ${o.short_id}</div>
+          </div>
+          ${printBillBtn}
+        </div>
+
+        <div class="order-chips-row">
+          <span class="ord-chip ${chipClass}">${chipText}</span>
+          ${prepTimeChip}
+          ${paidChip}
+          ${markPaidBtn}
+        </div>
+
+        ${itemsHtml}
+
+        <div class="order-summary-box">
+          <div class="order-summary-line">
+            <span>Subtotal</span>
+            <strong>&#8377;${subtotalStr}</strong>
+          </div>
+          <div class="order-summary-line">
+            <span>GST (5%)</span>
+            <strong>&#8377;${gstStr}</strong>
+          </div>
+          <div class="order-total-line">
+            <span class="order-total-label">TOTAL BILL</span>
+            <span class="order-total-val">&#8377;${totalStr}</span>
+          </div>
+        </div>
+
+        <div class="order-card-actions">
+          <button class="btn-order-cancel" onclick="cancelOrder(${o.id})" title="Cancel Order">
+            ${banSvg}
+          </button>
+          <button class="btn-order-primary" onclick="${primaryBtnClick}">
+            ${primaryBtnText}
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  window.cancelOrder = function(orderId) {
+    if (!confirm("Are you sure you want to cancel this order?")) return;
+    fetch(`/cancel-order/${orderId}/`, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": getCookie("csrftoken"),
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ reason: "Staff cancellation" })
+    })
+    .then(r => r.json())
+    .then(d => {
+      fetchOrdersData();
+    })
+    .catch(err => {
+      alert("Failed to cancel order: " + err);
+    });
+  };
+
+  // ── Render Recent Orders (Top 5 Completed) ──
+  function renderRecentOrders() {
+    const section = document.getElementById('recentOrdersSection');
+    const grid = document.getElementById('recentOrdersGrid');
+    const countEl = document.getElementById('recentOrdersCount');
+    if (!section || !grid) return;
+
+    const recent = ordersFeedStore.recent_orders || [];
+    if (recent.length === 0) {
+      section.style.display = 'none';
+      return;
+    }
+
+    section.style.display = 'block';
+    if (countEl) countEl.textContent = `(${recent.length})`;
+
+    let html = '';
+    recent.forEach(o => {
+      html += buildRecentOrderCardHtml(o);
+    });
+    grid.innerHTML = html;
+  }
+
+  // ── Build Recent Order Card HTML (Matches Screenshot media_1789681913379.png) ──
+  function buildRecentOrderCardHtml(o) {
+    const cutlerySvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.85;margin-right:6px;vertical-align:-2px;"><path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8Z"/><path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7"/><path d="m2.1 21.8 6.4-6.3"/><path d="m19 5-7 7"/></svg>`;
+
+    let itemsHtml = `<div class="order-items-list">`;
+    (o.items || []).forEach(it => {
+      itemsHtml += `
+        <div class="order-item-row">
+          <div class="d-flex align-items-center gap-1 overflow-hidden">
+            <span class="order-item-qty">${it.quantity}</span>
+            <span class="order-item-name" title="${escapeHtml(it.name)}">${escapeHtml(it.name)}</span>
+          </div>
+          <span class="order-item-price">&#8377;${it.total_price.toFixed(2)}</span>
+        </div>
+      `;
+    });
+    itemsHtml += `</div>`;
+
+    const subtotalStr = o.subtotal ? o.subtotal.toFixed(2) : "0.00";
+    const gstStr = o.gst_total ? o.gst_total.toFixed(2) : "0.00";
+    const totalStr = o.grand_total ? o.grand_total.toFixed(2) : "0.00";
+    const reopenTarget = o.table_id ? `/billing/?table=${o.table_id}` : `/bill/${o.id}/`;
+
+    return `
+      <div class="order-card" id="recent-card-${o.id}">
+        <div class="order-card-header d-flex justify-content-between align-items-start">
+          <div>
+            <div class="order-card-title">${cutlerySvg}${escapeHtml(o.table_name)}</div>
+            <div class="order-card-meta">${o.time} &bull; ${o.short_id}</div>
+          </div>
+          <div class="recent-card-actions">
+            <button class="recent-action-icon undo-icon" onclick="window.location.href='${reopenTarget}'" title="View / Reorder">
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
+            <button class="recent-action-icon" onclick="window.location.href='/thermal-receipt/${o.id}/'" title="Print Thermal Receipt">
+              <i class="bi bi-printer"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="order-chips-row">
+          <span class="ord-chip chip-paid"><i class="bi bi-check-circle-fill"></i> PAID</span>
+          <span class="ord-chip chip-method">PAID (${escapeHtml(o.payment_method || 'CASH')})</span>
+        </div>
+
+        ${itemsHtml}
+
+        <div class="order-summary-box">
+          <div class="order-summary-line">
+            <span>Subtotal</span>
+            <strong>&#8377;${subtotalStr}</strong>
+          </div>
+          <div class="order-summary-line">
+            <span>GST (5%)</span>
+            <strong>&#8377;${gstStr}</strong>
+          </div>
+          <div class="order-total-line">
+            <span class="order-total-label">TOTAL BILL</span>
+            <span class="order-total-val">&#8377;${totalStr}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ── Prep Time Modal Helpers (media_1789682100573.png) ──
+  let pendingAcceptOrderId = null;
+  let pendingAcceptTableId = null;
+
+  window.openPrepModal = function(orderId, orderNum, tableId) {
+    pendingAcceptOrderId = orderId;
+    pendingAcceptTableId = tableId;
+    const modal = document.getElementById('prepModalOverlay');
+    const sub = document.getElementById('prepModalSubtitle');
+    if (sub) sub.textContent = `Enter preparation time for Order #${orderNum}`;
+    if (modal) modal.style.display = 'flex';
+  };
+
+  window.closePrepModal = function() {
+    const modal = document.getElementById('prepModalOverlay');
+    if (modal) modal.style.display = 'none';
+    pendingAcceptOrderId = null;
+    pendingAcceptTableId = null;
+  };
+
+  window.selectPrepPreset = function(mins, btn) {
+    document.querySelectorAll('.prep-preset-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    const input = document.getElementById('prepTimeInput');
+    if (input) input.value = mins;
+  };
+
+  window.confirmAcceptOrder = function() {
+    if (!pendingAcceptOrderId) return;
+    const orderId = pendingAcceptOrderId;
+    const input = document.getElementById('prepTimeInput');
+    const mins = input ? (parseInt(input.value, 10) || 15) : 15;
+    closePrepModal();
+
+    fetch(`/orders/${orderId}/accept/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ prep_time: mins })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        showOrdersToast(`Order accepted with ${mins} min prep time!`);
+      } else {
+        alert(data.error || "Failed to accept order");
+      }
+      fetchOrdersData();
+    })
+    .catch(err => {
+      alert("Error accepting order: " + err);
+      fetchOrdersData();
+    });
+  };
+
+  window.markOrderServed = function(orderId) {
+    fetch(`/orders/${orderId}/serve/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(r => r.json())
+    .then(data => {
+      showOrdersToast("Order marked as served!");
+      fetchOrdersData();
+    })
+    .catch(() => {
+      fetchOrdersData();
+    });
+  };
+
+  function showOrdersToast(msg) {
+    let toast = document.getElementById('ordersDashboardToast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'ordersDashboardToast';
+      toast.className = 'orders-dashboard-toast';
+      document.body.appendChild(toast);
+    }
+    toast.innerHTML = `<i class="bi bi-info-circle text-warning me-1"></i> ${escapeHtml(msg)}`;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3500);
+  }
+
+  function playNewOrderChime() {
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+      osc.frequency.setValueAtTime(880.00, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.25, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.45);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.45);
+    } catch(e) {}
+  }
+
+  // ── Keyboard Shortcuts (F8 for Bill, F3 for All Tables) ──
+  window.addEventListener('keydown', function(e) {
+    if (e.key === 'F8') {
+      e.preventDefault();
+      const activeOrders = ordersFeedStore.orders || [];
+      const targetOrder = activeOrders.find(o => o.category === 'served' || o.status === 'billing') || activeOrders[0];
+      if (targetOrder) {
+        window.location.href = `/bill/${targetOrder.id}/`;
+      }
+    }
+  });
+
+  // ── Render Mini Floor Plan Widget ──
+  function renderMiniFloorWidget() {
+    const tabsContainer = document.getElementById('miniFloorTabs');
+    const canvasContainer = document.getElementById('miniCanvasContent');
+    if (!tabsContainer || !canvasContainer) return;
+
+    const tables = ordersFeedStore.tables || [];
+    const secMap = {};
+    tables.forEach(t => {
+      const sec = (t.section || 'Floor 1').trim();
+      if (!secMap[sec]) secMap[sec] = [];
+      secMap[sec].push(t);
+    });
+
+    const secKeys = Object.keys(secMap).sort();
+    if (secKeys.length === 0) secKeys.push('Floor 1');
+
+    if (!activeMiniFloor || !secKeys.includes(activeMiniFloor)) {
+      activeMiniFloor = secKeys[0];
+    }
+
+    // Render floor switch tabs
+    let tabsHtml = '';
+    secKeys.forEach(secName => {
+      const activeClass = (secName === activeMiniFloor) ? 'active' : '';
+      tabsHtml += `<button class="mini-floor-tab ${activeClass}" onclick="switchMiniFloor('${escapeHtml(secName)}')">${escapeHtml(secName)}</button>`;
+    });
+    tabsContainer.innerHTML = tabsHtml;
+
+    // Render table nodes on the mini canvas for activeMiniFloor
+    const activeTables = secMap[activeMiniFloor] || [];
+    const frameW = canvasContainer.clientWidth || 290;
+    const frameH = canvasContainer.clientHeight || 220;
+
+    let maxX = 500, maxY = 350;
+    activeTables.forEach(t => {
+      if (t.pos_x && t.pos_x > maxX) maxX = t.pos_x + 100;
+      if (t.pos_y && t.pos_y > maxY) maxY = t.pos_y + 100;
+    });
+
+    const scale = Math.min((frameW - 60) / maxX, (frameH - 60) / maxY, 0.65);
+
+    let canvasHtml = '';
+    activeTables.forEach((t, idx) => {
+      let x = t.pos_x, y = t.pos_y;
+      if (x == null || y == null) {
+        const col = idx % 4;
+        const row = Math.floor(idx / 4);
+        x = 20 + col * 65;
+        y = 20 + row * 60;
+      } else {
+        x = Math.round(x * scale) + 15;
+        y = Math.round(y * scale) + 15;
+      }
+
+      const isBusy = t.is_busy;
+      const elapsedSec = t.elapsed_seconds || 0;
+      const isUrgent = isBusy && (elapsedSec >= 900); // >15m
+
+      let stateClass = 'state-free';
+      if (isUrgent) stateClass = 'state-urgent';
+      else if (isBusy) stateClass = 'state-busy';
+
+      const shape = t.shape || 'square';
+      let timerMarkup = '';
+      if (isBusy) {
+        timerMarkup = `<div class="mini-node-timer" id="mini-timer-${t.id}">${formatMMSS(elapsedSec)}</div>`;
+      }
+
+      canvasHtml += `
+        <div class="mini-node shape-${shape} ${stateClass}" id="mini-node-${t.id}"
+             data-id="${t.id}" data-is-busy="${isBusy ? '1' : '0'}" data-elapsed="${elapsedSec}"
+             style="left:${x}px;top:${y}px;"
+             onclick="window.location.href='/billing/?table=${t.id}'"
+             title="${escapeHtml(t.name)} (${t.capacity || 4} seats)">
+          <div>${escapeHtml(t.name)}</div>
+          ${timerMarkup}
+        </div>
+      `;
+    });
+
+    canvasContainer.innerHTML = canvasHtml;
+  }
+
+  window.switchMiniFloor = function(secName) {
+    activeMiniFloor = secName;
+    renderMiniFloorWidget();
+  };
+
+  // ── Live Second-by-Second Timer Ticker ──
+  function tickTimers() {
+    document.querySelectorAll('.mini-node[data-is-busy="1"]').forEach(node => {
+      let sec = parseInt(node.getAttribute('data-elapsed') || '0', 10);
+      sec += 1;
+      node.setAttribute('data-elapsed', sec);
+
+      const tableId = node.getAttribute('data-id');
+      const timerEl = document.getElementById(`mini-timer-${tableId}`);
+      if (timerEl) {
+        timerEl.textContent = formatMMSS(sec);
+      }
+
+      if (sec >= 900 && !node.classList.contains('state-urgent')) {
+        node.classList.remove('state-busy');
+        node.classList.add('state-urgent');
+      }
+    });
+  }
+
+  function formatMMSS(totalSeconds) {
+    if (totalSeconds < 0) totalSeconds = 0;
+    const m = Math.floor(totalSeconds / 60);
+    const s = totalSeconds % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  }
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  // Initial load
+  fetchOrdersData();
+
+  // Background polling every 5 seconds
+  pollInterval = setInterval(fetchOrdersData, 5000);
+
+  // Second-by-second ticker
+  timerInterval = setInterval(tickTimers, 1000);
+
+  window.addEventListener('beforeunload', () => {
+    if (pollInterval) clearInterval(pollInterval);
+    if (timerInterval) clearInterval(timerInterval);
+  });
+})();
+</script>
+{% endblock %}
+

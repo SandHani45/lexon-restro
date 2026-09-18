@@ -1,0 +1,1146 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+  /* ══════════════════════════════════════════════════════════════
+     FLOOR EDITOR — Complete Light & Dark Theme Support
+     ══════════════════════════════════════════════════════════════ */
+  :root {
+    --editor-bg: #f8fafc;
+    --editor-panel: #ffffff;
+    --editor-card: #f1f5f9;
+    --editor-card-border: #e2e8f0;
+    --editor-border: #e2e8f0;
+    --editor-accent: #c5a059;
+    --editor-accent-hover: #b59250;
+    --editor-accent-soft: rgba(197, 160, 89, 0.12);
+    --editor-grid: rgba(0, 0, 0, 0.05);
+    --editor-canvas-bg: #ffffff;
+    --editor-canvas-border: rgba(0, 0, 0, 0.14);
+    --editor-canvas-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+    --editor-text-main: #0f172a;
+    --editor-text-muted: #64748b;
+    --editor-item-bg: #ffffff;
+    --editor-item-border: #cbd5e1;
+    --editor-item-text: #0f172a;
+    --editor-item-subtext: #64748b;
+    --editor-item-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    --editor-sim-bg: #ffffff;
+    --editor-sim-border: #e2e8f0;
+    --editor-sim-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+    --editor-sim-hover: rgba(0, 0, 0, 0.04);
+    --editor-viewport-dot: rgba(0, 0, 0, 0.06);
+  }
+
+  html.dark {
+    --editor-bg: #090b0e;
+    --editor-panel: #111318;
+    --editor-card: #171a21;
+    --editor-card-border: rgba(255, 255, 255, 0.08);
+    --editor-border: rgba(255, 255, 255, 0.08);
+    --editor-accent: #f59e0b;
+    --editor-accent-hover: #d97706;
+    --editor-accent-soft: rgba(245, 158, 11, 0.15);
+    --editor-grid: rgba(255, 255, 255, 0.04);
+    --editor-canvas-bg: #11141b;
+    --editor-canvas-border: rgba(255, 255, 255, 0.15);
+    --editor-canvas-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    --editor-text-main: #f8fafc;
+    --editor-text-muted: #94a3b8;
+    --editor-item-bg: #181c25;
+    --editor-item-border: rgba(255, 255, 255, 0.12);
+    --editor-item-text: #f1f5f9;
+    --editor-item-subtext: #94a3b8;
+    --editor-item-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    --editor-sim-bg: #141720;
+    --editor-sim-border: rgba(255, 255, 255, 0.1);
+    --editor-sim-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+    --editor-sim-hover: rgba(255, 255, 255, 0.06);
+    --editor-viewport-dot: rgba(255, 255, 255, 0.03);
+  }
+
+  #pos-main {
+    overflow: hidden !important;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - var(--topbar-height, 56px));
+    background: var(--editor-bg);
+  }
+
+  .editor-shell {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    user-select: none;
+  }
+
+  /* ── LEFT SIDEBAR ─────────────────────────────────────────── */
+  .editor-sidebar {
+    width: 280px;
+    min-width: 280px;
+    background: var(--editor-panel);
+    border-right: 1px solid var(--editor-border);
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem 1rem;
+    overflow-y: auto;
+    z-index: 20;
+    gap: 1.25rem;
+    transition: background 0.25s, border-color 0.25s;
+  }
+  .editor-sidebar::-webkit-scrollbar { width: 4px; }
+  .editor-sidebar::-webkit-scrollbar-thumb { background: var(--editor-border); border-radius: 4px; }
+
+  .editor-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--editor-text-main);
+    letter-spacing: -0.3px;
+    margin-bottom: 0.15rem;
+  }
+  .editor-subtitle {
+    font-size: 0.75rem;
+    color: var(--editor-text-muted);
+    letter-spacing: 0.5px;
+  }
+
+  /* Section selector */
+  .editor-section-card {
+    background: var(--editor-card);
+    border: 1px solid var(--editor-card-border);
+    border-radius: 8px;
+    padding: 0.75rem;
+    transition: background 0.25s, border-color 0.25s;
+  }
+  .editor-label-gold {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--editor-accent);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .editor-select {
+    width: 100%;
+    background: var(--editor-panel);
+    border: 1px solid var(--editor-card-border);
+    color: var(--editor-text-main);
+    border-radius: 6px;
+    padding: 0.5rem 0.65rem;
+    font-size: 0.82rem;
+    outline: none;
+    transition: border-color 0.15s, background 0.25s, color 0.25s;
+  }
+  .editor-select:focus {
+    border-color: var(--editor-accent);
+  }
+
+  /* Dimensions inputs */
+  .dim-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+  .dim-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .dim-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--editor-text-muted);
+    font-weight: 600;
+  }
+  .dim-input {
+    width: 100%;
+    background: var(--editor-panel);
+    border: 1px solid var(--editor-card-border);
+    color: var(--editor-text-main);
+    border-radius: 6px;
+    padding: 0.45rem 0.6rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.15s, background 0.25s, color 0.25s;
+  }
+  .dim-input:focus { border-color: var(--editor-accent); }
+
+  /* Item Palette */
+  .palette-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+  }
+  .palette-item {
+    background: var(--editor-panel);
+    border: 1px solid var(--editor-card-border);
+    border-radius: 8px;
+    padding: 0.85rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    cursor: grab;
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+  .palette-item:hover {
+    border-color: var(--editor-accent);
+    background: var(--editor-accent-soft);
+    transform: translateY(-2px);
+  }
+  .palette-item:active { cursor: grabbing; }
+  .palette-icon-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--editor-accent);
+    font-size: 1.25rem;
+  }
+  .palette-item-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--editor-text-muted);
+  }
+
+  /* Shape symbols */
+  .shape-square-icon {
+    width: 24px; height: 24px;
+    border: 2px solid var(--editor-accent);
+    border-radius: 4px;
+  }
+  .shape-round-icon {
+    width: 24px; height: 24px;
+    border: 2px solid var(--editor-accent);
+    border-radius: 50%;
+  }
+  .shape-rect-icon {
+    width: 32px; height: 20px;
+    border: 2px solid var(--editor-accent);
+    border-radius: 4px;
+  }
+  .shape-wall-icon {
+    width: 32px; height: 8px;
+    background: var(--editor-accent);
+    border-radius: 2px;
+  }
+
+  /* Inspector panel */
+  .inspector-panel {
+    background: var(--editor-card);
+    border: 1px solid var(--editor-card-border);
+    border-radius: 8px;
+    padding: 0.85rem;
+    display: none;
+    flex-direction: column;
+    gap: 0.65rem;
+    transition: background 0.25s, border-color 0.25s;
+  }
+  .inspector-panel.active { display: flex; }
+
+  /* ── CANVAS VIEWPORT ──────────────────────────────────────── */
+  .canvas-viewport {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    background: var(--editor-bg);
+    background-image: radial-gradient(circle, var(--editor-viewport-dot) 1px, transparent 1px);
+    background-size: 20px 20px;
+    transition: background 0.25s;
+  }
+
+  /* Canvas frame */
+  .floor-canvas {
+    position: relative;
+    background: var(--editor-canvas-bg);
+    border: 1.5px solid var(--editor-canvas-border);
+    box-shadow: var(--editor-canvas-shadow);
+    background-image: 
+      linear-gradient(to right, var(--editor-grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--editor-grid) 1px, transparent 1px);
+    background-size: 40px 40px;
+    transition: width 0.2s ease, height 0.2s ease, background 0.25s, border-color 0.25s;
+    overflow: hidden;
+  }
+
+  /* ── CANVAS TABLE ITEMS ───────────────────────────────────── */
+  .canvas-item {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--editor-item-bg);
+    border: 1.5px solid var(--editor-item-border);
+    box-shadow: var(--editor-item-shadow);
+    cursor: move;
+    user-select: none;
+    transition: box-shadow 0.15s, border-color 0.15s, background 0.25s;
+    z-index: 10;
+  }
+  .canvas-item:hover {
+    border-color: var(--editor-accent);
+    box-shadow: 0 6px 20px var(--editor-accent-soft);
+  }
+  .canvas-item.selected {
+    border-color: var(--editor-accent) !important;
+    box-shadow: 0 0 0 2px var(--editor-accent-soft), var(--editor-item-shadow);
+    z-index: 15;
+  }
+  .canvas-item.dragging {
+    opacity: 0.88;
+    transform: scale(1.02);
+    z-index: 30;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.35);
+  }
+
+  /* Shapes */
+  .canvas-item.shape-square {
+    border-radius: 10px;
+    width: 80px;
+    height: 80px;
+  }
+  .canvas-item.shape-round {
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+  }
+  .canvas-item.shape-rect {
+    border-radius: 10px;
+    width: 120px;
+    height: 80px;
+  }
+  .canvas-item.shape-wall {
+    border-radius: 3px;
+    width: 120px;
+    height: 20px;
+    background: #475569;
+    border-color: #64748b;
+  }
+
+  .canvas-item-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--editor-item-text);
+    letter-spacing: -0.2px;
+    line-height: 1.1;
+    pointer-events: none;
+  }
+  .canvas-item-cap {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--editor-item-subtext);
+    margin-top: 2px;
+    pointer-events: none;
+  }
+
+  /* Status accent line on top of canvas item */
+  .canvas-item-status-bar {
+    position: absolute;
+    top: 0; left: 15%; right: 15%;
+    height: 3px;
+    border-radius: 0 0 3px 3px;
+  }
+  .status-bar-free { background: var(--c-free, #10b981); }
+  .status-bar-ordering { background: var(--c-order, #eab308); }
+  .status-bar-preparing { background: var(--c-prepare, #f97316); }
+  .status-bar-served { background: var(--c-serve, #3b82f6); }
+  .status-bar-billing { background: #06b6d4; }
+
+  /* ── SIMULATE A CUSTOMER WIDGET ──────────────────────────── */
+  .simulation-card {
+    position: absolute;
+    bottom: 24px;
+    right: 24px;
+    width: 290px;
+    background: var(--editor-sim-bg);
+    border: 1px solid var(--editor-sim-border);
+    border-radius: 10px;
+    box-shadow: var(--editor-sim-shadow);
+    overflow: hidden;
+    z-index: 50;
+    transition: transform 0.25s ease, opacity 0.25s ease, background 0.25s, border-color 0.25s;
+  }
+  .simulation-card.collapsed .sim-body { display: none; }
+
+  .sim-header {
+    padding: 0.75rem 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--editor-card);
+    border-bottom: 1px solid var(--editor-border);
+    cursor: pointer;
+  }
+  .sim-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--editor-text-main);
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .sim-title i { color: var(--editor-accent); font-size: 0.95rem; }
+
+  html.dark .btn-close {
+    filter: invert(1) grayscale(100%);
+  }
+
+  .sim-body {
+    padding: 0.4rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    max-height: 280px;
+    overflow-y: auto;
+  }
+  .sim-action {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    padding: 0.5rem 0.55rem;
+    border-radius: 6px;
+    color: var(--editor-text-main);
+    text-decoration: none !important;
+    font-size: 0.75rem;
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+  .sim-action:hover {
+    background: var(--editor-sim-hover);
+    color: var(--editor-text-main);
+  }
+  .sim-action i {
+    font-size: 0.9rem;
+    color: var(--editor-accent);
+    margin-top: 1px;
+  }
+  .sim-action-text strong {
+    display: block;
+    color: var(--editor-text-main);
+    font-size: 0.76rem;
+    line-height: 1.2;
+  }
+  .sim-action-text span {
+    font-size: 0.68rem;
+    color: var(--editor-text-muted);
+    line-height: 1.1;
+  }
+
+  /* Unsaved badge */
+  .unsaved-indicator {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #ef4444;
+    margin-left: 6px;
+    display: none;
+  }
+  .unsaved-indicator.visible { display: inline-block; }
+</style>
+{% endblock %}
+
+{% block header_left %}
+<div class="d-flex align-items-center gap-2">
+  <a href="/tables/" class="btn-icon" title="Back to Floor Plan">
+    <i class="bi bi-arrow-left"></i>
+  </a>
+  <span class="topbar-outlet-name">Floor Editor &mdash; {{ request.user.outlet.name }}</span>
+</div>
+{% endblock %}
+
+{% block header_right %}
+<div class="d-flex align-items-center gap-2">
+  <button class="btn-luxury" id="btnSaveTop" onclick="saveCurrentFloorLayout()">
+    <i class="bi bi-cloud-arrow-up me-1"></i> Save Layout
+    <span class="unsaved-indicator" id="topUnsavedDot"></span>
+  </button>
+  <a href="/tables/" class="btn-luxury text-decoration-none">
+    <i class="bi bi-grid-3x3-gap me-1"></i> Floor Plan
+  </a>
+  <button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme">
+    <i class="bi bi-moon" id="themeIcon"></i>
+  </button>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="editor-shell">
+
+  <!-- ══════════════ LEFT SIDEBAR ══════════════ -->
+  <aside class="editor-sidebar">
+
+    <!-- Header title -->
+    <div>
+      <div class="editor-title">Floor Editor</div>
+      <div class="editor-subtitle">Grid Size: 40px</div>
+    </div>
+
+    <!-- Section / Floor Selector -->
+    <div class="editor-section-card">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <div class="editor-label-gold mb-0"><i class="bi bi-layers"></i> FLOOR / SECTION</div>
+        <button class="btn btn-sm btn-link p-0 text-decoration-none text-muted" onclick="promptAddSection()" title="Add Section" style="font-size:0.75rem;">
+          <i class="bi bi-plus-lg"></i> New
+        </button>
+      </div>
+      <select class="editor-select" id="floorSelector" onchange="switchSection(this.value)">
+        <option value="Main Hall">Main Hall</option>
+      </select>
+    </div>
+
+    <!-- Dimensions -->
+    <div class="editor-section-card">
+      <div class="editor-label-gold"><i class="bi bi-aspect-ratio"></i> DIMENSIONS</div>
+      <div class="dim-grid">
+        <div class="dim-box">
+          <span class="dim-label">Width</span>
+          <input type="number" id="canvasWidthInput" class="dim-input" value="900" min="400" max="2400" step="40" onchange="updateCanvasDimensions()">
+        </div>
+        <div class="dim-box">
+          <span class="dim-label">Height</span>
+          <input type="number" id="canvasHeightInput" class="dim-input" value="500" min="300" max="1600" step="40" onchange="updateCanvasDimensions()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Items Palette -->
+    <div class="editor-section-card">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <div class="editor-label-gold mb-0"><i class="bi bi-plus-circle"></i> ADD ITEMS</div>
+        <span style="font-size:0.65rem; color:#64748b;">Click or drag</span>
+      </div>
+      <div class="palette-grid">
+        <!-- Square -->
+        <div class="palette-item" draggable="true" ondragstart="handlePaletteDragStart(event, 'square')" onclick="addTableFromPalette('square')">
+          <div class="shape-square-icon"></div>
+          <span class="palette-item-label">Square</span>
+        </div>
+        <!-- Round -->
+        <div class="palette-item" draggable="true" ondragstart="handlePaletteDragStart(event, 'round')" onclick="addTableFromPalette('round')">
+          <div class="shape-round-icon"></div>
+          <span class="palette-item-label">Round</span>
+        </div>
+        <!-- Rect -->
+        <div class="palette-item" draggable="true" ondragstart="handlePaletteDragStart(event, 'rect')" onclick="addTableFromPalette('rect')">
+          <div class="shape-rect-icon"></div>
+          <span class="palette-item-label">Rect</span>
+        </div>
+        <!-- Wall -->
+        <div class="palette-item" draggable="true" ondragstart="handlePaletteDragStart(event, 'wall')" onclick="addTableFromPalette('wall')">
+          <div class="shape-wall-icon"></div>
+          <span class="palette-item-label">Wall</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table Inspector / Selection Edit -->
+    <div class="inspector-panel" id="inspectorPanel">
+      <div class="editor-label-gold"><i class="bi bi-pencil-square"></i> EDIT SELECTED</div>
+      <div>
+        <label class="dim-label mb-1">Name</label>
+        <input type="text" id="inspectName" class="editor-select" placeholder="e.g. T1" oninput="updateSelectedTableField('name', this.value)">
+      </div>
+      <div class="row g-2">
+        <div class="col-6">
+          <label class="dim-label mb-1">Capacity</label>
+          <input type="number" id="inspectCap" class="dim-input text-start ps-2" min="0" max="50" oninput="updateSelectedTableField('capacity', parseInt(this.value)||0)">
+        </div>
+        <div class="col-6">
+          <label class="dim-label mb-1">Shape</label>
+          <select id="inspectShape" class="editor-select" onchange="updateSelectedTableField('shape', this.value)">
+            <option value="square">Square</option>
+            <option value="round">Round</option>
+            <option value="rect">Rect</option>
+            <option value="wall">Wall</option>
+          </select>
+        </div>
+      </div>
+      <div class="d-flex gap-2 mt-2">
+        <button class="btn btn-sm btn-outline-danger w-100" onclick="deleteSelectedTable()" style="font-size:0.75rem;">
+          <i class="bi bi-trash me-1"></i> Remove
+        </button>
+      </div>
+    </div>
+
+    <!-- Save button at bottom of sidebar -->
+    <div class="mt-auto pt-2">
+      <button class="btn-luxury w-100 py-2" onclick="saveCurrentFloorLayout()" style="background:var(--editor-accent);border-color:var(--editor-accent);color:#111;font-weight:700;">
+        <i class="bi bi-check2-circle me-1"></i> Save Layout
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- ══════════════ CANVAS VIEWPORT ══════════════ -->
+  <main class="canvas-viewport" id="canvasViewport"
+        ondragover="handleCanvasDragOver(event)"
+        ondrop="handleCanvasDrop(event)"
+        onclick="handleCanvasBackgroundClick(event)">
+
+    <div class="floor-canvas" id="floorCanvas" style="width: 900px; height: 500px;">
+      <!-- Table nodes placed dynamically -->
+    </div>
+
+    <!-- ══════════════ SIMULATE A CUSTOMER WIDGET ══════════════ -->
+    <div class="simulation-card" id="simCard">
+      <div class="sim-header" onclick="toggleSimCard()">
+        <div class="sim-title">
+          <i class="bi bi-stars"></i> Simulate a customer
+        </div>
+        <button type="button" class="btn-close btn-close-white" style="font-size:0.65rem;" onclick="event.stopPropagation(); toggleSimCard();"></button>
+      </div>
+      <div class="sim-body">
+        <div class="sim-action" onclick="simulateAction('qr_order')">
+          <i class="bi bi-qr-code-scan"></i>
+          <div class="sim-action-text">
+            <strong>QR dine-in order</strong>
+            <span>A guest scans a table QR and orders</span>
+          </div>
+        </div>
+        <div class="sim-action" onclick="simulateAction('upi_delivery')">
+          <i class="bi bi-bicycle"></i>
+          <div class="sim-action-text">
+            <strong>Delivery order (UPI paid)</strong>
+            <span>Paid online before it reaches you</span>
+          </div>
+        </div>
+        <div class="sim-action" onclick="simulateAction('cod_delivery')">
+          <i class="bi bi-cash-coin"></i>
+          <div class="sim-action-text">
+            <strong>Delivery order (cash on delivery)</strong>
+            <span>Collect on delivery</span>
+          </div>
+        </div>
+        <div class="sim-action" onclick="simulateAction('takeaway')">
+          <i class="bi bi-bag-check"></i>
+          <div class="sim-action-text">
+            <strong>Takeaway order</strong>
+            <span>Phoned in for pickup</span>
+          </div>
+        </div>
+        <div class="sim-action" onclick="simulateAction('waiter_call')">
+          <i class="bi bi-bell"></i>
+          <div class="sim-action-text">
+            <strong>Guest calls a waiter</strong>
+            <span>Service request from a table</span>
+          </div>
+        </div>
+        <div class="sim-action" onclick="simulateAction('open_qr')">
+          <i class="bi bi-phone"></i>
+          <div class="sim-action-text">
+            <strong>Open the guest QR menu</strong>
+            <span>Order as a diner and watch it arrive</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  'use strict';
+
+  const GRID_SIZE = 40;
+  let currentSection = 'Main Hall';
+  let sectionsData = {};
+  let allTables = [];
+  let deletedIds = [];
+  let selectedTableId = null;
+  let isDirty = false;
+
+  const floorCanvas = document.getElementById('floorCanvas');
+  const floorSelector = document.getElementById('floorSelector');
+  const canvasWidthInput = document.getElementById('canvasWidthInput');
+  const canvasHeightInput = document.getElementById('canvasHeightInput');
+  const inspectorPanel = document.getElementById('inspectorPanel');
+  const inspectName = document.getElementById('inspectName');
+  const inspectCap = document.getElementById('inspectCap');
+  const inspectShape = document.getElementById('inspectShape');
+
+  // ── Load Floor Data on Start ───────────────────────────────────────────────
+  window.initFloorEditor = function() {
+    fetch('/floor-data/')
+      .then(r => r.json())
+      .then(data => {
+        if (data.error) throw new Error(data.error);
+
+        // Populate sections
+        sectionsData = {};
+        floorSelector.innerHTML = '';
+        (data.sections || []).forEach(sec => {
+          sectionsData[sec.name] = sec;
+          const opt = document.createElement('option');
+          opt.value = sec.name;
+          opt.textContent = sec.name;
+          floorSelector.appendChild(opt);
+        });
+
+        if (data.sections && data.sections.length > 0) {
+          currentSection = data.sections[0].name;
+          floorSelector.value = currentSection;
+        }
+
+        allTables = data.tables || [];
+        deletedIds = [];
+
+        // Apply first section dimensions and render
+        applySection(currentSection);
+      })
+      .catch(err => {
+        Swal.fire('Error', 'Failed to load floor layout: ' + err.message, 'error');
+      });
+  };
+
+  // ── Switch Section ─────────────────────────────────────────────────────────
+  window.switchSection = function(secName) {
+    if (isDirty) {
+      if (!confirm('You have unsaved changes. Switch floor anyway?')) {
+        floorSelector.value = currentSection;
+        return;
+      }
+    }
+    currentSection = secName;
+    deselectTable();
+    applySection(currentSection);
+  };
+
+  function applySection(secName) {
+    const sec = sectionsData[secName] || { width: 900, height: 500, grid_size: 40 };
+    canvasWidthInput.value = sec.width || 900;
+    canvasHeightInput.value = sec.height || 500;
+    floorCanvas.style.width = (sec.width || 900) + 'px';
+    floorCanvas.style.height = (sec.height || 500) + 'px';
+
+    renderCanvasItems();
+    setDirty(false);
+  }
+
+  // ── Update Canvas Dimensions ──────────────────────────────────────────────
+  window.updateCanvasDimensions = function() {
+    let w = parseInt(canvasWidthInput.value) || 900;
+    let h = parseInt(canvasHeightInput.value) || 500;
+    // Snap to grid
+    w = Math.max(400, Math.round(w / GRID_SIZE) * GRID_SIZE);
+    h = Math.max(300, Math.round(h / GRID_SIZE) * GRID_SIZE);
+    canvasWidthInput.value = w;
+    canvasHeightInput.value = h;
+    floorCanvas.style.width = w + 'px';
+    floorCanvas.style.height = h + 'px';
+
+    if (!sectionsData[currentSection]) {
+      sectionsData[currentSection] = { name: currentSection };
+    }
+    sectionsData[currentSection].width = w;
+    sectionsData[currentSection].height = h;
+    setDirty(true);
+  };
+
+  // ── Add New Section Prompt ────────────────────────────────────────────────
+  window.promptAddSection = function() {
+    Swal.fire({
+      title: 'New Floor / Section',
+      input: 'text',
+      inputPlaceholder: 'e.g. Patio, 1st Floor, Terrace',
+      showCancelButton: true,
+      confirmButtonText: 'Add Floor',
+      confirmButtonColor: '#f59e0b',
+    }).then(res => {
+      if (res.isConfirmed && res.value && res.value.trim()) {
+        const newSec = res.value.trim();
+        if (!sectionsData[newSec]) {
+          sectionsData[newSec] = { name: newSec, width: 900, height: 500, grid_size: 40 };
+          const opt = document.createElement('option');
+          opt.value = newSec;
+          opt.textContent = newSec;
+          floorSelector.appendChild(opt);
+        }
+        floorSelector.value = newSec;
+        switchSection(newSec);
+      }
+    });
+  };
+
+  // ── Render Tables on Canvas ────────────────────────────────────────────────
+  function renderCanvasItems() {
+    floorCanvas.innerHTML = '';
+
+    const currentTables = allTables.filter(t => (t.section || 'Main Hall') === currentSection);
+
+    currentTables.forEach((t, idx) => {
+      // If table doesn't have pos_x or pos_y, assign a neat grid default
+      if (t.pos_x == null || t.pos_y == null) {
+        const col = idx % 6;
+        const row = Math.floor(idx / 6);
+        t.pos_x = 40 + col * 120;
+        t.pos_y = 40 + row * 120;
+      }
+
+      const itemEl = createTableElement(t);
+      floorCanvas.appendChild(itemEl);
+    });
+  }
+
+  function createTableElement(t) {
+    const el = document.createElement('div');
+    const shape = t.shape || 'square';
+    el.className = `canvas-item shape-${shape}` + (t.id === selectedTableId ? ' selected' : '');
+    el.id = 'tableNode_' + t.id;
+    el.style.left = (t.pos_x || 0) + 'px';
+    el.style.top = (t.pos_y || 0) + 'px';
+
+    if (t.width) el.style.width = t.width + 'px';
+    if (t.height) el.style.height = t.height + 'px';
+
+    // Status bar if active
+    let statusBar = '';
+    if (t.state && t.state !== 'free') {
+      statusBar = `<div class="canvas-item-status-bar status-bar-${t.state}"></div>`;
+    }
+
+    if (shape === 'wall') {
+      el.innerHTML = statusBar;
+    } else {
+      el.innerHTML = `
+        ${statusBar}
+        <div class="canvas-item-name">${escapeHtml(t.name || 'T')}</div>
+        <div class="canvas-item-cap">${t.capacity || 4}p</div>
+      `;
+    }
+
+    // Attach pointer drag handler
+    attachItemDrag(el, t);
+
+    // Click to select
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectTable(t.id);
+    });
+
+    return el;
+  }
+
+  // ── Pointer Drag-and-Drop Implementation ──────────────────────────────────
+  function attachItemDrag(el, tableData) {
+    let isDragging = false;
+    let startX = 0, startY = 0;
+    let initialLeft = 0, initialTop = 0;
+
+    el.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return; // Left click only
+      isDragging = true;
+      el.classList.add('dragging');
+      el.setPointerCapture(e.pointerId);
+
+      startX = e.clientX;
+      startY = e.clientY;
+      initialLeft = parseInt(el.style.left) || 0;
+      initialTop = parseInt(el.style.top) || 0;
+
+      selectTable(tableData.id);
+      e.stopPropagation();
+    });
+
+    el.addEventListener('pointermove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+
+      let newLeft = initialLeft + dx;
+      let newTop = initialTop + dy;
+
+      // Bound inside canvas
+      const maxW = floorCanvas.clientWidth - el.offsetWidth;
+      const maxH = floorCanvas.clientHeight - el.offsetHeight;
+      newLeft = Math.max(0, Math.min(newLeft, maxW));
+      newTop = Math.max(0, Math.min(newTop, maxH));
+
+      el.style.left = newLeft + 'px';
+      el.style.top = newTop + 'px';
+    });
+
+    const endDrag = (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      el.classList.remove('dragging');
+      try { el.releasePointerCapture(e.pointerId); } catch(ex){}
+
+      // Snap to GRID_SIZE
+      let finalLeft = parseInt(el.style.left) || 0;
+      let finalTop = parseInt(el.style.top) || 0;
+
+      finalLeft = Math.round(finalLeft / GRID_SIZE) * GRID_SIZE;
+      finalTop = Math.round(finalTop / GRID_SIZE) * GRID_SIZE;
+
+      const maxW = floorCanvas.clientWidth - el.offsetWidth;
+      const maxH = floorCanvas.clientHeight - el.offsetHeight;
+      finalLeft = Math.max(0, Math.min(finalLeft, Math.floor(maxW / GRID_SIZE) * GRID_SIZE));
+      finalTop = Math.max(0, Math.min(finalTop, Math.floor(maxH / GRID_SIZE) * GRID_SIZE));
+
+      el.style.left = finalLeft + 'px';
+      el.style.top = finalTop + 'px';
+
+      // Update data model
+      tableData.pos_x = finalLeft;
+      tableData.pos_y = finalTop;
+      setDirty(true);
+    };
+
+    el.addEventListener('pointerup', endDrag);
+    el.addEventListener('pointercancel', endDrag);
+  }
+
+  // ── Selection and Inspector ───────────────────────────────────────────────
+  window.selectTable = function(tableId) {
+    selectedTableId = tableId;
+    document.querySelectorAll('.canvas-item').forEach(node => {
+      node.classList.toggle('selected', node.id === 'tableNode_' + tableId);
+    });
+
+    const t = allTables.find(x => x.id === tableId);
+    if (t) {
+      inspectorPanel.classList.add('active');
+      inspectName.value = t.name || '';
+      inspectCap.value = t.capacity || 4;
+      inspectShape.value = t.shape || 'square';
+    } else {
+      inspectorPanel.classList.remove('active');
+    }
+  };
+
+  window.deselectTable = function() {
+    selectedTableId = null;
+    document.querySelectorAll('.canvas-item').forEach(node => node.classList.remove('selected'));
+    inspectorPanel.classList.remove('active');
+  };
+
+  window.handleCanvasBackgroundClick = function(e) {
+    if (e.target === floorCanvas || e.target.id === 'canvasViewport') {
+      deselectTable();
+    }
+  };
+
+  window.updateSelectedTableField = function(field, val) {
+    if (!selectedTableId) return;
+    const t = allTables.find(x => x.id === selectedTableId);
+    if (!t) return;
+
+    t[field] = val;
+    setDirty(true);
+
+    // Re-render single node
+    const node = document.getElementById('tableNode_' + selectedTableId);
+    if (node) {
+      if (field === 'name') {
+        const nameEl = node.querySelector('.canvas-item-name');
+        if (nameEl) nameEl.textContent = val;
+      } else if (field === 'capacity') {
+        const capEl = node.querySelector('.canvas-item-cap');
+        if (capEl) capEl.textContent = val + 'p';
+      } else if (field === 'shape') {
+        node.className = `canvas-item shape-${val} selected`;
+        if (val === 'rect') { node.style.width = '120px'; node.style.height = '80px'; }
+        else if (val === 'wall') { node.style.width = '120px'; node.style.height = '20px'; }
+        else { node.style.width = '80px'; node.style.height = '80px'; }
+      }
+    }
+  };
+
+  window.deleteSelectedTable = function() {
+    if (!selectedTableId) return;
+    const idx = allTables.findIndex(x => x.id === selectedTableId);
+    if (idx === -1) return;
+
+    const t = allTables[idx];
+    if (confirm(`Remove table "${t.name}" from layout?`)) {
+      if (!String(t.id).startsWith('temp_')) {
+        deletedIds.push(t.id);
+      }
+      allTables.splice(idx, 1);
+      const node = document.getElementById('tableNode_' + selectedTableId);
+      if (node) node.remove();
+      deselectTable();
+      setDirty(true);
+    }
+  };
+
+  // ── Palette Add / Drag ────────────────────────────────────────────────────
+  let draggedPaletteShape = null;
+
+  window.handlePaletteDragStart = function(e, shape) {
+    draggedPaletteShape = shape;
+    e.dataTransfer.setData('text/plain', shape);
+  };
+
+  window.handleCanvasDragOver = function(e) {
+    e.preventDefault();
+  };
+
+  window.handleCanvasDrop = function(e) {
+    e.preventDefault();
+    const shape = draggedPaletteShape || e.dataTransfer.getData('text/plain');
+    if (!shape) return;
+
+    const rect = floorCanvas.getBoundingClientRect();
+    let dropX = e.clientX - rect.left - 40;
+    let dropY = e.clientY - rect.top - 40;
+
+    dropX = Math.max(0, Math.round(dropX / GRID_SIZE) * GRID_SIZE);
+    dropY = Math.max(0, Math.round(dropY / GRID_SIZE) * GRID_SIZE);
+
+    addTable(shape, dropX, dropY);
+    draggedPaletteShape = null;
+  };
+
+  window.addTableFromPalette = function(shape) {
+    // Add in center of floor
+    const w = floorCanvas.clientWidth;
+    const h = floorCanvas.clientHeight;
+    let posX = Math.round((w / 2 - 40) / GRID_SIZE) * GRID_SIZE;
+    let posY = Math.round((h / 2 - 40) / GRID_SIZE) * GRID_SIZE;
+    addTable(shape, posX, posY);
+  };
+
+  function addTable(shape, posX, posY) {
+    const nextNum = allTables.length + 1;
+    const tempId = 'temp_' + Date.now();
+    const newT = {
+      id: tempId,
+      name: shape === 'wall' ? 'Wall' : 'T' + nextNum,
+      section: currentSection,
+      capacity: shape === 'wall' ? 0 : (shape === 'rect' ? 6 : (shape === 'round' ? 2 : 4)),
+      shape: shape,
+      pos_x: posX,
+      pos_y: posY,
+      width: shape === 'rect' ? 120 : (shape === 'wall' ? 120 : 80),
+      height: shape === 'wall' ? 20 : 80,
+    };
+
+    allTables.push(newT);
+    const el = createTableElement(newT);
+    floorCanvas.appendChild(el);
+    selectTable(tempId);
+    setDirty(true);
+  }
+
+  // ── Dirty State & Save ─────────────────────────────────────────────────────
+  function setDirty(state) {
+    isDirty = state;
+    const dot = document.getElementById('topUnsavedDot');
+    if (dot) dot.classList.toggle('visible', state);
+  }
+
+  window.saveCurrentFloorLayout = function() {
+    const btn = document.getElementById('btnSaveTop');
+    if (btn) btn.disabled = true;
+
+    const w = parseInt(canvasWidthInput.value) || 900;
+    const h = parseInt(canvasHeightInput.value) || 500;
+
+    // Tables on current floor
+    const payload = {
+      section: currentSection,
+      width: w,
+      height: h,
+      grid_size: GRID_SIZE,
+      tables: allTables.filter(t => (t.section || 'Main Hall') === currentSection),
+      deleted_ids: deletedIds
+    };
+
+    fetch('/floor-save/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': apiClient.getCsrf()
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (btn) btn.disabled = false;
+      if (res.success) {
+        setDirty(false);
+        deletedIds = [];
+        // Update any temp ids that became real
+        if (res.saved_tables) {
+          res.saved_tables.forEach(st => {
+            if (st.temp_id) {
+              const item = allTables.find(x => x.id === st.temp_id);
+              if (item) item.id = st.id;
+              const node = document.getElementById('tableNode_' + st.temp_id);
+              if (node) node.id = 'tableNode_' + st.id;
+            }
+          });
+        }
+        ui.toast('Floor layout saved!', 'success');
+      } else {
+        Swal.fire('Error', res.error || 'Could not save floor layout', 'error');
+      }
+    })
+    .catch(err => {
+      if (btn) btn.disabled = false;
+      Swal.fire('Error', 'Save failed: ' + err.message, 'error');
+    });
+  };
+
+  // ── Simulation Actions ─────────────────────────────────────────────────────
+  window.toggleSimCard = function() {
+    const card = document.getElementById('simCard');
+    if (card) card.classList.toggle('collapsed');
+  };
+
+  window.simulateAction = function(actionType) {
+    const currentTables = allTables.filter(t => (t.section || 'Main Hall') === currentSection && t.shape !== 'wall');
+    if (currentTables.length === 0) {
+      ui.toast('No tables available on this floor to simulate', 'warning');
+      return;
+    }
+
+    const targetTable = (selectedTableId && currentTables.find(x => x.id === selectedTableId)) || currentTables[0];
+
+    if (actionType === 'open_qr' || actionType === 'qr_order') {
+      if (targetTable.qr_token) {
+        window.open(`/menu/digital-menu/?table_token=${targetTable.qr_token}`, '_blank');
+      } else {
+        ui.toast('Table token not found. Save layout first.', 'info');
+      }
+    } else if (actionType === 'upi_delivery' || actionType === 'cod_delivery' || actionType === 'takeaway') {
+      window.location.href = `/billing/?source=${actionType.includes('delivery') ? 'delivery' : 'takeaway'}`;
+    } else if (actionType === 'waiter_call') {
+      ui.toast(`Simulated: Waiter called from Table ${targetTable.name}`, 'info');
+    }
+  };
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    initFloorEditor();
+  });
+
+})();
+</script>
+{% endblock %}
+

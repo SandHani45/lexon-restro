@@ -8,9 +8,30 @@ from .discount_views import apply_discount, make_item_complimentary, apply_item_
 from .print_views import generate_bill, print_bill_action, print_kot_action, print_split_bill, qz_receipt_data, printer_status, download_pdf_bill, thermal_receipt_view
 from .billing_views import create_order
 # kitchen_views moved to kitchen/views.py (Phase 3 of the orders app split)
-from .table_views import table_dashboard, tables_data, mark_table_cleaned, available_tables, transfer_table_view, manage_table_view
+from .table_views import (
+    table_dashboard,
+    tables_data,
+    mark_table_cleaned,
+    available_tables,
+    transfer_table_view,
+    manage_table_view,
+    floor_editor_view,
+    floor_data_api,
+    save_floor_layout,
+    live_tables_view,
+)
 # merge_tables_view/unmerge_tables_view moved to tablemerge/views.py (Phase 5 of the split).
-from .order_views import running_order_view, running_order_items, running_order_data, approve_items, approve_item
+from .order_views import (
+    running_order_view,
+    running_order_items,
+    running_order_data,
+    approve_items,
+    approve_item,
+    orders_page_view,
+    orders_feed_data,
+    accept_order_view,
+    serve_order_view,
+)
 # waiter_dashboard/resolve_waiter_call moved to waiter/views.py, resolve_kitchen_message
 # to kitchen/views.py (Phase 4 of the orders app split).
 from .order_actions import cancel_order, cancel_item
@@ -49,10 +70,18 @@ __all__ = [
     # merge_tables_view/unmerge_tables_view moved to tablemerge/views.py (Phase 5).
     "transfer_table_view",
     "manage_table_view",
+    "floor_editor_view",
+    "floor_data_api",
+    "save_floor_layout",
+    "live_tables_view",
     # running order
     "running_order_view",
     "running_order_items",
     "running_order_data",
+    "orders_page_view",
+    "orders_feed_data",
+    "accept_order_view",
+    "serve_order_view",
     "approve_items",
     "approve_item",
     # waiter_dashboard/resolve_waiter_call moved to waiter/views.py,

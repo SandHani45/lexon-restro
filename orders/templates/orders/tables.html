@@ -1,69 +1,66 @@
-{% extends 'core/base.html' %}
-{% block title %}Floor Plan | {{ request.user.tenant.name }}{% endblock %}
+{% extends "core/base.html" %}
+{% load static %}
 
 {% block extra_css %}
 <style>
-  ::placeholder { color: var(--text-muted) !important; opacity: 0.7 !important; }
-  ::-webkit-input-placeholder { color: var(--text-muted) !important; opacity: 0.7 !important; }
+  /* ══════════════════════════════════════════════════════════════
+     TABLES & FLOOR PLAN STYLES
+     ══════════════════════════════════════════════════════════════ */
+  .table-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition-smooth);
+    display: flex;
+    flex-direction: column;
+    min-height: 220px;
+  }
+  .table-card:hover {
+    box-shadow: var(--shadow-hover);
+    border-color: var(--accent-gold);
+  }
 
-  /* Page-specific palette additions */
+  .table-status-line { position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .table-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+  .table-name { font-family: 'DM Serif Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin: 0; }
+  .table-timer { font-family: 'Space Mono', monospace; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 5px; }
+  .table-status { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 0.5rem; }
+
+  /* Cooking items badge */
+  .cooking-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 0.7rem; font-weight: 600; padding: 2px 7px;
+    border-radius: 4px; background: rgba(249,115,22,0.12);
+    color: var(--c-prepare); border: 1px solid rgba(249,115,22,0.25);
+    margin-bottom: 0.5rem; width: fit-content;
+  }
+
+  /* Status Colors */
   :root {
     --c-free:    #10b981;
     --c-order:   #eab308;
     --c-prepare: #f97316;
     --c-serve:   #3b82f6;
     --c-clean:   #ec4899;
-    --shadow-soft:  0 4px 15px rgba(0,0,0,0.06);
-    --shadow-hover: 0 10px 30px rgba(0,0,0,0.12);
-    --invert-val: 0;
   }
-  html.dark {
-    --shadow-soft:  0 4px 15px rgba(0,0,0,0.3);
-    --shadow-hover: 0 10px 30px rgba(0,0,0,0.5);
-    --invert-val: 1;
-  }
-
-  /* Override base header for sticky mode */
-  .pos-header { padding: 1.5rem 2rem; position: sticky; top: 0; z-index: 1000; flex-wrap: wrap; gap: 1rem; }
-  .brand-title { font-size: 1.5rem; margin: 0; color: var(--text-main); }
-
-  /* Table cards */
-  .table-card {
-    background: var(--panel-bg); border: 1px solid var(--border-color);
-    padding: 1.5rem 1.2rem; text-align: left; transition: var(--transition-smooth);
-    position: relative; display: flex; flex-direction: column;
-    justify-content: space-between; height: 100%;
-    border-radius: 12px; box-shadow: var(--shadow-soft);
-  }
-  .table-card:hover { border-color: var(--accent-gold); transform: translateY(-4px); box-shadow: var(--shadow-hover); }
-  .table-status-line { position: absolute; top: 0; left: 0; right: 0; height: 4px; border-top-left-radius: 8px; border-top-right-radius: 8px; }
-  .table-header { display: flex; justify-content: space-between; align-items: flex-start; }
-  .table-name { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--text-main); margin: 0; line-height: 1; }
-  .table-status { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; margin-top: 0.4rem; }
-  .table-timer { font-weight: 600; font-size: 0.9rem; background: rgba(115,115,115,0.1); padding: 0.2rem 0.6rem; border-radius: 12px; }
-
-  .status-free     { color: var(--c-free); }   .bg-free    { background: var(--c-free); }
-  .status-ordering { color: var(--c-order); }  .bg-order   { background: var(--c-order); }
-  .status-preparing{ color: var(--c-prepare);} .bg-prepare { background: var(--c-prepare); }
-  .status-served   { color: var(--c-serve); }  .bg-serve   { background: var(--c-serve); }
-  .status-billing  { color: #06b6d4; }         .bg-billing { background: #06b6d4; }
-  .status-cleaning { color: var(--c-clean); }  .bg-clean   { background: var(--c-clean); }
-  .status-merged   { color: #a855f7; }         .bg-merged  { background: #a855f7; }
+  .status-free     { color: var(--c-free); }     .bg-free    { background: var(--c-free); }
+  .status-ordering { color: var(--c-order); }    .bg-order   { background: var(--c-order); }
+  .status-preparing{ color: var(--c-prepare); }  .bg-prepare { background: var(--c-prepare); }
+  .status-served   { color: var(--c-serve); }    .bg-serve   { background: var(--c-serve); }
+  .status-billing  { color: #06b6d4; }           .bg-billing { background: #06b6d4; }
+  .status-cleaning { color: var(--c-clean); }    .bg-clean   { background: var(--c-clean); }
+  .status-merged   { color: #a855f7; }           .bg-merged  { background: #a855f7; }
   .status-approval { color: #f43f5e; font-weight: bold; } .bg-approval { background: #f43f5e; }
 
   .occupancy { font-size: 0.8rem; color: var(--text-muted); margin-top: 15px; display: flex; align-items: center; gap: 5px; }
 
-  .card-actions { margin-top: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
-  .btn-card-action {
-    flex: 1; min-width: 30%; padding: 0.6rem 0.2rem;
-    border: 1px solid var(--border-color); background: rgba(255,255,255,0.05);
-    color: var(--text-main); font-size: 0.70rem; text-transform: uppercase;
-    font-weight: 700; letter-spacing: 0.5px; border-radius: 4px;
-    transition: var(--transition-smooth); text-align: center;
-  }
-  .btn-card-action:hover { background: var(--text-main); color: var(--panel-bg); }
-  .btn-card-primary { background: var(--accent-gold); border-color: var(--accent-gold); color: #fff; }
-  .btn-card-primary:hover { background: #b59250; color: #fff; }
+  .card-actions { margin-top: 1.25rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  /* .btn-card-action is now layout-only -- appearance comes from the shared
+     .btn-luxury / .btn-luxury-primary classes applied alongside it in the HTML. */
+  .btn-card-action { flex: 1; min-width: 30%; text-align: center; }
 
   /* Metrics */
   .metric-card {
@@ -78,14 +75,14 @@
   .metric-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-top: 0.5rem; font-weight: 600; }
 
   /* Modal overrides */
-  .modal-content { background: var(--bg-color); border-radius: 0; border: 1px solid var(--border-color); }
-  .modal-header { border-bottom: 1px solid var(--border-color); padding: 1.5rem; }
+  .modal-content { background: var(--bg-color); border-radius: 8px; border: 1px solid var(--border-color); }
+  .modal-header { border-bottom: 1px solid var(--border-color); padding: 1.25rem 1.5rem; }
   .modal-title { font-family: 'DM Serif Display', serif; font-size: 1.3rem; }
   .modal-body { padding: 1.5rem; }
-  .modal-footer { border-top: 1px solid var(--border-color); padding: 1.5rem; }
+  .modal-footer { border-top: 1px solid var(--border-color); padding: 1.25rem 1.5rem; }
   html.dark .btn-close { filter: invert(1); }
 
-  .form-select-luxury { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-main); border-radius: 0; padding: 0.75rem 1rem; font-size: 0.9rem; width: 100%; margin-bottom: 1rem; }
+  .form-select-luxury { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-main); border-radius: 6px; padding: 0.65rem 0.85rem; font-size: 0.88rem; width: 100%; margin-bottom: 1rem; }
 
   .toast-minimal {
     position: fixed; top: 20px; right: 20px; background: var(--text-main); color: var(--bg-color);
@@ -98,49 +95,20 @@
     width: 28px; height: 28px; border-radius: 50%; background: var(--accent-gold); color: #fff;
     display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 800;
     border: 2px solid var(--panel-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    position: absolute; top: -10px; right: -10px; z-index: 5; cursor: help;
+    position: absolute; top: -8px; right: -8px; z-index: 5; cursor: help;
   }
   .waiter-badge.qr-badge { background: #f43f5e; }
-
-  @media (max-width: 576px) {
-    body { overflow-x: hidden; }
-    .pos-header { padding: 0.85rem 1rem; justify-content: space-between; }
-    .action-group { width: 100%; display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 0.4rem; margin-top: 10px; }
-    .btn-luxury { padding: 0.45rem 0.6rem; font-size: 0.68rem; }
-    .table-name { font-size: 1.3rem; }
-    .table-card { padding: 1rem 0.75rem; }
-    .metric-val { font-size: 1.8rem; }
-  }
-  @media (max-width: 400px) {
-    .btn-luxury { padding: 0.4rem 0.5rem; font-size: 0.65rem; letter-spacing: 0; }
-  }
 
   /* Urgency overlays */
   .card-urgent { border-color: #ef4444 !important; box-shadow: 0 0 0 2px rgba(239,68,68,.25) !important; }
   .card-warn   { border-color: #f97316 !important; box-shadow: 0 0 0 2px rgba(249,115,22,.15) !important; }
 
-  /* Cooking badge */
-  .cooking-badge {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 0.7rem; font-weight: 700; color: #f97316;
-    background: rgba(249,115,22,.1); border: 1px solid rgba(249,115,22,.3);
-    border-radius: 12px; padding: 2px 8px; margin-top: 6px;
-  }
-
-  /* Section dividers */
-  .section-header {
-    font-size: 0.65rem; text-transform: uppercase; letter-spacing: 3px;
-    font-weight: 700; color: var(--text-muted); padding: 0.4rem 0.2rem 0.2rem;
-    border-bottom: 1px solid var(--border-color); margin-bottom: 0.5rem;
-  }
-
-  /* ── Manager alert strip ───────────────────────────── */
+  /* Floor manager alert strip */
   .alert-strip {
-    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
-    padding: 0.75rem 1rem; margin-bottom: 1.5rem;
-    background: var(--panel-bg); border: 1px solid var(--border-color);
-    border-left: 4px solid #ef4444;
-    font-size: 0.78rem; font-weight: 600;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding: 8px 16px; border-radius: 8px; background: var(--panel-bg);
+    border: 1px solid var(--border-color); border-left: 4px solid var(--accent-gold);
+    margin-bottom: 1.5rem; font-size: 0.8rem;
   }
   .alert-strip.clean { border-left-color: #10b981; }
   .alert-chip {
@@ -151,30 +119,343 @@
   .chip-warn   { background: rgba(249,115,22,.1); color: #f97316; border: 1px solid rgba(249,115,22,.3); }
   .chip-info   { background: rgba(6,182,212,.1);  color: #06b6d4; border: 1px solid rgba(6,182,212,.3); }
   .chip-ok     { background: rgba(16,185,129,.1); color: #10b981; border: 1px solid rgba(16,185,129,.3); }
+
+  /* ── Filter Tabs ─────────────────────────────────────────── */
+  .table-filters {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.35rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .table-filters::-webkit-scrollbar { display: none; }
+
+  .filter-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    background: var(--panel-bg);
+    color: var(--text-muted);
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    user-select: none;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+  }
+  .filter-tab:hover {
+    border-color: var(--text-main);
+    color: var(--text-main);
+  }
+  .filter-tab .filter-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(128,128,128,0.15);
+    border-radius: 10px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    font-size: 0.65rem;
+    line-height: 1;
+  }
+
+  /* Active states */
+  .filter-tab.active                          { border-color: var(--text-muted); color: var(--text-main); background: var(--sidebar-active-bg, rgba(197,160,89,0.08)); }
+  .filter-tab.active.filter-all               { border-color: var(--accent-gold); color: var(--accent-gold); background: rgba(197,160,89,0.1); }
+  .filter-tab.active.filter-free              { border-color: var(--c-free);    color: var(--c-free);    background: rgba(16,185,129,0.10); }
+  .filter-tab.active.filter-ordering          { border-color: var(--c-order);   color: var(--c-order);   background: rgba(234,179,8,0.10); }
+  .filter-tab.active.filter-preparing         { border-color: var(--c-prepare); color: var(--c-prepare); background: rgba(249,115,22,0.10); }
+  .filter-tab.active.filter-served            { border-color: var(--c-serve);   color: var(--c-serve);   background: rgba(59,130,246,0.10); }
+  .filter-tab.active.filter-billing           { border-color: #06b6d4;           color: #06b6d4;           background: rgba(6,182,212,0.10); }
+  .filter-tab.active.filter-cleaning          { border-color: var(--c-clean);   color: var(--c-clean);   background: rgba(236,72,153,0.10); }
+  .filter-tab.active.filter-linked            { border-color: #a855f7;           color: #a855f7;           background: rgba(168,85,247,0.10); }
+  .filter-tab.active.filter-review            { border-color: #f43f5e;           color: #f43f5e;           background: rgba(244,63,94,0.10); }
+
+  .filter-tab .filter-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── Visual Floor Map View ── */
+  .floor-map-container {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--shadow-soft);
+    padding: 1.5rem;
+    overflow: auto;
+    margin-bottom: 2rem;
+    display: none;
+    transition: background 0.25s, border-color 0.25s;
+  }
+  .floor-map-container.active { display: block; }
+  .floor-map-canvas {
+    position: relative;
+    margin: 0 auto;
+    background: #ffffff;
+    border: 1.5px solid var(--border-color);
+    border-radius: 8px;
+    background-image: 
+      linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    transition: background 0.25s, border-color 0.25s;
+  }
+  html.dark .floor-map-canvas {
+    background: #11141b;
+    border: 1.5px solid rgba(255,255,255,0.12);
+    background-image: 
+      linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+    box-shadow: 0 16px 36px rgba(0,0,0,0.5);
+  }
+  .floor-map-node {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 2px solid #cbd5e1;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s, background 0.25s;
+    user-select: none;
+  }
+  html.dark .floor-map-node {
+    background: #181c25;
+    border: 2px solid rgba(255,255,255,0.12);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .floor-map-node:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 8px 24px rgba(197, 160, 89, 0.2);
+    border-color: var(--accent-gold);
+    z-index: 10;
+  }
+  .floor-map-node.shape-square { border-radius: 10px; width: 80px; height: 80px; }
+  .floor-map-node.shape-round  { border-radius: 50%; width: 80px; height: 80px; }
+  .floor-map-node.shape-rect   { border-radius: 10px; width: 120px; height: 80px; }
+  .floor-map-node.shape-wall   { border-radius: 3px; width: 120px; height: 20px; background: #94a3b8; border-color: #64748b; cursor: default; }
+  html.dark .floor-map-node.shape-wall { background: #475569; border-color: #64748b; }
+  .floor-map-node-name { font-weight: 700; font-size: 0.95rem; color: var(--text-main); line-height: 1.1; }
+  .floor-map-node-cap  { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+
+  .btn-group .btn-luxury.active {
+    background: var(--accent-gold) !important;
+    border-color: var(--accent-gold) !important;
+    color: #111 !important;
+    font-weight: 600;
+  }
+
+  /* ── Detailed Order Card (Grid View Matching Screenshot) ── */
+  .order-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+  .order-table-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    line-height: 1.2;
+  }
+  .order-table-title i {
+    color: var(--accent-gold);
+    font-size: 1.05rem;
+  }
+  .order-table-meta {
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    margin-top: 3px;
+    letter-spacing: 0.3px;
+  }
+  .order-chips-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0.9rem;
+  }
+  .order-chip {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .chip-placed    { background: rgba(245, 158, 11, 0.12); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+  .chip-preparing { background: rgba(249, 115, 22, 0.12); color: #f97316; border: 1px solid rgba(249, 115, 22, 0.3); }
+  .chip-served    { background: rgba(59, 130, 246, 0.12); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
+  .chip-unpaid    { background: rgba(239, 68, 68, 0.12); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+  .chip-paid      { background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+  .chip-btn-mark-paid {
+    background: #10b981;
+    color: #ffffff;
+    border: none;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 0.22rem 0.65rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .chip-btn-mark-paid:hover { opacity: 0.9; }
+
+  .order-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 190px;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+    margin-bottom: 0.85rem;
+  }
+  .order-items-list::-webkit-scrollbar { width: 3px; }
+  .order-items-list::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+
+  .order-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.88rem;
+  }
+  .order-item-qty {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    border: 1.5px solid #10b981;
+    color: #10b981;
+    font-weight: 700;
+    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .order-item-name {
+    font-weight: 600;
+    color: var(--text-main);
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .order-item-price {
+    font-weight: 700;
+    color: var(--text-main);
+    flex-shrink: 0;
+  }
+
+  .order-summary-box {
+    border-top: 1px solid var(--border-color);
+    padding-top: 0.65rem;
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .order-summary-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  .order-summary-line strong {
+    color: var(--text-main);
+  }
+  .order-total-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-top: 0.4rem;
+    margin-top: 0.35rem;
+    border-top: 1px dashed var(--border-color);
+  }
+  .order-total-label {
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-main);
+  }
+  .order-total-val {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-main);
+    font-family: var(--font-mono, monospace);
+  }
+
+  .order-card-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+  }
+  /* Danger-colored modifier for the shared .btn-luxury shape (icon-only cancel action) */
+  .btn-luxury-danger {
+    color: var(--danger);
+    border-color: var(--danger);
+  }
+  .btn-luxury-danger:hover {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: #ffffff;
+  }
+  /* Layout-only: let the primary action button fill the remaining row width
+     next to the fixed-size cancel button. Appearance comes from .btn-luxury-primary. */
+  .order-card-buttons .btn-luxury-primary { flex: 1; }
 </style>
 {% endblock %}
 
 {% block header_left %}
-<div class="d-flex flex-column">
-  <a href="/dashboard/" style="text-decoration:none;color:inherit;">
-    <h1 class="brand-title mb-0"><i class="bi bi-diamond-half me-2" style="color:var(--accent-gold);"></i>{{ request.user.tenant.name }}</h1>
-  </a>
-  <p class="mb-0 text-muted" style="font-size:0.75rem;letter-spacing:1px;text-transform:uppercase;">Floor Plan — {{ request.user.outlet.name }}</p>
+<div class="d-flex align-items-center gap-2">
+  <div style="width:34px;height:34px;border-radius:8px;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex-shrink:0;">
+    <i class="bi bi-grid-3x3-gap-fill" style="font-size:1.05rem;"></i>
+  </div>
+  <div>
+    <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.5px;color:var(--text-main);">Floor Plan &amp; Tables</h1>
+    <div class="text-muted" style="font-size:0.72rem;letter-spacing:1px;text-transform:uppercase;">{{ request.user.outlet.name }}</div>
+  </div>
 </div>
 {% endblock %}
 
 {% block header_right %}
 <div class="action-group d-flex align-items-center flex-wrap gap-2">
   <button class="btn-luxury" data-bs-toggle="modal" data-bs-target="#manageTablesModal"><i class="bi bi-gear me-1"></i> Tables</button>
+  <!-- Live / Floor Editor / QR Codes removed -- all three are permanent
+       sidebar nav items (base.html) sitting right next to this page; having
+       them here too was pure duplication. (The removed button's "F3" badge
+       wasn't an actual bound shortcut -- no keydown handler for it exists
+       anywhere in this template -- so nothing functional was lost.) -->
   <button class="btn-luxury" data-bs-toggle="modal" data-bs-target="#mergeModal">Combine</button>
   <button class="btn-luxury" data-bs-toggle="modal" data-bs-target="#transferModal">Transfer</button>
-  <a href="/billing/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Billing</a>
-  <a href="/kitchen/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Kitchen</a>
-  <a href="/reports/dashboard/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Reports</a>
 
-  <a href="/billing/" class="btn-icon d-sm-none" title="Billing"><i class="bi bi-receipt"></i></a>
-  <a href="/kitchen/" class="btn-icon d-sm-none" title="Kitchen"><i class="bi bi-fire"></i></a>
-  <a href="/reports/dashboard/" class="btn-icon d-sm-none" title="Reports"><i class="bi bi-bar-chart"></i></a>
   {% include "core/_notif_badges_luxury.html" %}
 
   <button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme">
@@ -216,16 +497,73 @@
     </div>
   </div>
 
-  <!-- LEGEND -->
-  <div class="d-flex flex-wrap gap-4 mb-5 justify-content-center text-uppercase" style="font-size:0.75rem;letter-spacing:1px;font-weight:600;">
-    <div class="d-flex align-items-center"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--c-free);margin-right:6px;"></span> Free</div>
-    <div class="d-flex align-items-center"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--c-order);margin-right:6px;"></span> Ordering</div>
-    <div class="d-flex align-items-center"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--c-prepare);margin-right:6px;"></span> Preparing</div>
-    <div class="d-flex align-items-center"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--c-serve);margin-right:6px;"></span> Served</div>
-    <div class="d-flex align-items-center"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#06b6d4;margin-right:6px;"></span> Billing</div>
-    <div class="d-flex align-items-center"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--c-clean);margin-right:6px;"></span> Cleaning</div>
-    <div class="d-flex align-items-center"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#a855f7;margin-right:6px;"></span> Linked</div>
-    <div class="d-flex align-items-center status-approval"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#f43f5e;margin-right:6px;"></span> Review</div>
+  <!-- VIEW TOGGLE & STATUS FILTER TABS -->
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+    <div class="table-filters mb-0" id="tableFilters">
+      <button class="filter-tab filter-all active" data-filter="all" onclick="setTableFilter('all', this)">
+        All <span class="filter-count" id="fc-all">0</span>
+      </button>
+      <button class="filter-tab filter-free" data-filter="free" onclick="setTableFilter('free', this)">
+        <span class="filter-dot" style="background:var(--c-free);"></span>
+        Free <span class="filter-count" id="fc-free">0</span>
+      </button>
+      <button class="filter-tab filter-ordering" data-filter="ordering" onclick="setTableFilter('ordering', this)">
+        <span class="filter-dot" style="background:var(--c-order);"></span>
+        Ordering <span class="filter-count" id="fc-ordering">0</span>
+      </button>
+      <button class="filter-tab filter-preparing" data-filter="preparing" onclick="setTableFilter('preparing', this)">
+        <span class="filter-dot" style="background:var(--c-prepare);"></span>
+        Preparing <span class="filter-count" id="fc-preparing">0</span>
+      </button>
+      <button class="filter-tab filter-served" data-filter="served" onclick="setTableFilter('served', this)">
+        <span class="filter-dot" style="background:var(--c-serve);"></span>
+        Served <span class="filter-count" id="fc-served">0</span>
+      </button>
+      <button class="filter-tab filter-billing" data-filter="billing" onclick="setTableFilter('billing', this)">
+        <span class="filter-dot" style="background:#06b6d4;"></span>
+        Billing <span class="filter-count" id="fc-billing">0</span>
+      </button>
+      <button class="filter-tab filter-cleaning" data-filter="cleaning" onclick="setTableFilter('cleaning', this)">
+        <span class="filter-dot" style="background:var(--c-clean);"></span>
+        Cleaning <span class="filter-count" id="fc-cleaning">0</span>
+      </button>
+      <button class="filter-tab filter-linked" data-filter="merged" onclick="setTableFilter('merged', this)">
+        <span class="filter-dot" style="background:#a855f7;"></span>
+        Linked <span class="filter-count" id="fc-merged">0</span>
+      </button>
+      <button class="filter-tab filter-review" data-filter="needs_approval" onclick="setTableFilter('needs_approval', this)">
+        <span class="filter-dot" style="background:#f43f5e;"></span>
+        Review <span class="filter-count" id="fc-needs_approval">0</span>
+      </button>
+    </div>
+
+    <!-- View Mode Toggle Buttons -->
+    <div class="btn-group" role="group" aria-label="Floor View Mode">
+      <button type="button" class="btn-luxury active" id="btnModeGrid" onclick="setTableViewMode('grid')">
+        <i class="bi bi-grid-fill me-1"></i> Grid
+      </button>
+      <button type="button" class="btn-luxury" id="btnModeMap" onclick="setTableViewMode('map')">
+        <i class="bi bi-diagram-3 me-1"></i> Floor Map
+      </button>
+    </div>
+  </div>
+
+  <!-- VISUAL FLOOR MAP VIEW -->
+  <div class="floor-map-container" id="floorMapContainer">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div class="d-flex align-items-center gap-2">
+        <span class="text-uppercase fw-bold text-muted small" style="letter-spacing:1px;">FLOOR:</span>
+        <select id="floorMapSectionSelect" class="form-select-luxury py-1 px-2" style="font-size:0.8rem;width:auto;" onchange="renderFloorMapView()"></select>
+      </div>
+      {% if request.user.role in "owner,manager" or request.user.is_superuser %}
+      <a href="/floor-editor/" class="btn-luxury text-decoration-none">
+        <i class="bi bi-pencil me-1"></i> Edit in Floor Editor
+      </a>
+      {% endif %}
+    </div>
+    <div class="floor-map-canvas" id="floorMapCanvas" style="width: 900px; height: 500px;">
+      <!-- Positioned table nodes rendered by JS -->
+    </div>
   </div>
 
   <!-- TABLES GRID -->
@@ -287,7 +625,7 @@
         <select id="transferFrom" class="form-select-luxury" disabled></select>
         <label class="text-muted text-uppercase mt-2 mb-2" style="font-size:0.7rem;letter-spacing:1px;">Destination (New) Table</label>
         <select id="transferTo" class="form-select-luxury">
-          <option value="" disabled selected>Select an empty table...</option>
+          <option value="" disabled selected>Select Destination Table...</option>
         </select>
         <button onclick="executeTransfer()" class="btn-luxury w-100 mt-4" style="background:var(--accent-gold);border-color:var(--accent-gold);color:#111;">Execute Transfer</button>
       </div>
@@ -299,9 +637,14 @@
 <div class="modal fade" id="manageTablesModal">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header d-flex justify-content-between align-items-center">
         <h5 class="modal-title m-0">Manage Tables</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="d-flex align-items-center gap-2">
+          <a href="/floor-editor/" class="btn-luxury text-decoration-none">
+            <i class="bi bi-grid-1x2 me-1"></i> Open Floor Editor
+          </a>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
       </div>
       <div class="modal-body d-flex flex-column gap-3">
         <div class="table-responsive">
@@ -336,8 +679,8 @@
         <img id="qrImage" src="" alt="QR Code" class="img-fluid rounded mb-3" style="border:4px solid #fff;">
         <p class="text-muted small">Scan this code to load the digital menu for this table.</p>
         <div class="d-flex gap-2">
-          <button class="btn-card-action w-50" id="qrViewBtn">View Large</button>
-          <button class="btn-card-action w-50" data-bs-toggle="modal" data-bs-target="#manageTablesModal">Back</button>
+          <button class="btn-luxury btn-card-action w-50" id="qrViewBtn">View Large</button>
+          <button class="btn-luxury btn-card-action w-50" data-bs-toggle="modal" data-bs-target="#manageTablesModal">Back</button>
         </div>
       </div>
     </div>
@@ -353,7 +696,180 @@
     setTimeout(() => t.classList.remove("show"), 3000);
   }
 
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  window.cancelOrder = function(orderId) {
+    if (!orderId) return;
+    Swal.fire({
+      title: 'Cancel Order?',
+      text: 'Are you sure you want to cancel this order? Non-served items will be voided.',
+      icon: 'warning',
+      input: 'text',
+      inputPlaceholder: 'Reason for cancellation (optional)',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      confirmButtonText: 'Yes, Cancel Order'
+    }).then(res => {
+      if (res.isConfirmed) {
+        fetch(`/cancel-order/${orderId}/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': apiClient.getCsrf()
+          },
+          body: JSON.stringify({ reason: res.value || 'Cancelled from floor plan' })
+        })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            ui.toast('Order cancelled', 'success');
+            refreshLayout();
+          } else {
+            Swal.fire('Error', data.error || 'Failed to cancel order', 'error');
+          }
+        })
+        .catch(err => {
+          Swal.fire('Error', err.message || 'Request failed', 'error');
+        });
+      }
+    });
+  };
+
   let tableDataStore = [];
+  let activeFilter = 'all'; // current status filter
+  let currentViewMode = 'grid';
+
+  window.setTableViewMode = function(mode) {
+    currentViewMode = mode;
+    const btnGrid = document.getElementById('btnModeGrid');
+    const btnMap = document.getElementById('btnModeMap');
+    const mapContainer = document.getElementById('floorMapContainer');
+    const gridContainer = document.getElementById('tableGrid');
+
+    if (mode === 'map') {
+      btnGrid.classList.remove('active');
+      btnMap.classList.add('active');
+      mapContainer.classList.add('active');
+      gridContainer.style.display = 'none';
+      populateFloorMapSections();
+      renderFloorMapView();
+    } else {
+      btnMap.classList.remove('active');
+      btnGrid.classList.add('active');
+      mapContainer.classList.remove('active');
+      gridContainer.style.display = 'flex';
+      renderGrid(tableDataStore);
+    }
+  };
+
+  function populateFloorMapSections() {
+    const sel = document.getElementById('floorMapSectionSelect');
+    if (!sel) return;
+    const currVal = sel.value;
+    const sections = [...new Set(tableDataStore.map(t => t.section || 'Main Hall'))].sort();
+    if (sections.length === 0) sections.push('Main Hall');
+    sel.innerHTML = sections.map(s => `<option value="${s}">${s}</option>`).join('');
+    if (currVal && sections.includes(currVal)) sel.value = currVal;
+  }
+
+  window.renderFloorMapView = function() {
+    const canvas = document.getElementById('floorMapCanvas');
+    const sel = document.getElementById('floorMapSectionSelect');
+    if (!canvas || !sel) return;
+
+    const sec = sel.value || 'Main Hall';
+    canvas.innerHTML = '';
+
+    const tables = tableDataStore.filter(t => (t.section || 'Main Hall') === sec);
+    const visibleTables = activeFilter === 'all'
+      ? tables
+      : tables.filter(t => activeFilter === 'served' ? (t.status === 'served' || t.status === 'ready') : t.status === activeFilter);
+
+    if (visibleTables.length === 0) {
+      canvas.innerHTML = `<div class="d-flex align-items-center justify-content-center h-100 text-muted small text-uppercase" style="letter-spacing:1px;min-height:300px;">No tables match filter on this floor</div>`;
+      return;
+    }
+
+    const statusColors = {
+      free: 'var(--c-free, #10b981)',
+      ordering: 'var(--c-order, #eab308)',
+      preparing: 'var(--c-prepare, #f97316)',
+      served: 'var(--c-serve, #3b82f6)',
+      ready: 'var(--c-serve, #3b82f6)',
+      billing: '#06b6d4',
+      cleaning: 'var(--c-clean, #ec4899)',
+      merged: '#a855f7',
+      needs_approval: '#f43f5e'
+    };
+
+    visibleTables.forEach((t, idx) => {
+      let x = t.pos_x, y = t.pos_y;
+      if (x == null || y == null) {
+        x = 40 + (idx % 6) * 120;
+        y = 40 + Math.floor(idx / 6) * 120;
+      }
+
+      const node = document.createElement('div');
+      const shape = t.shape || 'square';
+      node.className = `floor-map-node shape-${shape}`;
+      node.style.left = x + 'px';
+      node.style.top = y + 'px';
+      if (t.width) node.style.width = t.width + 'px';
+      if (t.height) node.style.height = t.height + 'px';
+      node.style.borderColor = statusColors[t.status] || 'rgba(255,255,255,0.15)';
+
+      if (shape === 'wall') {
+        node.style.cursor = 'default';
+      } else {
+        node.innerHTML = `
+          <div class="floor-map-node-name">${t.name}</div>
+          <div class="floor-map-node-cap">${t.capacity || 4}p &bull; ${t.status || 'free'}</div>
+        `;
+        node.addEventListener('click', () => {
+          if (t.status === 'free') {
+            window.location.href = `/billing/?table=${t.id}`;
+          } else {
+            handleTableClick(t.id);
+          }
+        });
+      }
+
+      canvas.appendChild(node);
+    });
+  };
+
+  // ── Filter tab click handler ─────────────────────────────────────────────
+  function setTableFilter(status, btn) {
+    activeFilter = status;
+    document.querySelectorAll('.filter-tab').forEach(el => el.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    if (currentViewMode === 'map') {
+      renderFloorMapView();
+    } else {
+      renderGrid(tableDataStore);
+    }
+  }
+
+  // ── Update per-status counts in the filter tab badges ───────────────────
+  function updateFilterCounts(tables) {
+    const ALL_STATUSES = ['free', 'ordering', 'preparing', 'served', 'billing', 'cleaning', 'merged', 'needs_approval'];
+    const counts = {};
+    ALL_STATUSES.forEach(s => counts[s] = 0);
+    tables.forEach(t => {
+      const s = t.status || 'free';
+      if (s in counts) counts[s]++;
+      if (s === 'ready') counts['served'] = (counts['served'] || 0) + 1;
+    });
+    const fcAll = document.getElementById('fc-all');
+    if (fcAll) fcAll.textContent = tables.length;
+    ALL_STATUSES.forEach(s => {
+      const el = document.getElementById('fc-' + s);
+      if (el) el.textContent = counts[s] || 0;
+    });
+  }
 
   function refreshLayout() {
     fetch("/tables-data/")
@@ -361,127 +877,277 @@
       .then(d => {
         if (!d || !d.tables) throw new Error(d.message || "Invalid data from server");
         tableDataStore = d.tables;
-        const container = document.getElementById("tableGrid");
-        if (!container) return;
-
-        const ACTIVE_STATES = ["ordering", "preparing", "served", "ready"];
-
-        // ── Manager alert strip ───────────────────────────────────────────
-        const stuckCount    = d.tables.filter(t => ACTIVE_STATES.includes(t.status) && (t.elapsed || 0) > 30).length;
-        const approvalCount = d.tables.filter(t => t.status === "needs_approval").length;
-        const billingCount  = d.tables.filter(t => t.status === "billing").length;
-        const isClean = stuckCount === 0 && approvalCount === 0;
-
-        let fullHtml = `<div class="col-12"><div class="alert-strip ${isClean ? 'clean' : ''}">
-          <span style="color:var(--text-muted);text-transform:uppercase;letter-spacing:2px;font-size:0.65rem;">Floor</span>`;
-        if (stuckCount > 0)    fullHtml += `<span class="alert-chip chip-danger"><i class="bi bi-exclamation-triangle-fill"></i> ${stuckCount} stuck &gt;30m</span>`;
-        if (approvalCount > 0) fullHtml += `<span class="alert-chip chip-warn"><i class="bi bi-hourglass-split"></i> ${approvalCount} need approval</span>`;
-        if (billingCount > 0)  fullHtml += `<span class="alert-chip chip-info"><i class="bi bi-receipt"></i> ${billingCount} awaiting payment</span>`;
-        if (isClean)           fullHtml += `<span class="alert-chip chip-ok"><i class="bi bi-check-circle-fill"></i> All clear</span>`;
-        fullHtml += `</div></div>`;
-
-        // ── Group tables by section ───────────────────────────────────────
-        const sections = {};
-        d.tables.forEach(t => {
-          const sec = t.section || "";
-          if (!sections[sec]) sections[sec] = [];
-          sections[sec].push(t);
-        });
-        const sectionKeys = Object.keys(sections).sort();
-
-        sectionKeys.forEach(sec => {
-          if (sec) {
-            fullHtml += `<div class="col-12"><div class="section-header"><i class="bi bi-grid-3x3-gap me-1"></i>${sec}</div></div>`;
-          }
-
-          sections[sec].forEach(t => {
-            let statusText = t.status || "free";
-            let statusClass = "status-free", bgClass = "bg-free";
-            let cardClasses = "";
-            let timerHtml = "", actionsHtml = "", cookingBadge = "";
-
-            if      (statusText === "ordering")       { statusClass = "status-ordering";  bgClass = "bg-order";   }
-            else if (statusText === "preparing")      { statusClass = "status-preparing"; bgClass = "bg-prepare"; }
-            else if (statusText === "served" || statusText === "ready") { statusClass = "status-served"; bgClass = "bg-serve"; }
-            else if (statusText === "billing")        { statusClass = "status-billing";   bgClass = "bg-billing"; }
-            else if (statusText === "cleaning")       { statusClass = "status-cleaning";  bgClass = "bg-clean";   }
-            else if (statusText === "merged")         { statusClass = "status-merged";    bgClass = "bg-merged";  }
-            else if (statusText === "needs_approval") { statusClass = "status-approval";  bgClass = "bg-approval";}
-
-            // Urgency highlighting for active tables
-            if (ACTIVE_STATES.includes(statusText)) {
-              const elapsed = t.elapsed || 0;
-              if (elapsed > 30)      cardClasses = "card-urgent";
-              else if (elapsed > 15) cardClasses = "card-warn";
-            }
-
-            // Cooking badge
-            if (t.cooking_items > 0) {
-              cookingBadge = `<span class="cooking-badge"><i class="bi bi-fire"></i> ${t.cooking_items} in kitchen</span>`;
-            }
-
-            if (statusText === "free") {
-              actionsHtml = `<button onclick="window.location.href='/billing/?table=${t.id}'" class="btn-card-action w-100"><i class="bi bi-plus-lg me-1"></i> New Order</button>`;
-              if (t.is_primary) actionsHtml += `<button onclick="unmergeTable(${t.id})" class="btn-card-action w-100" style="color:#ef4444;margin-top:5px;"><i class="bi bi-scissors"></i> Unmerge</button>`;
-            } else if (statusText === "merged") {
-              const pName = t.primary_table_name || t.primary_table;
-              timerHtml = `<div class="table-timer status-merged"><i class="bi bi-link"></i> Linked</div>`;
-              actionsHtml = `<button onclick="window.location.href='/billing/?table=${t.primary_table}'" class="btn-card-action w-100">Go to Primary (${pName})</button>`;
-            } else if (statusText === "cleaning") {
-              timerHtml = `<div class="table-timer text-muted"><i class="bi bi-stars"></i> Table Dirty</div>`;
-              actionsHtml = `<button onclick="markTableCleaned(${t.id})" class="btn-card-action btn-card-primary w-100">Mark Clean</button>`;
-            } else if (statusText === "billing") {
-              timerHtml = `<div class="table-timer status-billing"><i class="bi bi-receipt"></i> Billing</div>`;
-              actionsHtml = `<button onclick="window.location.href='/bill/${t.order_id}/'" class="btn-card-action btn-card-primary w-100" style="background:#06b6d4;border-color:#06b6d4;"><i class="bi bi-credit-card me-1"></i> Pay Bill</button>
-                <button onclick="handleTableClick(${t.id})" class="btn-card-action" title="More Options"><i class="bi bi-three-dots d-block mb-1 mx-auto fs-5"></i> More</button>`;
-            } else if (statusText === "needs_approval") {
-              timerHtml = `<div class="table-timer bg-approval text-white"><i class="bi bi-exclamation-triangle"></i> Review</div>`;
-              actionsHtml = `<button onclick="handleTableClick(${t.id})" class="btn-card-action btn-card-primary w-100" style="background:#f43f5e;border-color:#f43f5e;"><i class="bi bi-check-circle me-1"></i> Approve QR</button>`;
-            } else {
-              if (t.elapsed !== undefined) timerHtml = `<div class="table-timer ${statusClass}"><i class="bi bi-clock"></i> ${t.elapsed}m</div>`;
-              actionsHtml = `<button onclick="window.location.href='/billing/?table=${t.id}'" class="btn-card-action" title="Add Items"><i class="bi bi-cart-plus d-block mb-1 mx-auto fs-5"></i> Add</button>
-                <button onclick="generateBillForOrder(${t.order_id})" class="btn-card-action" title="Generate Bill"><i class="bi bi-receipt d-block mb-1 mx-auto fs-5"></i> Bill</button>
-                <button onclick="handleTableClick(${t.id})" class="btn-card-action" title="More Options"><i class="bi bi-three-dots d-block mb-1 mx-auto fs-5"></i> More</button>`;
-            }
-
-            let mergeBadge = '';
-            if (statusText === "merged") {
-              mergeBadge = `<div class="occupancy"><i class="bi bi-link-45deg"></i> Linked to ${t.primary_table_name || 'Primary'}</div>`;
-            } else if (t.is_primary) {
-              mergeBadge = `<div class="occupancy"><i class="bi bi-diagram-3"></i> Merged w/ ${t.merged_with_names}</div>`;
-            }
-
-            fullHtml += `<div class="col-12 col-md-6 col-xl-4 col-xxl-3 d-flex">
-              <div class="table-card w-100 shadow-sm ${cardClasses}">
-                <div class="table-status-line ${bgClass}"></div>
-                ${t.waiter_initials ? `<div class="waiter-badge ${t.waiter_initials === 'QR' ? 'qr-badge' : ''}" title="Waiter: ${t.waiter_name}">${t.waiter_initials}</div>` : ''}
-                <div class="table-header">
-                  <div class="d-flex align-items-center flex-wrap"><h3 class="table-name mb-0">${t.name}</h3></div>
-                  ${timerHtml}
-                </div>
-                <div class="table-status ${statusClass}">${statusText.replace('_', ' ')}</div>
-                ${cookingBadge}
-                ${mergeBadge}
-                <div class="mt-auto"><div class="card-actions">${actionsHtml}</div></div>
-              </div>
-            </div>`;
-          });
-        });
-
-        container.innerHTML = fullHtml;
-
-        const statTotal   = d.tables.length;
-        const statFree    = d.tables.filter(x => x.status === "free").length;
-        const statBilling = d.tables.filter(x => x.status === "billing").length;
-        const statActive  = statTotal - statFree - d.tables.filter(x => x.status === "cleaning" || x.status === "merged").length;
-        const s = (id, v) => { const el = document.getElementById(id); if (el) el.innerText = v; };
-        s("stat-total", statTotal); s("stat-free", statFree); s("stat-active", statActive); s("stat-billing", statBilling);
+        updateFilterCounts(d.tables);
+        if (currentViewMode === 'map') {
+          populateFloorMapSections();
+          renderFloorMapView();
+        } else {
+          renderGrid(d.tables);
+        }
         populateModals();
       })
       .catch(err => {
         const container = document.getElementById("tableGrid");
         if (container) container.innerHTML = `<div class="col-12 text-center text-danger py-5"><i class="bi bi-exclamation-triangle fs-1 d-block mb-3"></i>Failed to load floor plan. ${err.message || ''}</div>`;
       });
+  }
+
+  function renderGrid(tables) {
+    const container = document.getElementById("tableGrid");
+    if (!container) return;
+
+    // Apply active filter
+    const filtered = activeFilter === 'all'
+      ? tables
+      : tables.filter(t => {
+          const s = t.status || 'free';
+          if (activeFilter === 'served') return s === 'served' || s === 'ready';
+          return s === activeFilter;
+        });
+
+    const ACTIVE_STATES = ["ordering", "preparing", "served", "ready"];
+
+    // ── Manager alert strip ────────
+    const stuckCount    = tables.filter(t => ACTIVE_STATES.includes(t.status) && (t.elapsed || 0) > 30).length;
+    const approvalCount = tables.filter(t => t.status === "needs_approval").length;
+    const billingCount  = tables.filter(t => t.status === "billing").length;
+    const isClean = stuckCount === 0 && approvalCount === 0;
+
+    let fullHtml = `<div class="col-12"><div class="alert-strip ${isClean ? 'clean' : ''}">
+      <span style="color:var(--text-muted);text-transform:uppercase;letter-spacing:2px;font-size:0.65rem;">Floor</span>`;
+    if (stuckCount > 0)    fullHtml += `<span class="alert-chip chip-danger"><i class="bi bi-exclamation-triangle-fill"></i> ${stuckCount} stuck &gt;30m</span>`;
+    if (approvalCount > 0) fullHtml += `<span class="alert-chip chip-warn"><i class="bi bi-hourglass-split"></i> ${approvalCount} need approval</span>`;
+    if (billingCount > 0)  fullHtml += `<span class="alert-chip chip-info"><i class="bi bi-receipt"></i> ${billingCount} awaiting payment</span>`;
+    if (isClean)           fullHtml += `<span class="alert-chip chip-ok"><i class="bi bi-check-circle-fill"></i> All clear</span>`;
+    fullHtml += `</div></div>`;
+
+    // ── Show "no tables" message when filter returns nothing ──────────────
+    if (filtered.length === 0 && activeFilter !== 'all') {
+      fullHtml += `<div class="col-12 text-center py-5" style="color:var(--text-muted);">
+        <i class="bi bi-funnel fs-1 d-block mb-3 opacity-50"></i>
+        <span style="text-transform:uppercase;letter-spacing:2px;font-size:0.8rem;">No tables with status <strong>${activeFilter.replace('_', ' ')}</strong></span>
+      </div>`;
+      container.innerHTML = fullHtml;
+      const statTotal   = tables.length;
+      const statFree    = tables.filter(x => x.status === "free").length;
+      const statBilling = tables.filter(x => x.status === "billing").length;
+      const statActive  = statTotal - statFree - tables.filter(x => x.status === "cleaning" || x.status === "merged").length;
+      const sv = (id, v) => { const el = document.getElementById(id); if (el) el.innerText = v; };
+      sv("stat-total", statTotal); sv("stat-free", statFree); sv("stat-active", statActive); sv("stat-billing", statBilling);
+      return;
+    }
+
+    // ── Group FILTERED tables by section ──────────────────────────────────
+    const sections = {};
+    filtered.forEach(t => {
+      const sec = t.section || "";
+      if (!sections[sec]) sections[sec] = [];
+      sections[sec].push(t);
+    });
+    const sectionKeys = Object.keys(sections).sort();
+
+    sectionKeys.forEach(sec => {
+      if (sec) {
+        fullHtml += `<div class="col-12"><div class="section-header" style="font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);font-size:0.8rem;margin-bottom:0.5rem;"><i class="bi bi-grid-3x3-gap me-1"></i>${sec}</div></div>`;
+      }
+
+      sections[sec].forEach(t => {
+        let statusText = t.status || "free";
+        let statusClass = "status-free", bgClass = "bg-free";
+        let cardClasses = "";
+        let timerHtml = "", actionsHtml = "", cookingBadge = "";
+
+        if      (statusText === "ordering")       { statusClass = "status-ordering";  bgClass = "bg-order";   }
+        else if (statusText === "preparing")      { statusClass = "status-preparing"; bgClass = "bg-prepare"; }
+        else if (statusText === "served" || statusText === "ready") { statusClass = "status-served"; bgClass = "bg-serve"; }
+        else if (statusText === "billing")        { statusClass = "status-billing";   bgClass = "bg-billing"; }
+        else if (statusText === "cleaning")       { statusClass = "status-cleaning";  bgClass = "bg-clean";   }
+        else if (statusText === "merged")         { statusClass = "status-merged";    bgClass = "bg-merged";  }
+        else if (statusText === "needs_approval") { statusClass = "status-approval";  bgClass = "bg-approval";}
+
+        // Urgency highlighting for active tables
+        if (ACTIVE_STATES.includes(statusText)) {
+          const elapsed = t.elapsed || 0;
+          if (elapsed > 30)      cardClasses = "card-urgent";
+          else if (elapsed > 15) cardClasses = "card-warn";
+        }
+
+        // Cooking badge
+        if (t.cooking_items > 0) {
+          cookingBadge = `<span class="cooking-badge"><i class="bi bi-fire"></i> ${t.cooking_items} in kitchen</span>`;
+        }
+
+        if (statusText === "free") {
+          actionsHtml = `<button onclick="window.location.href='/billing/?table=${t.id}'" class="btn-luxury btn-card-action w-100"><i class="bi bi-plus-lg me-1"></i> New Order</button>`;
+          if (t.is_primary) actionsHtml += `<button onclick="unmergeTable(${t.id})" class="btn-luxury btn-card-action w-100" style="color:#ef4444;margin-top:5px;"><i class="bi bi-scissors"></i> Unmerge</button>`;
+        } else if (statusText === "merged") {
+          const pName = t.primary_table_name || t.primary_table;
+          timerHtml = `<div class="table-timer status-merged"><i class="bi bi-link"></i> Linked</div>`;
+          actionsHtml = `<button onclick="window.location.href='/billing/?table=${t.primary_table}'" class="btn-luxury btn-card-action w-100">Go to Primary (${pName})</button>`;
+        } else if (statusText === "cleaning") {
+          timerHtml = `<div class="table-timer text-muted"><i class="bi bi-stars"></i> Table Dirty</div>`;
+          actionsHtml = `<button onclick="markTableCleaned(${t.id})" class="btn-luxury btn-luxury-primary btn-card-action w-100">Mark Clean</button>`;
+        } else if (statusText === "billing") {
+          timerHtml = `<div class="table-timer status-billing"><i class="bi bi-receipt"></i> Billing</div>`;
+          actionsHtml = `<button onclick="window.location.href='/bill/${t.order_id}/'" class="btn-luxury btn-luxury-primary btn-card-action w-100" style="background:#06b6d4;border-color:#06b6d4;"><i class="bi bi-credit-card me-1"></i> Pay Bill</button>
+            <button onclick="handleTableClick(${t.id})" class="btn-luxury btn-card-action" title="More Options"><i class="bi bi-three-dots d-block mb-1 mx-auto fs-5"></i> More</button>`;
+        } else if (statusText === "needs_approval") {
+          timerHtml = `<div class="table-timer bg-approval text-white"><i class="bi bi-exclamation-triangle"></i> Review</div>`;
+          actionsHtml = `<button onclick="handleTableClick(${t.id})" class="btn-luxury btn-luxury-primary btn-card-action w-100" style="background:#f43f5e;border-color:#f43f5e;"><i class="bi bi-check-circle me-1"></i> Approve QR</button>`;
+        } else {
+          if (t.elapsed !== undefined) timerHtml = `<div class="table-timer ${statusClass}"><i class="bi bi-clock"></i> ${t.elapsed}m</div>`;
+          actionsHtml = `<button onclick="window.location.href='/billing/?table=${t.id}'" class="btn-luxury btn-card-action" title="Add Items"><i class="bi bi-cart-plus d-block mb-1 mx-auto fs-5"></i> Add</button>
+            <button onclick="generateBillForOrder(${t.order_id})" class="btn-luxury btn-card-action" title="Generate Bill"><i class="bi bi-receipt d-block mb-1 mx-auto fs-5"></i> Bill</button>
+            <button onclick="handleTableClick(${t.id})" class="btn-luxury btn-card-action" title="More Options"><i class="bi bi-three-dots d-block mb-1 mx-auto fs-5"></i> More</button>`;
+        }
+
+        let mergeBadge = '';
+        if (statusText === "merged") {
+          mergeBadge = `<div class="occupancy"><i class="bi bi-link-45deg"></i> Linked to ${t.primary_table_name || 'Primary'}</div>`;
+        } else if (t.is_primary) {
+          mergeBadge = `<div class="occupancy"><i class="bi bi-diagram-3"></i> Merged w/ ${t.merged_with_names}</div>`;
+        }
+
+        let cardInnerHtml = '';
+
+        // ── DETAILED ORDER CARD (Matching Reference Screenshot) ──
+        if (t.order && t.order.items && t.order.items.length > 0) {
+          const o = t.order;
+
+          let placedChipClass = "chip-placed";
+          let placedText = "PLACED";
+          if (statusText === "preparing") { placedChipClass = "chip-preparing"; placedText = "PREPARING"; }
+          else if (statusText === "served" || statusText === "ready") { placedChipClass = "chip-served"; placedText = "SERVED"; }
+          else if (statusText === "billing") { placedChipClass = "chip-placed"; placedText = "BILLING"; }
+          else if (statusText === "needs_approval") { placedChipClass = "chip-unpaid"; placedText = "REVIEW"; }
+
+          const displayName = (t.name || '').trim().toLowerCase().startsWith('table') ? t.name : `Table ${t.name}`;
+          const cutlerySvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.85;margin-right:6px;vertical-align:-2px;"><path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8Z"/><path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7"/><path d="m2.1 21.8 6.4-6.3"/><path d="m19 5-7 7"/></svg>`;
+          const checkSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:3px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>`;
+          const banSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>`;
+
+          const paidChip = o.is_paid 
+            ? `<span class="order-chip chip-paid"><i class="bi bi-check-circle-fill"></i> PAID</span>`
+            : `<span class="order-chip chip-unpaid">UNPAID</span>`;
+
+          const markPaidBtn = !o.is_paid 
+            ? `<button class="chip-btn-mark-paid" onclick="window.location.href='/billing/?table=${t.id}'" title="Pay Order">${checkSvg}MARK PAID</button>`
+            : ``;
+
+          let itemsHtml = `<div class="order-items-list">`;
+          o.items.forEach(it => {
+            itemsHtml += `
+              <div class="order-item-row">
+                <div class="d-flex align-items-center gap-2 overflow-hidden">
+                  <span class="order-item-qty">${it.quantity}</span>
+                  <span class="order-item-name" title="${escapeHtml(it.name)}">${escapeHtml(it.name)}</span>
+                </div>
+                <span class="order-item-price">&#8377;${it.total_price.toFixed(2)}</span>
+              </div>
+            `;
+          });
+          itemsHtml += `</div>`;
+
+          const subtotalStr = o.subtotal ? o.subtotal.toFixed(2) : "0.00";
+          const gstStr = o.gst_total ? o.gst_total.toFixed(2) : "0.00";
+          const totalStr = o.grand_total ? o.grand_total.toFixed(2) : "0.00";
+
+          let primaryActionText = "Accept Order &rarr;";
+          let primaryActionClick = `window.location.href='/billing/?table=${t.id}'`;
+          if (statusText === "billing") {
+            primaryActionText = "Pay Bill &rarr;";
+            primaryActionClick = `window.location.href='/bill/${t.order_id}/'`;
+          } else if (statusText === "needs_approval") {
+            primaryActionText = "Approve QR &rarr;";
+            primaryActionClick = `handleTableClick(${t.id})`;
+          } else if (statusText === "preparing" || statusText === "served") {
+            primaryActionText = "Accept Order &rarr;";
+            primaryActionClick = `window.location.href='/billing/?table=${t.id}'`;
+          }
+
+          cardInnerHtml = `
+            <div class="table-card w-100 shadow-sm ${cardClasses}">
+              <div class="table-status-line ${bgClass}"></div>
+              ${t.waiter_initials ? `<div class="waiter-badge ${t.waiter_initials === 'QR' ? 'qr-badge' : ''}" title="Waiter: ${t.waiter_name}">${t.waiter_initials}</div>` : ''}
+              
+              <div class="order-card-header">
+                <div>
+                  <div class="order-table-title">${cutlerySvg}${displayName}</div>
+                  <div class="order-table-meta">${o.time} &bull; ${o.short_id}</div>
+                </div>
+                ${timerHtml}
+              </div>
+
+              <div class="order-chips-row">
+                <span class="order-chip ${placedChipClass}">${placedText}</span>
+                ${paidChip}
+                ${markPaidBtn}
+              </div>
+
+              ${itemsHtml}
+
+              <div class="order-summary-box">
+                <div class="order-summary-line">
+                  <span>Subtotal</span>
+                  <strong>&#8377;${subtotalStr}</strong>
+                </div>
+                <div class="order-summary-line">
+                  <span>GST (5%)</span>
+                  <strong>&#8377;${gstStr}</strong>
+                </div>
+                <div class="order-total-line">
+                  <span class="order-total-label">TOTAL BILL</span>
+                  <span class="order-total-val">&#8377;${totalStr}</span>
+                </div>
+              </div>
+
+              <div class="order-card-buttons">
+                <button class="btn-luxury btn-luxury-danger" onclick="cancelOrder(${t.order_id})" title="Cancel Order">
+                  ${banSvg}
+                </button>
+                <button class="btn-luxury btn-luxury-primary" onclick="${primaryActionClick}">
+                  ${primaryActionText}
+                </button>
+              </div>
+
+              <div class="d-flex gap-1 mt-2 pt-2 border-top" style="border-color:var(--border-color)!important;">
+                <button onclick="window.location.href='/billing/?table=${t.id}'" class="btn-luxury btn-card-action" title="Add Items"><i class="bi bi-cart-plus me-1"></i> Add</button>
+                <button onclick="generateBillForOrder(${t.order_id})" class="btn-luxury btn-card-action" title="Generate Bill"><i class="bi bi-receipt me-1"></i> Bill</button>
+                <button onclick="handleTableClick(${t.id})" class="btn-luxury btn-card-action" title="More Options"><i class="bi bi-three-dots me-1"></i> More</button>
+              </div>
+            </div>
+          `;
+        } else {
+          // Standard card for tables with no active order items (Free, Cleaning, Merged)
+          cardInnerHtml = `
+            <div class="table-card w-100 shadow-sm ${cardClasses}">
+              <div class="table-status-line ${bgClass}"></div>
+              ${t.waiter_initials ? `<div class="waiter-badge ${t.waiter_initials === 'QR' ? 'qr-badge' : ''}" title="Waiter: ${t.waiter_name}">${t.waiter_initials}</div>` : ''}
+              <div class="table-header">
+                <div class="d-flex align-items-center flex-wrap"><h3 class="table-name mb-0">${t.name}</h3></div>
+                ${timerHtml}
+              </div>
+              <div class="table-status ${statusClass}">${statusText.replace('_', ' ')}</div>
+              ${cookingBadge}
+              ${mergeBadge}
+              <div class="mt-auto"><div class="card-actions">${actionsHtml}</div></div>
+            </div>
+          `;
+        }
+
+        fullHtml += `<div class="col-12 col-md-6 col-xl-4 col-xxl-3 d-flex">${cardInnerHtml}</div>`;
+      });
+    });
+
+    container.innerHTML = fullHtml;
+
+    // ── Metric cards (always from ALL tables) ──────────────────────────────
+    const statTotal   = tables.length;
+    const statFree    = tables.filter(x => x.status === "free").length;
+    const statBilling = tables.filter(x => x.status === "billing").length;
+    const statActive  = statTotal - statFree - tables.filter(x => x.status === "cleaning" || x.status === "merged").length;
+    const sv = (id, v) => { const el = document.getElementById(id); if (el) el.innerText = v; };
+    sv("stat-total", statTotal); sv("stat-free", statFree); sv("stat-active", statActive); sv("stat-billing", statBilling);
   }
 
   function populateModals() {
@@ -505,10 +1171,6 @@
       if (t.status === "free") { sOpts += opt; ttOpts += opt; freeCount++; }
     });
 
-    // Merge/transfer destinations are deliberately limited to free tables
-    // (transferring onto an already-occupied table would silently clobber
-    // its order) -- but an empty dropdown with no explanation just looks
-    // broken. Say why instead of leaving it blank.
     if (freeCount === 0) {
       const noneOpt = '<option value="" disabled>No free tables available right now</option>';
       sOpts += noneOpt; ttOpts += noneOpt;
@@ -521,45 +1183,51 @@
     if (mList) {
       mList.innerHTML = tableDataStore.map(t => `
         <tr>
-          <td><input type="text" id="editName_${t.id}" class="form-control form-select-luxury py-1 m-0" value="${t.name}"></td>
-          <td><input type="text" id="editSection_${t.id}" class="form-control form-select-luxury py-1 m-0" value="${t.section || ''}"></td>
-          <td><button class="btn btn-sm btn-outline-secondary py-1" onclick="showQR('${t.name}', '${t.qr_token}')"><i class="bi bi-qr-code"></i></button></td>
-          <td><button class="btn btn-sm btn-dark py-1" onclick="saveTableEdit(${t.id})">Save</button></td>
-        </tr>`).join('');
+          <td><input type="text" class="form-control form-control-sm form-select-luxury m-0" value="${t.name}" id="editName_${t.id}"></td>
+          <td><input type="text" class="form-control form-control-sm form-select-luxury m-0" value="${t.section}" id="editSec_${t.id}"></td>
+          <td><button class="btn-luxury" onclick="showQrModal('${t.qr_token}', '${t.name}')"><i class="bi bi-qr-code"></i> View</button></td>
+          <td><button class="btn-luxury" onclick="updateTable(${t.id})">Save</button></td>
+        </tr>
+      `).join('');
     }
   }
 
-  function showQR(name, token) {
-    const qrUrl  = `${window.location.origin}/menu/digital-menu/?table_token=${token}`;
-    const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrUrl)}`;
-    document.getElementById("qrModalTitle").innerText = name + " QR Reference";
-    document.getElementById("qrImage").src = apiUrl;
-    document.getElementById("qrViewBtn").onclick = () => window.open(apiUrl, '_blank');
-    const m = bootstrap.Modal.getInstance(document.getElementById("manageTablesModal"));
-    if (m) m.hide();
+  function showQrModal(token, name) {
+    document.getElementById("qrModalTitle").innerText = `Table QR: ${name}`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${window.location.origin}/menu/digital-menu/?table_token=${token}`;
+    document.getElementById("qrImage").src = qrUrl;
+    document.getElementById("qrViewBtn").onclick = () => window.open(qrUrl, "_blank");
     new bootstrap.Modal(document.getElementById("qrModal")).show();
   }
 
   function createTable() {
     const name = document.getElementById("newTableName").value;
-    const sec  = document.getElementById("newTableSection").value;
-    if (!name) return showToast("Enter table name");
-    fetch("/manage-table/", {
+    const section = document.getElementById("newTableSection").value;
+    if (!name) { showToast("Name is required"); return; }
+    fetch("{% url 'manage-table' %}", {
       method: "POST",
-      headers: { "X-CSRFToken": apiClient.getCsrf(), "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "create", name, section: sec })
-    }).then(r => r.json()).then(d => { if (d.success) refreshLayout(); else showToast(d.error); });
+      headers: { "Content-Type": "application/json", "X-CSRFToken": apiClient.getCsrf() },
+      body: JSON.stringify({ action: "create", name: name, section: section })
+    }).then(r => r.json()).then(d => {
+      if (d.success) {
+        showToast("Table Created");
+        document.getElementById("newTableName").value = "";
+        document.getElementById("newTableSection").value = "";
+        refreshLayout();
+      } else showToast(d.error || "Failed to create table");
+    });
   }
 
-  function saveTableEdit(id) {
-    const name = document.getElementById("editName_" + id).value;
-    const sec  = document.getElementById("editSection_" + id).value;
-    fetch("/manage-table/", {
+  function updateTable(id) {
+    const name = document.getElementById(`editName_${id}`).value;
+    const section = document.getElementById(`editSec_${id}`).value;
+    fetch("{% url 'manage-table' %}", {
       method: "POST",
-      headers: { "X-CSRFToken": apiClient.getCsrf(), "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "edit", table_id: id, name, section: sec })
+      headers: { "Content-Type": "application/json", "X-CSRFToken": apiClient.getCsrf() },
+      body: JSON.stringify({ action: "edit", table_id: id, name: name, section: section })
     }).then(r => r.json()).then(d => {
-      if (d.success) { showToast("Table saved!"); refreshLayout(); } else showToast(d.error);
+      if (d.success) { showToast("Table Updated"); refreshLayout(); }
+      else showToast(d.error || "Failed to update table");
     });
   }
 
@@ -568,14 +1236,21 @@
     const t = tableDataStore.find(x => x.id === tableId);
     if (!t) return;
 
-    if (t.status === "free") { window.location.href = `/billing/?table=${t.id}`; return; }
-
     document.getElementById("actionModalTitle").innerText = t.name;
     const btns = document.getElementById("actionModalButtons");
 
-    if (t.status === "cleaning") {
-      document.getElementById("actionModalStatus").innerText = "Table needs to be cleaned";
-      btns.innerHTML = `<button onclick="markTableCleaned(${t.id})" class="btn-luxury w-100" style="color:var(--c-clean);border-color:var(--c-clean);"><i class="bi bi-stars me-2"></i>Mark as Cleaned</button>`;
+    if (t.status === "free") {
+      document.getElementById("actionModalStatus").innerText = "Available for Seating";
+      const unmergeBtn = t.is_primary ? `<button onclick="unmergeTable(${t.id})" class="btn-luxury w-100" style="color:#ef4444;border-color:#ef4444;">Unmerge Tables</button>` : '';
+      btns.innerHTML = `<button onclick="window.location.href='/billing/?table=${t.id}'" class="btn-luxury w-100" style="background:var(--accent-gold);border-color:var(--accent-gold);color:#111;">Create New Order</button>
+        ${unmergeBtn}`;
+    } else if (t.status === "merged") {
+      document.getElementById("actionModalStatus").innerText = `Linked to ${t.primary_table_name || 'Primary Table'}`;
+      btns.innerHTML = `<button onclick="window.location.href='/billing/?table=${t.primary_table}'" class="btn-luxury w-100">Go to Primary Table (${t.primary_table_name})</button>
+        <button onclick="unmergeTable(${t.primary_table})" class="btn-luxury w-100" style="color:#ef4444;border-color:#ef4444;">Unmerge All</button>`;
+    } else if (t.status === "cleaning") {
+      document.getElementById("actionModalStatus").innerText = "Needs Cleaning & Sanitizing";
+      btns.innerHTML = `<button onclick="markTableCleaned(${t.id})" class="btn-luxury w-100" style="background:var(--accent-gold);border-color:var(--accent-gold);color:#111;">Mark as Cleaned</button>`;
     } else if (t.status === "billing") {
       document.getElementById("actionModalStatus").innerText = `Order Active (${t.status})`;
       const unmergeBtn = t.is_primary ? `<button onclick="unmergeTable(${t.id})" class="btn-luxury w-100" style="color:#ef4444;border-color:#ef4444;">Unmerge Tables</button>` : '';
@@ -637,8 +1312,6 @@
       if (d.success) { showToast("Tables Unmerged"); setTimeout(() => location.reload(), 1000); }
       else showToast(d.error || "Unmerge failed");
     }).catch(err => {
-      // Previously uncaught -- a non-JSON error response (e.g. a real 500)
-      // failed silently here: no toast, no reload, nothing visible at all.
       console.error("Unmerge failed:", err);
       showToast("Unmerge failed — please try again");
     });
@@ -683,11 +1356,6 @@
     });
   }
 
-  // Waiter/QR/system badges on this page are now kept in sync by the one
-  // global poller in core/base.html (runs every 8s, covers all three) --
-  // this used to run its own separate 10s poller hitting the same
-  // /api/notifications/ endpoint just to update the waiter badge alone,
-  // a redundant duplicate of a mechanism that already works.
   document.addEventListener("DOMContentLoaded", () => {
     refreshLayout();
     setInterval(refreshLayout, 5000);

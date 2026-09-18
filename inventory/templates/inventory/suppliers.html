@@ -11,28 +11,20 @@
         --text:   var(--text-main);
         --muted:  var(--text-muted);
         --border: var(--border-color);
-        --gold:   var(--accent-gold);
         --red:    #ef4444;
         --smooth: var(--transition-smooth);
     }
 
-    .btn-lux {
-        border:1px solid var(--border); background:transparent; color:var(--text);
-        border-radius:0; text-transform:uppercase; font-size:0.72rem; letter-spacing:2px;
-        padding:0.6rem 1.3rem; transition:var(--smooth); cursor:pointer;
-        text-decoration:none; display:inline-block;
-    }
-    .btn-lux:hover { border-color:var(--gold); background:var(--gold); color:#fff; }
-    .btn-lux.danger { border-color:var(--red); color:var(--red); }
-    .btn-lux.danger:hover { background:var(--red); color:#fff; }
+    .btn-luxuryury.danger { border-color:var(--red); color:var(--red); }
+    .btn-luxuryury.danger:hover { background:var(--red); color:#fff; }
     .section-title { font-family:'DM Serif Display',serif; font-size:1rem; text-transform:uppercase; letter-spacing:3px; margin-bottom:1.5rem; }
     .card-lux { background:var(--panel); border:1px solid var(--border); }
     .form-field { margin-bottom:1rem; }
     .form-field label { font-size:0.68rem; text-transform:uppercase; letter-spacing:2px; color:var(--muted); display:block; margin-bottom:0.4rem; }
     .form-field input { width:100%; background:transparent; border:none; border-bottom:1px solid var(--border); color:var(--text); padding:0.4rem 0; font-size:0.88rem; font-family:'Outfit',sans-serif; outline:none; }
-    .form-field input:focus { border-color:var(--gold); }
+    .form-field input:focus { border-color:var(--accent-gold); }
     .supplier-card { background:var(--panel); border:1px solid var(--border); padding:1.25rem 1.5rem; position:relative; transition:var(--smooth); }
-    .supplier-card:hover { border-color:var(--gold); }
+    .supplier-card:hover { border-color:var(--accent-gold); }
     .supplier-name { font-size:1.05rem; font-weight:600; margin-bottom:0.25rem; }
     .supplier-meta { font-size:0.78rem; color:var(--muted); }
     .supplier-meta i { margin-right:4px; }
@@ -40,7 +32,7 @@
     .gst-badge { font-size:0.68rem; letter-spacing:1px; padding:2px 7px; border:1px solid var(--border); color:var(--muted); text-transform:uppercase; margin-top:0.5rem; display:inline-block; }
     .empty-state { text-align:center; padding:3rem; color:var(--muted); }
     .toast-container { position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999; }
-    .toast-msg { background:#111; color:#fff; padding:0.75rem 1.25rem; margin-top:0.5rem; font-size:0.82rem; border-left:3px solid var(--gold); }
+    .toast-msg { background:#111; color:#fff; padding:0.75rem 1.25rem; margin-top:0.5rem; font-size:0.82rem; border-left:3px solid var(--accent-gold); }
     .toast-msg.err { border-left-color:var(--red); }
     .search-bar {
         background:transparent; border:none; border-bottom:1px solid var(--border);
@@ -48,7 +40,7 @@
         padding:0.4rem 0; outline:none; width:200px;
     }
     .search-bar::placeholder { color:var(--muted); opacity:0.7; }
-    .search-bar:focus { border-color:var(--gold); }
+    .search-bar:focus { border-color:var(--accent-gold); }
 </style>
 {% endblock %}
 
@@ -64,8 +56,8 @@
 
 {% block header_right %}
 <input class="search-bar d-none d-sm-block" type="text" id="searchInput" placeholder="Search suppliers…" oninput="filterSuppliers()">
-<a href="{% url 'purchase_order_list' %}" class="btn-lux d-none d-sm-inline-block">Purchase Orders</a>
-<a href="{% url 'inventory_board' %}" class="btn-lux d-none d-sm-inline-block">Inventory</a>
+<a href="{% url 'purchase_order_list' %}" class="btn-luxury d-none d-sm-inline-block">Purchase Orders</a>
+<a href="{% url 'inventory_board' %}" class="btn-luxury d-none d-sm-inline-block">Inventory</a>
 {{ block.super }}
 {% endblock %}
 
@@ -151,7 +143,7 @@
                     <label>Address</label>
                     <input type="text" id="s_address" placeholder="Street, City">
                 </div>
-                <button class="btn-lux w-100 mt-2" onclick="createSupplier()">
+                <button class="btn-luxury w-100 mt-2" onclick="createSupplier()">
                     <i class="bi bi-plus-lg me-1"></i>Add Supplier
                 </button>
             </div>

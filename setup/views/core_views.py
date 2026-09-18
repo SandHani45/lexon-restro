@@ -1090,9 +1090,10 @@ def outlet_settings(request):
 @login_required
 @tenant_required
 def setup_qr_codes(request):
-    """Print QR codes for all tables — one QR per table linking to the digital menu."""
-    if request.user.role not in ["owner", "manager"]:
+    """Generate and print beautiful luxury QR codes for all tables."""
+    if request.user.role not in ["owner", "manager"] and not request.user.is_superuser:
         return redirect("/setup/")
+    import json
     from django.conf import settings
 
     outlet = request.user.outlet
@@ -1107,25 +1108,34 @@ def setup_qr_codes(request):
         base_url += "/"
     menu_base_url = f"{base_url}menu/"
 
-    # QSR-only: link to the public "Now Serving" display board (see
-    # tokens/views.py::display_board) -- fine-dining tenants don't use
-    # tokens, so there's nothing to display. Same tenant types also get
-    # an outlet-wide "Counter / Walk-in" QR (Outlet.qr_token) for outlets
-    # with no seating at all, so there's still something to print even
-    # when `tables` above is empty.
+    counter_qr_url = f"{menu_base_url}{outlet.qr_token}/" if outlet and outlet.qr_token else None
+
+    tables_data = [
+        {
+            "id": t.id,
+            "name": t.name,
+            "section": t.section or "Main Hall",
+            "capacity": t.capacity,
+            "qr_token": str(t.qr_token),
+            "url": f"{menu_base_url}{t.qr_token}/",
+        }
+        for t in tables
+    ]
+
     display_board_url = None
-    counter_qr_url = None
-    if tenant.tenant_type in ["franchise", "cafe"]:
+    if tenant.tenant_type in ["franchise", "cafe"] and outlet and getattr(outlet, "display_token", None):
         from django.urls import reverse
         display_board_url = base_url.rstrip("/") + reverse(
             "display-board", args=[outlet.display_token]
         )
-        counter_qr_url = f"{menu_base_url}{outlet.qr_token}/"
 
     return render(request, "setup/setup_qr_codes.html", {
-        "tables":       tables,
+        "tables": tables,
+        "tables_data": tables_data,
+        "tables_json": json.dumps(tables_data),
         "menu_base_url": menu_base_url,
-        "outlet":       outlet,
+        "outlet": outlet,
+        "tenant": tenant,
         "display_board_url": display_board_url,
         "counter_qr_url": counter_qr_url,
     })

@@ -150,38 +150,12 @@
 <div class="bill-page">
 <div class="bill-wrap">
 
-    <!-- Back navigation — QSR goes to Tokens, fine-dining goes to Tables -->
-    {% if remaining > 0 %}
-        {% if request.user.role == 'owner' or request.user.role == 'manager' %}
-        <a href="#" onclick="logBypass({{ order.id }}); return false;" class="nav-back no-print">
-            <i class="bi bi-arrow-left"></i> Dashboard (Bypass)
-        </a>
-        {% elif request.user.role == 'cashier' %}
-        <a href="#" onclick="ui.toast('Complete payment before leaving','warning'); return false;" class="nav-back no-print">
-            <i class="bi bi-arrow-left"></i> Back
-        </a>
-        {% else %}
-        <!-- Waiter, chef, or any other role viewing this bill isn't the one
-             responsible for collecting payment at this terminal -- locking
-             them with the same "complete payment before leaving" rule meant
-             for the cashier left them with no way off this page at all. -->
-        {% if direct_billing_mode or is_qsr %}
-        <a href="/dashboard/" class="nav-back no-print"><i class="bi bi-arrow-left"></i> Dashboard</a>
-        {% elif order.token %}
-        <a href="{% url 'token-dashboard' %}" class="nav-back no-print"><i class="bi bi-arrow-left"></i> Tokens</a>
-        {% else %}
-        <a href="/tables/" class="nav-back no-print"><i class="bi bi-arrow-left"></i> Tables</a>
-        {% endif %}
-        {% endif %}
-    {% else %}
-        {% if direct_billing_mode or is_qsr %}
-        <a href="/dashboard/" class="nav-back no-print"><i class="bi bi-arrow-left"></i> Dashboard</a>
-        {% elif order.token %}
-        <a href="{% url 'token-dashboard' %}" class="nav-back no-print"><i class="bi bi-arrow-left"></i> Tokens</a>
-        {% else %}
-        <a href="/tables/" class="nav-back no-print"><i class="bi bi-arrow-left"></i> Tables</a>
-        {% endif %}
-    {% endif %}
+    <!-- Back navigation: safely returns to previous screen without altering order state -->
+    <a href="{% if order.table %}/tables/{% elif order.token %}{% url 'token-dashboard' %}{% elif direct_billing_mode or is_qsr %}/dashboard/{% else %}/orders/{% endif %}"
+       onclick="navigateBackSafe(event, '{% if order.table %}/tables/{% elif order.token %}{% url 'token-dashboard' %}{% elif direct_billing_mode or is_qsr %}/dashboard/{% else %}/orders/{% endif %}');"
+       class="nav-back no-print">
+        <i class="bi bi-arrow-left"></i> Back to {% if order.table %}Tables{% elif order.token %}Tokens{% elif direct_billing_mode or is_qsr %}Dashboard{% else %}Orders{% endif %}
+    </a>
 
     <div class="receipt-container">
 
@@ -396,7 +370,14 @@
                     {% if razorpay_feature_enabled and config.razorpay_enabled %}<button class="btn-pay" onclick="openRazorpayQR()"><i class="bi bi-qr-code-scan"></i>Razorpay QR</button>{% endif %}
                 </div>
                 <button class="btn-action" onclick="printReceipt({{ order.id }})"><i class="bi bi-printer me-2"></i>Print Bill</button>
-            {% else %}
+                {% if request.user.role in "owner,manager" %}
+                <div style="margin-top:0.85rem;text-align:center;">
+                    <button type="button" onclick="confirmBypass({{ order.id }})"
+                            style="background:transparent;border:1px dashed rgba(239,68,68,0.35);color:#ef4444;font-size:0.68rem;letter-spacing:1px;text-transform:uppercase;padding:0.4rem 0.8rem;cursor:pointer;">
+                        <i class="bi bi-shield-exclamation me-1"></i>Admin: Bypass Payment Gate
+                    </button>
+                </div>
+                {% endif %}
                 {% if order.status != 'closed' and order.status != 'paid' %}
                 <button class="btn-pay" style="width:100%;" onclick="recordPay('cash', 0)">
                     <i class="bi bi-check-circle"></i>Close Zero-Total Order
@@ -931,9 +912,35 @@ renderUpiQR({{ remaining }});
         }
     }
 
-    async function logBypass(orderId) {
-        try { await apiClient.post(`/log-bypass/${orderId}/`, {}); } catch(e) {}
+    function navigateBackSafe(e, fallbackUrl) {
+        if (e && e.preventDefault) e.preventDefault();
+        if (window.history.length > 1 && document.referrer && document.referrer.includes(window.location.host)) {
+            window.history.back();
+        } else {
+            window.location.href = fallbackUrl;
+        }
+    }
+
+    async function confirmBypass(orderId) {
+        if (!confirm("Bypass payment gate?\n\nThis will close Order #" + orderId + " WITHOUT collecting payment. This action is logged for audit purposes.\n\nAre you sure you want to proceed?")) {
+            return;
+        }
+        try {
+            const res = await apiClient.post(`/log-bypass/${orderId}/`, {});
+            if (res && res.error) {
+                if (typeof ui !== 'undefined' && ui.toast) ui.toast(res.error, 'error');
+                else alert(res.error);
+                return;
+            }
+            if (typeof ui !== 'undefined' && ui.toast) ui.toast('Payment gate bypassed', 'info');
+        } catch(e) {
+            console.error('Bypass error:', e);
+        }
         window.location.href = {% if is_qsr %}'/token/'{% else %}'/tables/'{% endif %};
+    }
+
+    async function logBypass(orderId) {
+        return confirmBypass(orderId);
     }
 
     function openThermalReceipt() {

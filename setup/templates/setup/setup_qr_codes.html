@@ -1,92 +1,1161 @@
 {% extends 'core/base.html' %}
 {% load static %}
 
-{% block title %}Print QR Codes | {{ request.user.tenant.name }}{% endblock %}
+{% block title %}QR Code Generator | {{ request.user.tenant.name }}{% endblock %}
 
 {% block extra_css %}
 <style>
-    .qr-container { max-width: 1000px; margin: 2.5rem auto; padding: 0 1.5rem 4rem; }
+    /* ── Page Layout ── */
+    .qr-gen-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1.5rem 1.25rem 4rem;
+    }
+    .qr-gen-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    .btn-back-circle {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        font-size: 1.1rem;
+    }
+    .btn-back-circle:hover {
+        border-color: var(--accent-gold);
+        color: var(--accent-gold);
+        transform: translateX(-2px);
+    }
+    .qr-gen-title {
+        font-family: var(--font-display, 'Outfit', sans-serif);
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--text-main);
+        letter-spacing: -0.3px;
+    }
+    .qr-gen-subtitle {
+        color: var(--text-muted);
+        font-size: 0.88rem;
+        margin: 0.2rem 0 0;
+    }
 
-    .qr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+    /* ── Two-Column Grid ── */
+    .qr-gen-grid {
+        display: grid;
+        grid-template-columns: minmax(360px, 440px) 1fr;
+        gap: 2.25rem;
+        align-items: start;
+    }
+    @media (max-width: 991px) {
+        .qr-gen-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 
-    .qr-card { background: var(--panel-bg); padding: 30px; text-align: center; border: 1px solid var(--border-color); border-radius: 12px; position: relative; transition: var(--transition-smooth); }
-    .qr-card:hover { transform: translateY(-5px); border-color: var(--accent-gold); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+    /* ── Settings Card (Left Column) ── */
+    .qr-settings-card {
+        background: var(--panel-bg, #161922);
+        border: 1px solid var(--border-color, rgba(255,255,255,0.08));
+        border-radius: 16px;
+        padding: 1.75rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    .settings-header {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.85rem;
+        border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.08));
+    }
+    .settings-header i {
+        color: var(--accent-gold, #d4af37);
+        font-size: 1.25rem;
+    }
 
-    .restaurant-name { font-family: 'DM Serif Display', serif; font-size: 1.4rem; margin-bottom: 5px; }
-    .table-name { text-transform: uppercase; letter-spacing: 2px; font-size: 0.75rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 20px; }
+    .form-group-label {
+        display: block;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--text-muted, #9ca3af);
+        margin-bottom: 0.5rem;
+        text-transform: capitalize;
+    }
+    .section-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin: 1.5rem 0 0.85rem;
+    }
 
-    .qr-image { width: 180px; height: 180px; margin: 0 auto 20px; border: 1px solid var(--border-color); padding: 10px; background: #fff; /* white bg required for QR scanability */ }
-    .qr-hint { font-size: 0.7rem; color: var(--text-muted); margin-top: 10px; }
+    /* Custom select & inputs */
+    .qr-select, .qr-input {
+        width: 100%;
+        background: rgba(0,0,0,0.25);
+        border: 1px solid var(--border-color, rgba(255,255,255,0.12));
+        color: var(--text-main, #fff);
+        padding: 0.65rem 0.9rem;
+        border-radius: 8px;
+        font-size: 0.88rem;
+        transition: border-color 0.15s, box-shadow 0.15s;
+        outline: none;
+    }
+    .qr-select:focus, .qr-input:focus {
+        border-color: var(--accent-gold, #d4af37);
+        box-shadow: 0 0 0 2px rgba(212,175,55,0.2);
+    }
+    .qr-select option {
+        background: #1e222d;
+        color: #fff;
+    }
 
+    /* ── Preset Color Pills Grid ── */
+    .preset-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.6rem;
+        margin-bottom: 1.25rem;
+    }
+    .preset-btn {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid var(--border-color, rgba(255,255,255,0.1));
+        color: var(--text-main);
+        padding: 0.55rem 0.75rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        user-select: none;
+    }
+    .preset-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .preset-btn.active {
+        box-shadow: 0 0 0 1px currentColor, 0 4px 16px rgba(0,0,0,0.3);
+    }
+
+    /* Preset Specific Theme Colors */
+    .preset-gold { border-color: #d4af37; color: #d4af37; }
+    .preset-gold.active { background: rgba(212,175,55,0.18); border-color: #d4af37; }
+
+    .preset-blue { border-color: #0ea5e9; color: #38bdf8; }
+    .preset-blue.active { background: rgba(14,165,233,0.18); border-color: #0ea5e9; }
+
+    .preset-green { border-color: #10b981; color: #34d399; }
+    .preset-green.active { background: rgba(16,185,129,0.18); border-color: #10b981; }
+
+    .preset-purple { border-color: #a855f7; color: #c084fc; }
+    .preset-purple.active { background: rgba(168,85,247,0.18); border-color: #a855f7; }
+
+    .preset-orange { border-color: #f97316; color: #fb923c; }
+    .preset-orange.active { background: rgba(249,115,22,0.18); border-color: #f97316; }
+
+    .preset-red { border-color: #ef4444; color: #f87171; }
+    .preset-red.active { background: rgba(239,68,68,0.18); border-color: #ef4444; }
+
+    .preset-midnight { border-color: #3b82f6; color: #60a5fa; }
+    .preset-midnight.active { background: rgba(59,130,246,0.18); border-color: #3b82f6; }
+
+    .preset-mint { border-color: #14b8a6; color: #2dd4bf; }
+    .preset-mint.active { background: rgba(20,184,166,0.18); border-color: #14b8a6; }
+
+    /* ── Color Pickers ── */
+    .color-input-row {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        background: rgba(0,0,0,0.25);
+        border: 1px solid var(--border-color, rgba(255,255,255,0.12));
+        border-radius: 8px;
+        padding: 0.35rem 0.6rem;
+        margin-bottom: 1rem;
+    }
+    .color-swatch-wrapper {
+        position: relative;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.2);
+        flex-shrink: 0;
+        cursor: pointer;
+    }
+    .color-native-input {
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        width: 50px;
+        height: 50px;
+        border: none;
+        cursor: pointer;
+    }
+    .color-hex-text {
+        background: transparent;
+        border: none;
+        color: var(--text-main);
+        font-family: monospace;
+        font-size: 0.9rem;
+        font-weight: 600;
+        width: 100%;
+        outline: none;
+        text-transform: uppercase;
+    }
+
+    /* ── Custom Checkbox ── */
+    .custom-check-row {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        margin: 1.25rem 0 1.5rem;
+        cursor: pointer;
+        user-select: none;
+    }
+    .custom-check-row input[type="checkbox"] {
+        width: 17px;
+        height: 17px;
+        accent-color: var(--accent-gold, #d4af37);
+        cursor: pointer;
+    }
+    .custom-check-row span {
+        font-size: 0.85rem;
+        color: var(--text-main);
+    }
+
+    /* ── Action Buttons ── */
+    .btn-qr-action {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        font-size: 0.92rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        margin-bottom: 0.75rem;
+        text-decoration: none;
+    }
+    .btn-qr-primary {
+        background: #eab308;
+        color: #0f1117;
+        box-shadow: 0 4px 15px rgba(234,179,8,0.25);
+    }
+    .btn-qr-primary:hover {
+        background: #facc15;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(234,179,8,0.35);
+    }
+    .btn-qr-secondary {
+        background: rgba(255,255,255,0.04);
+        border-color: var(--border-color, rgba(255,255,255,0.12));
+        color: var(--text-main);
+    }
+    .btn-qr-secondary:hover {
+        background: rgba(255,255,255,0.08);
+        border-color: rgba(255,255,255,0.2);
+        color: var(--text-main);
+    }
+    .btn-qr-print {
+        background: #4f46e5;
+        color: #ffffff;
+        box-shadow: 0 4px 15px rgba(79,70,229,0.25);
+    }
+    .btn-qr-print:hover {
+        background: #6366f1;
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(79,70,229,0.35);
+    }
+
+    /* ── QR URL Input with Copy ── */
+    .url-copy-box {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(0,0,0,0.25);
+        border: 1px solid var(--border-color, rgba(255,255,255,0.12));
+        border-radius: 8px;
+        padding: 0.35rem 0.5rem 0.35rem 0.85rem;
+    }
+    .url-copy-input {
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        flex: 1;
+        outline: none;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .btn-copy-url {
+        background: rgba(255,255,255,0.08);
+        border: none;
+        color: var(--text-main);
+        padding: 0.35rem 0.65rem;
+        border-radius: 6px;
+        font-size: 0.78rem;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+    .btn-copy-url:hover {
+        background: rgba(255,255,255,0.15);
+        color: var(--accent-gold);
+    }
+
+    /* ── Preview Panel (Right Column) ── */
+    .qr-preview-panel {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .preview-panel-title {
+        align-self: flex-start;
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 1.5rem;
+    }
+
+    /* ── The Luxury QR Card ── */
+    .preview-card-outer {
+        position: relative;
+        width: 100%;
+        max-width: 400px;
+        background: #11141a;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 20px;
+        padding: 2.25rem 2rem;
+        text-align: center;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+        transition: all 0.25s ease;
+    }
+    .preview-card-outer:hover {
+        border-color: rgba(212,175,55,0.25);
+        box-shadow: 0 30px 70px rgba(0,0,0,0.7);
+    }
+    .preview-table-label {
+        font-size: 0.82rem;
+        color: #9ca3af;
+        letter-spacing: 1px;
+        margin-bottom: 0.25rem;
+    }
+    .preview-table-title {
+        font-family: var(--font-display, 'Outfit', sans-serif);
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #d4af37;
+        line-height: 1.1;
+        margin-bottom: 0.4rem;
+        transition: color 0.2s;
+    }
+    .preview-scan-label {
+        font-size: 1.05rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: #d4af37;
+        margin-bottom: 1.5rem;
+        transition: color 0.2s;
+    }
+    .card-divider {
+        height: 1px;
+        background: rgba(255,255,255,0.08);
+        margin: 1.25rem 0;
+    }
+
+    /* QR Canvas / SVG Holder */
+    .qr-code-holder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0.5rem auto;
+        min-height: 250px;
+    }
+    .qr-code-holder svg, .qr-code-holder canvas {
+        border-radius: 12px;
+        display: block;
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* NFC Tag Placeholder */
+    .nfc-tag-placeholder {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding: 0.5rem 1rem;
+        background: rgba(255,255,255,0.03);
+        border: 1px dashed rgba(255,255,255,0.15);
+        border-radius: 8px;
+        font-size: 0.8rem;
+        color: #9ca3af;
+    }
+    .nfc-tag-placeholder i {
+        font-size: 1.1rem;
+        color: #d4af37;
+    }
+
+    /* Powered by footer */
+    .powered-by-label {
+        font-size: 0.72rem;
+        color: #6b7280;
+        margin-bottom: 0.35rem;
+    }
+    .powered-by-brand {
+        font-family: var(--font-display, 'Outfit', sans-serif);
+        font-size: 1.2rem;
+        font-weight: 900;
+        letter-spacing: 2.5px;
+        color: #d4af37;
+        transition: color 0.2s;
+    }
+
+    /* Preview Bottom Info */
+    .preview-bottom-info {
+        margin-top: 1.5rem;
+        text-align: center;
+    }
+    .preview-bottom-sub {
+        font-size: 0.85rem;
+        color: #9ca3af;
+    }
+    .preview-bottom-name {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #d4af37;
+        margin: 0.15rem 0;
+        transition: color 0.2s;
+    }
+
+    /* ── Dedicated Printable A4 Sheet Styles ── */
+    #a4PrintContainer {
+        display: none;
+    }
     @media print {
-        .pos-header { display: none !important; }
-        body { background: #fff !important; color: #000 !important; }
-        .qr-container { padding: 0 !important; }
-        .qr-grid { display: block; }
-        .qr-card { page-break-inside: avoid; border: 2px solid #000 !important; margin-bottom: 30px; box-shadow: none !important; transform: none !important; background: #fff !important; }
-        .restaurant-name, .table-name, .qr-hint { color: #000 !important; }
+        #pos-app { display: none !important; }
+        body { background: #fff !important; color: #000 !important; margin: 0 !important; padding: 0 !important; }
+        #a4PrintContainer {
+            display: block !important;
+            padding: 10mm;
+        }
+        .a4-page {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15mm;
+            page-break-after: always;
+        }
+        .a4-card {
+            border: 2px solid #222;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            background: #fff;
+            page-break-inside: avoid;
+        }
+        .a4-card .a4-title { font-size: 24pt; font-weight: 800; color: #000; }
+        .a4-card .a4-sub { font-size: 12pt; font-weight: 700; letter-spacing: 2px; color: #333; margin-bottom: 10px; }
+        .a4-card .a4-qr { display: flex; justify-content: center; margin: 15px auto; }
+        .a4-card .a4-qr canvas, .a4-card .a4-qr img { width: 160px; height: 160px; }
+        .a4-card .a4-footer { font-size: 10pt; color: #666; }
     }
 </style>
 {% endblock %}
 
 {% block header_left %}
-<div>
-    <a href="/setup/" style="text-decoration:none;color:inherit;">
-        <h1 class="brand-title mb-0" style="font-family:'DM Serif Display',serif;font-size:1.5rem;">
-            <i class="bi bi-qr-code-scan" style="color:var(--accent-gold);"></i>
-            Table QR Codes
-        </h1>
-    </a>
-    <p class="brand-subtitle">Print and place these on tables for digital ordering</p>
+<div class="d-flex align-items-center gap-2">
+    <div style="width:34px;height:34px;border-radius:8px;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex-shrink:0;">
+        <i class="bi bi-qr-code" style="font-size:1.15rem;"></i>
+    </div>
+    <div>
+        <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.5px;color:var(--text-main);">QR Code Generator</h1>
+        <div class="text-muted" style="font-size:0.72rem;letter-spacing:1px;text-transform:uppercase;">{{ request.user.outlet.name }}</div>
+    </div>
 </div>
 {% endblock %}
 
 {% block header_right %}
-<a href="/setup/tables/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">
-    <i class="bi bi-arrow-left me-1"></i> Back
+<a href="/tables/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">
+    <i class="bi bi-arrow-left me-1"></i> Tables
 </a>
-{% if display_board_url %}
-<a href="{{ display_board_url }}" target="_blank" class="btn-luxury text-decoration-none d-none d-sm-inline-flex" title="Open on the TV/monitor at your pickup counter">
-    <i class="bi bi-tv me-1"></i> Display Board
-</a>
-{% endif %}
-<button onclick="window.print()" class="btn-luxury">
-    <i class="bi bi-printer me-1"></i> Print All
-</button>
-<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme">
+<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Dark / Light Mode">
     <i class="bi bi-moon" id="themeIcon"></i>
 </button>
 {% endblock %}
 
 {% block content %}
-<div class="qr-container">
-    <div class="qr-grid">
-        {% if counter_qr_url %}
-        <div class="qr-card">
-            <div class="restaurant-name">{{ request.user.tenant.name }}</div>
-            <div class="table-name">Counter / Walk-in</div>
-            <div class="qr-image">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={{ counter_qr_url }}"
-                     alt="Counter QR for {{ outlet.name }}"
-                     style="width:100%;height:100%;">
-            </div>
-            <div class="qr-hint">One QR for the whole counter &mdash; no table needed. Scan to View Menu &amp; Order</div>
-            <div style="font-size:0.6rem;color:var(--text-muted);margin-top:5px;opacity:0.5;">{{ outlet.qr_token }}</div>
+<div class="qr-gen-wrapper">
+
+    <!-- Header navigation row -->
+    <div class="qr-gen-header">
+        <a href="/tables/" class="btn-back-circle" title="Back to Tables">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <div>
+            <h1 class="qr-gen-title">QR Code Generator</h1>
+            <p class="qr-gen-subtitle">Generate beautiful QR codes for your tables</p>
         </div>
-        {% endif %}
-        {% for table in tables %}
-        <div class="qr-card">
-            <div class="restaurant-name">{{ request.user.tenant.name }}</div>
-            <div class="table-name">Table {{ table.name }}</div>
-            <div class="qr-image">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={{ menu_base_url }}{{ table.qr_token }}/"
-                     alt="QR for {{ table.name }}"
-                     style="width:100%;height:100%;">
-            </div>
-            <div class="qr-hint">Scan to View Menu &amp; Order</div>
-            <div style="font-size:0.6rem;color:var(--text-muted);margin-top:5px;opacity:0.5;">{{ table.qr_token }}</div>
-        </div>
-        {% endfor %}
     </div>
+
+    <!-- Main 2-column layout -->
+    <div class="qr-gen-grid">
+
+        <!-- ── LEFT COLUMN: Settings ── -->
+        <div class="qr-settings-card">
+            <div class="settings-header">
+                <i class="bi bi-sliders"></i>
+                <span>Settings</span>
+            </div>
+
+            <!-- 1. Select Table -->
+            <div class="mb-4">
+                <label class="form-group-label" for="tableSelect">Select Table</label>
+                <select id="tableSelect" class="qr-select">
+                    {% for t in tables %}
+                    <option value="{{ t.id }}" data-name="{{ t.name }}" data-url="{{ menu_base_url }}{{ t.qr_token }}/">Table {{ t.name }}</option>
+                    {% endfor %}
+                    {% if counter_qr_url %}
+                    <option value="counter" data-name="Counter" data-url="{{ counter_qr_url }}">Counter / Walk-in</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <!-- 2. Customize QR Code -->
+            <div class="section-title">Customize QR Code</div>
+
+            <div class="form-group-label">Color Presets</div>
+            <div class="preset-grid">
+                <div class="preset-btn preset-gold active" onclick="applyPreset('gold')">Classic Gold</div>
+                <div class="preset-btn preset-blue" onclick="applyPreset('blue')">Ocean Blue</div>
+                <div class="preset-btn preset-green" onclick="applyPreset('green')">Forest Green</div>
+                <div class="preset-btn preset-purple" onclick="applyPreset('purple')">Royal Purple</div>
+                <div class="preset-btn preset-orange" onclick="applyPreset('orange')">Sunset Orange</div>
+                <div class="preset-btn preset-red" onclick="applyPreset('red')">Cherry Red</div>
+                <div class="preset-btn preset-midnight" onclick="applyPreset('midnight')">Midnight</div>
+                <div class="preset-btn preset-mint" onclick="applyPreset('mint')">Mint Fresh</div>
+            </div>
+
+            <!-- Dot Style -->
+            <div class="mb-3">
+                <label class="form-group-label" for="dotStyle">Dot Style</label>
+                <select id="dotStyle" class="qr-select" onchange="updateQrPreview()">
+                    <option value="rounded" selected>Rounded</option>
+                    <option value="dots">Dots</option>
+                    <option value="classy">Classy</option>
+                    <option value="classy-rounded">Classy Rounded</option>
+                    <option value="square">Square</option>
+                </select>
+            </div>
+
+            <!-- Corner Style -->
+            <div class="mb-3">
+                <label class="form-group-label" for="cornerStyle">Corner Style</label>
+                <select id="cornerStyle" class="qr-select" onchange="updateQrPreview()">
+                    <option value="extra-rounded" selected>Extra Rounded</option>
+                    <option value="rounded">Rounded</option>
+                    <option value="dot">Dot</option>
+                    <option value="square">Square</option>
+                </select>
+            </div>
+
+            <!-- QR Color -->
+            <div class="mb-2">
+                <label class="form-group-label">QR Color</label>
+                <div class="color-input-row">
+                    <div class="color-swatch-wrapper" id="qrSwatchWrapper" style="background:#D4AF37;">
+                        <input type="color" id="qrColorNative" class="color-native-input" value="#D4AF37" oninput="onQrColorChange(this.value)">
+                    </div>
+                    <input type="text" id="qrColorHex" class="color-hex-text" value="#D4AF37" onchange="onQrColorChange(this.value)">
+                </div>
+            </div>
+
+            <!-- Background Color -->
+            <div class="mb-3">
+                <label class="form-group-label">Background Color</label>
+                <div class="color-input-row">
+                    <div class="color-swatch-wrapper" id="bgSwatchWrapper" style="background:#1a1a1a;">
+                        <input type="color" id="bgColorNative" class="color-native-input" value="#1a1a1a" oninput="onBgColorChange(this.value)">
+                    </div>
+                    <input type="text" id="bgColorHex" class="color-hex-text" value="#1a1a1a" onchange="onBgColorChange(this.value)">
+                </div>
+            </div>
+
+            <!-- NFC Tag Checkbox -->
+            <label class="custom-check-row">
+                <input type="checkbox" id="nfcCheckbox" onchange="toggleNfcPlaceholder(this.checked)">
+                <span>Extend layout with NFC Tag placeholder</span>
+            </label>
+
+            <!-- Action Buttons -->
+            <button class="btn-qr-action btn-qr-primary" id="btnDownloadCard" onclick="downloadSelectedCard()">
+                <i class="bi bi-download"></i> Download QR Code
+            </button>
+
+            <button class="btn-qr-action btn-qr-secondary" id="btnDownloadAll" onclick="downloadAllCardsZip()">
+                <i class="bi bi-qr-code"></i> Download All ({{ tables|length }})
+            </button>
+
+            <button class="btn-qr-action btn-qr-print" id="btnPrintSheets" onclick="printA4Sheets()">
+                <i class="bi bi-printer"></i> Print A4 Sheets ({{ tables|length }} tables)
+            </button>
+
+            <!-- QR Code URL -->
+            <div class="mt-4">
+                <label class="form-group-label">QR Code URL</label>
+                <div class="url-copy-box">
+                    <input type="text" id="qrUrlInput" class="url-copy-input" readonly value="">
+                    <button class="btn-copy-url" onclick="copyQrUrl()" title="Copy URL">
+                        <i class="bi bi-clipboard me-1"></i>Copy
+                    </button>
+                </div>
+            </div>
+
+        </div><!-- /.qr-settings-card -->
+
+
+        <!-- ── RIGHT COLUMN: Preview ── -->
+        <div class="qr-preview-panel">
+            <div class="preview-panel-title">Preview</div>
+
+            <!-- Luxury Card Container -->
+            <div class="preview-card-outer" id="previewCardElement">
+                <div class="preview-table-label">Table</div>
+                <div class="preview-table-title" id="cardTableTitle">T1</div>
+                <div class="preview-scan-label" id="cardScanLabel">SCAN TO ORDER</div>
+
+                <div class="card-divider"></div>
+
+                <!-- QR Holder -->
+                <div class="qr-code-holder" id="qrCanvasContainer"></div>
+
+                <!-- NFC Tag Placeholder -->
+                <div class="nfc-tag-placeholder" id="nfcPlaceholderElement">
+                    <i class="bi bi-broadcast"></i>
+                    <span>Tap phone here for NFC</span>
+                </div>
+
+                <div class="card-divider"></div>
+
+                <!-- Footer branding -->
+                <div class="powered-by-label">Powered by</div>
+                <div class="powered-by-brand" id="cardBrandText">SERVYN</div>
+            </div>
+
+            <!-- Preview Footer Info below card -->
+            <div class="preview-bottom-info">
+                <div class="preview-bottom-sub">Preview for Table</div>
+                <div class="preview-bottom-name" id="previewFooterTableName">T1</div>
+                <div class="preview-bottom-sub">Scan to view menu &amp; order</div>
+            </div>
+
+        </div><!-- /.qr-preview-panel -->
+
+    </div><!-- /.qr-gen-grid -->
+
 </div>
+
+<!-- Hidden Printable A4 Sheet Holder -->
+<div id="a4PrintContainer"></div>
+
+<!-- Vendored QR Code Styling & JSZip -->
+<script src="{% static 'js/vendor/qr-code-styling.js' %}"></script>
+<script src="{% static 'js/vendor/jszip.min.js' %}"></script>
+
+<script>
+    // Tables dataset from Django
+    const ALL_TABLES = {{ tables_json|safe }};
+    const TENANT_NAME = "{{ tenant.name|escapejs }}";
+    const OUTLET_NAME = "{{ outlet.name|escapejs }}";
+
+    // Presets definition
+    const PRESETS = {
+        gold:     { qr: '#D4AF37', bg: '#1a1a1a', dot: 'rounded', corner: 'extra-rounded' },
+        blue:     { qr: '#0ea5e9', bg: '#0c1929', dot: 'rounded', corner: 'extra-rounded' },
+        green:    { qr: '#10b981', bg: '#0a2318', dot: 'rounded', corner: 'extra-rounded' },
+        purple:   { qr: '#a855f7', bg: '#1f0e38', dot: 'rounded', corner: 'extra-rounded' },
+        orange:   { qr: '#f97316', bg: '#2b1408', dot: 'rounded', corner: 'extra-rounded' },
+        red:      { qr: '#ef4444', bg: '#290a0a', dot: 'rounded', corner: 'extra-rounded' },
+        midnight: { qr: '#3b82f6', bg: '#090d1a', dot: 'rounded', corner: 'extra-rounded' },
+        mint:     { qr: '#14b8a6', bg: '#082320', dot: 'rounded', corner: 'extra-rounded' }
+    };
+
+    let currentPreset = 'gold';
+    let currentQrColor = '#D4AF37';
+    let currentBgColor = '#1a1a1a';
+    let currentDotStyle = 'rounded';
+    let currentCornerStyle = 'extra-rounded';
+    let isNfcEnabled = false;
+    let qrCodeInstance = null;
+
+    // Helper to generate center brand SVG logo
+    function createCenterLogoSvg(text, qrColor, bgColor) {
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="90" height="26" viewBox="0 0 90 26">
+            <rect width="90" height="26" rx="6" fill="${bgColor}"/>
+            <text x="45" y="18" font-family="'Outfit', sans-serif" font-weight="900" font-size="12" fill="${qrColor}" text-anchor="middle" letter-spacing="2">${text}</text>
+        </svg>`;
+        return "data:image/svg+xml;base64," + btoa(svg);
+    }
+
+    // Initialize UI
+    document.addEventListener("DOMContentLoaded", function() {
+        // Load saved preferences if any
+        try {
+            const saved = localStorage.getItem("pos_qr_settings");
+            if (saved) {
+                const cfg = JSON.parse(saved);
+                if (cfg.qr) currentQrColor = cfg.qr;
+                if (cfg.bg) currentBgColor = cfg.bg;
+                if (cfg.dot) currentDotStyle = cfg.dot;
+                if (cfg.corner) currentCornerStyle = cfg.corner;
+                if (cfg.nfc !== undefined) isNfcEnabled = cfg.nfc;
+                if (cfg.preset) currentPreset = cfg.preset;
+            }
+        } catch (e) {}
+
+        // Apply saved controls
+        document.getElementById("dotStyle").value = currentDotStyle;
+        document.getElementById("cornerStyle").value = currentCornerStyle;
+        document.getElementById("nfcCheckbox").checked = isNfcEnabled;
+        toggleNfcPlaceholder(isNfcEnabled);
+
+        updateColorInputs(currentQrColor, currentBgColor);
+        highlightPresetButton(currentPreset);
+
+        // Setup table select
+        const tableSelect = document.getElementById("tableSelect");
+        if (tableSelect) {
+            tableSelect.addEventListener("change", onTableSelectChange);
+            onTableSelectChange();
+        }
+    });
+
+    function highlightPresetButton(presetKey) {
+        document.querySelectorAll(".preset-btn").forEach(btn => btn.classList.remove("active"));
+        const btn = document.querySelector(`.preset-${presetKey}`);
+        if (btn) btn.classList.add("active");
+    }
+
+    function applyPreset(key) {
+        const p = PRESETS[key];
+        if (!p) return;
+        currentPreset = key;
+        highlightPresetButton(key);
+
+        currentQrColor = p.qr;
+        currentBgColor = p.bg;
+        currentDotStyle = p.dot;
+        currentCornerStyle = p.corner;
+
+        document.getElementById("dotStyle").value = p.dot;
+        document.getElementById("cornerStyle").value = p.corner;
+
+        updateColorInputs(p.qr, p.bg);
+        saveSettingsToLocal();
+        updateQrPreview();
+    }
+
+    function updateColorInputs(qrColor, bgColor) {
+        currentQrColor = qrColor;
+        currentBgColor = bgColor;
+
+        document.getElementById("qrColorNative").value = qrColor;
+        document.getElementById("qrColorHex").value = qrColor.toUpperCase();
+        document.getElementById("qrSwatchWrapper").style.backgroundColor = qrColor;
+
+        document.getElementById("bgColorNative").value = bgColor;
+        document.getElementById("bgColorHex").value = bgColor.toUpperCase();
+        document.getElementById("bgSwatchWrapper").style.backgroundColor = bgColor;
+
+        // Card typography accent
+        document.getElementById("cardTableTitle").style.color = qrColor;
+        document.getElementById("cardScanLabel").style.color = qrColor;
+        document.getElementById("cardBrandText").style.color = qrColor;
+        document.getElementById("previewFooterTableName").style.color = qrColor;
+
+        // Preview card background
+        document.getElementById("previewCardElement").style.background = bgColor;
+    }
+
+    function onQrColorChange(val) {
+        if (!val.startsWith("#")) val = "#" + val;
+        currentQrColor = val;
+        document.getElementById("qrColorNative").value = val;
+        document.getElementById("qrColorHex").value = val.toUpperCase();
+        document.getElementById("qrSwatchWrapper").style.backgroundColor = val;
+
+        document.getElementById("cardTableTitle").style.color = val;
+        document.getElementById("cardScanLabel").style.color = val;
+        document.getElementById("cardBrandText").style.color = val;
+        document.getElementById("previewFooterTableName").style.color = val;
+
+        currentPreset = 'custom';
+        document.querySelectorAll(".preset-btn").forEach(btn => btn.classList.remove("active"));
+        saveSettingsToLocal();
+        updateQrPreview();
+    }
+
+    function onBgColorChange(val) {
+        if (!val.startsWith("#")) val = "#" + val;
+        currentBgColor = val;
+        document.getElementById("bgColorNative").value = val;
+        document.getElementById("bgColorHex").value = val.toUpperCase();
+        document.getElementById("bgSwatchWrapper").style.backgroundColor = val;
+        document.getElementById("previewCardElement").style.background = val;
+
+        currentPreset = 'custom';
+        document.querySelectorAll(".preset-btn").forEach(btn => btn.classList.remove("active"));
+        saveSettingsToLocal();
+        updateQrPreview();
+    }
+
+    function toggleNfcPlaceholder(checked) {
+        isNfcEnabled = checked;
+        const el = document.getElementById("nfcPlaceholderElement");
+        if (el) el.style.display = checked ? "flex" : "none";
+        saveSettingsToLocal();
+    }
+
+    function onTableSelectChange() {
+        const select = document.getElementById("tableSelect");
+        if (!select) return;
+        const selectedOpt = select.options[select.selectedIndex];
+        if (!selectedOpt) return;
+
+        const tableName = selectedOpt.getAttribute("data-name") || "T1";
+        const tableUrl = selectedOpt.getAttribute("data-url") || window.location.origin + "/menu/";
+
+        document.getElementById("cardTableTitle").textContent = tableName;
+        document.getElementById("previewFooterTableName").textContent = tableName;
+        document.getElementById("qrUrlInput").value = tableUrl;
+
+        updateQrPreview();
+    }
+
+    function saveSettingsToLocal() {
+        try {
+            localStorage.setItem("pos_qr_settings", JSON.stringify({
+                qr: currentQrColor,
+                bg: currentBgColor,
+                dot: currentDotStyle,
+                corner: currentCornerStyle,
+                nfc: isNfcEnabled,
+                preset: currentPreset
+            }));
+        } catch (e) {}
+    }
+
+    // Rebuild the QR Code inside container
+    function updateQrPreview() {
+        currentDotStyle = document.getElementById("dotStyle").value;
+        currentCornerStyle = document.getElementById("cornerStyle").value;
+
+        const url = document.getElementById("qrUrlInput").value || window.location.origin + "/menu/";
+        const container = document.getElementById("qrCanvasContainer");
+        if (!container) return;
+
+        container.innerHTML = "";
+
+        const centerLogo = createCenterLogoSvg("SERVYN", currentQrColor, currentBgColor);
+
+        qrCodeInstance = new QRCodeStyling({
+            width: 250,
+            height: 250,
+            type: "canvas",
+            data: url,
+            image: centerLogo,
+            margin: 4,
+            qrOptions: {
+                typeNumber: 0,
+                mode: "Byte",
+                errorCorrectionLevel: "H"
+            },
+            dotsOptions: {
+                color: currentQrColor,
+                type: currentDotStyle
+            },
+            backgroundOptions: {
+                color: currentBgColor
+            },
+            cornersSquareOptions: {
+                color: currentQrColor,
+                type: currentCornerStyle
+            },
+            cornersDotOptions: {
+                color: currentQrColor,
+                type: currentCornerStyle === "extra-rounded" ? "dot" : (currentCornerStyle === "dot" ? "dot" : "square")
+            },
+            imageOptions: {
+                crossOrigin: "anonymous",
+                margin: 4,
+                imageSize: 0.35
+            }
+        });
+
+        qrCodeInstance.append(container);
+    }
+
+    function copyQrUrl() {
+        const input = document.getElementById("qrUrlInput");
+        if (!input) return;
+        navigator.clipboard.writeText(input.value).then(() => {
+            if (window.ui && ui.toast) {
+                ui.toast("URL copied to clipboard!", "success");
+            } else {
+                alert("URL copied to clipboard!");
+            }
+        });
+    }
+
+    // ── Generate Composite Canvas for High-DPI Card Download ──
+    async function renderCardToCanvas(tableName, tableUrl) {
+        const scale = 2; // 2x high resolution
+        const width = 400 * scale;
+        const height = (isNfcEnabled ? 580 : 530) * scale;
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+
+        // Rounded Card Background
+        const radius = 24 * scale;
+        ctx.fillStyle = currentBgColor;
+        ctx.beginPath();
+        ctx.roundRect(0, 0, width, height, radius);
+        ctx.fill();
+
+        // Border
+        ctx.strokeStyle = "rgba(255,255,255,0.1)";
+        ctx.lineWidth = 2 * scale;
+        ctx.stroke();
+
+        // Top "Table" label
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#9ca3af";
+        ctx.font = `${14 * scale}px 'Outfit', sans-serif`;
+        ctx.fillText("Table", width / 2, 45 * scale);
+
+        // Large Table Name
+        ctx.fillStyle = currentQrColor;
+        ctx.font = `bold ${38 * scale}px 'Outfit', sans-serif`;
+        ctx.fillText(tableName, width / 2, 90 * scale);
+
+        // SCAN TO ORDER
+        ctx.font = `bold ${16 * scale}px 'Outfit', sans-serif`;
+        ctx.letterSpacing = "2px";
+        ctx.fillText("SCAN TO ORDER", width / 2, 120 * scale);
+        ctx.letterSpacing = "0px";
+
+        // Top Divider
+        ctx.strokeStyle = "rgba(255,255,255,0.1)";
+        ctx.lineWidth = 1 * scale;
+        ctx.beginPath();
+        ctx.moveTo(35 * scale, 138 * scale);
+        ctx.lineTo(width - 35 * scale, 138 * scale);
+        ctx.stroke();
+
+        // Generate QR code for this specific table
+        const centerLogo = createCenterLogoSvg("SERVYN", currentQrColor, currentBgColor);
+        const tempQr = new QRCodeStyling({
+            width: 250 * scale,
+            height: 250 * scale,
+            type: "canvas",
+            data: tableUrl,
+            image: centerLogo,
+            margin: 4,
+            qrOptions: { errorCorrectionLevel: "H" },
+            dotsOptions: { color: currentQrColor, type: currentDotStyle },
+            backgroundOptions: { color: currentBgColor },
+            cornersSquareOptions: { color: currentQrColor, type: currentCornerStyle },
+            cornersDotOptions: {
+                color: currentQrColor,
+                type: currentCornerStyle === "extra-rounded" ? "dot" : (currentCornerStyle === "dot" ? "dot" : "square")
+            },
+            imageOptions: { margin: 4, imageSize: 0.35 }
+        });
+
+        const qrBlob = await tempQr.getRawData("png");
+        const qrImage = await new Promise(resolve => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.src = URL.createObjectURL(qrBlob);
+        });
+
+        // Draw QR Image
+        const qrX = (width - (250 * scale)) / 2;
+        const qrY = 150 * scale;
+        ctx.drawImage(qrImage, qrX, qrY, 250 * scale, 250 * scale);
+
+        let currentY = qrY + (265 * scale);
+
+        // Draw NFC Tag Placeholder if enabled
+        if (isNfcEnabled) {
+            ctx.fillStyle = "rgba(255,255,255,0.04)";
+            ctx.beginPath();
+            ctx.roundRect((width - (240 * scale)) / 2, currentY, 240 * scale, 34 * scale, 8 * scale);
+            ctx.fill();
+            ctx.strokeStyle = "rgba(255,255,255,0.15)";
+            ctx.stroke();
+
+            ctx.fillStyle = "#9ca3af";
+            ctx.font = `${12 * scale}px 'Outfit', sans-serif`;
+            ctx.fillText("(( 📱 ))  Tap phone here for NFC", width / 2, currentY + (22 * scale));
+
+            currentY += 45 * scale;
+        }
+
+        // Bottom Divider
+        ctx.strokeStyle = "rgba(255,255,255,0.1)";
+        ctx.beginPath();
+        ctx.moveTo(35 * scale, currentY);
+        ctx.lineTo(width - 35 * scale, currentY);
+        ctx.stroke();
+
+        // Footer
+        ctx.fillStyle = "#6b7280";
+        ctx.font = `${12 * scale}px 'Outfit', sans-serif`;
+        ctx.fillText("Powered by", width / 2, currentY + (25 * scale));
+
+        ctx.fillStyle = currentQrColor;
+        ctx.font = `bold ${18 * scale}px 'Outfit', sans-serif`;
+        ctx.letterSpacing = "2px";
+        ctx.fillText("SERVYN", width / 2, currentY + (48 * scale));
+
+        return canvas;
+    }
+
+    // ── Download Single Card ──
+    async function downloadSelectedCard() {
+        const select = document.getElementById("tableSelect");
+        const selectedOpt = select.options[select.selectedIndex];
+        const tableName = selectedOpt ? selectedOpt.getAttribute("data-name") : "T1";
+        const tableUrl = document.getElementById("qrUrlInput").value;
+
+        const btn = document.getElementById("btnDownloadCard");
+        const origText = btn.innerHTML;
+        btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Generating...`;
+
+        try {
+            const canvas = await renderCardToCanvas(tableName, tableUrl);
+            const a = document.createElement("a");
+            a.download = `table-${tableName.replace(/\s+/g, '_')}-qr.png`;
+            a.href = canvas.toDataURL("image/png");
+            a.click();
+            if (window.ui && ui.toast) ui.toast(`Downloaded QR card for ${tableName}`, "success");
+        } catch (e) {
+            console.error(e);
+            alert("Failed to export image: " + e.message);
+        } finally {
+            btn.innerHTML = origText;
+        }
+    }
+
+    // ── Download All Cards (ZIP) ──
+    async function downloadAllCardsZip() {
+        if (typeof JSZip === "undefined") {
+            alert("ZIP generator library not loaded.");
+            return;
+        }
+
+        const btn = document.getElementById("btnDownloadAll");
+        const origText = btn.innerHTML;
+        btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Packaging 0/${ALL_TABLES.length}...`;
+
+        try {
+            const zip = new JSZip();
+            const folder = zip.folder("table-qr-codes");
+
+            for (let i = 0; i < ALL_TABLES.length; i++) {
+                const t = ALL_TABLES[i];
+                btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Packaging ${i + 1}/${ALL_TABLES.length}...`;
+                const canvas = await renderCardToCanvas(t.name, t.url);
+                const dataUrl = canvas.toDataURL("image/png");
+                const base64Data = dataUrl.replace(/^data:image\/png;base64,/, "");
+                folder.file(`table-${t.name.replace(/\s+/g, '_')}-qr.png`, base64Data, { base64: true });
+            }
+
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Compressing ZIP...`;
+            const content = await zip.generateAsync({ type: "blob" });
+            const a = document.createElement("a");
+            a.download = `${TENANT_NAME.replace(/\s+/g, '_')}-table-qr-codes.zip`;
+            a.href = URL.createObjectURL(content);
+            a.click();
+
+            if (window.ui && ui.toast) ui.toast("All table QR codes downloaded successfully!", "success");
+        } catch (e) {
+            console.error(e);
+            alert("Failed to generate ZIP: " + e.message);
+        } finally {
+            btn.innerHTML = origText;
+        }
+    }
+
+    // ── Print A4 Sheets (Multi-Card Layout) ──
+    async function printA4Sheets() {
+        const container = document.getElementById("a4PrintContainer");
+        container.innerHTML = "";
+
+        const btn = document.getElementById("btnPrintSheets");
+        const origText = btn.innerHTML;
+        btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Preparing print sheets...`;
+
+        try {
+            // Group cards in pages of 4 (2x2 grid on A4 for maximum clarity)
+            const cardsPerPage = 4;
+            for (let p = 0; p < ALL_TABLES.length; p += cardsPerPage) {
+                const pageEl = document.createElement("div");
+                pageEl.className = "a4-page";
+
+                const slice = ALL_TABLES.slice(p, p + cardsPerPage);
+                for (const t of slice) {
+                    const cardEl = document.createElement("div");
+                    cardEl.className = "a4-card";
+
+                    const qrCanvas = await renderCardToCanvas(t.name, t.url);
+                    const img = document.createElement("img");
+                    img.src = qrCanvas.toDataURL("image/png");
+                    img.style.maxWidth = "100%";
+                    img.style.height = "auto";
+                    img.style.borderRadius = "8px";
+
+                    cardEl.appendChild(img);
+                    pageEl.appendChild(cardEl);
+                }
+                container.appendChild(pageEl);
+            }
+
+            window.print();
+        } catch (e) {
+            console.error(e);
+            alert("Failed to prepare print: " + e.message);
+        } finally {
+            btn.innerHTML = origText;
+        }
+    }
+</script>
 {% endblock %}
