@@ -1,7 +1,7 @@
 # billing/views.py
 """
-Lexnorax's own subscription billing webhook -- confirms payment against a
-SubscriptionInvoice's Razorpay Payment Link, under Lexnorax's OWN account.
+EasyBillBro's own subscription billing webhook -- confirms payment against a
+SubscriptionInvoice's Razorpay Payment Link, under EasyBillBro's OWN account.
 Deliberately separate from payments/razorpay_views.py's webhook, which
 handles tenant-owned QR payments from restaurant diners.
 

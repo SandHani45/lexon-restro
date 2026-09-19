@@ -1,7 +1,7 @@
 # billing/models.py
 """
-Lexnorax's own subscription billing -- charging restaurant tenants for using
-Lexnorax itself. Deliberately NOT a TenantScopedModel: this is Lexnorax-internal
+EasyBillBro's own subscription billing -- charging restaurant tenants for using
+EasyBillBro itself. Deliberately NOT a TenantScopedModel: this is EasyBillBro-internal
 billing data ABOUT tenants (same relationship as Tenant itself, which is
 also a plain models.Model), not tenant-facing operational data that should
 ever be auto-scoped to "the current tenant's own view."

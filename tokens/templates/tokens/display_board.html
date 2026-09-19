@@ -8,7 +8,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
         background: #0a0a0a;
-        color: #f5f5f5;
+        color: #f7f1ec;
         font-family: 'Segoe UI', Arial, sans-serif;
         min-height: 100vh;
         display: flex;
@@ -17,7 +17,7 @@
         padding: 2.5rem 1.5rem;
     }
     .board-header { text-align: center; margin-bottom: 2.5rem; }
-    .board-title { font-size: 1.6rem; text-transform: uppercase; letter-spacing: 4px; color: #c5a059; }
+    .board-title { font-size: 1.6rem; text-transform: uppercase; letter-spacing: 4px; color: #EC2734; }
     .board-sub { font-size: 1rem; color: #888; margin-top: 0.4rem; text-transform: uppercase; letter-spacing: 2px; }
 
     .token-grid {
@@ -28,25 +28,44 @@
         max-width: 1400px;
     }
     .token-tile {
-        background: #161616;
-        border: 2px solid #c5a059;
-        border-radius: 12px;
+        background: #EC2734;
+        border: none;
+        border-radius: 20px;
         text-align: center;
-        padding: 2.5rem 1rem;
+        padding: 2.5rem 1rem 2rem;
         animation: pop 0.4s ease-out;
+        position: relative;
+    }
+    /* Rotate bold tile fills so a wall of "ready" tokens still reads as
+       distinct cards from across the room, instead of one solid block. */
+    .token-tile:nth-child(3n+2) { background: #a3182a; }
+    .token-tile:nth-child(3n)   { background: #FA7327; }
+    .token-tile .icon-badge {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        position: absolute;
+        top: 14px;
+        left: 14px;
     }
     .token-tile .num {
         font-size: 5rem;
-        font-weight: 700;
+        font-weight: 800;
         color: #fff;
         line-height: 1;
+        margin-top: 0.5rem;
     }
     .token-tile .label {
         margin-top: 0.75rem;
         font-size: 0.9rem;
         letter-spacing: 2px;
         text-transform: uppercase;
-        color: #c5a059;
+        color: rgba(255,255,255,0.8);
     }
     @keyframes pop {
         from { transform: scale(0.85); opacity: 0; }
@@ -90,6 +109,7 @@
         empty.style.display = 'none';
         grid.innerHTML = tokens.map(t => `
             <div class="token-tile">
+                <div class="icon-badge">&#10003;</div>
                 <div class="num">${t.display}</div>
                 <div class="label">Ready for pickup</div>
             </div>

@@ -6,7 +6,7 @@ from core.models import TenantScopedModel
 
 class PrintJob(TenantScopedModel):
     """
-    Queued receipt/KOT print job consumed by the Lexnorax Agent in polling mode.
+    Queued receipt/KOT print job consumed by the EasyBillBro Agent in polling mode.
 
     The browser pushes a job here (HTTPS POST to EC2).
     The agent running on the local device polls /orders/agent/<key>/jobs/ every 2 s,

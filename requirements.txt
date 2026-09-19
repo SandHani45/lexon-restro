@@ -41,6 +41,6 @@ rapidfuzz==3.14.1
 # WhatsApp receipts (optional — set TWILIO_* env vars to enable)
 twilio==9.3.6
 
-# Lexnorax Print Agent — WebSocket server for USB printing
+# EasyBillBro Print Agent — WebSocket server for USB printing
 websockets==13.1
 pywin32==308; sys_platform == 'win32'

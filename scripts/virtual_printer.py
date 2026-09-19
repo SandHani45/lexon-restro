@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Lexnorax Virtual Thermal Printer
+EasyBillBro Virtual Thermal Printer
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Listens on TCP 9100 — the ESC/POS standard port.
-Set any Kitchen Station → Printer IP = 127.0.0.1 in Lexnorax setup.
+Set any Kitchen Station → Printer IP = 127.0.0.1 in EasyBillBro setup.
 Every print job appears in this terminal window.
 
 Run:  python scripts/virtual_printer.py
@@ -95,11 +95,11 @@ def run():
 
     print(f"""
 ╔{'═' * (W + 4)}╗
-║  🖨  Lexnorax Virtual Thermal Printer{' ' * (W - 31)}║
+║  🖨  EasyBillBro Virtual Thermal Printer{' ' * (W - 31)}║
 ║  Listening on 127.0.0.1:{PORT}   (Ctrl+C to stop){' ' * (W - 44)}║
 ╚{'═' * (W + 4)}╝
 
-  → In Lexnorax: Setup → Kitchen Stations → enter Printer IP = 127.0.0.1
+  → In EasyBillBro: Setup → Kitchen Stations → enter Printer IP = 127.0.0.1
   → Trigger a print from billing screen or use:
       python manage.py preview_print --list
 """)

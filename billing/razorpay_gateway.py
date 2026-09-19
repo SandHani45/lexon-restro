@@ -1,7 +1,7 @@
 # billing/razorpay_gateway.py
 """
-Lexnorax's OWN Razorpay integration — for charging restaurant tenants their
-Lexnorax subscription fee. Deliberately separate from payments/razorpay_gateway.py,
+EasyBillBro's OWN Razorpay integration — for charging restaurant tenants their
+EasyBillBro subscription fee. Deliberately separate from payments/razorpay_gateway.py,
 which is the tenant-owned, bring-your-own-keys integration used to collect a
 RESTAURANT's payments from ITS OWN diners. Never share credentials or code
 paths between the two -- see md_files/eli5_subscription_billing_plan.html
@@ -36,7 +36,7 @@ def decimal_to_paise(amount: Decimal) -> int:
 
 def create_subscription_payment_link(invoice, owner_user=None):
     """
-    Creates a Razorpay Payment Link, under Lexnorax's OWN account, for one
+    Creates a Razorpay Payment Link, under EasyBillBro's OWN account, for one
     SubscriptionInvoice. Returns (payment_link_id, payment_link_url).
 
     owner_user: pass the tenant's owner User if the caller already looked
@@ -65,7 +65,7 @@ def create_subscription_payment_link(invoice, owner_user=None):
             "amount": decimal_to_paise(invoice.amount),
             "currency": "INR",
             "description": (
-                f"Lexnorax subscription — {tenant.name} "
+                f"EasyBillBro subscription — {tenant.name} "
                 f"({invoice.period_start} to {invoice.period_end})"
             ),
             "customer": {"name": tenant.name, "email": owner},
@@ -86,7 +86,7 @@ def create_subscription_payment_link(invoice, owner_user=None):
 
 def verify_webhook_signature(body: bytes, signature_header: str) -> bool:
     """Mirrors payments/razorpay_gateway.py's HMAC pattern exactly, checking
-    against Lexnorax's OWN webhook secret, not any tenant's."""
+    against EasyBillBro's OWN webhook secret, not any tenant's."""
     webhook_secret = settings.LEXNORAX_RAZORPAY_WEBHOOK_SECRET
     if not signature_header or not webhook_secret:
         return False

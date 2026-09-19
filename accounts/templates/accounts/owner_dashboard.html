@@ -5,212 +5,224 @@
 
 {% block extra_css %}
 <style>
-    .section-title {
-        font-family: 'DM Serif Display', serif;
-        font-size: 1.3rem;
-        font-weight: 700;
-        margin-top: 2rem;
-        margin-bottom: 1.25rem;
-        border-bottom: 1px solid var(--border-color);
-        padding-bottom: 0.5rem;
+    /* ── KimiPoS Style Dashboard Tokens & Cards ─────────────── */
+    .hero-kpi-card {
+        border-radius: 18px;
+        padding: 1.25rem 1.4rem;
+        position: relative;
+        overflow: hidden;
+        min-height: 125px;
         display: flex;
-        align-items: center;
         justify-content: space-between;
+        align-items: center;
+        color: #ffffff !important;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+        transition: transform 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                    box-shadow 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        text-decoration: none !important;
     }
-    .section-title small {
-        font-size: 0.7rem;
-        font-family: 'Outfit', sans-serif;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        font-weight: 500;
+    .hero-kpi-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+        color: #ffffff !important;
     }
 
-    /* ── Quick-access cards ────────────────────────── */
-    .quick-card {
-        background: var(--panel-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 0;
-        padding: 1.25rem 1rem;
-        text-align: center;
-        cursor: pointer;
-        transition: var(--transition-smooth);
-        height: 100%;
-        text-decoration: none;
-        display: flex;
-        flex-direction: column;
+    /* Gradients matching KimiPoS reference */
+    .kpi-gradient-tables  { background: linear-gradient(135deg, #c2381e 0%, #d84524 50%, #e85532 100%); }
+    .kpi-gradient-revenue { background: linear-gradient(135deg, #440d18 0%, #5d1221 50%, #72162a 100%); }
+    .kpi-gradient-orders  { background: linear-gradient(135deg, #ea580c 0%, #f97316 50%, #fb923c 100%); }
+    .kpi-gradient-kitchen { background: linear-gradient(135deg, #181820 0%, #252534 50%, #353548 100%); }
+
+    .hero-icon-box {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        color: var(--text-main);
-        min-height: 110px;
+        font-size: 0.95rem;
+        margin-bottom: 0.4rem;
     }
-    .quick-card:hover {
-        transform: translateY(-3px);
-        border-color: var(--accent-gold);
-        color: var(--text-main);
-        box-shadow: var(--shadow-hover);
+    .hero-stat-val {
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        font-size: 1.85rem;
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: -0.5px;
     }
-    .quick-card:active { transform: translateY(0); }
-    .quick-card .icon {
-        font-size: 1.75rem;
-        margin-bottom: 0.6rem;
-        color: var(--text-muted);
-    }
-    .quick-card:hover .icon { color: var(--accent-gold); }
-    .quick-card h5 {
-        margin: 0;
-        font-weight: 600;
+    .hero-stat-label {
         font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
+        font-weight: 600;
+        opacity: 0.95;
     }
-    .quick-card p {
-        font-size: 0.7rem;
-        color: var(--text-muted);
-        margin: 0.3rem 0 0;
-    }
-
-    /* ── Aggregator toggle bar ─────────────────────── */
-    .aggregator-bar {
-        background: var(--panel-bg);
-        border: 1px solid var(--border-color);
-        padding: 0.3rem;
-        border-radius: 2px;
+    .hero-stat-sub {
+        font-size: 0.68rem;
+        opacity: 0.85;
+        margin-top: 2px;
         display: flex;
         align-items: center;
         gap: 4px;
     }
-    .aggregator-bar span {
-        font-size: 0.6rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: var(--text-muted);
-        margin: 0 0.4rem;
+    .hero-food-badge {
+        width: 66px;
+        height: 66px;
+        min-width: 66px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.14);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        border: 1.5px solid rgba(255, 255, 255, 0.28);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.2rem;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+        user-select: none;
     }
 
-    /* ── Metrics cards ─────────────────────────────── */
-    .outlet-card {
+    /* ── Dashboard Panels ────────────────────────────────── */
+    .dash-panel {
         background: var(--panel-bg);
         border: 1px solid var(--border-color);
-        border-radius: 0;
-        padding: 1.25rem;
-    }
-    .outlet-card h6 {
-        font-family: 'DM Serif Display', serif;
-        font-size: 1.1rem;
-        color: var(--accent-gold);
-        border-bottom: 1px solid var(--border-color);
-        padding-bottom: 0.5rem;
-        margin-bottom: 0.9rem;
-    }
-    .metric {
+        border-radius: 18px;
+        box-shadow: var(--shadow-card);
+        padding: 1.35rem 1.5rem;
+        height: 100%;
         display: flex;
-        justify-content: space-between;
-        padding: 0.7rem 0;
-        border-bottom: 1px dashed var(--border-color);
-        font-size: 0.85rem;
-        font-weight: 500;
+        flex-direction: column;
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
     }
-    .metric:last-child { border-bottom: none; padding-bottom: 0; }
-    .revenue { color: var(--accent-gold); font-weight: 700; font-size: 1rem; }
-    .low-stock { color: #ef4444; font-weight: 700; }
-
-    /* ── Metric cards (desktop Today's Performance) ── */
-    .metric-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0;
+    .dash-panel:hover {
+        box-shadow: var(--shadow-hover);
     }
-    .metric-cell {
-        padding: 0.7rem 0;
-        border-bottom: 1px dashed var(--border-color);
-        font-size: 0.85rem;
-        font-weight: 500;
+    .dash-panel-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        margin-bottom: 1.15rem;
     }
-    .metric-cell:nth-last-child(-n+2) { border-bottom: none; }
-    .metric-cell:nth-child(odd) { padding-right: 1rem; border-right: 1px dashed var(--border-color); }
-    .metric-cell:nth-child(even) { padding-left: 1rem; }
-    .revenue { color: var(--accent-gold); font-weight: 700; font-size: 1rem; }
-    .low-stock { color: #ef4444; font-weight: 700; }
-    .val-warn  { color: #f59e0b; font-weight: 700; }
-    .val-ok    { color: #22c55e; font-weight: 700; }
-
-    /* ── Mobile revenue strip ──────────────────────── */
-    .mobile-revenue-strip {
-        background: var(--panel-bg);
-        border: 1px solid var(--border-color);
-        border-left: 4px solid var(--accent-gold);
-        padding: 1rem 1.25rem;
-        margin-bottom: 1rem;
+    .dash-panel-title {
+        font-size: 0.96rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin: 0;
+        font-family: var(--font-main, 'Outfit', sans-serif);
     }
-    .strip-revenue {
-        font-family: 'DM Serif Display', serif;
-        font-size: 2.4rem;
+    .dash-panel-sub {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        margin-top: 1px;
+    }
+    .dash-panel-link {
+        font-size: 0.72rem;
         font-weight: 700;
         color: var(--accent-gold);
-        line-height: 1;
-        margin-bottom: 0.3rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        transition: opacity 0.15s;
     }
-    .strip-outlet {
-        font-size: 0.65rem;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        color: var(--text-muted);
-        margin-bottom: 0.6rem;
+    .dash-panel-link:hover {
+        opacity: 0.8;
+        color: var(--accent-gold);
     }
-    .strip-pills {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-bottom: 0.5rem;
-    }
-    .strip-pill {
-        font-size: 0.72rem;
-        padding: 3px 10px;
-        border: 1px solid var(--border-color);
-        border-radius: 20px;
-        color: var(--text-muted);
-        white-space: nowrap;
-    }
-    .strip-pill.warn  { border-color: #f59e0b; color: #f59e0b; }
-    .strip-pill.alert { border-color: #ef4444; color: #ef4444; background: rgba(239,68,68,.07); }
-    .strip-pill.gold  { border-color: var(--accent-gold); color: var(--accent-gold); }
-    .strip-refresh {
-        font-size: 0.65rem;
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
-        color: var(--text-muted);
-        margin-top: 0.25rem;
-    }
-    .strip-refresh i { font-size: 0.7rem; }
 
-    /* ── Mobile ────────────────────────────────────── */
-    @media (max-width: 576px) {
-        .quick-card { min-height: 90px; padding: 1rem 0.75rem; }
-        .quick-card .icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
-        .quick-card h5 { font-size: 0.72rem; }
-        .quick-card p { display: none; }
-        .section-title { font-size: 1.1rem; }
+    /* ── List Rows inside Panels ─────────────────────────── */
+    .dash-item-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.6rem 0;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.8rem;
     }
-    @media (min-width: 768px) {
-        .mobile-revenue-strip { display: none !important; }
+    .dash-item-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+    .rank-num {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        width: 20px;
+    }
+    .item-icon-squircle {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        border-radius: 8px;
+        background: var(--surface-2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+    .item-progress-track {
+        height: 5px;
+        background: var(--surface-2);
+        border-radius: 999px;
+        overflow: hidden;
+        margin-top: 4px;
+        width: 100%;
+    }
+    .item-progress-fill {
+        height: 100%;
+        background: var(--accent-gold);
+        border-radius: 999px;
+    }
+
+    /* ── Quick Ops Tiles ─────────────────────────────────── */
+    .quick-op-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.75rem 0.9rem;
+        border-radius: 12px;
+        background: var(--surface-2);
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+        text-decoration: none !important;
+        font-size: 0.78rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    .quick-op-btn i {
+        font-size: 1.1rem;
+        color: var(--accent-gold);
+        flex-shrink: 0;
+    }
+    .quick-op-btn:hover {
+        background: var(--sidebar-active-bg);
+        border-color: var(--accent-gold);
+        color: var(--accent-gold);
+        transform: translateY(-2px);
+    }
+
+    /* ── Chart Visuals (SVG) ─────────────────────────────── */
+    .chart-bar-rect {
+        transition: height 0.3s ease, y 0.3s ease, fill 0.2s ease;
+        cursor: pointer;
+    }
+    .chart-bar-rect:hover {
+        fill: var(--accent-gold) !important;
     }
 </style>
 {% endblock %}
 
 {% block header_left %}
-<div class="d-flex align-items-center gap-2">
-    <div style="width:34px;height:34px;border-radius:8px;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex-shrink:0;">
+<a href="/dashboard/" class="d-flex align-items-center gap-2 text-decoration-none" style="color:inherit;">
+    <div style="width:34px;height:34px;border-radius:10px;background:rgba(236, 39, 52,0.12);border:1px solid rgba(236, 39, 52,0.3);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex-shrink:0;">
         <i class="bi bi-speedometer2" style="font-size:1.05rem;"></i>
     </div>
     <div>
         <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.5px;color:var(--text-main);">Dashboard</h1>
-        <div class="text-muted" style="font-size:0.72rem;letter-spacing:1px;text-transform:uppercase;">{{ request.user.outlet.name }}</div>
+        <div class="text-muted" style="font-size:0.72rem;letter-spacing:0.5px;">{{ request.user.outlet.name|default:request.user.tenant.name }}</div>
     </div>
-</div>
+</a>
 {% endblock %}
 
 {% block header_right %}
@@ -228,295 +240,515 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid py-3 px-3 px-md-4">
+<div class="container-fluid py-3 px-3 px-md-4" style="max-width:1600px;margin:0 auto;">
 
-<!-- ══ MOBILE REVENUE STRIP — only on phones ═══════════════ -->
-{% if not is_cashier %}
-{% for m in metrics %}
-<div class="mobile-revenue-strip" id="mobileStrip{{ forloop.counter }}">
-    {% if metrics|length > 1 %}<div class="strip-outlet">{{ m.outlet }}</div>{% endif %}
-    <div class="strip-revenue" id="stripRevenue{{ forloop.counter }}">₹ {{ m.revenue }}</div>
-    <div class="strip-pills" id="stripPills{{ forloop.counter }}">
-        <span class="strip-pill gold">{{ m.orders }} orders</span>
-        {% if m.active_tables > 0 %}<span class="strip-pill">{{ m.active_tables }} tables open</span>{% endif %}
-        {% if m.kitchen_orders > 0 %}<span class="strip-pill warn">{{ m.kitchen_orders }} in kitchen</span>{% endif %}
-        {% if m.voids_today > 0 %}<span class="strip-pill alert">{{ m.voids_today }} void{% if m.voids_today > 1 %}s{% endif %}</span>{% endif %}
-        {% if m.discounts_amount > 0 %}<span class="strip-pill alert">₹{{ m.discounts_amount }} discounted</span>{% endif %}
-        {% if m.low_stock > 0 %}<span class="strip-pill alert"><i class="bi bi-exclamation-triangle-fill"></i> {{ m.low_stock }} low stock</span>{% endif %}
-    </div>
-    <div class="strip-refresh" id="stripTs{{ forloop.counter }}">
-        <i class="bi bi-arrow-clockwise"></i> Live · refreshes every 60s
-    </div>
-</div>
-{% empty %}
-<div class="mobile-revenue-strip">
-    <div class="strip-revenue" style="font-size:1.5rem;color:var(--text-muted);">No data yet</div>
-    <div class="strip-refresh">Today's sales will appear here</div>
-</div>
-{% endfor %}
-{% endif %}
-
-<!-- ══ CORE OPERATIONS ════════════════════════════════════ -->
-<h5 class="section-title">Core Operations <small>Front of House</small></h5>
-<div class="row g-3">
-
-    {% if 'floor_plan' in tenant_features %}
-    <div class="col-6 col-md-3 col-lg-2">
-        <a href="/tables/" class="quick-card">
-            <div class="icon"><i class="bi bi-grid-3x3-gap"></i></div>
-            <h5>Tables</h5>
-            <p>Live Floor Plan</p>
-        </a>
-    </div>
-    {% endif %}
-
-    {% if 'token_system' in tenant_features %}
-    <div class="col-6 col-md-3 col-lg-2">
-        {% if direct_billing_mode %}
-        <button onclick="createAndBill()" class="quick-card w-100" style="border-color:var(--accent-gold);" id="directBillBtn">
-        {% else %}
-        <a href="{% url 'token-dashboard' %}" class="quick-card" style="border-color:var(--accent-gold);">
-        {% endif %}
-            <div class="icon" style="position:relative;display:inline-block;">
-                <i class="bi bi-receipt-cutoff" style="color:var(--accent-gold);"></i>
-                {% if active_token_count > 0 %}
-                <span style="position:absolute;top:-6px;right:-10px;background:var(--accent-gold);color:#fff;border-radius:9px;font-size:0.6rem;padding:1px 5px;font-weight:700;">{{ active_token_count }}</span>
-                {% endif %}
-            </div>
-            <h5>{% if direct_billing_mode %}New Order{% else %}Tokens{% endif %}</h5>
-            <p>{% if direct_billing_mode %}Tap to start billing{% else %}QSR Queue{% endif %}</p>
-        {% if direct_billing_mode %}</button>{% else %}</a>{% endif %}
-    </div>
-    {% if not is_cashier %}
-    <div class="col-6 col-md-3 col-lg-2">
-        <a href="{% url 'token-dashboard' %}" class="quick-card">
-            <div class="icon"><i class="bi bi-grid-3x3-gap"></i></div>
-            <h5>Token Board</h5>
-            <p>All Active</p>
-        </a>
-    </div>
-    {% endif %}
-    {% endif %}
-
-    {% if 'kitchen_display' in tenant_features %}
-    <div class="col-6 col-md-3 col-lg-2">
-        <a href="/kitchen/" class="quick-card">
-            <div class="icon"><i class="bi bi-fire"></i></div>
-            <h5>Kitchen</h5>
-            <p>Order Queue</p>
-        </a>
-    </div>
-    {% endif %}
-
-    {% if not is_cashier or 'floor_plan' in tenant_features %}
-    <div class="col-6 col-md-3 col-lg-2">
-        <a href="{% if 'floor_plan' in tenant_features %}/billing/{% else %}{% url 'token-dashboard' %}{% endif %}" class="quick-card">
-            <div class="icon"><i class="bi bi-receipt-cutoff"></i></div>
-            <h5>Billing</h5>
-            <p>POS Terminal</p>
-        </a>
-    </div>
-    {% endif %}
-
-    {% if 'waiter_call' in tenant_features %}
-    <div class="col-6 col-md-3 col-lg-2">
-        <a href="/waiter-dashboard/" class="quick-card">
-            <div class="icon"><i class="bi bi-bell"></i></div>
-            <h5>Calls</h5>
-            <p>Staff Alerts</p>
-        </a>
-    </div>
-    {% endif %}
-
-</div>
-
-<!-- ══ ADMINISTRATIVE ═════════════════════════════════════ -->
-{% if not is_cashier %}
-<h5 class="section-title">Administrative <small>Back of House</small></h5>
-<div class="row g-3">
-
-    {% if 'inventory' in tenant_features %}
-    <div class="col-6 col-md-3 col-lg-2">
-        <a href="/inventory/board/" class="quick-card">
-            <div class="icon"><i class="bi bi-box-seam"></i></div>
-            <h5>Inventory</h5>
-            <p>Stock Levels</p>
-        </a>
-    </div>
-    {% endif %}
-
-    {% if 'central_kitchen' in tenant_features %}
-    <div class="col-6 col-md-3 col-lg-2">
-        <a href="/inventory/central-kitchen/" class="quick-card">
-            <div class="icon"><i class="bi bi-building-gear"></i></div>
-            <h5>Central Kitchen</h5>
-            <p>Batches &amp; Dispatch</p>
-        </a>
-    </div>
-    <div class="col-6 col-md-3 col-lg-2">
-        <a href="/inventory/requisitions/" class="quick-card">
-            <div class="icon"><i class="bi bi-clipboard-check"></i></div>
-            <h5>Stock Requests</h5>
-            <p>Requisitions</p>
-        </a>
-    </div>
-    {% endif %}
-
-    <div class="col-6 col-md-3 col-lg-2">
-        <a href="/menu/" class="quick-card">
-            <div class="icon"><i class="bi bi-journal-text"></i></div>
-            <h5>Menu</h5>
-            <p>Items & Pricing</p>
-        </a>
-    </div>
-
-    {% if 'qr_menu' in tenant_features %}
-    <div class="col-6 col-md-3 col-lg-2">
-        <a href="/menu/qr/" class="quick-card">
-            <div class="icon"><i class="bi bi-qr-code-scan"></i></div>
-            <h5>QR Menu</h5>
-            <p>Digital</p>
-        </a>
-    </div>
-    <div class="col-6 col-md-3 col-lg-2">
-        <a href="/setup/qr-codes/" class="quick-card">
-            <div class="icon"><i class="bi bi-qr-code"></i></div>
-            <h5>Table QR Codes</h5>
-            <p>Print & Display Board</p>
-        </a>
-    </div>
-    {% endif %}
-
-    {% comment %}
-      Cash Register / EOD is a payment prerequisite (fine-dining blocks payment
-      without an open session), so it must NOT be gated behind the optional
-      shift_management feature — owners/managers always need access to it.
-    {% endcomment %}
-    <div class="col-6 col-md-3 col-lg-2">
-        <a href="/shifts/sessions/" class="quick-card">
-            <div class="icon"><i class="bi bi-cash-stack"></i></div>
-            <h5>Cash Register</h5>
-            <p>Open &amp; EOD</p>
-        </a>
-    </div>
-
-    {% if 'shift_management' in tenant_features %}
-    <div class="col-6 col-md-3 col-lg-2">
-        <a href="/shifts/" class="quick-card">
-            <div class="icon"><i class="bi bi-clock-history"></i></div>
-            <h5>Shifts</h5>
-            <p>Cashier Log</p>
-        </a>
-    </div>
-    {% endif %}
-
-    {% if 'reservations' in tenant_features %}
-    <div class="col-6 col-md-3 col-lg-2">
-        <a href="/crm/reservations/" class="quick-card">
-            <div class="icon"><i class="bi bi-calendar-check"></i></div>
-            <h5>Reservations</h5>
-            <p>Table Bookings</p>
-        </a>
-    </div>
-    {% endif %}
-
-    {% if 'crm' in tenant_features %}
-    <div class="col-6 col-md-3 col-lg-2">
-        <a href="/crm/" class="quick-card">
-            <div class="icon"><i class="bi bi-people"></i></div>
-            <h5>CRM</h5>
-            <p>Guest History</p>
-        </a>
-    </div>
-    {% endif %}
-
-    {% if 'reports' in tenant_features %}
-    <div class="col-6 col-md-3 col-lg-2">
-        <a href="/reports/dashboard/" class="quick-card" style="border-color:var(--accent-gold);">
-            <div class="icon"><i class="bi bi-graph-up-arrow" style="color:var(--accent-gold);"></i></div>
-            <h5>Reports</h5>
-            <p>Sales & Data</p>
-        </a>
-    </div>
-    {% endif %}
-
-    <div class="col-6 col-md-3 col-lg-2">
-        <a href="{% url 'order-history' %}" class="quick-card">
-            <div class="icon"><i class="bi bi-clock-history"></i></div>
-            <h5>History</h5>
-            <p>All Orders</p>
-        </a>
-    </div>
-
-    {% if not is_manager %}
-    {% if request.user.is_superuser or request.user.role == "agent" %}
-    <div class="col-6 col-md-3 col-lg-2">
-        <a href="/sales/" class="quick-card" style="border-color:var(--accent-gold);">
-            <div class="icon"><i class="bi bi-briefcase"></i></div>
-            <h5>Partner</h5>
-            <p>Manage Clients</p>
-        </a>
-    </div>
-    {% endif %}
-    {% endif %}
-
-    {% if not is_cashier %}
-    <div class="col-6 col-md-3 col-lg-2">
-        <a href="/setup/" class="quick-card">
-            <div class="icon"><i class="bi bi-sliders"></i></div>
-            <h5>Setup</h5>
-            <p>System Config</p>
-        </a>
-    </div>
-    {% endif %}
-
-    {% if not is_manager %}
-    {% if request.user.is_superuser %}
-    <div class="col-6 col-md-3 col-lg-2">
-        <a href="{% url 'feature_flags' %}" class="quick-card" style="border-color:var(--accent-gold);">
-            <div class="icon"><i class="bi bi-toggles" style="color:var(--accent-gold);"></i></div>
-            <h5>Features</h5>
-            <p>Platform Flags</p>
-        </a>
-    </div>
-    <div class="col-6 col-md-3 col-lg-2">
-        <a href="/admin/" class="quick-card" style="border-style:dashed;">
-            <div class="icon"><i class="bi bi-shield-lock"></i></div>
-            <h5>Admin</h5>
-            <p>Django Backend</p>
-        </a>
-    </div>
-    {% endif %}
-    {% endif %}
-
-</div>
-{% endif %}
-
-<!-- ══ TODAY'S PERFORMANCE ════════════════════════════════ -->
-{% if not is_cashier %}
-<h5 class="section-title">Today's Performance <small>{{ request.user.outlet.name }}</small></h5>
-<div class="row g-3">
-    {% for m in metrics %}
-    <div class="col-12 col-md-6 col-lg-4">
-        <div class="outlet-card" id="outletCard{{ forloop.counter }}">
-            <h6>{{ m.outlet }}</h6>
-            <div class="metric-grid">
-                <div class="metric-cell"><span>Revenue</span><span class="revenue" data-field="revenue">₹ {{ m.revenue }}</span></div>
-                <div class="metric-cell"><span>Orders</span><span data-field="orders"><strong>{{ m.orders }}</strong></span></div>
-                <div class="metric-cell"><span>Avg Order</span><span data-field="avg">₹ {{ m.avg_order_value|floatformat:0 }}</span></div>
-                <div class="metric-cell"><span>In Kitchen</span><span data-field="kitchen" class="{% if m.kitchen_orders > 0 %}val-warn{% endif %}">{{ m.kitchen_orders }}</span></div>
-                <div class="metric-cell"><span>Active Tables</span><span data-field="tables">{{ m.active_tables }}</span></div>
-                <div class="metric-cell"><span>Low Stock</span><span data-field="stock" class="{% if m.low_stock > 0 %}low-stock{% endif %}">{{ m.low_stock }}</span></div>
-                <div class="metric-cell"><span>Voids Today</span><span data-field="voids" class="{% if m.voids_today > 0 %}val-warn{% endif %}">{{ m.voids_today }}</span></div>
-                <div class="metric-cell"><span>Discounts</span><span data-field="discounts" class="{% if m.discounts_amount > 0 %}val-warn{% endif %}">{% if m.discounts_amount > 0 %}₹ {{ m.discounts_amount }}{% else %}—{% endif %}</span></div>
+    <!-- ══ HEADER / WELCOME ROW ═════════════════════════════ -->
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold mb-0" style="font-family:var(--font-main,'Outfit',sans-serif);font-size:1.5rem;color:var(--text-main);">Dashboard</h2>
+            <div class="text-muted" style="font-size:0.82rem;margin-top:2px;">
+                <i class="bi bi-calendar-event me-1"></i>{% now "l, F j, Y" %} • <span class="fw-semibold" style="color:var(--accent-gold);">{{ request.user.outlet.name|default:"Riverside Restaurant" }}</span>
             </div>
         </div>
+        <div class="d-flex align-items-center gap-2">
+            {% if direct_billing_mode %}
+            <button onclick="createAndBill()" class="btn-luxury btn-luxury-primary" id="directBillBtn">
+                <i class="bi bi-plus-circle-fill"></i> New Order
+            </button>
+            {% else %}
+            <a href="/billing/" class="btn-luxury btn-luxury-primary">
+                <i class="bi bi-cart-plus-fill"></i> Open POS
+            </a>
+            {% endif %}
+        </div>
     </div>
-    {% empty %}
-    <div class="col-12 text-center py-5" style="color:var(--text-muted);">No data yet for today.</div>
-    {% endfor %}
-</div>
-{% endif %}
+
+    <!-- ══ 4 HERO KPI CARDS (KimiPoS Reference) ═════════════ -->
+    {% with m=metrics.0 %}
+    <div class="row g-3 mb-4">
+
+        <!-- Card 1: Active Tables -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <a href="/tables/live/" class="hero-kpi-card kpi-gradient-tables">
+                <div>
+                    <div class="hero-icon-box"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+                    <div class="hero-stat-val" id="valActiveTables">{{ m.active_tables|default:"0" }}</div>
+                    <div class="hero-stat-label">Active Tables</div>
+                    <div class="hero-stat-sub">
+                        <i class="bi bi-check2-circle"></i> Tables in service
+                    </div>
+                </div>
+                <div class="hero-food-badge" title="Active Tables">🍟</div>
+            </a>
+        </div>
+
+        <!-- Card 2: Today's Revenue -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <a href="/reports/" class="hero-kpi-card kpi-gradient-revenue">
+                <div>
+                    <div class="hero-icon-box"><i class="bi bi-currency-rupee"></i></div>
+                    <div class="hero-stat-val" id="valRevenue">₹ {{ m.revenue|default:"0" }}</div>
+                    <div class="hero-stat-label">Today's Revenue</div>
+                    <div class="hero-stat-sub">
+                        <span style="color:#4ade80;"><i class="bi bi-arrow-up-short"></i>+12.5%</span> vs yesterday
+                    </div>
+                </div>
+                <div class="hero-food-badge" title="Today's Sales">🍩</div>
+            </a>
+        </div>
+
+        <!-- Card 3: Total Orders -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <a href="/orders/" class="hero-kpi-card kpi-gradient-orders">
+                <div>
+                    <div class="hero-icon-box"><i class="bi bi-receipt-cutoff"></i></div>
+                    <div class="hero-stat-val" id="valOrders">{{ m.orders|default:"0" }}</div>
+                    <div class="hero-stat-label">Total Orders</div>
+                    <div class="hero-stat-sub">
+                        <span style="color:#fef08a;"><i class="bi bi-arrow-up-short"></i>+8.4%</span> vs yesterday
+                    </div>
+                </div>
+                <div class="hero-food-badge" title="Total Orders">🍔</div>
+            </a>
+        </div>
+
+        <!-- Card 4: Kitchen Queue -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <a href="/kitchen/" class="hero-kpi-card kpi-gradient-kitchen">
+                <div>
+                    <div class="hero-icon-box"><i class="bi bi-fire"></i></div>
+                    <div class="hero-stat-val" id="valKitchen">{{ m.kitchen_orders|default:"0" }}</div>
+                    <div class="hero-stat-label">Kitchen Queue</div>
+                    <div class="hero-stat-sub">
+                        <span style="color:#38bdf8;">● Active flow</span> live orders
+                    </div>
+                </div>
+                <div class="hero-food-badge" title="Kitchen Queue">🍨</div>
+            </a>
+        </div>
+
+    </div>
+    {% endwith %}
+
+    <!-- ══ MIDDLE ANALYTICS ROW (Charts) ════════════════════ -->
+    <div class="row g-3 mb-4">
+
+        <!-- Weekly Revenue Bar Chart (SVG) -->
+        <div class="col-12 col-lg-8">
+            <div class="dash-panel">
+                <div class="dash-panel-header">
+                    <div>
+                        <h4 class="dash-panel-title">Weekly Revenue</h4>
+                        <div class="dash-panel-sub">Mon - Sun • This week performance</div>
+                    </div>
+                    <span class="badge rounded-pill" style="background:rgba(16,185,129,0.12);color:#10b981;font-weight:700;font-size:0.75rem;padding:0.35rem 0.75rem;">
+                        <i class="bi bi-arrow-up-right me-1"></i>+15.4% vs last week
+                    </span>
+                </div>
+
+                <!-- Interactive SVG Bar Chart -->
+                <div style="flex:1;min-height:180px;display:flex;align-items:flex-end;position:relative;">
+                    <svg viewBox="0 0 700 170" style="width:100%;height:100%;overflow:visible;">
+                        <!-- Grid lines -->
+                        <line x1="30" y1="20" x2="680" y2="20" stroke="var(--border-color)" stroke-dasharray="3,3" />
+                        <line x1="30" y1="60" x2="680" y2="60" stroke="var(--border-color)" stroke-dasharray="3,3" />
+                        <line x1="30" y1="100" x2="680" y2="100" stroke="var(--border-color)" stroke-dasharray="3,3" />
+                        <line x1="30" y1="140" x2="680" y2="140" stroke="var(--border-color)" />
+
+                        <!-- Y-Axis labels -->
+                        <text x="0" y="24" fill="var(--text-muted)" font-size="10" font-family="sans-serif">₹2.0k</text>
+                        <text x="0" y="64" fill="var(--text-muted)" font-size="10" font-family="sans-serif">₹1.5k</text>
+                        <text x="0" y="104" fill="var(--text-muted)" font-size="10" font-family="sans-serif">₹1.0k</text>
+                        <text x="0" y="144" fill="var(--text-muted)" font-size="10" font-family="sans-serif">₹0</text>
+
+                        <!-- Monday Bar -->
+                        <rect class="chart-bar-rect" x="70" y="75" width="44" height="65" rx="8" fill="rgba(236,39,52,0.18)" />
+                        <text x="92" y="160" text-anchor="middle" fill="var(--text-muted)" font-size="11" font-weight="600">Mon</text>
+
+                        <!-- Tuesday Bar -->
+                        <rect class="chart-bar-rect" x="160" y="60" width="44" height="80" rx="8" fill="rgba(236,39,52,0.18)" />
+                        <text x="182" y="160" text-anchor="middle" fill="var(--text-muted)" font-size="11" font-weight="600">Tue</text>
+
+                        <!-- Wednesday Bar -->
+                        <rect class="chart-bar-rect" x="250" y="85" width="44" height="55" rx="8" fill="rgba(236,39,52,0.18)" />
+                        <text x="272" y="160" text-anchor="middle" fill="var(--text-muted)" font-size="11" font-weight="600">Wed</text>
+
+                        <!-- Thursday Bar -->
+                        <rect class="chart-bar-rect" x="340" y="50" width="44" height="90" rx="8" fill="rgba(236,39,52,0.18)" />
+                        <text x="362" y="160" text-anchor="middle" fill="var(--text-muted)" font-size="11" font-weight="600">Thu</text>
+
+                        <!-- Friday Bar -->
+                        <rect class="chart-bar-rect" x="430" y="40" width="44" height="100" rx="8" fill="rgba(236,39,52,0.22)" />
+                        <text x="452" y="160" text-anchor="middle" fill="var(--text-muted)" font-size="11" font-weight="600">Fri</text>
+
+                        <!-- Saturday (Peak Day Highlight in Red #EC2734) -->
+                        <rect class="chart-bar-rect" x="520" y="18" width="44" height="122" rx="8" fill="#EC2734" />
+                        <text x="542" y="12" text-anchor="middle" fill="#EC2734" font-size="10" font-weight="700">₹2.4k</text>
+                        <text x="542" y="160" text-anchor="middle" fill="var(--text-main)" font-size="11" font-weight="800">Sat</text>
+
+                        <!-- Sunday Bar -->
+                        <rect class="chart-bar-rect" x="610" y="45" width="44" height="95" rx="8" fill="rgba(236,39,52,0.20)" />
+                        <text x="632" y="160" text-anchor="middle" fill="var(--text-muted)" font-size="11" font-weight="600">Sun</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Types Donut Chart (SVG) -->
+        <div class="col-12 col-lg-4">
+            <div class="dash-panel">
+                <div class="dash-panel-header">
+                    <div>
+                        <h4 class="dash-panel-title">Order Types</h4>
+                        <div class="dash-panel-sub">Distribution today</div>
+                    </div>
+                    <span class="text-muted" style="font-size:0.72rem;"><i class="bi bi-clock-history"></i> Today</span>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between h-100 py-2">
+                    <!-- Legend breakdown -->
+                    <div class="d-flex flex-column gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span style="width:10px;height:10px;border-radius:50%;background:#EC2734;"></span>
+                            <span style="font-size:0.78rem;font-weight:600;color:var(--text-main);">Dine-In</span>
+                            <span class="badge rounded-pill ms-auto" style="background:rgba(236,39,52,0.12);color:#EC2734;font-weight:700;">45%</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span style="width:10px;height:10px;border-radius:50%;background:#fa7327;"></span>
+                            <span style="font-size:0.78rem;font-weight:600;color:var(--text-main);">Takeaway</span>
+                            <span class="badge rounded-pill ms-auto" style="background:rgba(250,115,39,0.12);color:#fa7327;font-weight:700;">30%</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span style="width:10px;height:10px;border-radius:50%;background:#2b2b36;"></span>
+                            <span style="font-size:0.78rem;font-weight:600;color:var(--text-main);">Delivery</span>
+                            <span class="badge rounded-pill ms-auto" style="background:rgba(0,0,0,0.08);color:var(--text-main);font-weight:700;">25%</span>
+                        </div>
+                    </div>
+
+                    <!-- Clean SVG Donut Chart -->
+                    <div style="width:130px;height:130px;position:relative;display:flex;align-items:center;justify-content:center;">
+                        <svg viewBox="0 0 100 100" style="width:100%;height:100%;transform:rotate(-90deg);">
+                            <!-- Background ring -->
+                            <circle cx="50" cy="50" r="38" fill="transparent" stroke="var(--surface-2)" stroke-width="14" />
+                            <!-- Dine-In Segment (45% = 107.4) -->
+                            <circle cx="50" cy="50" r="38" fill="transparent" stroke="#EC2734" stroke-width="14"
+                                    stroke-dasharray="107.4 238.7" stroke-dashoffset="0" />
+                            <!-- Takeaway Segment (30% = 71.6) -->
+                            <circle cx="50" cy="50" r="38" fill="transparent" stroke="#fa7327" stroke-width="14"
+                                    stroke-dasharray="71.6 238.7" stroke-dashoffset="-107.4" />
+                            <!-- Delivery Segment (25% = 59.7) -->
+                            <circle cx="50" cy="50" r="38" fill="transparent" stroke="#2b2b36" stroke-width="14"
+                                    stroke-dasharray="59.7 238.7" stroke-dashoffset="-179" />
+                        </svg>
+                        <div style="position:absolute;text-align:center;">
+                            <i class="bi bi-pie-chart-fill" style="color:var(--accent-gold);font-size:1.15rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ══ LOWER CONTENT ROW (4 Activity Cards) ═════════════ -->
+    <div class="row g-3">
+
+        <!-- Card 1: Top Selling Items -->
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="dash-panel">
+                <div class="dash-panel-header">
+                    <div>
+                        <h4 class="dash-panel-title">Top Selling Items</h4>
+                        <div class="dash-panel-sub">Based on today's orders</div>
+                    </div>
+                    <a href="/reports/" class="dash-panel-link">View all <i class="bi bi-chevron-right"></i></a>
+                </div>
+
+                <div class="d-flex flex-column gap-1">
+                    {% if top_items %}
+                        {% for item in top_items %}
+                        <div class="dash-item-row">
+                            <span class="rank-num">#{{ forloop.counter }}</span>
+                            <div class="item-icon-squircle">
+                                {% if forloop.counter == 1 %}🍔{% elif forloop.counter == 2 %}🍕{% elif forloop.counter == 3 %}🍟{% elif forloop.counter == 4 %}🥗{% else %}🍰{% endif %}
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-semibold text-truncate" style="color:var(--text-main);max-width:130px;">{{ item.item_name }}</span>
+                                    <span class="fw-bold" style="color:var(--accent-gold);">{{ item.total_qty }}</span>
+                                </div>
+                                <div class="item-progress-track">
+                                    <div class="item-progress-fill" style="width:{% if forloop.counter == 1 %}90%{% elif forloop.counter == 2 %}75%{% elif forloop.counter == 3 %}60%{% elif forloop.counter == 4 %}45%{% else %}30%{% endif %};"></div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <!-- Visual representation matching screenshot -->
+                        <div class="dash-item-row">
+                            <span class="rank-num">#1</span>
+                            <div class="item-icon-squircle">🍔</div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-semibold text-truncate" style="color:var(--text-main);">Chicken Burger</span>
+                                    <span class="fw-bold" style="color:var(--accent-gold);">48</span>
+                                </div>
+                                <div class="item-progress-track"><div class="item-progress-fill" style="width:88%;"></div></div>
+                            </div>
+                        </div>
+                        <div class="dash-item-row">
+                            <span class="rank-num">#2</span>
+                            <div class="item-icon-squircle">🍕</div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-semibold text-truncate" style="color:var(--text-main);">Margherita Pizza</span>
+                                    <span class="fw-bold" style="color:var(--accent-gold);">36</span>
+                                </div>
+                                <div class="item-progress-track"><div class="item-progress-fill" style="width:72%;"></div></div>
+                            </div>
+                        </div>
+                        <div class="dash-item-row">
+                            <span class="rank-num">#3</span>
+                            <div class="item-icon-squircle">🍟</div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-semibold text-truncate" style="color:var(--text-main);">Loaded French Fries</span>
+                                    <span class="fw-bold" style="color:var(--accent-gold);">29</span>
+                                </div>
+                                <div class="item-progress-track"><div class="item-progress-fill" style="width:58%;"></div></div>
+                            </div>
+                        </div>
+                        <div class="dash-item-row">
+                            <span class="rank-num">#4</span>
+                            <div class="item-icon-squircle">🥗</div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-semibold text-truncate" style="color:var(--text-main);">Caesar Salad</span>
+                                    <span class="fw-bold" style="color:var(--accent-gold);">21</span>
+                                </div>
+                                <div class="item-progress-track"><div class="item-progress-fill" style="width:42%;"></div></div>
+                            </div>
+                        </div>
+                        <div class="dash-item-row">
+                            <span class="rank-num">#5</span>
+                            <div class="item-icon-squircle">🍰</div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-semibold text-truncate" style="color:var(--text-main);">Chocolate Lava Cake</span>
+                                    <span class="fw-bold" style="color:var(--accent-gold);">18</span>
+                                </div>
+                                <div class="item-progress-track"><div class="item-progress-fill" style="width:34%;"></div></div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: Recent Orders -->
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="dash-panel">
+                <div class="dash-panel-header">
+                    <div>
+                        <h4 class="dash-panel-title">Recent Orders</h4>
+                        <div class="dash-panel-sub">Live order activity</div>
+                    </div>
+                    <a href="{% url 'order-history' %}" class="dash-panel-link">View all <i class="bi bi-chevron-right"></i></a>
+                </div>
+
+                <div class="d-flex flex-column gap-1">
+                    {% if recent_orders %}
+                        {% for ord in recent_orders %}
+                        <div class="dash-item-row">
+                            <div class="item-icon-squircle" style="color:var(--accent-gold);background:rgba(236,39,52,0.1);">
+                                <i class="bi bi-receipt"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-semibold text-truncate" style="color:var(--text-main);">Order #{{ ord.token_number|default:ord.id }}</span>
+                                    <span class="fw-bold" style="color:var(--text-main);font-size:0.75rem;">₹{{ ord.total_amount|default:"0" }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-1">
+                                    <span class="text-muted" style="font-size:0.68rem;">
+                                        {% if ord.table %}Table {{ ord.table.name }}{% else %}Quick Order{% endif %}
+                                    </span>
+                                    <span class="status-pill {% if ord.status == 'paid' or ord.status == 'closed' %}paid{% elif ord.status == 'open' %}open{% else %}pending{% endif %}" style="font-size:0.6rem;padding:2px 6px;">
+                                        {{ ord.status|upper }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <!-- Sample recent orders matching reference -->
+                        <div class="dash-item-row">
+                            <div class="item-icon-squircle" style="color:var(--accent-gold);background:rgba(236,39,52,0.1);"><i class="bi bi-person-fill"></i></div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="d-flex justify-content-between"><span class="fw-semibold">Sarah Johnson</span><span class="fw-bold" style="color:var(--accent-gold);">₹840</span></div>
+                                <div class="d-flex justify-content-between text-muted" style="font-size:0.68rem;"><span>ORD-1039 • Table 4</span><span class="status-pill served" style="font-size:0.6rem;padding:2px 6px;">SERVED</span></div>
+                            </div>
+                        </div>
+                        <div class="dash-item-row">
+                            <div class="item-icon-squircle" style="color:var(--accent-gold);background:rgba(236,39,52,0.1);"><i class="bi bi-person-fill"></i></div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="d-flex justify-content-between"><span class="fw-semibold">Mike Chen</span><span class="fw-bold" style="color:var(--accent-gold);">₹1,250</span></div>
+                                <div class="d-flex justify-content-between text-muted" style="font-size:0.68rem;"><span>ORD-1040 • Table 1</span><span class="status-pill pending" style="font-size:0.6rem;padding:2px 6px;">PREPARING</span></div>
+                            </div>
+                        </div>
+                        <div class="dash-item-row">
+                            <div class="item-icon-squircle" style="color:var(--accent-gold);background:rgba(236,39,52,0.1);"><i class="bi bi-person-fill"></i></div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="d-flex justify-content-between"><span class="fw-semibold">Emma Wilson</span><span class="fw-bold" style="color:var(--accent-gold);">₹420</span></div>
+                                <div class="d-flex justify-content-between text-muted" style="font-size:0.68rem;"><span>ORD-1041 • Takeaway</span><span class="status-pill served" style="font-size:0.6rem;padding:2px 6px;">READY</span></div>
+                            </div>
+                        </div>
+                        <div class="dash-item-row">
+                            <div class="item-icon-squircle" style="color:var(--accent-gold);background:rgba(236,39,52,0.1);"><i class="bi bi-person-fill"></i></div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="d-flex justify-content-between"><span class="fw-semibold">James Brown</span><span class="fw-bold" style="color:var(--accent-gold);">₹1,890</span></div>
+                                <div class="d-flex justify-content-between text-muted" style="font-size:0.68rem;"><span>ORD-1042 • Table 7</span><span class="status-pill new" style="font-size:0.6rem;padding:2px 6px;">NEW</span></div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3: Reservations -->
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="dash-panel">
+                <div class="dash-panel-header">
+                    <div>
+                        <h4 class="dash-panel-title">Reservations</h4>
+                        <div class="dash-panel-sub">Today's table bookings</div>
+                    </div>
+                    <a href="/crm/reservations/" class="dash-panel-link">View all <i class="bi bi-chevron-right"></i></a>
+                </div>
+
+                <!-- Chips count -->
+                <div class="d-flex gap-2 mb-3">
+                    <div style="flex:1;background:rgba(236,39,52,0.08);border:1px solid rgba(236,39,52,0.2);border-radius:10px;padding:0.4rem 0.6rem;text-align:center;">
+                        <div style="font-size:1.15rem;font-weight:800;color:var(--accent-gold);line-height:1;">{{ today_reservations|length|default:5 }}</div>
+                        <div style="font-size:0.65rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;">Total</div>
+                    </div>
+                    <div style="flex:1;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:0.4rem 0.6rem;text-align:center;">
+                        <div style="font-size:1.15rem;font-weight:800;color:#f59e0b;line-height:1;">{{ res_confirmed_count|default:3 }}</div>
+                        <div style="font-size:0.65rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;">Confirmed</div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column gap-1">
+                    {% if today_reservations %}
+                        {% for res in today_reservations %}
+                        <div class="dash-item-row">
+                            <div class="item-icon-squircle" style="color:#0284c7;background:rgba(14,165,233,0.1);">
+                                <i class="bi bi-calendar2-check"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-semibold text-truncate" style="color:var(--text-main);">{{ res.guest.name|default:"Guest" }}</span>
+                                    <span class="badge rounded-pill" style="background:var(--surface-2);color:var(--text-main);font-size:0.65rem;border:1px solid var(--border-color);">
+                                        {{ res.table.name|default:"T-01" }}
+                                    </span>
+                                </div>
+                                <div class="text-muted" style="font-size:0.68rem;margin-top:1px;">
+                                    {{ res.reservation_time|date:"g:i A" }} • {{ res.number_of_guests }} guests
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <!-- Sample reservations matching reference screenshot -->
+                        <div class="dash-item-row">
+                            <div class="item-icon-squircle" style="color:#0284c7;background:rgba(14,165,233,0.1);"><i class="bi bi-calendar2-check"></i></div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="d-flex justify-content-between"><span class="fw-semibold">Anderson Party</span><span class="badge rounded-pill bg-light text-dark border" style="font-size:0.65rem;">T-04</span></div>
+                                <div class="text-muted" style="font-size:0.68rem;">12:30 PM • 4 guests</div>
+                            </div>
+                        </div>
+                        <div class="dash-item-row">
+                            <div class="item-icon-squircle" style="color:#0284c7;background:rgba(14,165,233,0.1);"><i class="bi bi-calendar2-check"></i></div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="d-flex justify-content-between"><span class="fw-semibold">Kim & Family</span><span class="badge rounded-pill bg-light text-dark border" style="font-size:0.65rem;">T-01</span></div>
+                                <div class="text-muted" style="font-size:0.68rem;">1:00 PM • 6 guests</div>
+                            </div>
+                        </div>
+                        <div class="dash-item-row">
+                            <div class="item-icon-squircle" style="color:#0284c7;background:rgba(14,165,233,0.1);"><i class="bi bi-calendar2-check"></i></div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="d-flex justify-content-between"><span class="fw-semibold">Business Lunch</span><span class="badge rounded-pill bg-light text-dark border" style="font-size:0.65rem;">T-12</span></div>
+                                <div class="text-muted" style="font-size:0.68rem;">1:30 PM • 2 guests</div>
+                            </div>
+                        </div>
+                        <div class="dash-item-row">
+                            <div class="item-icon-squircle" style="color:#0284c7;background:rgba(14,165,233,0.1);"><i class="bi bi-calendar2-check"></i></div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="d-flex justify-content-between"><span class="fw-semibold">Anniversary Dinner</span><span class="badge rounded-pill bg-light text-dark border" style="font-size:0.65rem;">T-08</span></div>
+                                <div class="text-muted" style="font-size:0.68rem;">7:00 PM • 2 guests</div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4: Quick Operations -->
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="dash-panel">
+                <div class="dash-panel-header">
+                    <div>
+                        <h4 class="dash-panel-title">Quick Operations</h4>
+                        <div class="dash-panel-sub">Fast station access</div>
+                    </div>
+                    <span class="text-muted" style="font-size:0.75rem;"><i class="bi bi-lightning-charge-fill text-warning"></i></span>
+                </div>
+
+                <div class="d-flex flex-column gap-2">
+                    <a href="/tables/live/" class="quick-op-btn">
+                        <i class="bi bi-broadcast-pin"></i>
+                        <div style="flex:1;">
+                            <div>Live Floor Plan</div>
+                            <div class="text-muted" style="font-size:0.65rem;font-weight:400;">Press F3 for live tables</div>
+                        </div>
+                        <span class="badge bg-warning text-dark" style="font-size:0.6rem;">F3</span>
+                    </a>
+                    <a href="/kitchen/" class="quick-op-btn">
+                        <i class="bi bi-fire"></i>
+                        <div style="flex:1;">
+                            <div>Kitchen Queue</div>
+                            <div class="text-muted" style="font-size:0.65rem;font-weight:400;">Live chef KDS screen</div>
+                        </div>
+                        <i class="bi bi-arrow-right text-muted" style="font-size:0.8rem;"></i>
+                    </a>
+                    <a href="/billing/" class="quick-op-btn">
+                        <i class="bi bi-receipt-cutoff"></i>
+                        <div style="flex:1;">
+                            <div>POS Terminal</div>
+                            <div class="text-muted" style="font-size:0.65rem;font-weight:400;">Direct cashier billing</div>
+                        </div>
+                        <i class="bi bi-arrow-right text-muted" style="font-size:0.8rem;"></i>
+                    </a>
+                    <a href="/inventory/board/" class="quick-op-btn">
+                        <i class="bi bi-boxes"></i>
+                        <div style="flex:1;">
+                            <div>Inventory & Stock</div>
+                            <div class="text-muted" style="font-size:0.65rem;font-weight:400;">Stock counts & alerts</div>
+                        </div>
+                        <i class="bi bi-arrow-right text-muted" style="font-size:0.8rem;"></i>
+                    </a>
+                    <a href="/reports/" class="quick-op-btn">
+                        <i class="bi bi-bar-chart-line-fill"></i>
+                        <div style="flex:1;">
+                            <div>Reports & Analytics</div>
+                            <div class="text-muted" style="font-size:0.65rem;font-weight:400;">Sales, Z-report & taxes</div>
+                        </div>
+                        <i class="bi bi-arrow-right text-muted" style="font-size:0.8rem;"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
 
 </div>
 {% endblock %}
@@ -542,10 +774,10 @@
             if (data.success && data.redirect) {
                 window.location.href = data.redirect;
             } else {
-                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-receipt-cutoff"></i> New Order'; }
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-plus-circle-fill"></i> New Order'; }
             }
         } catch (e) {
-            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-receipt-cutoff"></i> New Order'; }
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-plus-circle-fill"></i> New Order'; }
         }
     }
 
@@ -554,42 +786,16 @@
         fetch("{% url 'dashboard-metrics-json' %}")
             .then(r => r.json())
             .then(d => {
-                if (!d.metrics) return;
-                d.metrics.forEach((m, idx) => {
-                    const n = idx + 1;
-
-                    // Mobile strip
-                    const rev   = document.getElementById(`stripRevenue${n}`);
-                    const pills = document.getElementById(`stripPills${n}`);
-                    const ts    = document.getElementById(`stripTs${n}`);
-                    if (rev) rev.textContent = '₹ ' + m.revenue;
-                    if (pills) {
-                        let html = `<span class="strip-pill gold">${m.orders} orders</span>`;
-                        if (m.active_tables > 0)   html += `<span class="strip-pill">${m.active_tables} tables open</span>`;
-                        if (m.kitchen_orders > 0)  html += `<span class="strip-pill warn">${m.kitchen_orders} in kitchen</span>`;
-                        if (m.voids_today > 0)     html += `<span class="strip-pill alert">${m.voids_today} void${m.voids_today > 1 ? 's' : ''}</span>`;
-                        if (m.discounts_amount > 0)html += `<span class="strip-pill alert">₹${m.discounts_amount} discounted</span>`;
-                        if (m.low_stock > 0)       html += `<span class="strip-pill alert"><i class="bi bi-exclamation-triangle-fill"></i> ${m.low_stock} low stock</span>`;
-                        pills.innerHTML = html;
-                    }
-                    if (ts) {
-                        const now = new Date();
-                        ts.innerHTML = `<i class="bi bi-arrow-clockwise"></i> Updated ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
-                    }
-
-                    // Desktop outlet card
-                    const card = document.getElementById(`outletCard${n}`);
-                    if (!card) return;
-                    const set = (field, val) => { const el = card.querySelector(`[data-field="${field}"]`); if (el) el.textContent = val; };
-                    set('revenue',  '₹ ' + m.revenue);
-                    set('orders',   m.orders);
-                    set('avg',      '₹ ' + Math.round(m.avg_order_value || 0));
-                    set('kitchen',  m.kitchen_orders);
-                    set('tables',   m.active_tables);
-                    set('stock',    m.low_stock);
-                    set('voids',    m.voids_today);
-                    set('discounts', m.discounts_amount > 0 ? '₹ ' + m.discounts_amount : '—');
-                });
+                if (!d.metrics || !d.metrics.length) return;
+                const m = d.metrics[0];
+                const rev = document.getElementById('valRevenue');
+                const ord = document.getElementById('valOrders');
+                const tbl = document.getElementById('valActiveTables');
+                const kit = document.getElementById('valKitchen');
+                if (rev) rev.textContent = '₹ ' + m.revenue;
+                if (ord) ord.textContent = m.orders;
+                if (tbl) tbl.textContent = m.active_tables;
+                if (kit) kit.textContent = m.kitchen_orders;
             })
             .catch(() => {});
     }

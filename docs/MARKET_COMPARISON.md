@@ -1,4 +1,4 @@
-# Lexnorax POS — Market Comparison
+# EasyBillBro POS — Market Comparison
 
 > NOTE: I read "7 ships pso" as the **7 leading restaurant POS systems**.
 > If you meant something else (e.g. "7shifts" workforce platform, or a
@@ -20,7 +20,7 @@
 
 ## Side-by-Side Feature Comparison
 
-| Feature                  | Lexnorax | Toast | Square | Lightspeed | TouchBistro | Revel | Clover | Aloha |
+| Feature                  | EasyBillBro | Toast | Square | Lightspeed | TouchBistro | Revel | Clover | Aloha |
 |--------------------------|--------|-------|--------|------------|-------------|-------|--------|-------|
 | **Cloud-based**          | ✅     | ✅    | ✅     | ✅         | ✅          | ✅    | ✅     | ⚠️    |
 | **Multi-tenant SaaS**    | ✅     | ✅    | ✅     | ✅         | ❌          | ✅    | ✅     | ❌    |
@@ -52,7 +52,7 @@
 
 ---
 
-## Where Lexnorax WINS
+## Where EasyBillBro WINS
 
 ### 1. India-first GST compliance
 Every competitor listed above is built for the US, Canada, or Europe. None
@@ -67,20 +67,20 @@ separate Buzzex or similar device.
 
 ### 3. AI Menu Import
 No competitor has this. If a restaurant has a PDF menu or a photo of their
-chalk board, Lexnorax can import it. Saves 2–4 hours of setup time.
+chalk board, EasyBillBro can import it. Saves 2–4 hours of setup time.
 
 ### 4. QSR + Fine Dining + Franchise in one platform
-Most POS systems are either fine-dining OR QSR. Lexnorax handles both with
+Most POS systems are either fine-dining OR QSR. EasyBillBro handles both with
 the same codebase, plus a franchise/central-kitchen mode. Revel does this
 but costs enterprise pricing.
 
 ### 5. Price
-At ₹999/month (~$12 USD) for Starter, Lexnorax is 5–10x cheaper than Toast
+At ₹999/month (~$12 USD) for Starter, EasyBillBro is 5–10x cheaper than Toast
 or Lightspeed for a comparable feature set in the Indian market.
 
 ---
 
-## Where Lexnorax LOSES (Gaps to Close)
+## Where EasyBillBro LOSES (Gaps to Close)
 
 ### CRITICAL (blocks sales today)
 
@@ -116,7 +116,7 @@ or Lightspeed for a comparable feature set in the Indian market.
 
 These are closer competitors than Toast or Square:
 
-| Competitor      | Strength                          | Weakness vs Lexnorax          |
+| Competitor      | Strength                          | Weakness vs EasyBillBro          |
 |-----------------|-----------------------------------|-----------------------------|
 | **Petpooja**    | GST, huge user base in India      | Ugly UI, no waiter call, no AI import |
 | **EPOS Now**    | Global, multi-outlet              | Not India-first             |
@@ -127,7 +127,7 @@ These are closer competitors than Toast or Square:
 | **Posist**      | Enterprise fine dining India      | Very expensive, slow         |
 
 **The actual competition is Petpooja and GoFrugal** — not Toast.
-Lexnorax's UX is already significantly better than both. That is a real advantage.
+EasyBillBro's UX is already significantly better than both. That is a real advantage.
 
 ---
 

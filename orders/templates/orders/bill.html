@@ -46,7 +46,7 @@
 
     /* ── Balance / status card ────────────────────────────── */
     .balance-card {
-        background: rgba(197,160,89,0.07);
+        background: rgba(236, 39, 52,0.07);
         border: 1px solid var(--border-color);
         padding: 1.1rem; text-align: center; margin: 1.25rem 0;
     }
@@ -82,7 +82,7 @@
     .nav-back:hover { color: var(--accent-gold); }
 
     /* ── GST breakdown ────────────────────────────────────── */
-    .gst-breakdown { margin: 0.75rem 0; padding: 0.75rem; border: 1px dashed var(--border-color); background: rgba(197,160,89,0.03); }
+    .gst-breakdown { margin: 0.75rem 0; padding: 0.75rem; border: 1px dashed var(--border-color); background: rgba(236, 39, 52,0.03); }
     .gst-breakdown-title { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 0.6rem; font-weight: 600; }
 
     /* ── Discount section ─────────────────────────────────── */
@@ -680,7 +680,7 @@ renderUpiQR({{ remaining }});
         }
     }
 
-    // Manual receipt print. On the Lexnorax app / any device, queue to the on-LAN
+    // Manual receipt print. On the EasyBillBro app / any device, queue to the on-LAN
     // print agent; on a plain desktop browser, fall back to window.print().
     async function printReceipt(orderId) {
         const p = window.lexnoraxPlatform || {};
@@ -751,7 +751,7 @@ renderUpiQR({{ remaining }});
 
                 let printed = false;
 
-                // 0. Lexnorax Android app (or any device): push to the print queue so
+                // 0. EasyBillBro Android app (or any device): push to the print queue so
                 //    the on-LAN agent (PC/phone) prints it. The EC2 server itself
                 //    cannot reach a local printer, so this is the cloud-correct path.
                 const _p = window.lexnoraxPlatform || {};
@@ -861,7 +861,7 @@ renderUpiQR({{ remaining }});
         } catch (_) { /* apiClient already toasted the failure */ }
     }
 
-    /* ── Lexnorax Print Agent ── */
+    /* ── EasyBillBro Print Agent ── */
     const LEXNORAX_AGENT_URL = 'ws://{{ request.user.outlet.agent_host|default:"localhost" }}:8765';
     let _agentSocket = null;
 
@@ -907,7 +907,7 @@ renderUpiQR({{ remaining }});
                 setTimeout(() => { ws.removeEventListener('message', handler); resolve(false); }, 10000);
             });
         } catch(e) {
-            console.warn('Lexnorax Agent not available:', e.message);
+            console.warn('EasyBillBro Agent not available:', e.message);
             return false;
         }
     }

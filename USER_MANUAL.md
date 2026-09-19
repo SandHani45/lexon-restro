@@ -1,6 +1,6 @@
-# Lexnorax — User Manual
+# EasyBillBro — User Manual
 
-### A plain-English guide to running your restaurant on Lexnorax
+### A plain-English guide to running your restaurant on EasyBillBro
 
 ---
 
@@ -22,17 +22,17 @@
 
 ## 1. Welcome
 
-Lexnorax is the software that runs your restaurant's day-to-day: taking orders, sending them to the kitchen, printing bills, tracking stock, and telling you at the end of the night exactly how much money came in.
+EasyBillBro is the software that runs your restaurant's day-to-day: taking orders, sending them to the kitchen, printing bills, tracking stock, and telling you at the end of the night exactly how much money came in.
 
 You don't need to know anything technical to use it. This manual is written for the people actually working the floor and the counter, not developers.
 
-Every screen in Lexnorax is built around one rule: **big buttons, plain words, nothing hidden.** If something feels confusing, that's a mistake in the software, not something you're missing.
+Every screen in EasyBillBro is built around one rule: **big buttons, plain words, nothing hidden.** If something feels confusing, that's a mistake in the software, not something you're missing.
 
 ---
 
 ## 2. Logging In
 
-- Go to your restaurant's Lexnorax web address (given to you when your account was set up).
+- Go to your restaurant's EasyBillBro web address (given to you when your account was set up).
 - Enter your **username** (not your email) and your password.
 - Type your username in **lowercase**, exactly as it was given to you — logins are case-sensitive, so `Vishal` and `vishal` are treated as different usernames.
 
@@ -46,7 +46,7 @@ Every screen in Lexnorax is built around one rule: **big buttons, plain words, n
 | **Waiter** | Tables, orders, kitchen status |
 | **Chef** | Kitchen display only |
 
-If you try to open a page that isn't meant for your role, Lexnorax will simply take you back to your own dashboard — nothing breaks, nothing is exposed.
+If you try to open a page that isn't meant for your role, EasyBillBro will simply take you back to your own dashboard — nothing breaks, nothing is exposed.
 
 ---
 
@@ -54,9 +54,9 @@ If you try to open a page that isn't meant for your role, Lexnorax will simply t
 
 ### Setting Up Your Restaurant
 
-The first time you log in, Lexnorax walks you through a short setup wizard:
+The first time you log in, EasyBillBro walks you through a short setup wizard:
 
-1. **Menu** — add your categories and dishes, or photograph your existing paper menu and let Lexnorax's AI import it automatically (Settings → Menu → AI Import).
+1. **Menu** — add your categories and dishes, or photograph your existing paper menu and let EasyBillBro's AI import it automatically (Settings → Menu → AI Import).
 2. **Tables** (fine dining) — bulk-create tables in one click, or add them one at a time.
 3. **Staff** — create logins for your team (see below).
 4. **Payment methods** — turn on Cash, UPI, and/or Card, and customize how each one is labeled on the bill.
@@ -92,7 +92,7 @@ By default, the staff list only shows active team members. Tick **Show inactive*
 
 Before taking any payments, a cash register session needs to be open. Fine dining staff open one manually from **Shifts → Cash Sessions**. QSR/counter restaurants open one automatically the first time a payment is taken each day.
 
-At the end of a shift, count the actual cash in the drawer and close the session — Lexnorax will show you the difference between what it expected and what you counted, so any shortfall is caught immediately, not days later.
+At the end of a shift, count the actual cash in the drawer and close the session — EasyBillBro will show you the difference between what it expected and what you counted, so any shortfall is caught immediately, not days later.
 
 ---
 
@@ -160,7 +160,7 @@ Each table has its own printed QR code. When a guest scans it:
 
 - **Stock** is automatically deducted the moment an item is sent to the kitchen (or at payment time for very simple counter setups).
 - **Wastage** — if something is dropped, spoiled, or over-poured, log it under **Inventory → Wastage** so your stock numbers stay accurate.
-- **Low stock alerts** — set a threshold per ingredient, and Lexnorax will flag it once stock drops below that line.
+- **Low stock alerts** — set a threshold per ingredient, and EasyBillBro will flag it once stock drops below that line.
 - **Purchase Orders** — create a PO when you're restocking from a supplier; receiving it automatically adds the quantity back to stock.
 
 ---
@@ -177,7 +177,7 @@ Each table has its own printed QR code. When a guest scans it:
 
 ## 10. When Things Go Wrong
 
-**"Failed" or an error message you don't recognize appears mid-action** — reload the page and try again. Lexnorax now shows a plain "Your session needs a refresh" message instead of a confusing technical error for exactly this situation.
+**"Failed" or an error message you don't recognize appears mid-action** — reload the page and try again. EasyBillBro now shows a plain "Your session needs a refresh" message instead of a confusing technical error for exactly this situation.
 
 **A table is stuck showing the wrong status** — this should no longer happen after recent fixes, but if it ever does, canceling and re-adding an item on that table will force it to recalculate correctly.
 
@@ -205,4 +205,4 @@ Each table has its own printed QR code. When a guest scans it:
 
 ---
 
-*Questions not covered here? Ask your restaurant's Lexnorax administrator, or reach out to Lexnorax support.*
+*Questions not covered here? Ask your restaurant's EasyBillBro administrator, or reach out to EasyBillBro support.*

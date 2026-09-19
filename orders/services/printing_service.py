@@ -308,7 +308,7 @@ class PrintingService:
         # ── FOOTER — Font B, centered ────────────────────────────────────
         p.set(align="center", bold=False, font='b')
         p.text("Thank you for visiting!\n")
-        p.text("Powered by Lexnorax POS\n")
+        p.text("Powered by EasyBillBro POS\n")
 
     # ------------------------------------------------------------------
     # SPLIT BILL BY CATEGORY  (Counter Billing Mode)
@@ -428,7 +428,7 @@ class PrintingService:
 
         p.text(self._sep() + "\n")
         p.set(align="center")
-        p.text("Powered by Lexnorax\n")
+        p.text("Powered by EasyBillBro\n")
         p.text("\n")
 
     def _print_category_slip(self, p, order, group):
@@ -463,7 +463,7 @@ class PrintingService:
                              self._currency(group["total"])) + "\n")
         p.set(bold=False)
         p.set(align="center")
-        p.text("Powered by Lexnorax\n")
+        p.text("Powered by EasyBillBro\n")
         p.text("\n")
 
     # ------------------------------------------------------------------

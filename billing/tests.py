@@ -1,12 +1,12 @@
 # billing/tests.py
 """
-Tests for Lexnorax's own subscription billing app (charging tenants, not
+Tests for EasyBillBro's own subscription billing app (charging tenants, not
 tenant-facing). Covers:
 
   - SubscriptionInvoice model constraints (unique period, unique payment id,
     PROTECT on tenant delete)
-  - billing/razorpay_gateway.py -- Lexnorax's OWN Razorpay integration, with a
-    specific test that it authenticates with Lexnorax's own credentials and
+  - billing/razorpay_gateway.py -- EasyBillBro's OWN Razorpay integration, with a
+    specific test that it authenticates with EasyBillBro's own credentials and
     never a tenant's PaymentConfig (the whole reason this is a separate
     module from payments/razorpay_gateway.py)
   - billing/views.py's webhook -- signature verification, malformed/spoofed
@@ -163,7 +163,7 @@ class SubscriptionInvoiceModelTest(TestCase):
 
 
 # ======================================================================
-#  billing/razorpay_gateway.py -- Lexnorax's OWN Razorpay integration
+#  billing/razorpay_gateway.py -- EasyBillBro's OWN Razorpay integration
 # ======================================================================
 
 class RazorpayGatewayUnitTest(TestCase):
@@ -220,10 +220,10 @@ class CreateSubscriptionPaymentLinkTest(TestCase):
     @patch("billing.razorpay_gateway.requests.post")
     def test_uses_lexnorax_own_credentials_not_tenant_config(self, mock_post):
         """
-        Security-relevant separation: this must authenticate with Lexnorax's
+        Security-relevant separation: this must authenticate with EasyBillBro's
         OWN LEXNORAX_RAZORPAY_* settings, never a tenant's PaymentConfig keys.
         That separation is the entire reason billing/razorpay_gateway.py
-        exists apart from payments/razorpay_gateway.py -- Lexnorax billing a
+        exists apart from payments/razorpay_gateway.py -- EasyBillBro billing a
         tenant must never be able to move money through THAT tenant's own
         account.
         """

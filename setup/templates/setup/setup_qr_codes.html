@@ -83,7 +83,7 @@
         border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.08));
     }
     .settings-header i {
-        color: var(--accent-gold, #d4af37);
+        color: var(--accent-gold, #EC2734);
         font-size: 1.25rem;
     }
 
@@ -115,8 +115,8 @@
         outline: none;
     }
     .qr-select:focus, .qr-input:focus {
-        border-color: var(--accent-gold, #d4af37);
-        box-shadow: 0 0 0 2px rgba(212,175,55,0.2);
+        border-color: var(--accent-gold, #EC2734);
+        box-shadow: 0 0 0 2px rgba(236, 39, 52,0.2);
     }
     .qr-select option {
         background: #1e222d;
@@ -156,8 +156,8 @@
     }
 
     /* Preset Specific Theme Colors */
-    .preset-gold { border-color: #d4af37; color: #d4af37; }
-    .preset-gold.active { background: rgba(212,175,55,0.18); border-color: #d4af37; }
+    .preset-gold { border-color: #EC2734; color: #EC2734; }
+    .preset-gold.active { background: rgba(236, 39, 52,0.18); border-color: #EC2734; }
 
     .preset-blue { border-color: #0ea5e9; color: #38bdf8; }
     .preset-blue.active { background: rgba(14,165,233,0.18); border-color: #0ea5e9; }
@@ -234,7 +234,7 @@
     .custom-check-row input[type="checkbox"] {
         width: 17px;
         height: 17px;
-        accent-color: var(--accent-gold, #d4af37);
+        accent-color: var(--accent-gold, #EC2734);
         cursor: pointer;
     }
     .custom-check-row span {
@@ -355,7 +355,7 @@
         transition: all 0.25s ease;
     }
     .preview-card-outer:hover {
-        border-color: rgba(212,175,55,0.25);
+        border-color: rgba(236, 39, 52,0.25);
         box-shadow: 0 30px 70px rgba(0,0,0,0.7);
     }
     .preview-table-label {
@@ -368,7 +368,7 @@
         font-family: var(--font-display, 'Outfit', sans-serif);
         font-size: 2.5rem;
         font-weight: 800;
-        color: #d4af37;
+        color: #EC2734;
         line-height: 1.1;
         margin-bottom: 0.4rem;
         transition: color 0.2s;
@@ -377,7 +377,7 @@
         font-size: 1.05rem;
         font-weight: 700;
         letter-spacing: 2px;
-        color: #d4af37;
+        color: #EC2734;
         margin-bottom: 1.5rem;
         transition: color 0.2s;
     }
@@ -418,7 +418,7 @@
     }
     .nfc-tag-placeholder i {
         font-size: 1.1rem;
-        color: #d4af37;
+        color: #EC2734;
     }
 
     /* Powered by footer */
@@ -432,7 +432,7 @@
         font-size: 1.2rem;
         font-weight: 900;
         letter-spacing: 2.5px;
-        color: #d4af37;
+        color: #EC2734;
         transition: color 0.2s;
     }
 
@@ -448,7 +448,7 @@
     .preview-bottom-name {
         font-size: 1.35rem;
         font-weight: 800;
-        color: #d4af37;
+        color: #EC2734;
         margin: 0.15rem 0;
         transition: color 0.2s;
     }
@@ -488,15 +488,15 @@
 {% endblock %}
 
 {% block header_left %}
-<div class="d-flex align-items-center gap-2">
-    <div style="width:34px;height:34px;border-radius:8px;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex-shrink:0;">
+<a href="/setup/qr-codes/" class="d-flex align-items-center gap-2 text-decoration-none" style="color:inherit;">
+    <div style="width:34px;height:34px;border-radius:10px;background:rgba(236, 39, 52,0.12);border:1px solid rgba(236, 39, 52,0.3);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex-shrink:0;">
         <i class="bi bi-qr-code" style="font-size:1.15rem;"></i>
     </div>
     <div>
         <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.5px;color:var(--text-main);">QR Code Generator</h1>
-        <div class="text-muted" style="font-size:0.72rem;letter-spacing:1px;text-transform:uppercase;">{{ request.user.outlet.name }}</div>
+        <div class="text-muted" style="font-size:0.72rem;letter-spacing:0.5px;">{{ request.user.outlet.name }}</div>
     </div>
-</div>
+</a>
 {% endblock %}
 
 {% block header_right %}
@@ -587,10 +587,10 @@
             <div class="mb-2">
                 <label class="form-group-label">QR Color</label>
                 <div class="color-input-row">
-                    <div class="color-swatch-wrapper" id="qrSwatchWrapper" style="background:#D4AF37;">
-                        <input type="color" id="qrColorNative" class="color-native-input" value="#D4AF37" oninput="onQrColorChange(this.value)">
+                    <div class="color-swatch-wrapper" id="qrSwatchWrapper" style="background:#EC2734;">
+                        <input type="color" id="qrColorNative" class="color-native-input" value="#EC2734" oninput="onQrColorChange(this.value)">
                     </div>
-                    <input type="text" id="qrColorHex" class="color-hex-text" value="#D4AF37" onchange="onQrColorChange(this.value)">
+                    <input type="text" id="qrColorHex" class="color-hex-text" value="#EC2734" onchange="onQrColorChange(this.value)">
                 </div>
             </div>
 
@@ -694,7 +694,7 @@
 
     // Presets definition
     const PRESETS = {
-        gold:     { qr: '#D4AF37', bg: '#1a1a1a', dot: 'rounded', corner: 'extra-rounded' },
+        gold:     { qr: '#EC2734', bg: '#1a1a1a', dot: 'rounded', corner: 'extra-rounded' },
         blue:     { qr: '#0ea5e9', bg: '#0c1929', dot: 'rounded', corner: 'extra-rounded' },
         green:    { qr: '#10b981', bg: '#0a2318', dot: 'rounded', corner: 'extra-rounded' },
         purple:   { qr: '#a855f7', bg: '#1f0e38', dot: 'rounded', corner: 'extra-rounded' },
@@ -705,7 +705,7 @@
     };
 
     let currentPreset = 'gold';
-    let currentQrColor = '#D4AF37';
+    let currentQrColor = '#EC2734';
     let currentBgColor = '#1a1a1a';
     let currentDotStyle = 'rounded';
     let currentCornerStyle = 'extra-rounded';

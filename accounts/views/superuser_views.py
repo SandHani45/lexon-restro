@@ -1,7 +1,7 @@
 """
 Superuser Control Panel — /superuser/
 
-Lets Lexnorax staff (is_superuser=True) set up any restaurant without
+Lets EasyBillBro staff (is_superuser=True) set up any restaurant without
 logging in as that restaurant's owner. Every action here is scoped to
 the target tenant/outlet, completely separate from the superuser's own
 account context.

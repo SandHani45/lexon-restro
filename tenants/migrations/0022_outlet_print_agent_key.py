@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 default=uuid.uuid4,
                 editable=False,
                 unique=True,
-                help_text="Secret key the Lexnorax Agent uses to poll for print jobs.",
+                help_text="Secret key the EasyBillBro Agent uses to poll for print jobs.",
             ),
         ),
     ]

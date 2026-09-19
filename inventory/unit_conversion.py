@@ -1,6 +1,6 @@
 # inventory/unit_conversion.py
 """
-Unit conversion between the small set of units Lexnorax tracks inventory in.
+Unit conversion between the small set of units EasyBillBro tracks inventory in.
 
 Recipe, ModifierRecipe, RequisitionItem and BatchItem each store their own
 `unit`, independent of the InventoryItem they reference. Nothing used to

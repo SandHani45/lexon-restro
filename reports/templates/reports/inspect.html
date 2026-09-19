@@ -12,12 +12,14 @@
 
   <style>
     :root {
-      --bg-color: #fafafa;
+      --bg-color: #F7F7F9;
       --panel-bg: #ffffff;
-      --text-main: #111111;
-      --text-muted: #737373;
-      --border-color: #eaeaea;
-      --accent-gold: #c5a059;
+      --text-main: #2C170E;
+      --text-muted: #8a7d74;
+      --border-color: #ECE7E2;
+      --accent-gold: #EC2734;
+      --radius-sm: 8px;
+      --radius-pill: 999px;
     }
     body {
       background-color: var(--bg-color);
@@ -77,23 +79,34 @@
       border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;
     }
 
-    /* ── Summary cards ───────────────────────────────── */
+    /* ── Summary cards (bold KPI tiles) ───────────────── */
     .summary-card {
-      background: var(--panel-bg);
-      border: 1px solid var(--border-color);
-      padding: 1.5rem;
-      text-align: center;
+      background: var(--accent-gold);
+      border: none;
+      border-radius: 20px;
+      padding: 1.1rem 1.25rem;
+      text-align: left;
+      color: #fff;
+    }
+    .summary-card.tile-maroon { background: #a3182a; }
+    .summary-card.tile-orange { background: var(--accent-orange); }
+    .summary-card .icon-badge {
+      width: 34px; height: 34px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; color: #fff;
+      margin-bottom: 0.65rem;
     }
     .summary-card .label {
       font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px;
-      color: var(--text-muted); margin-bottom: 0.5rem;
+      color: rgba(255,255,255,0.8); margin-top: 0.35rem; margin-bottom: 0;
     }
-    .summary-card .value {
-      font-size: 1.75rem; font-weight: 600; color: var(--text-main);
+    .summary-card .value, .summary-card .value.gold {
+      font-size: 1.7rem; font-weight: 700; color: #fff; line-height: 1.15;
     }
-    .summary-card .value.gold { color: var(--accent-gold); }
     .summary-card .sub {
-      font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;
+      font-size: 0.72rem; color: rgba(255,255,255,0.8); margin-top: 0.25rem;
     }
 
     /* ── Tables ──────────────────────────────────────── */
@@ -132,7 +145,7 @@
     .status-paid {
       font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px;
       color: #1a7a4a; background: #e6f4ee;
-      padding: 0.15rem 0.5rem; border-radius: 2px;
+      padding: 0.15rem 0.5rem; border-radius: var(--radius-pill);
     }
 
     /* ── Print ───────────────────────────────────────── */
@@ -140,7 +153,17 @@
     @media print {
       .no-print { display: none !important; }
       body { background: #fff; }
-      .panel, .summary-card { border: 1px solid #ccc; }
+      .panel { border: 1px solid #ccc; }
+      /* KPI tiles print as plain outlined boxes with dark text -- the bold
+         color fills are a screen affordance and would either waste ink or
+         (since most browsers skip background-color when printing) leave
+         white text invisible on white paper. */
+      .summary-card {
+        background: #fff !important; border: 1px solid #ccc; color: #000;
+      }
+      .summary-card .icon-badge { background: #f0f0f0; color: #000; }
+      .summary-card .value, .summary-card .value.gold { color: #000; }
+      .summary-card .label, .summary-card .sub { color: #555; }
       .report-header { border-bottom: 2px solid #000; }
       .table-clean .total-row td { background: #eee; }
       a { text-decoration: none; color: inherit; }
@@ -158,7 +181,7 @@
 <!-- Top bar — hidden when printing -->
 <div class="top-bar no-print">
   <a href="{% url 'dashboard' %}" class="brand-title">← Back to Reports</a>
-  <button onclick="window.print()" class="btn btn-sm" style="background:var(--accent-gold);color:#000;font-size:0.8rem;letter-spacing:1px;text-transform:uppercase;border-radius:0;">
+  <button onclick="window.print()" class="btn btn-sm" style="background:var(--accent-gold);color:#fff;font-size:0.8rem;letter-spacing:1px;text-transform:uppercase;border-radius:var(--radius-pill);">
     <i class="bi bi-printer me-1"></i> Print
   </button>
 </div>
@@ -185,40 +208,46 @@
   <div class="row g-3 mb-4">
     <div class="col-6 col-md-3">
       <div class="summary-card">
-        <div class="label">Total Orders</div>
+        <div class="icon-badge"><i class="bi bi-receipt"></i></div>
         <div class="value">{{ order_count }}</div>
+        <div class="label">Total Orders</div>
       </div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="summary-card">
-        <div class="label">Gross Revenue</div>
+      <div class="summary-card tile-maroon">
+        <div class="icon-badge"><i class="bi bi-cash-stack"></i></div>
         <div class="value gold">₹{{ gross|floatformat:2 }}</div>
+        <div class="label">Gross Revenue</div>
       </div>
     </div>
     {% if not is_composition %}
     <div class="col-6 col-md-3">
-      <div class="summary-card">
-        <div class="label">GST Collected</div>
+      <div class="summary-card tile-orange">
+        <div class="icon-badge"><i class="bi bi-percent"></i></div>
         <div class="value">₹{{ gst|floatformat:2 }}</div>
+        <div class="label">GST Collected</div>
       </div>
     </div>
     <div class="col-6 col-md-3">
       <div class="summary-card">
-        <div class="label">Net Revenue (excl. GST)</div>
+        <div class="icon-badge"><i class="bi bi-graph-up"></i></div>
         <div class="value">₹{{ net|floatformat:2 }}</div>
+        <div class="label">Net Revenue (excl. GST)</div>
       </div>
     </div>
     {% else %}
     <div class="col-6 col-md-3">
-      <div class="summary-card">
-        <div class="label">Discounts Given</div>
+      <div class="summary-card tile-orange">
+        <div class="icon-badge"><i class="bi bi-tag"></i></div>
         <div class="value">₹{{ discounts|floatformat:2 }}</div>
+        <div class="label">Discounts Given</div>
       </div>
     </div>
     <div class="col-6 col-md-3">
       <div class="summary-card">
-        <div class="label">GST</div>
+        <div class="icon-badge"><i class="bi bi-percent"></i></div>
         <div class="value">Not Applicable</div>
+        <div class="label">GST</div>
         <div class="sub">Composition Scheme</div>
       </div>
     </div>

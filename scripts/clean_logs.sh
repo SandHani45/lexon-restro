@@ -1,5 +1,5 @@
 #!/bin/bash
-# Keep Lexnorax's append-only logs from growing forever.
+# Keep EasyBillBro's append-only logs from growing forever.
 #
 # Django app logs (pos.log, errors.log, django.log, security.log) already self-cap
 # via Python's RotatingFileHandler — this script only handles the plain-append logs

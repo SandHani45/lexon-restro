@@ -54,6 +54,20 @@ def robots_txt(request):
 
 # Public — the marketing site
 Allow: /
+Allow: /compare/
+Allow: /product-tour/
+Allow: /pricing/
+Allow: /about/
+Allow: /contact/
+Allow: /platform/billing/
+Allow: /platform/floor-and-kitchen/
+Allow: /platform/menu/
+Allow: /platform/multi-outlet/
+Allow: /platform/inventory/
+Allow: /platform/crm/
+Allow: /platform/reports/
+Allow: /platform/staff/
+Allow: /platform/integrations/
 
 # Public — the customer-facing digital menu (overrides the /menu/
 # disallow below; see the comment in robots_txt() for why)
@@ -106,6 +120,84 @@ def sitemap_xml(request):
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://lexnorax.net/product-tour/</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://lexnorax.net/pricing/</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://lexnorax.net/about/</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://lexnorax.net/contact/</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://lexnorax.net/platform/billing/</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://lexnorax.net/platform/floor-and-kitchen/</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://lexnorax.net/platform/menu/</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://lexnorax.net/platform/multi-outlet/</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://lexnorax.net/platform/inventory/</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://lexnorax.net/platform/crm/</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://lexnorax.net/platform/reports/</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://lexnorax.net/platform/staff/</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://lexnorax.net/platform/integrations/</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>"""
     return HttpResponse(content, content_type='application/xml')
 
@@ -125,6 +217,24 @@ urlpatterns = [
     path('demo/', views.demo_switch, name='demo_switch'),
     path('robots.txt', robots_txt),
     path('sitemap.xml', sitemap_xml),
+    # Public marketing page — showcases the post-login product experience
+    # (mockup screenshots only; never the real authenticated dashboard).
+    path('product-tour/', TemplateView.as_view(template_name='core/product_tour.html'), name='product_tour'),
+    # Public marketing pages — dedicated pricing/about/contact + per-feature
+    # platform deep-dives, mirroring sevenrooms.com's page breadth. All
+    # additive; none of this touches the real authenticated app.
+    path('pricing/', TemplateView.as_view(template_name='core/pricing.html'), name='pricing'),
+    path('about/', TemplateView.as_view(template_name='core/about.html'), name='about'),
+    path('contact/', TemplateView.as_view(template_name='core/contact.html'), name='contact'),
+    path('platform/billing/', TemplateView.as_view(template_name='core/platform_billing.html'), name='platform_billing'),
+    path('platform/floor-and-kitchen/', TemplateView.as_view(template_name='core/platform_floor_kitchen.html'), name='platform_floor_kitchen'),
+    path('platform/menu/', TemplateView.as_view(template_name='core/platform_menu.html'), name='platform_menu'),
+    path('platform/multi-outlet/', TemplateView.as_view(template_name='core/platform_multi_outlet.html'), name='platform_multi_outlet'),
+    path('platform/inventory/', TemplateView.as_view(template_name='core/platform_inventory.html'), name='platform_inventory'),
+    path('platform/crm/', TemplateView.as_view(template_name='core/platform_crm.html'), name='platform_crm'),
+    path('platform/reports/', TemplateView.as_view(template_name='core/platform_reports.html'), name='platform_reports_page'),
+    path('platform/staff/', TemplateView.as_view(template_name='core/platform_staff.html'), name='platform_staff'),
+    path('platform/integrations/', TemplateView.as_view(template_name='core/platform_integrations.html'), name='platform_integrations'),
     # /compare/petpooja/ existed for ~6 minutes on 2026-07-31 before being
     # genericized back to /compare/ (af74912) -- if Google indexed it in
     # that window, this stops it dead-ending in a 404 and consolidates any
@@ -165,7 +275,7 @@ urlpatterns = [
     # crm module
     path('crm/', include('crm.urls')),
 
-    # Lexnorax's own subscription billing (charging tenants, not tenant-facing)
+    # EasyBillBro's own subscription billing (charging tenants, not tenant-facing)
     path('billing/', include('billing.urls')),
 
     # finance module
@@ -174,7 +284,7 @@ urlpatterns = [
     # agency module
     path('agency/', include('agency.urls')),
 
-    # portal — Lexnorax internal ops panel
+    # portal — EasyBillBro internal ops panel
     path('portal/', include('portal.urls', namespace='portal')),
     # backward compat: /superuser/ → /portal/
     path('superuser/', lambda r: __import__('django.shortcuts', fromlist=['redirect']).redirect('/portal/')),

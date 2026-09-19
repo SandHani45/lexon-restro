@@ -1,4 +1,4 @@
-# Lexnorax - Restaurant POS Platform
+# EasyBillBro - Restaurant POS Platform
 
 > Cloud-based POS and restaurant management system for Indian restaurants.  
 > Django 6.0 · PostgreSQL · Celery + Redis · Multi-tenant SaaS · ESC/POS thermal printing.
@@ -7,9 +7,9 @@ See [`CHANGELOG.md`](CHANGokELOG.md) for what's changed recently.
 
 ---
 
-## What Is Lexnorax
+## What Is EasyBillBro
 
-Lexnorax is a full-stack restaurant management platform built for Indian restaurants - fine dining, QSR counters, and cafés. It handles the complete order lifecycle: table management, kitchen tickets, billing, thermal printing, inventory, reports, and an order history with a full audit trail.
+EasyBillBro is a full-stack restaurant management platform built for Indian restaurants - fine dining, QSR counters, and cafés. It handles the complete order lifecycle: table management, kitchen tickets, billing, thermal printing, inventory, reports, and an order history with a full audit trail.
 
 Two things that make it different from existing Indian POS software:
 
@@ -276,7 +276,7 @@ DEMO_FOUNDER_KEY=some-long-random-string
 
 ## Thermal Printing Architecture
 
-Lexnorax supports two printing modes:
+EasyBillBro supports two printing modes:
 
 **Browser printing** (zero local installation):
 ```
@@ -416,7 +416,7 @@ Business logic lives in `orders/services/` - 14 service modules, none of which k
 ## License
 
 Proprietary. All rights reserved.  
-© 2026 Lexnorax. Built in Bengaluru.
+© 2026 EasyBillBro. Built in Bengaluru.
 
 ---
 

@@ -1,6 +1,6 @@
 # billing/services.py
 """
-Invoice PDF generation for Lexnorax's own subscription billing.
+Invoice PDF generation for EasyBillBro's own subscription billing.
 
 Follows the exact same pattern as orders/views/print_views.py's
 download_pdf_bill -- including the same explicit presentational_hints=False,

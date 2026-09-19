@@ -1,5 +1,5 @@
 """
-Print queue — server-side job list consumed by Lexnorax Agent in polling mode.
+Print queue — server-side job list consumed by EasyBillBro Agent in polling mode.
 
 Browser (Android) → POST /orders/agent/add-job/   (CSRF, adds PrintJob row)
 Agent             → GET  /orders/agent/<key>/jobs/ (no CSRF, auth via outlet key)

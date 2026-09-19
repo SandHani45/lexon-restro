@@ -53,7 +53,7 @@ def feature_flags_view(request):
     from tenants.models import Tenant, TenantFeatureOverride
 
     if not request.user.is_superuser:
-        return HttpResponseForbidden("Feature management is restricted to Lexnorax staff.")
+        return HttpResponseForbidden("Feature management is restricted to EasyBillBro staff.")
 
     all_tenants = Tenant.objects.order_by("name")
     tenant_id   = request.GET.get("tenant_id")

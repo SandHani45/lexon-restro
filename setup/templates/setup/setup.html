@@ -1,165 +1,722 @@
 {% extends 'core/base.html' %}
 {% load static %}
 
-{% block title %}Setup | {{ request.user.tenant.name }}{% endblock %}
+{% block title %}Setup Hub | {{ request.user.tenant.name }}{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* ── Hero ── */
-    .hero { text-align: center; padding: 4rem 2rem 2rem; }
-    .hero-eyebrow { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 4px; color: var(--accent-gold); margin-bottom: 1rem; }
-    .hero-title { font-size: 2.5rem; font-family: 'DM Serif Display', serif; margin-bottom: 0.75rem; }
-    .hero-title i { font-style: italic; font-weight: 400; color: var(--accent-gold); }
-    .hero-sub { color: var(--text-muted); font-size: 0.9rem; max-width: 480px; margin: 0 auto; line-height: 1.7; }
-    .hero-divider { width: 40px; height: 1px; background: var(--border-color); margin: 2rem auto; }
+  :root {
+    --pos-red: #EC2734;
+    --pos-red-hover: #d81f2f;
+    --pos-red-soft: #FFF4F4;
+    --pos-red-border: rgba(236, 39, 52, 0.22);
+    --pos-green: #10b981;
+    --pos-green-soft: #ECFDF5;
+  }
 
-    /* ── Logo upload card ── */
-    .upload-card { max-width: 600px; margin: 0 auto 3rem; background: var(--panel-bg); border: 1px dashed var(--border-color); padding: 1.5rem; text-align: center; border-radius: 8px; }
-    .upload-card input[type=file] { max-width: 100%; margin-bottom: 1rem; color: var(--text-main); font-size: 0.8rem; }
+  html.dark {
+    --pos-red-soft: rgba(236, 39, 52, 0.16);
+    --pos-red-border: rgba(236, 39, 52, 0.35);
+    --pos-green-soft: rgba(16, 185, 129, 0.16);
+  }
 
-    /* ── Setup cards grid ── */
-    .setup-grid { max-width: 1000px; margin: 0 auto; padding: 0 2rem 5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 1.5rem; }
-    .setup-card { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 2rem; transition: var(--transition-smooth); text-decoration: none; display: block; position: relative; overflow: hidden; box-shadow: var(--shadow-soft); color: var(--text-main); }
-    .setup-card:hover { border-color: var(--accent-gold); transform: translateY(-3px); color: var(--text-main); }
-    .setup-card::before { content: ''; position: absolute; top: 0; left: 0; width: 0; height: 2px; background: var(--accent-gold); transition: width 0.4s ease; }
-    .setup-card:hover::before { width: 100%; }
-    .card-icon { font-size: 1.5rem; color: var(--accent-gold); margin-bottom: 1.2rem; }
-    .card-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 700; color: var(--text-main); margin-bottom: 0.6rem; }
-    .card-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; }
-    .card-status { display: inline-flex; align-items: center; gap: 5px; margin-top: 1.2rem; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
-    .status-done { color: #22c55e; }
-    .status-pending { color: var(--text-muted); }
+  body {
+    background: var(--bg-color) !important;
+  }
 
-    @media (max-width: 600px) {
-        .hero { padding: 2.25rem 1.1rem 1.5rem; }
-        .hero-title { font-size: 1.9rem; }
-        /* Explicit single column, not just a smaller minmax() floor --
-           the min(260px, 100%) fix above stops the grid from forcing
-           overflow, but a phone-width screen still has technically
-           enough room for two very cramped columns at ~170px each
-           once auto-fit fits them; a real setup card (icon + title +
-           2-line description) needs the full width to stay readable. */
-        .setup-grid { grid-template-columns: 1fr; padding: 0 1.1rem 3rem; gap: 1.1rem; }
-        .setup-card { padding: 1.5rem; }
-        .upload-card { margin: 0 1.1rem 2.25rem; padding: 1.25rem; }
+  .setup-container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 1.5rem 1.5rem 5rem;
+  }
+
+  /* ── Subbar Breadcrumbs ── */
+  .setup-subbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 1.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .setup-breadcrumb {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+  }
+  .setup-breadcrumb a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .setup-breadcrumb a:hover {
+    color: var(--pos-red);
+  }
+  .setup-breadcrumb .sep {
+    color: var(--border-color);
+    font-size: 0.7rem;
+  }
+  .setup-breadcrumb .active {
+    color: var(--pos-red);
+    font-weight: 700;
+  }
+
+  /* ── Hero Welcome Card ── */
+  .setup-hero-card {
+    background: linear-gradient(135deg, rgba(236,39,52,0.06) 0%, rgba(250,115,39,0.04) 100%);
+    border: 1.5px solid var(--border-color);
+    border-radius: 22px;
+    padding: 1.8rem 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    box-shadow: var(--shadow-card);
+  }
+  .setup-hero-title {
+    font-family: var(--font-display, 'DM Serif Display', serif);
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: -0.3px;
+    margin: 0 0 0.35rem;
+  }
+  .setup-hero-title i {
+    color: var(--pos-red);
+    font-style: normal;
+  }
+  .setup-hero-sub {
+    font-size: 0.86rem;
+    color: var(--text-muted);
+    margin: 0;
+    max-width: 620px;
+    line-height: 1.55;
+  }
+  .setup-hero-badge {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    padding: 6px 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-main);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* ── Brand Logo Card ── */
+  .logo-upload-card {
+    background: var(--panel-bg);
+    border: 1.5px solid var(--border-color);
+    border-radius: 20px;
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 2.25rem;
+    box-shadow: var(--shadow-card);
+    transition: all 0.2s ease;
+  }
+  .logo-upload-card:hover {
+    border-color: rgba(236, 39, 52, 0.3);
+  }
+  .logo-preview-box {
+    width: 64px;
+    height: 64px;
+    min-width: 64px;
+    border-radius: 16px;
+    background: var(--surface-2);
+    border: 1.5px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 4px;
+  }
+  .logo-preview-box img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  /* ── Section Title ── */
+  .section-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 2rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .section-label {
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--pos-red);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+  }
+
+  /* ── Grid Cards ── */
+  .setup-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 1rem;
+  }
+  @media (max-width: 991px) {
+    .setup-grid {
+      grid-template-columns: repeat(2, 1fr);
     }
+  }
+  @media (max-width: 600px) {
+    .setup-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .setup-card {
+    background: var(--panel-bg);
+    border: 1.5px solid var(--border-color);
+    border-radius: 18px;
+    padding: 1.35rem 1.4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-decoration: none !important;
+    color: var(--text-main);
+    box-shadow: var(--shadow-card);
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .setup-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(236, 39, 52, 0.4);
+    box-shadow: 0 10px 24px rgba(236, 39, 52, 0.12);
+    color: var(--text-main);
+  }
+  .setup-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .setup-icon-squircle {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    transition: transform 0.2s ease;
+  }
+  .setup-card:hover .setup-icon-squircle {
+    transform: scale(1.08);
+  }
+  .setup-arrow-icon {
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    opacity: 0.5;
+    transition: all 0.2s ease;
+  }
+  .setup-card:hover .setup-arrow-icon {
+    opacity: 1;
+    color: var(--pos-red);
+    transform: translateX(3px);
+  }
+
+  .setup-card-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0 0 4px;
+    line-height: 1.3;
+  }
+  .setup-card-desc {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin: 0 0 14px;
+    flex-grow: 1;
+  }
+
+  .setup-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: 1px solid rgba(0,0,0,0.04);
+  }
+  html.dark .setup-card-footer {
+    border-top-color: var(--border-color);
+  }
+
+  .setup-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 3px 9px;
+    letter-spacing: 0.3px;
+  }
+  .setup-status-badge.done {
+    background: rgba(16, 185, 129, 0.14);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+  .setup-status-badge.pending {
+    background: var(--surface-2);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+  }
+  .setup-status-badge.missing {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+  }
+  .setup-card-action {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--pos-red);
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  /* Upload button */
+  .btn-upload-pill {
+    height: 38px;
+    padding: 0 18px;
+    border-radius: 999px;
+    background: var(--pos-red);
+    color: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(236, 39, 52, 0.25);
+  }
+  .btn-upload-pill:hover {
+    background: var(--pos-red-hover);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(236, 39, 52, 0.35);
+  }
 </style>
 {% endblock %}
 
 {% block header_left %}
-<div>
-    <a href="/dashboard/" style="text-decoration:none;color:inherit;">
-        <h1 class="brand-title mb-0">
-            <i class="bi bi-diamond-half" style="color:var(--accent-gold);"></i>
-            {{ request.user.tenant.name }}
-        </h1>
-    </a>
-    <p class="brand-subtitle">Setup — {{ request.user.outlet.name }}</p>
+<div class="d-flex align-items-center gap-3">
+  <a href="/dashboard/" class="d-flex align-items-center text-decoration-none text-reset" title="Back to Dashboard">
+    <span class="btn-icon" style="width:36px;height:36px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border-color);display:inline-flex;align-items:center;justify-content:center;transition:all 0.2s;">
+      <i class="bi bi-arrow-left" style="font-size:1.05rem;color:var(--pos-red);"></i>
+    </span>
+  </a>
+  <div class="d-flex align-items-center gap-2">
+    <div style="width:34px;height:34px;border-radius:10px;background:rgba(236, 39, 52,0.12);border:1px solid rgba(236, 39, 52,0.3);display:flex;align-items:center;justify-content:center;color:var(--pos-red);flex-shrink:0;">
+      <i class="bi bi-gear-wide-connected" style="font-size:1.05rem;"></i>
+    </div>
+    <div>
+      <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.3px;color:var(--text-main);">Setup Hub</h1>
+      <div class="text-muted" style="font-size:0.72rem;">Outlet Configuration • {{ request.user.outlet.name|default:request.user.tenant.name }}</div>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block header_right %}
-<a href="/dashboard/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Dashboard</a>
-<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme">
+<div class="d-flex align-items-center gap-2">
+  <a href="/billing/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex" style="border-radius:999px;">
+    <i class="bi bi-calculator me-1"></i> Open POS
+  </a>
+  <a href="/dashboard/" class="btn-luxury text-decoration-none d-none d-md-inline-flex" style="border-radius:999px;">
+    <i class="bi bi-speedometer2 me-1"></i> Dashboard
+  </a>
+  <button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Dark / Light Theme">
     <i class="bi bi-moon" id="themeIcon"></i>
-</button>
+  </button>
+</div>
 {% endblock %}
 
 {% block content %}
-<div class="hero">
-    <p class="hero-eyebrow">Initial Configuration</p>
-    <h1 class="hero-title">Restaurant <i>Setup</i></h1>
-    <div class="hero-divider"></div>
-    <p class="hero-sub">Configure your outlet before going live. Complete each section once — settings are saved permanently.</p>
-</div>
+<div class="setup-container">
 
-{% if messages %}
-<div class="container mb-4" style="max-width:600px;">
+  <!-- ── Subbar Breadcrumbs ── -->
+  <div class="setup-subbar">
+    <div class="setup-breadcrumb">
+      <a href="/dashboard/"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
+      <span class="sep">/</span>
+      <span class="active">Setup Hub</span>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge" style="background:var(--pos-red-soft);color:var(--pos-red);border:1px solid var(--pos-red-border);border-radius:999px;padding:4px 10px;font-size:0.75rem;">
+        <i class="bi bi-shield-check me-1"></i>{{ request.user.role|title }} Access
+      </span>
+    </div>
+  </div>
+
+  <!-- ── Hero Welcome Card ── -->
+  <div class="setup-hero-card">
+    <div>
+      <h1 class="setup-hero-title">Restaurant <i>Setup Hub</i></h1>
+      <p class="setup-hero-sub">
+        Configure your outlet before or during live operations. Settings here govern floor tables, billing workflows, KOT routing, staff roles, and delivery channels.
+      </p>
+    </div>
+    <div class="d-flex flex-column align-items-end gap-2">
+      <div class="setup-hero-badge">
+        <i class="bi bi-shop text-danger"></i>
+        <span>{{ request.user.outlet.name|default:"Main Outlet" }}</span>
+      </div>
+      <div class="text-muted small">
+        <i class="bi bi-clock-history me-1"></i>Settings sync instantly to POS
+      </div>
+    </div>
+  </div>
+
+  {% if messages %}
+  <div class="mb-4">
     {% for msg in messages %}
-    <div style="padding:0.8rem 1.2rem;font-size:0.8rem;border-left:3px solid var(--accent-gold);background:rgba(197,160,89,0.08);text-align:center;">{{ msg }}</div>
+    <div class="alert alert-dismissible fade show" role="alert" style="background:var(--panel-bg);border:1.5px solid var(--pos-green);border-radius:14px;color:var(--text-main);box-shadow:var(--shadow-card);">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-check-circle-fill text-success fs-5"></i>
+        <span>{{ msg }}</span>
+      </div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     {% endfor %}
-</div>
-{% endif %}
+  </div>
+  {% endif %}
 
-<div class="upload-card">
-    <p style="font-size:0.8rem;font-weight:600;text-transform:uppercase;letter-spacing:2px;margin-bottom:1rem;">Restaurant Logo</p>
-    {% if request.user.tenant.logo %}
-    <img src="{{ request.user.tenant.logo.url }}" alt="Logo" style="max-height:60px;max-width:100%;margin-bottom:1rem;">
-    {% endif %}
-    <form method="post" enctype="multipart/form-data">
+  <!-- ── Brand Identity & Logo Card ── -->
+  <div class="logo-upload-card">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="logo-preview-box">
+          {% if request.user.tenant.logo %}
+          <img src="{{ request.user.tenant.logo.url }}" alt="Logo">
+          {% else %}
+          <i class="bi bi-cup-hot-fill" style="font-size:1.8rem;color:var(--pos-red);"></i>
+          {% endif %}
+        </div>
+        <div>
+          <h2 class="h6 fw-bold mb-1" style="color:var(--text-main);">Restaurant Logo &amp; Receipt Branding</h2>
+          <p class="small text-muted mb-0">Printed on thermal receipts, customer invoices, and displayed on customer order displays.</p>
+        </div>
+      </div>
+
+      <form method="post" enctype="multipart/form-data" class="d-flex align-items-center gap-2 flex-wrap">
         {% csrf_token %}
-        <input type="file" name="logo" accept="image/*" required>
-        <button type="submit" class="btn-luxury">Upload Logo</button>
-    </form>
-</div>
+        <input type="file" name="logo" accept="image/*" class="form-control form-control-sm" style="max-width:230px;border-radius:999px;background:var(--surface-2);border:1px solid var(--border-color);font-size:0.75rem;" required>
+        <button type="submit" class="btn-upload-pill">
+          <i class="bi bi-cloud-arrow-up-fill"></i>
+          <span>Update Logo</span>
+        </button>
+      </form>
+    </div>
+  </div>
 
-<div class="setup-grid">
+  <!-- ════ SECTION 1: STORE & OPERATIONS ═════════════════════ -->
+  <div class="section-label-row">
+    <h2 class="section-label">
+      <i class="bi bi-shop"></i>
+      Store &amp; Floor Operations
+    </h2>
+    <span class="text-muted small">Floor layout, menu, KDS &amp; printers</span>
+  </div>
 
+  <div class="setup-grid">
+
+    <!-- Tables & Floor Plan -->
     {% if 'floor_plan' in tenant_features %}
-    <a href="/setup/tables/" class="setup-card">
-        <div class="card-icon"><i class="bi bi-grid-3x3-gap"></i></div>
-        <div class="card-title">Tables</div>
-        <div class="card-desc">Define your floor plan. Add dining tables, bar seats, and outdoor sections.</div>
-        <div class="card-status {% if tables_done %}status-done{% else %}status-pending{% endif %}">
-            {% if tables_done %}<i class="bi bi-check-circle-fill"></i> Configured{% else %}<i class="bi bi-circle"></i> Not configured{% endif %}
+    <a href="{% url 'setup_tables' %}" class="setup-card">
+      <div class="setup-card-top">
+        <div class="setup-icon-squircle" style="background:rgba(236,39,52,0.12);color:var(--pos-red);">
+          <i class="bi bi-grid-3x3-gap-fill"></i>
         </div>
+        <i class="bi bi-chevron-right setup-arrow-icon"></i>
+      </div>
+      <div>
+        <h3 class="setup-card-title">Tables &amp; Live Floor</h3>
+        <p class="setup-card-desc">Define table arrangements, bar counter seating, outdoor patio zones, and capacity limits.</p>
+      </div>
+      <div class="setup-card-footer">
+        <span class="setup-status-badge {% if tables_done %}done{% else %}missing{% endif %}">
+          <i class="bi {% if tables_done %}bi-check-circle-fill{% else %}bi-exclamation-circle-fill{% endif %}"></i>
+          {% if tables_done %}Configured{% else %}Setup Needed{% endif %}
+        </span>
+        <span class="setup-card-action">Manage <i class="bi bi-arrow-right"></i></span>
+      </div>
     </a>
     {% endif %}
 
+    <!-- Menu Management -->
     <a href="/menu/" class="setup-card">
-        <div class="card-icon"><i class="bi bi-journal-bookmark"></i></div>
-        <div class="card-title">Menu</div>
-        <div class="card-desc">Add categories and dishes. Set pricing and assign kitchen stations.</div>
-        <div class="card-status {% if menu_done %}status-done{% else %}status-pending{% endif %}">
-            {% if menu_done %}<i class="bi bi-check-circle-fill"></i> Configured{% else %}<i class="bi bi-circle"></i> Not configured{% endif %}
+      <div class="setup-card-top">
+        <div class="setup-icon-squircle" style="background:rgba(249,115,22,0.12);color:#ea580c;">
+          <i class="bi bi-journal-bookmark-fill"></i>
         </div>
+        <i class="bi bi-chevron-right setup-arrow-icon"></i>
+      </div>
+      <div>
+        <h3 class="setup-card-title">Menu &amp; Categories</h3>
+        <p class="setup-card-desc">Add food categories, dishes, modifiers, GST tax slabs, and station assignments.</p>
+      </div>
+      <div class="setup-card-footer">
+        <span class="setup-status-badge {% if menu_done %}done{% else %}missing{% endif %}">
+          <i class="bi {% if menu_done %}bi-check-circle-fill{% else %}bi-exclamation-circle-fill{% endif %}"></i>
+          {% if menu_done %}Active Menu{% else %}Add Dishes{% endif %}
+        </span>
+        <span class="setup-card-action">Open Menu <i class="bi bi-arrow-right"></i></span>
+      </div>
     </a>
 
-    <a href="/setup/kitchen-stations/" class="setup-card">
-        <div class="card-icon"><i class="bi bi-fire"></i></div>
-        <div class="card-title">Kitchen Stations</div>
-        <div class="card-desc">Define preparation stations (Hot Kitchen, Bar, Bakery) for targeted KOT printing.</div>
-        <div class="card-status status-pending"><i class="bi bi-circle"></i> Review</div>
+    <!-- Kitchen Stations -->
+    <a href="{% url 'setup_kitchen_stations' %}" class="setup-card">
+      <div class="setup-card-top">
+        <div class="setup-icon-squircle" style="background:rgba(239,68,68,0.12);color:#dc2626;">
+          <i class="bi bi-fire"></i>
+        </div>
+        <i class="bi bi-chevron-right setup-arrow-icon"></i>
+      </div>
+      <div>
+        <h3 class="setup-card-title">Kitchen Stations (KDS)</h3>
+        <p class="setup-card-desc">Configure Hot Kitchen, Bar, Grill, and Bakery prep stations for split KOT dispatch.</p>
+      </div>
+      <div class="setup-card-footer">
+        <span class="setup-status-badge done">
+          <i class="bi bi-check-circle-fill"></i> Multi-Station
+        </span>
+        <span class="setup-card-action">Configure <i class="bi bi-arrow-right"></i></span>
+      </div>
     </a>
 
-    <a href="/setup/payment-methods/" class="setup-card">
-        <div class="card-icon"><i class="bi bi-credit-card-2-front"></i></div>
-        <div class="card-title">Payment Methods</div>
-        <div class="card-desc">Enable Cash, UPI, and Card. Customize label names (e.g. "GPay").</div>
-        <div class="card-status status-pending"><i class="bi bi-circle"></i> Review</div>
+    <!-- Printer Setup -->
+    <a href="{% url 'printer_setup' %}" class="setup-card">
+      <div class="setup-card-top">
+        <div class="setup-icon-squircle" style="background:rgba(168,85,247,0.12);color:#9333ea;">
+          <i class="bi bi-printer-fill"></i>
+        </div>
+        <i class="bi bi-chevron-right setup-arrow-icon"></i>
+      </div>
+      <div>
+        <h3 class="setup-card-title">Printers &amp; KOT Hardware</h3>
+        <p class="setup-card-desc">Setup thermal receipt printers (USB, LAN, Bluetooth) and print templates (80mm / 58mm).</p>
+      </div>
+      <div class="setup-card-footer">
+        <span class="setup-status-badge pending">
+          <i class="bi bi-gear-fill"></i> Hardware
+        </span>
+        <span class="setup-card-action">Configure <i class="bi bi-arrow-right"></i></span>
+      </div>
     </a>
 
-    <a href="/setup/staff/" class="setup-card">
-        <div class="card-icon"><i class="bi bi-people"></i></div>
-        <div class="card-title">Staff Accounts</div>
-        <div class="card-desc">Create logins for Managers, Cashiers, Waiters, and Chefs.</div>
-        <div class="card-status status-pending"><i class="bi bi-circle"></i> Review</div>
+    <!-- Table QR Ordering -->
+    <a href="{% url 'setup_qr_codes' %}" class="setup-card">
+      <div class="setup-card-top">
+        <div class="setup-icon-squircle" style="background:rgba(6,182,212,0.12);color:#0891b2;">
+          <i class="bi bi-qr-code-scan"></i>
+        </div>
+        <i class="bi bi-chevron-right setup-arrow-icon"></i>
+      </div>
+      <div>
+        <h3 class="setup-card-title">Table QR Codes</h3>
+        <p class="setup-card-desc">Generate stylish contactless dining QR stands for instant customer mobile ordering.</p>
+      </div>
+      <div class="setup-card-footer">
+        <span class="setup-status-badge done">
+          <i class="bi bi-phone-fill"></i> Dine-in QR
+        </span>
+        <span class="setup-card-action">Generate <i class="bi bi-arrow-right"></i></span>
+      </div>
     </a>
 
-    <a href="/inventory/board" class="setup-card">
-        <div class="card-icon"><i class="bi bi-boxes"></i></div>
-        <div class="card-title">Inventory</div>
-        <div class="card-desc">Define stock items and set low-stock alerts for kitchen ingredients.</div>
-        <div class="card-status status-pending"><i class="bi bi-circle"></i> Review</div>
+    <!-- Inventory -->
+    <a href="/inventory/" class="setup-card">
+      <div class="setup-card-top">
+        <div class="setup-icon-squircle" style="background:rgba(20,184,166,0.12);color:#0d9488;">
+          <i class="bi bi-boxes"></i>
+        </div>
+        <i class="bi bi-chevron-right setup-arrow-icon"></i>
+      </div>
+      <div>
+        <h3 class="setup-card-title">Inventory &amp; Stock</h3>
+        <p class="setup-card-desc">Manage raw kitchen ingredients, track consumption, recipes, and configure low-stock alerts.</p>
+      </div>
+      <div class="setup-card-footer">
+        <span class="setup-status-badge pending">
+          <i class="bi bi-layers-half"></i> Stock Tracker
+        </span>
+        <span class="setup-card-action">Manage <i class="bi bi-arrow-right"></i></span>
+      </div>
     </a>
 
-    <a href="/setup/aggregators/" class="setup-card">
-        <div class="card-icon"><i class="bi bi-box-arrow-in-down"></i></div>
-        <div class="card-title">Online Integrations</div>
-        <div class="card-desc">Configure Webhooks for Zomato, Swiggy, and Uber Eats routing directly into the kitchen.</div>
-        <div class="card-status status-pending"><i class="bi bi-circle"></i> Review</div>
+  </div>
+
+  <!-- ════ SECTION 2: PAYMENTS & CHANNELS ════════════════════ -->
+  <div class="section-label-row">
+    <h2 class="section-label">
+      <i class="bi bi-credit-card-2-front"></i>
+      Payments &amp; Channels
+    </h2>
+    <span class="text-muted small">Billing methods, Zomato, Swiggy &amp; discounts</span>
+  </div>
+
+  <div class="setup-grid">
+
+    <!-- Payment Methods -->
+    <a href="{% url 'setup_payment_methods' %}" class="setup-card">
+      <div class="setup-card-top">
+        <div class="setup-icon-squircle" style="background:rgba(16,185,129,0.12);color:#059669;">
+          <i class="bi bi-wallet2"></i>
+        </div>
+        <i class="bi bi-chevron-right setup-arrow-icon"></i>
+      </div>
+      <div>
+        <h3 class="setup-card-title">Payment Methods</h3>
+        <p class="setup-card-desc">Configure Cash, Dynamic UPI QR, Card swipe POS terminals, and online payment gateways.</p>
+      </div>
+      <div class="setup-card-footer">
+        <span class="setup-status-badge done">
+          <i class="bi bi-qr-code"></i> UPI &amp; Cash
+        </span>
+        <span class="setup-card-action">Configure <i class="bi bi-arrow-right"></i></span>
+      </div>
     </a>
 
+    <!-- Online Aggregators -->
+    <a href="{% url 'setup_aggregators' %}" class="setup-card">
+      <div class="setup-card-top">
+        <div class="setup-icon-squircle" style="background:rgba(226,55,68,0.12);color:#e23744;">
+          <i class="bi bi-diagram-3-fill"></i>
+        </div>
+        <i class="bi bi-chevron-right setup-arrow-icon"></i>
+      </div>
+      <div>
+        <h3 class="setup-card-title">Online Aggregators</h3>
+        <p class="setup-card-desc">Zomato, Swiggy, and Uber Eats live webhook relay with automatic zero-touch kitchen dispatch.</p>
+      </div>
+      <div class="setup-card-footer">
+        <span class="setup-status-badge done">
+          <i class="bi bi-lightning-charge-fill"></i> ZBT Engine
+        </span>
+        <span class="setup-card-action">Integrate <i class="bi bi-arrow-right"></i></span>
+      </div>
+    </a>
+
+    <!-- Marketing & Promos -->
+    <a href="{% url 'setup_promos' %}" class="setup-card">
+      <div class="setup-card-top">
+        <div class="setup-icon-squircle" style="background:rgba(245,158,11,0.12);color:#d97706;">
+          <i class="bi bi-tags-fill"></i>
+        </div>
+        <i class="bi bi-chevron-right setup-arrow-icon"></i>
+      </div>
+      <div>
+        <h3 class="setup-card-title">Marketing &amp; Coupons</h3>
+        <p class="setup-card-desc">Create discount promo codes, percentage off deals, and happy hour billing rules.</p>
+      </div>
+      <div class="setup-card-footer">
+        <span class="setup-status-badge pending">
+          <i class="bi bi-percent"></i> Discounts
+        </span>
+        <span class="setup-card-action">Create <i class="bi bi-arrow-right"></i></span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- ════ SECTION 3: OUTLET SETTINGS & ACCESS ═══════════════ -->
+  <div class="section-label-row">
+    <h2 class="section-label">
+      <i class="bi bi-sliders"></i>
+      Outlet Compliance &amp; Staff
+    </h2>
+    <span class="text-muted small">GST compliance, staff credentials &amp; emails</span>
+  </div>
+
+  <div class="setup-grid">
+
+    <!-- Outlet Settings -->
     <a href="{% url 'outlet_settings' %}" class="setup-card">
-        <div class="card-icon"><i class="bi bi-building-gear"></i></div>
-        <div class="card-title">Outlet Settings</div>
-        <div class="card-desc">Update restaurant name, address, phone, WhatsApp, email, GSTIN, and FSSAI license. Required for compliant bills.</div>
-        {% if request.user.outlet.gst_no %}
-        <div class="card-status status-done"><i class="bi bi-check-circle-fill"></i> GSTIN Set</div>
-        {% else %}
-        <div class="card-status" style="color:#ef4444;"><i class="bi bi-exclamation-circle-fill"></i> GSTIN Missing</div>
-        {% endif %}
+      <div class="setup-card-top">
+        <div class="setup-icon-squircle" style="background:rgba(59,130,246,0.12);color:#2563eb;">
+          <i class="bi bi-building-gear"></i>
+        </div>
+        <i class="bi bi-chevron-right setup-arrow-icon"></i>
+      </div>
+      <div>
+        <h3 class="setup-card-title">Outlet Profile &amp; GSTIN</h3>
+        <p class="setup-card-desc">Restaurant legal name, FSSAI number, GSTIN registration, contact phone, and tax address.</p>
+      </div>
+      <div class="setup-card-footer">
+        <span class="setup-status-badge {% if request.user.outlet.gst_no %}done{% else %}missing{% endif %}">
+          <i class="bi {% if request.user.outlet.gst_no %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %}"></i>
+          {% if request.user.outlet.gst_no %}GST Compliant{% else %}GSTIN Missing{% endif %}
+        </span>
+        <span class="setup-card-action">Edit Details <i class="bi bi-arrow-right"></i></span>
+      </div>
     </a>
+
+    <!-- Staff Accounts -->
+    <a href="{% url 'setup_staff' %}" class="setup-card">
+      <div class="setup-card-top">
+        <div class="setup-icon-squircle" style="background:rgba(99,102,241,0.12);color:#4f46e5;">
+          <i class="bi bi-people-fill"></i>
+        </div>
+        <i class="bi bi-chevron-right setup-arrow-icon"></i>
+      </div>
+      <div>
+        <h3 class="setup-card-title">Staff &amp; Role Permissions</h3>
+        <p class="setup-card-desc">Manage employee logins, assign Manager / Cashier / Waiter / Chef roles, and PIN codes.</p>
+      </div>
+      <div class="setup-card-footer">
+        <span class="setup-status-badge done">
+          <i class="bi bi-shield-lock-fill"></i> Multi-User
+        </span>
+        <span class="setup-card-action">Manage Staff <i class="bi bi-arrow-right"></i></span>
+      </div>
+    </a>
+
+    <!-- Report Subscriptions -->
+    <a href="{% url 'report_subscriptions' %}" class="setup-card">
+      <div class="setup-card-top">
+        <div class="setup-icon-squircle" style="background:rgba(244,63,94,0.12);color:#e11d48;">
+          <i class="bi bi-envelope-paper-fill"></i>
+        </div>
+        <i class="bi bi-chevron-right setup-arrow-icon"></i>
+      </div>
+      <div>
+        <h3 class="setup-card-title">Automated Sales Reports</h3>
+        <p class="setup-card-desc">Daily closing email summaries, shift digests, and weekly revenue analytics sent to owners.</p>
+      </div>
+      <div class="setup-card-footer">
+        <span class="setup-status-badge pending">
+          <i class="bi bi-bell-fill"></i> Email Reports
+        </span>
+        <span class="setup-card-action">Subscribe <i class="bi bi-arrow-right"></i></span>
+      </div>
+    </a>
+
+  </div>
 
 </div>
 {% endblock %}

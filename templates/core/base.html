@@ -1,18 +1,18 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en" style="background:#0a0a0a;">
+<html lang="en" style="background:#F7F7F9;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="color-scheme" content="dark">
-    <meta name="theme-color" content="#0a0a0a">
-    <!-- Inline dark background — prevents white flash between page navigations.
-         height:100% here too: the sidebar shell (#pos-app/#pos-sidebar) sizes
-         itself off body's height, and body only had min-height before, which
-         made that chain rely on flex's implicit stretch behavior rather than
-         an explicit ancestor height. -->
-    <style>html,body{background:#0a0a0a;height:100%;}</style>
-    <title>{% block title %}{{ request.user.tenant.name|default:"Lexnorax POS" }}{% endblock %}</title>
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#F7F7F9">
+    <!-- Inline background — prevents a flash of the wrong color between page
+         navigations. height:100% here too: the sidebar shell
+         (#pos-app/#pos-sidebar) sizes itself off body's height, and body only
+         had min-height before, which made that chain rely on flex's implicit
+         stretch behavior rather than an explicit ancestor height. -->
+    <style>html,body{background:#F7F7F9;height:100%;}</style>
+    <title>{% block title %}{{ request.user.tenant.name|default:"EasyBillBro POS" }}{% endblock %}</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}">
@@ -63,7 +63,7 @@
     <!-- Tenant-specific dynamic overrides (primary_color, font_family, font_scale from DB) -->
     <style>
         :root {
-            --accent-gold: {{ request.user.tenant.primary_color|default:"#c5a059" }};
+            --accent-gold: {{ request.user.tenant.primary_color|default:"#EC2734" }};
             --font-main:   '{{ request.user.tenant.font_family|default:"Outfit" }}', sans-serif;
             --font-scale:  {{ request.user.tenant.font_scale|default:1.0 }};
             font-size: calc(16px * {{ request.user.tenant.font_scale|default:1.0 }});
@@ -163,7 +163,7 @@
 
         /* ---- Toast notifications (ui.toast) ----
            Reskins the SweetAlert2 toast used by every ui.toast() call across
-           the app so it matches Lexnorax's own look instead of SweetAlert2's
+           the app so it matches EasyBillBro's own look instead of SweetAlert2's
            generic default -- rounded panel, a colored left accent bar per
            type, and a slide-in from the corner it actually appears in.
            !important is required throughout: SweetAlert2 ships its own
@@ -340,19 +340,20 @@
         .btn-icon {
             background: transparent;
             border: none;
-            color: var(--text-main);
-            font-size: 1.25rem;
-            padding: 0.5rem;
+            color: var(--text-muted);
+            font-size: 1.15rem;
+            padding: 0.45rem;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            transition: var(--transition-smooth);
+            transition: var(--transition-fast);
+            border-radius: var(--radius-sm);
         }
-        .btn-icon:hover { color: var(--accent-gold); transform: scale(1.1); }
+        .btn-icon:hover { color: var(--accent-gold); background: var(--sidebar-active-bg); }
 
         /* ===================================================
-           SIDEBAR LAYOUT — Redesigned POS Navigation
+           SIDEBAR LAYOUT — KimiPoS-Inspired Premium Design
            =================================================== */
 
         /* Outer flex wrapper — sidebar + right panel */
@@ -372,123 +373,233 @@
             display: flex;
             flex-direction: column;
             height: 100%;
-            overflow: hidden;
-            transition: width 0.25s cubic-bezier(0.4,0,0.2,1),
-                        min-width 0.25s cubic-bezier(0.4,0,0.2,1);
+            overflow: visible; /* allow floating collapse btn to straddle right border */
+            transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                        min-width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
             flex-shrink: 0;
-            z-index: 1100;
+            z-index: 1050;
+            position: relative;
+        }
+        /* Inner clip wrapper so scrollable nav items don't overflow */
+        #pos-sidebar-inner {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            width: 100%;
         }
         #pos-sidebar.collapsed {
             width: var(--sidebar-collapsed);
             min-width: var(--sidebar-collapsed);
         }
 
-        /* Brand & Toggle header row */
+        /* ── Brand header row ─────────────────────────────── */
         .sidebar-brand {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 0.65rem;
             height: var(--topbar-height);
             min-height: var(--topbar-height);
+            max-height: var(--topbar-height);
+            box-sizing: border-box;
             padding: 0 0.85rem;
             border-bottom: 1px solid var(--border-color);
             overflow: hidden;
             flex-shrink: 0;
             white-space: nowrap;
         }
+        /* Logo squircle */
+        .sidebar-logo-icon {
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            border-radius: 10px;
+            background: var(--accent-gold);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 1.05rem;
+            flex-shrink: 0;
+            box-shadow: 0 3px 10px rgba(236, 39, 52, 0.35);
+        }
         .sidebar-brand-info {
             display: flex;
-            align-items: center;
-            gap: 0.65rem;
+            flex-direction: column;
             overflow: hidden;
             min-width: 0;
+            flex: 1;
         }
-        .sidebar-brand-icon {
-            font-size: 1.15rem;
-            color: var(--accent-gold);
-            flex-shrink: 0;
-            width: 20px;
-            text-align: center;
-        }
-        .sidebar-brand-text {
-            font-family: var(--font-display);
-            font-size: 0.92rem;
-            font-weight: 500;
+        .sidebar-brand-name {
+            font-family: var(--font-main, 'Outfit', sans-serif);
+            font-size: 0.88rem;
+            font-weight: 700;
             color: var(--text-main);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            opacity: 1;
-            max-width: 140px;
-            transition: opacity 0.18s ease, max-width 0.18s ease;
+            line-height: 1.2;
         }
+        .sidebar-brand-sub {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.2;
+        }
+
+        /* ── Floating Collapse Toggle Button ─────────────── */
+        /* Straddles the right border of the sidebar, centered vertically on the header */
         .sidebar-toggle-btn {
+            position: absolute;
+            right: -12px;
+            top: calc(var(--topbar-height) / 2);
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--panel-bg);
+            border: 1.5px solid var(--border-color);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.72rem;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            background: none;
-            border: 1px solid transparent;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 0.92rem;
             flex-shrink: 0;
-            transition: color 0.15s, background 0.15s, border-color 0.15s;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+            z-index: 1200;
         }
         .sidebar-toggle-btn:hover {
             color: var(--accent-gold);
+            border-color: var(--accent-gold);
             background: var(--sidebar-active-bg);
-            border-color: var(--border-color);
+            box-shadow: 0 3px 12px rgba(236, 39, 52, 0.25);
+            transform: translateY(-50%) scale(1.1);
         }
-        #pos-sidebar.collapsed .sidebar-brand {
-            justify-content: center;
-            padding: 0;
+
+        /* ── Outlet Info Card ────────────────────────────── */
+        .sidebar-outlet-card {
+            margin: 0.5rem 0.75rem 0.25rem;
+            padding: 0.4rem 0.65rem;
+            background: var(--surface-2);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            flex-shrink: 0;
+            overflow: hidden;
+            transition: opacity 0.2s ease, max-height 0.2s ease;
         }
-        #pos-sidebar.collapsed .sidebar-brand-info {
-            display: none;
+        .sidebar-outlet-card i {
+            color: var(--accent-gold);
+            font-size: 0.8rem;
+            flex-shrink: 0;
         }
-        #pos-sidebar.collapsed .sidebar-toggle-btn {
+        .sidebar-outlet-name {
+            font-size: 0.74rem;
+            font-weight: 600;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ── Sidebar Search Bar ───────────────────────────── */
+        .sidebar-search-wrap {
+            padding: 0.35rem 0.75rem 0.45rem;
+            flex-shrink: 0;
+        }
+        .sidebar-search-wrap-inner {
+            position: relative;
             width: 100%;
-            height: var(--topbar-height);
-            border-radius: 0;
         }
-        #pos-sidebar.collapsed .sidebar-brand-text {
-            opacity: 0;
-            max-width: 0;
+        .sidebar-search-input {
+            width: 100%;
+            background: var(--surface-2);
+            border: 1px solid var(--border-color);
+            border-radius: 999px;
+            color: var(--text-main);
+            font-size: 0.75rem;
+            font-family: var(--font-main, 'Outfit', sans-serif);
+            padding: 0.35rem 1.8rem 0.35rem 1.9rem;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .sidebar-search-input:focus {
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.12);
+        }
+        .sidebar-search-input::placeholder { color: var(--text-hint); }
+        .sidebar-search-icon {
+            position: absolute;
+            left: 0.65rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            pointer-events: none;
+        }
+        .sidebar-search-shortcut {
+            position: absolute;
+            right: 0.6rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.58rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: var(--border-color);
+            padding: 0.05rem 0.3rem;
+            border-radius: 3px;
             pointer-events: none;
         }
 
-        /* Nav scroll area */
+        /* ── Section Headers ─────────────────────────────── */
+        .sidebar-section-title {
+            font-size: 0.62rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            padding: 0.65rem 1rem 0.2rem;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        /* ── Nav scroll area ─────────────────────────────── */
         .sidebar-nav {
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 0.4rem 0;
+            padding: 0.2rem 0 0.4rem;
         }
         .sidebar-nav::-webkit-scrollbar { width: 3px; }
-        .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border-color); }
+        .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 99px; }
 
-        /* Nav items */
+        /* ── Nav items ───────────────────────────────────── */
         .sidebar-item {
             display: flex;
             align-items: center;
-            gap: 0.7rem;
-            padding: 0.6rem 0.8rem;
-            margin: 1px 5px;
+            gap: 0.65rem;
+            padding: 0.5rem 0.8rem;
+            margin: 2px 8px;
             color: var(--text-muted);
             text-decoration: none !important;
             font-size: 0.82rem;
             font-weight: 500;
             white-space: nowrap;
             overflow: hidden;
-            border-radius: 6px;
-            transition: color 0.15s, background 0.15s;
+            border-radius: 10px;
+            transition: all 0.18s ease;
             cursor: pointer;
             background: none;
             border: none;
-            width: calc(100% - 10px);
+            width: calc(100% - 16px);
             text-align: left;
             position: relative;
             line-height: 1.3;
@@ -500,7 +611,6 @@
             width: 18px;
             text-align: center;
         }
-        /* notif-wrapper inside a sidebar-item */
         .sidebar-item .notif-wrapper {
             flex-shrink: 0;
             width: 18px;
@@ -511,17 +621,11 @@
         .sidebar-item .sidebar-label {
             overflow: hidden;
             text-overflow: ellipsis;
-            opacity: 1;
-            transition: opacity 0.15s ease, max-width 0.15s ease;
+            white-space: nowrap;
             max-width: 200px;
         }
-        #pos-sidebar.collapsed .sidebar-item .sidebar-label {
-            opacity: 0;
-            max-width: 0;
-            pointer-events: none;
-        }
         .sidebar-item:hover {
-            color: var(--text-main);
+            color: var(--accent-gold);
             background: var(--sidebar-active-bg);
             text-decoration: none;
         }
@@ -536,46 +640,96 @@
             left: 0; top: 20%; bottom: 20%;
             width: 3px;
             background: var(--accent-gold);
-            border-radius: 0 2px 2px 0;
+            border-radius: 0 3px 3px 0;
         }
 
-        /* Separator */
-        .sidebar-separator {
-            height: 1px;
-            background: var(--border-color);
-            margin: 0.35rem 0.85rem;
-        }
-
-        /* Bottom section */
+        /* ── Bottom Section ──────────────────────────────── */
         .sidebar-bottom {
             border-top: 1px solid var(--border-color);
             padding: 0.35rem 0;
             flex-shrink: 0;
         }
 
-        /* Collapsed sidebar layout (desktop/tablet) */
-        @media (min-width: 768px) {
-            #pos-sidebar.collapsed .sidebar-item {
-                justify-content: center;
-                padding-left: 0;
-                padding-right: 0;
-            }
+        /* ── Sidebar Promo / Summary Card ────────────────── */
+        .sidebar-promo-card {
+            margin: 0.45rem 0.75rem 0.55rem;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, rgba(236,39,52,0.08) 0%, rgba(250,115,39,0.06) 100%);
+            border: 1px solid rgba(236,39,52,0.15);
+            border-radius: 12px;
+            flex-shrink: 0;
+            overflow: hidden;
         }
-        /* Collapsed-item tooltip -- a single shared element (see #sidebar-tooltip
-           JS below), NOT a per-item ::after. The old ::after approach was
-           positioned with `left: calc(100% + 10px)`, but both of its ancestors
-           (#pos-sidebar and .sidebar-nav) clip overflow -- neither has a
-           `visible` axis for the other to fall back to, so per the CSS overflow
-           spec that clipping is never relaxed, meaning the tooltip rendered
-           completely invisible on every hover. A single fixed-position element
-           driven by the hovered item's actual bounding rect escapes that
-           clipping entirely and positions correctly regardless of scroll
-           offset inside .sidebar-nav. */
+        .sidebar-promo-card .promo-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.2rem;
+        }
+        .sidebar-promo-card .promo-sub {
+            font-size: 0.64rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+        .sidebar-promo-card .promo-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: var(--accent-gold);
+            color: #ffffff !important;
+            border: none;
+            border-radius: 999px;
+            font-size: 0.64rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0.26rem 0.7rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        .sidebar-promo-card .promo-btn:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 3px 10px rgba(236, 39, 52, 0.3);
+        }
+
+        /* ── Collapsed Sidebar Rules ─────────────────────── */
+        #pos-sidebar.collapsed .sidebar-brand {
+            justify-content: center;
+            padding: 0;
+        }
+        #pos-sidebar.collapsed .sidebar-brand-info {
+            display: none !important;
+        }
+        #pos-sidebar.collapsed .sidebar-outlet-card {
+            display: none !important;
+        }
+        #pos-sidebar.collapsed .sidebar-search-wrap {
+            display: none !important;
+        }
+        #pos-sidebar.collapsed .sidebar-section-title {
+            display: none !important;
+        }
+        #pos-sidebar.collapsed .sidebar-promo-card {
+            display: none !important;
+        }
+        #pos-sidebar.collapsed .sidebar-item {
+            justify-content: center;
+            padding: 0.55rem 0;
+            margin: 2px 4px;
+            width: calc(100% - 8px);
+        }
+        #pos-sidebar.collapsed .sidebar-item .sidebar-label {
+            display: none !important;
+        }
+
+        /* Collapsed-item tooltip */
         #sidebar-tooltip {
             position: fixed;
             background: var(--text-main);
             color: var(--panel-bg);
-            padding: 0.28rem 0.65rem;
+            padding: 0.3rem 0.7rem;
             font-size: 0.72rem;
             border-radius: 4px;
             white-space: nowrap;
@@ -583,12 +737,13 @@
             pointer-events: none;
             transition: opacity 0.15s;
             z-index: 9999;
-            font-weight: 500;
+            font-weight: 600;
             font-family: var(--font-main, 'Outfit', sans-serif);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
         #sidebar-tooltip.visible { opacity: 1; }
 
-        /* ── Right panel ──────────────────────────────────── */
+        /* ── Right Panel ──────────────────────────────────── */
         #pos-right {
             flex: 1;
             display: flex;
@@ -597,91 +752,150 @@
             min-width: 0;
         }
 
-        /* ── Top bar ──────────────────────────────────────── */
+        /* ── Top Bar ──────────────────────────────────────── */
         #pos-topbar {
             background: var(--panel-bg);
             border-bottom: 1px solid var(--border-color);
-            padding: 0 1rem;
+            padding: 0 1.1rem;
+            height: var(--topbar-height);
             min-height: var(--topbar-height);
+            max-height: var(--topbar-height);
+            box-sizing: border-box;
             display: flex;
             align-items: center;
             gap: 0.65rem;
             flex-shrink: 0;
-            flex-wrap: wrap;
-            row-gap: 0;
+            flex-wrap: nowrap;
+            overflow: hidden;
         }
-        .topbar-outlet-name {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
+        .topbar-page-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-main);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 180px;
             font-family: var(--font-main, 'Outfit', sans-serif);
         }
-        .topbar-right { flex-shrink: 0; }
+        .topbar-right {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            flex-wrap: nowrap;
+            height: 100%;
+        }
 
-        /* ── User Profile / Role Badge in Header ─────────── */
+        #pos-topbar .btn-icon {
+            width: 34px;
+            height: 34px;
+            min-height: unset;
+            min-width: unset;
+            padding: 0;
+            font-size: 1.1rem;
+            border-radius: var(--radius-sm);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        #pos-topbar .btn-luxury,
+        #pos-topbar .btn-agg {
+            min-height: unset;
+        }
+
+        /* ── Universal Aggregator Bar in Topbar ───────────── */
+        .aggregator-bar {
+            background: var(--surface-2);
+            border: 1px solid var(--border-color);
+            padding: 3px 6px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            height: 32px;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+        .aggregator-bar span {
+            font-size: 0.62rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            margin: 0 0.3rem;
+            white-space: nowrap;
+            line-height: 1;
+        }
+        .aggregator-bar .btn-luxury,
+        .aggregator-bar .btn-agg {
+            min-height: unset !important;
+            height: 22px !important;
+            padding: 0 10px !important;
+            font-size: 0.67rem !important;
+            line-height: 22px !important;
+            border-radius: 999px !important;
+            font-weight: 700;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        /* ── User Avatar / Role Badge in Header ──────────── */
         .user-role-badge {
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
-            padding: 0.2rem 0.6rem 0.2rem 0.35rem;
-            background: rgba(255, 255, 255, 0.04);
+            height: 34px;
+            box-sizing: border-box;
+            padding: 0 0.7rem 0 0.35rem;
+            background: var(--surface-2);
             border: 1px solid var(--border-color);
-            border-radius: 20px;
+            border-radius: 999px;
             font-family: var(--font-main, 'Outfit', sans-serif);
             user-select: none;
-            transition: all 0.2s ease;
+            flex-shrink: 0;
+            transition: var(--transition-fast);
+            cursor: default;
         }
         .user-role-badge:hover {
-            border-color: rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(236, 39, 52, 0.3);
+            background: var(--sidebar-active-bg);
+        }
+        .user-avatar-circle {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.62rem;
+            font-weight: 800;
+            flex-shrink: 0;
+            text-transform: uppercase;
         }
         .user-role-tag {
             display: inline-flex;
             align-items: center;
-            font-size: 0.68rem;
+            font-size: 0.64rem;
             font-weight: 800;
-            letter-spacing: 0.8px;
+            letter-spacing: 0.6px;
             text-transform: uppercase;
-            padding: 0.2rem 0.55rem;
-            border-radius: 14px;
-            line-height: 1.2;
+            height: 22px;
+            line-height: 22px;
+            padding: 0 0.5rem;
+            border-radius: 999px;
+            box-sizing: border-box;
         }
-        .user-role-tag.role-owner {
-            background: rgba(212, 175, 55, 0.18);
-            color: #d4af37;
-            border: 1px solid rgba(212, 175, 55, 0.5);
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.15);
-        }
-        .user-role-tag.role-manager {
-            background: rgba(14, 165, 233, 0.18);
-            color: #38bdf8;
-            border: 1px solid rgba(14, 165, 233, 0.5);
-        }
-        .user-role-tag.role-cashier {
-            background: rgba(16, 185, 129, 0.18);
-            color: #34d399;
-            border: 1px solid rgba(16, 185, 129, 0.5);
-        }
-        .user-role-tag.role-captain {
-            background: rgba(168, 85, 247, 0.18);
-            color: #c084fc;
-            border: 1px solid rgba(168, 85, 247, 0.5);
-        }
-        .user-role-tag.role-waiter {
-            background: rgba(245, 158, 11, 0.18);
-            color: #fbbf24;
-            border: 1px solid rgba(245, 158, 11, 0.5);
-        }
-        .user-role-tag.role-chef, .user-role-tag.role-kitchen {
-            background: rgba(239, 68, 68, 0.18);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.5);
-        }
+        .user-role-tag.role-owner    { background: rgba(236, 39, 52, 0.12); color: #EC2734; border: 1px solid rgba(236, 39, 52, 0.3); }
+        .user-role-tag.role-manager  { background: rgba(14, 165, 233, 0.12); color: #0284c7; border: 1px solid rgba(14, 165, 233, 0.3); }
+        .user-role-tag.role-cashier  { background: rgba(16, 185, 129, 0.12); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .user-role-tag.role-captain  { background: rgba(168, 85, 247, 0.12); color: #7c3aed; border: 1px solid rgba(168, 85, 247, 0.3); }
+        .user-role-tag.role-waiter   { background: rgba(245, 158, 11, 0.12); color: #b45309; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .user-role-tag.role-chef,
+        .user-role-tag.role-kitchen  { background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3); }
+
         .user-name-text {
             font-size: 0.78rem;
             font-weight: 600;
@@ -692,43 +906,7 @@
             white-space: nowrap;
         }
 
-        html:not(.dark) .user-role-badge {
-            background: #f1f5f9;
-            border-color: #cbd5e1;
-        }
-        html:not(.dark) .user-role-tag.role-owner {
-            background: #fef3c7;
-            color: #92400e;
-            border-color: #f59e0b;
-        }
-        html:not(.dark) .user-role-tag.role-manager {
-            background: #e0f2fe;
-            color: #0369a1;
-            border-color: #38bdf8;
-        }
-        html:not(.dark) .user-role-tag.role-cashier {
-            background: #dcfce7;
-            color: #15803d;
-            border-color: #22c55e;
-        }
-        html:not(.dark) .user-role-tag.role-captain {
-            background: #f3e8ff;
-            color: #6b21a8;
-            border-color: #a855f7;
-        }
-        html:not(.dark) .user-role-tag.role-waiter {
-            background: #fef3c7;
-            color: #b45309;
-            border-color: #f59e0b;
-        }
-        html:not(.dark) .user-role-tag.role-chef,
-        html:not(.dark) .user-role-tag.role-kitchen {
-            background: #fee2e2;
-            color: #b91c1c;
-            border-color: #ef4444;
-        }
-
-        /* ── Main content area ────────────────────────────── */
+        /* ── Main Content Area ────────────────────────────── */
         #pos-main {
             flex: 1;
             overflow-y: auto;
@@ -736,40 +914,47 @@
             min-height: 0;
         }
 
-        /* ── Mobile sidebar overlay ───────────────────────── */
+        /* ── Mobile Sidebar Overlay ───────────────────────── */
         #sidebar-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.45);
+            background: rgba(0, 0, 0, 0.4);
             z-index: 1090;
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
         }
         body.sidebar-open #sidebar-overlay { display: block; }
 
-        /* ── Mobile responsive ────────────────────────────── */
+        /* ── Mobile Responsive ────────────────────────────── */
         @media (max-width: 767px) {
             #pos-sidebar {
                 position: fixed;
                 left: 0; top: 0; bottom: 0;
                 height: 100dvh;
-                height: 100vh; /* fallback */
+                height: 100vh;
                 transform: translateX(-100%);
-                transition: transform 0.25s cubic-bezier(0.4,0,0.2,1) !important;
-                z-index: 1200;
-                /* Force full width on mobile regardless of collapsed state */
-                width: 220px !important;
-                min-width: 220px !important;
+                transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                z-index: 1250;
+                width: 240px !important;
+                min-width: 240px !important;
             }
-            body.sidebar-open #pos-sidebar {
-                transform: translateX(0);
-            }
-            /* Always show labels on mobile */
-            #pos-sidebar .sidebar-brand-text,
+            body.sidebar-open #pos-sidebar { transform: translateX(0); }
+            #pos-sidebar .sidebar-brand-name,
+            #pos-sidebar .sidebar-brand-sub,
+            #pos-sidebar .sidebar-brand-info,
             #pos-sidebar .sidebar-item .sidebar-label {
+                display: flex !important;
                 opacity: 1 !important;
                 max-width: 200px !important;
+                pointer-events: auto !important;
+            }
+            #pos-sidebar .sidebar-outlet-card,
+            #pos-sidebar .sidebar-search-wrap,
+            #pos-sidebar .sidebar-section-title,
+            #pos-sidebar .sidebar-promo-card {
+                display: flex !important;
+                opacity: 1 !important;
                 pointer-events: auto !important;
             }
             #pos-sidebar .sidebar-item {
@@ -777,12 +962,70 @@
                 padding-left: 0.8rem !important;
                 padding-right: 0.8rem !important;
             }
-            /* Hide desktop toggle on mobile */
             .sidebar-toggle-btn { display: none !important; }
             #mobile-menu-btn { display: inline-flex !important; }
         }
         @media (min-width: 768px) {
             #mobile-menu-btn { display: none !important; }
+        }
+
+        /* ── Dark Mode Enhancements for Sidebar & Topbar ── */
+        html.dark #pos-sidebar {
+            background: #0d0d0f;
+            border-right-color: #222226;
+        }
+        html.dark #pos-topbar {
+            background: #0d0d0f;
+            border-bottom-color: #222226;
+        }
+        html.dark .sidebar-brand {
+            border-bottom-color: #222226;
+        }
+        html.dark .sidebar-outlet-card {
+            background: #161619;
+            border-color: #27272a;
+        }
+        html.dark .sidebar-search-input {
+            background: #161619;
+            border-color: #27272a;
+            color: #f4f4f6;
+        }
+        html.dark .sidebar-search-input:focus {
+            background: #121214;
+            border-color: var(--accent-gold);
+        }
+        html.dark .sidebar-toggle-btn {
+            background: #161619;
+            border-color: #27272a;
+            color: #a1a1aa;
+        }
+        html.dark .sidebar-toggle-btn:hover {
+            background: rgba(236, 39, 52, 0.18);
+            border-color: #ff4d5a;
+            color: #ff4d5a;
+        }
+        html.dark .sidebar-item {
+            color: #a1a1aa;
+        }
+        html.dark .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #f4f4f6;
+        }
+        html.dark .sidebar-item.active {
+            background: var(--sidebar-active-bg);
+            color: var(--sidebar-active-color);
+        }
+        html.dark .user-role-badge {
+            background: #161619;
+            border-color: #27272a;
+        }
+        html.dark .aggregator-bar {
+            background: #161619;
+            border-color: #27272a;
+        }
+        html.dark .sidebar-promo-card {
+            background: linear-gradient(135deg, rgba(236, 39, 52, 0.12) 0%, rgba(250, 115, 39, 0.08) 100%);
+            border-color: rgba(236, 39, 52, 0.25);
         }
     </style>
     
@@ -801,24 +1044,78 @@
         <!-- ══════════════ SIDEBAR ══════════════ -->
         <aside id="pos-sidebar" role="navigation" aria-label="Main navigation">
 
-            <!-- Brand / restaurant name + collapse toggle -->
+            <!-- Floating collapse toggle — positioned on right border, centered vertically on header -->
+            <button class="sidebar-toggle-btn" id="sidebar-toggle-btn"
+                    onclick="posToggleSidebar()"
+                    title="Toggle sidebar" aria-label="Toggle sidebar">
+                <i class="bi bi-chevron-left" id="sidebar-toggle-icon"></i>
+            </button>
+
+            <!-- Inner wrapper clips nav items (sidebar itself has overflow:visible for the floating btn) -->
+            <div id="pos-sidebar-inner">
+
+            <!-- Brand header row -->
             <div class="sidebar-brand">
+                <!-- Logo squircle -->
+                <span class="sidebar-logo-icon">
+                    <i class="bi bi-cup-hot-fill"></i>
+                </span>
+                <!-- Brand text -->
                 <div class="sidebar-brand-info">
-                    <i class="bi bi-diamond-half sidebar-brand-icon"></i>
-                    <span class="sidebar-brand-text">
-                        {{ request.user.tenant.name|default:"Lexnorax POS" }}
-                    </span>
+                    <span class="sidebar-brand-name">{{ request.user.tenant.name|default:"Restaurant POS" }}</span>
+                    <span class="sidebar-brand-sub">Management System</span>
                 </div>
-                <button class="sidebar-toggle-btn" id="sidebar-toggle-btn"
-                        onclick="posToggleSidebar()"
-                        title="Toggle sidebar" aria-label="Toggle sidebar">
-                    <i class="bi bi-chevron-left" id="sidebar-toggle-icon"></i>
+                <!-- Mobile close button -->
+                <button type="button" class="btn-icon d-md-none ms-auto" onclick="posCloseMobileSidebar()" title="Close menu" aria-label="Close menu" style="color:var(--text-muted);font-size:1.1rem;padding:4px;width:32px;height:32px;min-height:unset;min-width:unset;">
+                    <i class="bi bi-x-lg"></i>
                 </button>
+            </div>
+
+            <!-- Outlet info card -->
+            {% if request.user.outlet %}
+            <div class="sidebar-outlet-card">
+                <i class="bi bi-geo-alt-fill"></i>
+                <span class="sidebar-outlet-name">{{ request.user.outlet.name }}</span>
+            </div>
+            {% endif %}
+
+            <!-- Global search bar -->
+            <div class="sidebar-search-wrap">
+                <div class="sidebar-search-wrap-inner">
+                    <i class="bi bi-search sidebar-search-icon"></i>
+                    <input type="text" class="sidebar-search-input" id="sidebarSearch"
+                           placeholder="Search..." autocomplete="off"
+                           oninput="sidebarFilterNav(this.value)">
+                    <span class="sidebar-search-shortcut">/</span>
+                </div>
             </div>
 
             <!-- ── Main navigation ── -->
             <nav class="sidebar-nav">
                 {% with p=request.path %}
+
+                <!-- STORE GROUP -->
+                <div class="sidebar-section-title">Store</div>
+
+                {# Dashboard — owners / managers / superuser #}
+                {% if request.user.role in "owner,manager" or request.user.is_superuser %}
+                <a href="/dashboard/"
+                   class="sidebar-item {% if p == '/dashboard/' or p == '/dashboard' %}active{% endif %}"
+                   data-label="Dashboard">
+                    <i class="bi bi-speedometer2"></i>
+                    <span class="sidebar-label">Dashboard</span>
+                </a>
+                {% endif %}
+
+                {# POS Billing #}
+                {% if request.user.role != "chef" and request.user.role != "kitchen" %}
+                <a href="/billing/"
+                   class="sidebar-item {% if '/billing' in p %}active{% endif %}"
+                   data-label="POS Billing">
+                    <i class="bi bi-laptop"></i>
+                    <span class="sidebar-label">POS Billing</span>
+                </a>
+                {% endif %}
 
                 {# Orders — hide from kitchen staff/chef #}
                 {% if request.user.role != "chef" and request.user.role != "kitchen" %}
@@ -835,16 +1132,16 @@
                 </a>
                 {% endif %}
 
-                {# Kitchen #}
-                <a href="/kitchen/"
-                   class="sidebar-item {% if '/kitchen' in p %}active{% endif %}"
-                   data-label="Kitchen">
-                    <i class="bi bi-egg-fried"></i>
-                    <span class="sidebar-label">Kitchen</span>
+                {# Live Floor Plan #}
+                {% if request.user.role != "chef" and request.user.role != "kitchen" %}
+                <a href="/tables/live/"
+                   class="sidebar-item {% if '/tables/live' in p or '/tables/all' in p %}active{% endif %}"
+                   data-label="Live Floor">
+                    <i class="bi bi-broadcast-pin"></i>
+                    <span class="sidebar-label">Live Floor <span class="badge bg-warning text-dark ms-1" style="font-size:0.55rem;padding:2px 5px;font-weight:700;border-radius:999px;">F3</span></span>
                 </a>
 
-                {# Tables — hide from chefs/kitchen #}
-                {% if request.user.role != "chef" and request.user.role != "kitchen" %}
+                {# Tables #}
                 <a href="/tables/"
                    class="sidebar-item {% if '/tables' in p and '/tables/live' not in p and '/table-merge' not in p and '/tables/qr' not in p %}active{% endif %}"
                    data-label="Tables">
@@ -856,25 +1153,37 @@
                     </span>
                     <span class="sidebar-label">Tables</span>
                 </a>
-
-                <a href="/tables/live/"
-                   class="sidebar-item {% if '/tables/live' in p or '/tables/all' in p %}active{% endif %}"
-                   data-label="Live Floor">
-                    <i class="bi bi-broadcast-pin"></i>
-                    <span class="sidebar-label">Live Floor <span class="badge bg-warning text-dark ms-1" style="font-size:0.58rem;padding:2px 4px;font-weight:700;">F3</span></span>
-                </a>
-
-                {% if request.user.role in "owner,manager" or request.user.is_superuser %}
-                <a href="/floor-editor/"
-                   class="sidebar-item {% if '/floor-editor' in p %}active{% endif %}"
-                   data-label="Floor Editor">
-                    <i class="bi bi-grid-1x2"></i>
-                    <span class="sidebar-label">Floor Editor</span>
-                </a>
-                {% endif %}
                 {% endif %}
 
-                {# Waiter Calls — for waiter, captain, manager, owner #}
+                {# Kitchen #}
+                <a href="/kitchen/"
+                   class="sidebar-item {% if '/kitchen' in p %}active{% endif %}"
+                   data-label="Kitchen">
+                    <i class="bi bi-egg-fried"></i>
+                    <span class="sidebar-label">Kitchen</span>
+                </a>
+
+                {# Tokens #}
+                {% if 'token_system' in tenant_features or is_qsr or request.user.role in "owner,manager,cashier" or request.user.is_superuser %}
+                <a href="{% url 'token-dashboard' %}"
+                   class="sidebar-item {% if '/token' in p %}active{% endif %}"
+                   data-label="Tokens">
+                    <i class="bi bi-ticket-perforated"></i>
+                    <span class="sidebar-label">Tokens</span>
+                </a>
+                {% endif %}
+
+                {# Reservations — if feature enabled #}
+                {% if 'reservations' in tenant_features or request.user.role in "owner,manager" or request.user.is_superuser %}
+                <a href="/crm/reservations/"
+                   class="sidebar-item {% if '/reservations' in p %}active{% endif %}"
+                   data-label="Reservations">
+                    <i class="bi bi-calendar-check"></i>
+                    <span class="sidebar-label">Reservations</span>
+                </a>
+                {% endif %}
+
+                {# Waiter Calls #}
                 {% if 'waiter_call' in tenant_features and request.user.role in "waiter,captain,manager,owner" or request.user.is_superuser %}
                 <a href="{% url 'waiter-calls' %}"
                    class="sidebar-item {% if '/waiter' in p %}active{% endif %}"
@@ -887,78 +1196,47 @@
                 </a>
                 {% endif %}
 
-                {# Customers / CRM #}
+                {# Order History #}
+                {% if request.user.role != "chef" and request.user.is_authenticated %}
+                <a href="{% url 'order-history' %}"
+                   class="sidebar-item {% if '/history' in p %}active{% endif %}"
+                   data-label="Order History">
+                    <i class="bi bi-clock-history"></i>
+                    <span class="sidebar-label">Order History</span>
+                </a>
+                {% endif %}
+
+                <!-- OPERATIONS & CRM GROUP -->
+                <div class="sidebar-section-title">Operations &amp; CRM</div>
+
+                {# Customers (CRM) #}
                 {% if request.user.role in "owner,manager" or request.user.is_superuser %}
-                <a href="/crm/"
-                   class="sidebar-item {% if '/crm' in p and '/reviews' not in p %}active{% endif %}"
+                <a href="{% url 'crm-dashboard' %}"
+                   class="sidebar-item {% if '/crm' in p and '/reviews' not in p and '/reservations' not in p %}active{% endif %}"
                    data-label="Customers">
                     <i class="bi bi-people"></i>
                     <span class="sidebar-label">Customers</span>
                 </a>
-                {% endif %}
 
                 {# Reviews #}
-                {% if request.user.role in "owner,manager" or request.user.is_superuser %}
                 <a href="/crm/reviews/"
-                   class="sidebar-item {% if '/crm/reviews' in p %}active{% endif %}"
+                   class="sidebar-item {% if '/crm/reviews' in p or '/reviews' in p %}active{% endif %}"
                    data-label="Reviews">
                     <i class="bi bi-star"></i>
                     <span class="sidebar-label">Reviews</span>
                 </a>
                 {% endif %}
 
-                {# Analytics #}
-                {% if request.user.role in "owner,manager" or request.user.is_superuser %}
-                <a href="/reports/analytics/"
-                   class="sidebar-item {% if '/reports/analytics' in p %}active{% endif %}"
-                   data-label="Analytics">
-                    <i class="bi bi-bar-chart-line"></i>
-                    <span class="sidebar-label">Analytics</span>
-                </a>
-                {% endif %}
-
-                {# Reports #}
-                {% if request.user.role in "owner,manager" or request.user.is_superuser %}
-                <a href="/reports/"
-                   class="sidebar-item {% if '/reports' in p and '/analytics' not in p %}active{% endif %}"
-                   data-label="Reports">
+                {# Payments #}
+                {% if request.user.role in "owner,manager,cashier" or request.user.is_superuser %}
+                <a href="{% url 'pending-refunds' %}"
+                   class="sidebar-item {% if '/payments' in p or '/refunds' in p %}active{% endif %}"
+                   data-label="Payments">
                     <span class="notif-wrapper">
-                        <i class="bi bi-file-earmark-bar-graph"></i>
-                        {% if request.user.role in "owner,manager" %}
-                        <span class="notif-badge hidden" id="notif-badge-system"></span>
-                        {% endif %}
+                        <i class="bi bi-credit-card"></i>
+                        <span class="notif-badge hidden" id="notif-badge-refund"></span>
                     </span>
-                    <span class="sidebar-label">Reports</span>
-                </a>
-                {% endif %}
-
-                {# Menu #}
-                {% if request.user.role in "owner,manager" or request.user.is_superuser %}
-                <a href="/menu/"
-                   class="sidebar-item {% if '/menu' in p and '/qr' not in p and '/digital' not in p %}active{% endif %}"
-                   data-label="Menu">
-                    <i class="bi bi-journal-bookmark"></i>
-                    <span class="sidebar-label">Menu</span>
-                </a>
-                {% endif %}
-
-                {# QR Codes Generator #}
-                {% if request.user.role in "owner,manager" or request.user.is_superuser %}
-                <a href="/setup/qr-codes/"
-                   class="sidebar-item {% if '/qr-codes' in p or '/tables/qr' in p %}active{% endif %}"
-                   data-label="QR Codes">
-                    <i class="bi bi-qr-code"></i>
-                    <span class="sidebar-label">QR Codes</span>
-                </a>
-                {% endif %}
-
-                {# Marketing #}
-                {% if request.user.role in "owner,manager" or request.user.is_superuser %}
-                <a href="/promos/"
-                   class="sidebar-item {% if '/promos' in p %}active{% endif %}"
-                   data-label="Marketing">
-                    <i class="bi bi-megaphone"></i>
-                    <span class="sidebar-label">Marketing</span>
+                    <span class="sidebar-label">Payments</span>
                 </a>
                 {% endif %}
 
@@ -972,7 +1250,80 @@
                 </a>
                 {% endif %}
 
-                {# Staff — owner only #}
+                {# Shifts #}
+                {% if request.user.is_authenticated %}
+                <a href="/shifts/"
+                   class="sidebar-item {% if '/shifts' in p %}active{% endif %}"
+                   data-label="Shifts">
+                    <i class="bi bi-clock"></i>
+                    <span class="sidebar-label">Shifts</span>
+                </a>
+                {% endif %}
+
+                <!-- BACK OFFICE GROUP -->
+                {% if request.user.role in "owner,manager" or request.user.is_superuser %}
+                <div class="sidebar-section-title">Back Office</div>
+
+                {# Analytics #}
+                <a href="/reports/analytics/"
+                   class="sidebar-item {% if '/reports/analytics' in p %}active{% endif %}"
+                   data-label="Analytics">
+                    <i class="bi bi-graph-up-arrow"></i>
+                    <span class="sidebar-label">Analytics</span>
+                </a>
+
+                {# Reports #}
+                <a href="/reports/"
+                   class="sidebar-item {% if '/reports' in p and '/analytics' not in p %}active{% endif %}"
+                   data-label="Reports">
+                    <span class="notif-wrapper">
+                        <i class="bi bi-file-earmark-bar-graph"></i>
+                        <span class="notif-badge hidden" id="notif-badge-system"></span>
+                    </span>
+                    <span class="sidebar-label">Reports</span>
+                </a>
+
+                {# Menu Management #}
+                <a href="/menu/"
+                   class="sidebar-item {% if '/menu' in p and '/qr' not in p and '/digital' not in p %}active{% endif %}"
+                   data-label="Menu Management">
+                    <i class="bi bi-journal-bookmark"></i>
+                    <span class="sidebar-label">Menu Management</span>
+                </a>
+
+                {# QR Codes #}
+                <a href="/setup/qr-codes/"
+                   class="sidebar-item {% if '/qr-codes' in p or '/tables/qr' in p %}active{% endif %}"
+                   data-label="QR Codes">
+                    <i class="bi bi-qr-code"></i>
+                    <span class="sidebar-label">QR Codes</span>
+                </a>
+
+                {# Marketing / Promos #}
+                <a href="/promos/"
+                   class="sidebar-item {% if '/promos' in p %}active{% endif %}"
+                   data-label="Marketing">
+                    <i class="bi bi-megaphone"></i>
+                    <span class="sidebar-label">Marketing</span>
+                </a>
+
+                {# Floor Editor #}
+                <a href="/floor-editor/"
+                   class="sidebar-item {% if '/floor-editor' in p %}active{% endif %}"
+                   data-label="Floor Editor">
+                    <i class="bi bi-grid-1x2"></i>
+                    <span class="sidebar-label">Floor Editor</span>
+                </a>
+
+                {# Finance / Expenses #}
+                <a href="/finance/"
+                   class="sidebar-item {% if '/finance' in p %}active{% endif %}"
+                   data-label="Finance">
+                    <i class="bi bi-wallet2"></i>
+                    <span class="sidebar-label">Finance</span>
+                </a>
+
+                {# Staff Management #}
                 {% if request.user.role == "owner" or request.user.is_superuser %}
                 <a href="/setup/staff/"
                    class="sidebar-item {% if '/setup/staff' in p %}active{% endif %}"
@@ -980,34 +1331,61 @@
                     <i class="bi bi-person-badge"></i>
                     <span class="sidebar-label">Staff</span>
                 </a>
-                {% endif %}
 
-                {# Roles & Access — owner only #}
-                {% if request.user.role == "owner" or request.user.is_superuser %}
+                {# Roles & Access #}
                 <a href="/setup/roles/"
-                   class="sidebar-item {% if '/setup/roles' in p %}active{% endif %}"
+                   class="sidebar-item {% if '/setup/roles' in p or '/roles' in p %}active{% endif %}"
                    data-label="Roles & Access">
                     <i class="bi bi-shield-lock"></i>
                     <span class="sidebar-label">Roles & Access</span>
                 </a>
+
+                {# Feature Flags #}
+                <a href="{% url 'feature_flags' %}"
+                   class="sidebar-item {% if '/settings/features' in p %}active{% endif %}"
+                   data-label="Feature Flags">
+                    <i class="bi bi-toggles"></i>
+                    <span class="sidebar-label">Feature Flags</span>
+                </a>
+                {% endif %}
+
+                {# Settings #}
+                <a href="/setup/"
+                   class="sidebar-item {% if '/setup' in p and '/setup/staff' not in p and '/setup/roles' not in p and '/setup/qr-codes' not in p %}active{% endif %}"
+                   data-label="Settings">
+                    <i class="bi bi-gear"></i>
+                    <span class="sidebar-label">Settings</span>
+                </a>
+
+                {# Superuser Portal #}
+                {% if request.user.is_superuser %}
+                <a href="/portal/"
+                   class="sidebar-item {% if '/portal' in p or '/superuser' in p %}active{% endif %}"
+                   data-label="Superuser Portal">
+                    <i class="bi bi-shield-shaded"></i>
+                    <span class="sidebar-label">Superuser Portal</span>
+                </a>
+                {% endif %}
+
+                {% endif %}{# end back-office #}
+
+                <!-- Revenue summary mini card (inside scroll area so it doesn't block viewport) -->
+                {% if request.user.role in "owner,manager" or request.user.is_superuser %}
+                <div class="sidebar-promo-card">
+                    <div class="promo-title">📊 Today's Summary</div>
+                    <div class="promo-sub">View your full revenue & performance report.</div>
+                    <a href="/reports/" class="promo-btn">
+                        <i class="bi bi-bar-chart-fill"></i> View Report
+                    </a>
+                </div>
                 {% endif %}
 
                 {% endwith %}
             </nav><!-- /.sidebar-nav -->
 
-            <!-- ── Bottom actions ── -->
+            <!-- ── Bottom actions (Compact & Clean) ── -->
             <div class="sidebar-bottom">
-                <div class="sidebar-separator"></div>
-
                 {% if request.user.is_authenticated %}
-                {# Shifts #}
-                <a href="/shifts/"
-                   class="sidebar-item"
-                   data-label="Shifts">
-                    <i class="bi bi-clock"></i>
-                    <span class="sidebar-label">Shifts</span>
-                </a>
-
                 {# Switch profile (superusers) #}
                 {% if request.user.is_superuser %}
                 <a href="/demo/"
@@ -1037,8 +1415,9 @@
                 {% endif %}
             </div><!-- /.sidebar-bottom -->
 
-        </aside><!-- /#pos-sidebar -->
+            </div><!-- /#pos-sidebar-inner -->
 
+        </aside><!-- /#pos-sidebar -->
         <!-- Shared tooltip for collapsed sidebar items — a sibling of
              #pos-sidebar (not a descendant), positioned per-hover via JS
              below, so it isn't clipped by the sidebar's own overflow:hidden. -->
@@ -1064,31 +1443,29 @@
 
                 <!-- header_left block (outlet name by default; child templates may override) -->
                 {% block header_left %}
-                <span class="topbar-outlet-name">
-                    {{ request.user.outlet.name|default:"" }}
-                </span>
+                <a href="/dashboard/" class="d-flex flex-column justify-content-center text-decoration-none" style="overflow:hidden;color:inherit;">
+                    <span class="topbar-page-title">{{ request.user.outlet.name|default:"Dashboard" }}</span>
+                </a>
                 {% endblock %}
 
                 <!-- Flex spacer -->
                 <div style="flex:1;min-width:0;"></div>
 
-                <!-- Right-side controls (child templates may override header_right) -->
-                <div class="topbar-right d-flex align-items-center gap-2 flex-wrap">
+                <!-- Right-side controls -->
+                <div class="topbar-right d-flex align-items-center gap-2 flex-nowrap">
                     {% if request.user.is_authenticated %}
-                    <a href="/shifts/" class="btn-icon d-none d-md-inline-flex" title="Clock In / Out">
-                        <i class="bi bi-clock"></i>
-                    </a>
-                    <!-- User Profile Role Badge -->
+                    <!-- User Avatar + Role Badge -->
                     <div class="user-role-badge" title="Logged in as {{ request.user.username }} ({{ request.user.get_role_display|default:request.user.role }})">
+                        <span class="user-avatar-circle">{{ request.user.username|slice:":2"|upper }}</span>
                         <span class="user-role-tag role-{{ request.user.role }}">
-                            {% if request.user.role == 'owner' %}<i class="bi bi-shield-shaded me-1"></i>OWNER
-                            {% elif request.user.role == 'manager' %}<i class="bi bi-person-gear me-1"></i>MANAGER
-                            {% elif request.user.role == 'cashier' %}<i class="bi bi-cash me-1"></i>CASHIER
-                            {% elif request.user.role == 'captain' %}<i class="bi bi-award me-1"></i>CAPTAIN
-                            {% elif request.user.role == 'waiter' %}<i class="bi bi-bell me-1"></i>WAITER
-                            {% elif request.user.role == 'chef' %}<i class="bi bi-egg-fried me-1"></i>CHEF
-                            {% elif request.user.role == 'kitchen' %}<i class="bi bi-fire me-1"></i>KITCHEN
-                            {% else %}<i class="bi bi-person me-1"></i>{{ request.user.role|upper }}
+                            {% if request.user.role == 'owner' %}<i class="bi bi-shield-shaded me-1"></i>Owner
+                            {% elif request.user.role == 'manager' %}<i class="bi bi-person-gear me-1"></i>Manager
+                            {% elif request.user.role == 'cashier' %}<i class="bi bi-cash me-1"></i>Cashier
+                            {% elif request.user.role == 'captain' %}<i class="bi bi-award me-1"></i>Captain
+                            {% elif request.user.role == 'waiter' %}<i class="bi bi-bell me-1"></i>Waiter
+                            {% elif request.user.role == 'chef' %}<i class="bi bi-egg-fried me-1"></i>Chef
+                            {% elif request.user.role == 'kitchen' %}<i class="bi bi-fire me-1"></i>Kitchen
+                            {% else %}<i class="bi bi-person me-1"></i>{{ request.user.role|title }}
                             {% endif %}
                         </span>
                         <span class="user-name-text d-none d-md-inline">{{ request.user.username }}</span>
@@ -1237,8 +1614,7 @@
         document.addEventListener("DOMContentLoaded", function() {
             if (window.innerWidth >= 768) {
                 const stored = localStorage.getItem("pos_sidebar_collapsed");
-                const shouldCollapse = stored === "1"
-                    || (stored === null && window.innerWidth < 1100);
+                const shouldCollapse = stored === "1";
                 if (shouldCollapse) {
                     const sidebar = document.getElementById("pos-sidebar");
                     const icon = document.getElementById("sidebar-toggle-icon");
@@ -1246,7 +1622,64 @@
                     if (icon) icon.className = "bi bi-chevron-right";
                 }
             }
+            // Update theme icon on load
+            const themeIcon = document.getElementById("themeIcon");
+            if (themeIcon) {
+                themeIcon.className = document.documentElement.classList.contains("dark")
+                    ? "bi bi-sun" : "bi bi-moon";
+            }
         });
+
+        // ── Sidebar search filter ──────────────────────────────
+        function sidebarFilterNav(query) {
+            const q = (query || "").trim().toLowerCase();
+            const items = document.querySelectorAll("#pos-sidebar .sidebar-item");
+            const sections = document.querySelectorAll("#pos-sidebar .sidebar-section-title");
+            items.forEach(item => {
+                const label = (item.dataset.label || item.textContent || "").toLowerCase();
+                item.style.display = (!q || label.includes(q)) ? "" : "none";
+            });
+            // Show/hide section titles based on whether any visible item follows them
+            sections.forEach(section => {
+                if (!q) { section.style.display = ""; return; }
+                let next = section.nextElementSibling;
+                let hasVisible = false;
+                while (next && !next.classList.contains("sidebar-section-title")) {
+                    if (next.classList.contains("sidebar-item") && next.style.display !== "none") {
+                        hasVisible = true; break;
+                    }
+                    next = next.nextElementSibling;
+                }
+                section.style.display = hasVisible ? "" : "none";
+            });
+        }
+
+        // "/" key focuses sidebar search (when not already in an input)
+        document.addEventListener("keydown", function(e) {
+            if (e.key === "/" && !["INPUT","TEXTAREA","SELECT"].includes(document.activeElement.tagName)) {
+                e.preventDefault();
+                const searchInput = document.getElementById("sidebarSearch");
+                if (searchInput) {
+                    // Make sure sidebar is expanded on desktop
+                    const sidebar = document.getElementById("pos-sidebar");
+                    if (sidebar && sidebar.classList.contains("collapsed") && window.innerWidth >= 768) {
+                        posToggleSidebar();
+                    }
+                    searchInput.focus();
+                    searchInput.select();
+                }
+            }
+            // Escape clears search
+            if (e.key === "Escape") {
+                const searchInput = document.getElementById("sidebarSearch");
+                if (document.activeElement === searchInput) {
+                    searchInput.value = "";
+                    sidebarFilterNav("");
+                    searchInput.blur();
+                }
+            }
+        });
+
 
         // --- 2. Network State Management (Edge Case: WiFi Drops) ---
         window.addEventListener('online',  () => {
@@ -1292,9 +1725,9 @@
                     background: themeManager.isDark() ? 'var(--panel-bg)' : '#ffffff',
                     color: 'var(--text-main)',
                     customClass: {
-                        popup: 'rounded-0', // Sharp edges
-                        confirmButton: 'rounded-0 btn btn-accent',
-                        cancelButton: 'rounded-0 btn btn-luxury'
+                        popup: 'rounded-4',
+                        confirmButton: 'btn btn-accent',
+                        cancelButton: 'btn btn-luxury'
                     }
                 });
             }
@@ -1810,7 +2243,7 @@
         const ios          = /iphone|ipad|ipod/.test(ua) && !android;
         const windows      = !android && !ios && /windows/.test(ua);
         const mac          = !android && !ios && /mac/.test(ua);
-        // nativeAndroid = running inside the Lexnorax Android APK (WebView shell).
+        // nativeAndroid = running inside the EasyBillBro Android APK (WebView shell).
         // The APK appends "LexnoraxPOS-Android/1.0" to the user-agent string.
         // When true: printing is handled by the native foreground service — no Termux needed.
         const nativeAndroid = /lexnoraxPOS-android/i.test(navigator.userAgent);
@@ -1822,7 +2255,7 @@
     })();
 
     // ── Native Android app: auto-configure print service after login ───────────
-    // When the user logs in inside the Lexnorax APK, tell the native print service
+    // When the user logs in inside the EasyBillBro APK, tell the native print service
     // what URL to poll. The JSBridge receives this and starts the ForegroundService.
     {% if request.user.is_authenticated and request.user.outlet %}
     (function () {
@@ -1837,7 +2270,7 @@
         try {
             Android.startPrinting(pollUrl);
         } catch (e) {
-            console.warn('Lexnorax native bridge error:', e);
+            console.warn('EasyBillBro native bridge error:', e);
         }
     })();
     {% endif %}
@@ -1860,7 +2293,7 @@
 
         // ── Install prompt ──────────────────────────────────────────────────────
         // Suppressed entirely for the shared /live-demo/ account (trailer-mode
-        // visitors AND the founder-key walkthrough) -- "Install Lexnorax POS"
+        // visitors AND the founder-key walkthrough) -- "Install EasyBillBro POS"
         // makes no sense on a demo account nobody actually owns, and it's a
         // confusing thing to have pop up mid pitch on a real prospect's screen.
         const IS_DEMO_SESSION = {% if "demo_trailer_mode" in request.session %}true{% else %}false{% endif %};
@@ -1875,7 +2308,7 @@
             if (document.getElementById('pwa-banner')) return;
             const p = lexnoraxPlatform;
             const sub = p.nativeAndroid
-                ? 'Lexnorax app — printing is already active'
+                ? 'EasyBillBro app — printing is already active'
                 : p.android
                 ? 'Add to home screen — tap Install, then set up printing in Termux'
                 : p.ios
@@ -1892,7 +2325,7 @@
             `;
             banner.innerHTML = `
                 <div style="flex:1;">
-                    <div style="font-weight:600;font-size:0.9rem;color:var(--text-main);">Install Lexnorax POS</div>
+                    <div style="font-weight:600;font-size:0.9rem;color:var(--text-main);">Install EasyBillBro POS</div>
                     <div style="font-size:0.75rem;color:var(--text-muted);">${sub}</div>
                 </div>
                 <button id="pwa-install-btn" style="background:var(--accent-gold);color:#fff;border:none;padding:0.6rem 1.2rem;font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;cursor:pointer;min-height:44px;white-space:nowrap;">Install</button>
@@ -1945,7 +2378,7 @@
             } else if (p.ios) {
                 title   = 'Printing on iOS';
                 steps   = [
-                    'Lexnorax will open the receipt in a new tab when you print',
+                    'EasyBillBro will open the receipt in a new tab when you print',
                     'Use <strong>Share → Print</strong> to send to AirPrint printers',
                     'No extra app needed',
                 ];
@@ -1968,7 +2401,7 @@
                 font-family:var(--font-main,'Outfit',sans-serif);
             `;
             sheet.innerHTML = `
-                <div style="background:var(--panel-bg);border:1px solid var(--border-color);width:100%;max-width:540px;padding:1.5rem;border-radius:0;position:relative;">
+                <div style="background:var(--panel-bg);border:1px solid var(--border-color);width:100%;max-width:540px;padding:1.5rem;border-radius:20px 20px 0 0;position:relative;">
                     <button onclick="document.getElementById('post-install-sheet').remove();" style="position:absolute;top:0.75rem;right:1rem;background:none;border:none;color:var(--text-muted);font-size:1.4rem;cursor:pointer;line-height:1;">✕</button>
                     <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:3px;color:var(--accent-gold);margin-bottom:0.4rem;">Almost there</div>
                     <div style="font-size:1.1rem;font-weight:700;color:var(--text-main);margin-bottom:1.1rem;">${title}</div>
@@ -2049,10 +2482,10 @@
                 z-index:9999;gap:1rem;font-family:var(--font-main,'Outfit',sans-serif);
             `;
             const msg = lexnoraxPlatform.nativeAndroid
-                ? 'Printing unavailable — open Lexnorax app and allow battery optimization'
+                ? 'Printing unavailable — open EasyBillBro app and allow battery optimization'
                 : lexnoraxPlatform.android
                 ? 'Printing unavailable — open Termux and run: python lexnorax_agent.py'
-                : 'Printing unavailable — start Lexnorax Agent on this device';
+                : 'Printing unavailable — start EasyBillBro Agent on this device';
             hint.innerHTML = `
                 <span><strong>Agent offline</strong> — ${msg}</span>
                 <button onclick="document.getElementById('agent-offline-hint').remove();" style="background:none;border:none;color:#fef3c7;font-size:1.1rem;cursor:pointer;padding:0;min-height:32px;">✕</button>

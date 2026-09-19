@@ -154,7 +154,7 @@ class MainActivity : AppCompatActivity() {
     fun onScanQrClicked(view: View) {
         qrScanLauncher.launch(
             ScanOptions().apply {
-                setPrompt("Scan the QR code from Setup → Printer in your Lexnorax dashboard")
+                setPrompt("Scan the QR code from Setup → Printer in your EasyBillBro dashboard")
                 setBeepEnabled(true)
                 setOrientationLocked(true)
                 setDesiredBarcodeFormats(ScanOptions.QR_CODE)

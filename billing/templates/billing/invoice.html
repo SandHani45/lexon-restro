@@ -27,7 +27,7 @@
 <body>
 
   <div class="header">
-    <div class="brand">Lexnorax<div class="sub">Restaurant POS SaaS &middot; lexnorax.net</div></div>
+    <div class="brand">EasyBillBro<div class="sub">Restaurant POS SaaS &middot; lexnorax.net</div></div>
     <div class="invoice-meta">
       <div><strong>Invoice #{{ invoice.id }}</strong></div>
       <div>{{ invoice.period_start|date:"d M Y" }} &ndash; {{ invoice.period_end|date:"d M Y" }}</div>
@@ -46,7 +46,7 @@
       <th style="text-align:right;">Amount</th>
     </tr>
     <tr>
-      <td>Lexnorax subscription &mdash; {{ invoice.period_start|date:"d M Y" }} to {{ invoice.period_end|date:"d M Y" }}</td>
+      <td>EasyBillBro subscription &mdash; {{ invoice.period_start|date:"d M Y" }} to {{ invoice.period_end|date:"d M Y" }}</td>
       <td style="text-align:right;">&#8377;{{ invoice.amount|floatformat:2 }}</td>
     </tr>
     <tr class="amount-row">
@@ -62,7 +62,7 @@
   {% endif %}
 
   <div class="footer">
-    Lexnorax &middot; This is a system-generated invoice for your Lexnorax subscription, separate from any bills your own customers receive.
+    EasyBillBro &middot; This is a system-generated invoice for your EasyBillBro subscription, separate from any bills your own customers receive.
   </div>
 
 </body>

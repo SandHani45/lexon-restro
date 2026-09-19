@@ -52,6 +52,41 @@ def owner_dashboard(request):
     ).exists():
         return redirect("/setup/onboard/")
 
+    from orders.models import Order, OrderItem
+    from django.db.models import Sum
+
+    recent_orders = list(
+        Order.objects.filter(tenant=tenant, outlet=request.user.outlet)
+        .select_related("table")
+        .order_by("-created_at")[:6]
+    )
+
+    from django.db.models import F
+
+    top_items = list(
+        OrderItem.objects.filter(
+            order__tenant=tenant,
+            order__outlet=request.user.outlet,
+            menu_item__isnull=False,
+        )
+        .values(item_name=F("menu_item__name"))
+        .annotate(total_qty=Sum("quantity"))
+        .order_by("-total_qty")[:5]
+    )
+
+    today_reservations = []
+    res_confirmed_count = 0
+    try:
+        from crm.models import Reservation
+        today_reservations = list(
+            Reservation.objects.filter(
+                tenant=tenant, outlet=request.user.outlet
+            ).select_related("guest", "table").order_by("-reservation_time")[:5]
+        )
+        res_confirmed_count = sum(1 for r in today_reservations if r.status == "confirmed")
+    except Exception:
+        pass
+
     return render(request, "accounts/owner_dashboard.html", {
         "metrics":             metrics,
         "notifications":       notifications,
@@ -61,6 +96,10 @@ def owner_dashboard(request):
         "active_token_count":  active_token_count,
         "is_manager":          is_manager,
         "is_cashier":          is_cashier,
+        "recent_orders":       recent_orders,
+        "top_items":           top_items,
+        "today_reservations":  today_reservations,
+        "res_confirmed_count": res_confirmed_count,
     })
 
 

@@ -645,7 +645,7 @@ TWILIO_AUTH_TOKEN    = os.getenv("TWILIO_AUTH_TOKEN", "")
 TWILIO_WHATSAPP_FROM = os.getenv("TWILIO_WHATSAPP_FROM", "whatsapp:+14155238886")
 
 # -------------------------------------------------------
-# LEXNORAX'S OWN RAZORPAY ACCOUNT -- for charging tenants their Lexnorax
+# LEXNORAX'S OWN RAZORPAY ACCOUNT -- for charging tenants their EasyBillBro
 # subscription fee. Deliberately named distinctly from anything tenant-
 # facing (PaymentConfig's per-tenant razorpay_key_id/secret) so the two
 # are never confused in config, mirroring the code-level separation in
@@ -803,7 +803,7 @@ CELERY_BEAT_SCHEDULE = {
         "task": "reports.tasks.send_daily_digest_email",
         "schedule": crontab(hour=7, minute=0),
     },
-    # Lexnorax's own subscription billing (charging tenants, not tenant-facing).
+    # EasyBillBro's own subscription billing (charging tenants, not tenant-facing).
     # See md_files/eli5_subscription_billing_plan.html for the full design.
     "generate-monthly-subscription-invoices": {
         "task": "billing.tasks.generate_monthly_invoices",

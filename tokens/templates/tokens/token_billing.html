@@ -66,7 +66,7 @@
     }
     .panel-handle:hover,
     .panel-handle.dragging {
-        background: rgba(197,160,89,0.25);
+        background: rgba(236,39,52,0.25);
         border-left-color: var(--accent-gold);
     }
     @media (max-width: 991px) { .panel-handle { display: none !important; } }
@@ -107,7 +107,7 @@
         display: none;
         overflow-x: auto;
         white-space: nowrap;
-        padding: 0 1rem;
+        padding: 0.5rem 1rem;
         background: var(--panel-bg);
         border-bottom: 1px solid var(--border-color);
         scrollbar-width: none;
@@ -118,20 +118,25 @@
     }
     .mobile-category-nav::-webkit-scrollbar { display: none; }
     @media (max-width: 991px) { .mobile-category-nav { display: block; } }
+    /* Filter-chip treatment: pill-shaped, active = solid fill + white text */
     .mobile-category-nav .category-item {
         display: inline-flex;
         align-items: center;
-        margin-right: 0.25rem;
-        padding: 0 1rem;
-        height: 52px;          /* bigger tap target */
+        margin: 0 0.3rem 0 0;
+        padding: 0 1.1rem;
+        height: 48px;          /* meets min tap target */
         font-size: 0.95rem;
         font-weight: 500;
-        border-bottom: 3px solid transparent;
+        border-radius: var(--radius-pill);
+        border-bottom: none;
+        background: transparent;
+        color: var(--text-muted);
         -webkit-tap-highlight-color: transparent;
     }
     .mobile-category-nav .category-item.active {
-        color: var(--accent-gold);
-        border-bottom-color: var(--accent-gold);
+        background: var(--accent-gold);
+        color: #fff;
+        border-bottom-color: transparent;
         font-weight: 700;
     }
 
@@ -157,7 +162,7 @@
         width: 100%;
         min-height: 54px;          /* bigger tap target */
         outline: none;
-        border-radius: 0;
+        border-radius: var(--radius-sm);
     }
     .search-box:focus { border-color: var(--accent-gold); }
     ::placeholder { color: var(--text-muted) !important; opacity: 0.7 !important; }
@@ -190,11 +195,11 @@
     }
     .menu-card:active {
         border-color: var(--accent-gold);
-        background: rgba(197,160,89,0.06);
+        background: rgba(236,39,52,0.06);
         transform: scale(0.97);
     }
     @media (hover: hover) {
-        .menu-card:hover { border-color: var(--accent-gold); background: rgba(197,160,89,0.04); }
+        .menu-card:hover { border-color: var(--accent-gold); background: rgba(236,39,52,0.04); }
     }
     /* Cart badge — shows how many of this item are in cart */
     .menu-card .cart-badge {
@@ -213,7 +218,7 @@
         box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         z-index: 2;
     }
-    .menu-card.in-cart { border-color: rgba(197,160,89,0.5); }
+    .menu-card.in-cart { border-color: rgba(236,39,52,0.5); }
     .menu-card.in-cart .cart-badge { display: flex; }
     .item-name {
         font-size: 1rem;
@@ -262,22 +267,30 @@
 
     .context-tabs {
         display: flex;
+        gap: 0.5rem;
+        padding: 0.6rem 0.75rem;
         border-bottom: 1px solid var(--border-color);
     }
+    /* Segmented filter control: pill-shaped, active = solid fill + white text */
     .context-tab {
         flex: 1;
         text-align: center;
-        padding: 1rem 0.5rem;
+        padding: 0.6rem 0.5rem;
         cursor: pointer;
         font-family: 'DM Serif Display', serif;
         font-size: 0.85rem;
         color: var(--text-muted);
-        border-bottom: 3px solid transparent;
+        border-radius: var(--radius-pill);
+        border-bottom: none;
         letter-spacing: 1px;
         text-transform: uppercase;
         transition: var(--transition-smooth);
     }
-    .context-tab.active { color: var(--text-main); border-bottom-color: var(--accent-gold); }
+    .context-tab.active { color: #fff; background: var(--accent-gold); border-bottom-color: transparent; font-weight: 700; }
+    /* The unread-count badge is inline-styled solid red on its own — once the
+       tab itself goes solid red (active), invert the badge so it stays legible
+       instead of disappearing into the same-color background. */
+    .context-tab.active span { background: rgba(255,255,255,0.9) !important; color: var(--accent-gold) !important; }
 
     /* min-height:0 is required for flex children — without it, a flex item won't
        shrink below its content size even with overflow-y:auto set, so the checkout
@@ -350,6 +363,7 @@
     .btn-checkout {
         background: var(--accent-gold);
         border: none;
+        border-radius: var(--radius-pill);
         color: #fff;
         width: 100%;
         padding: 1.1rem;
@@ -388,14 +402,26 @@
         border-bottom: 1px solid var(--border-color);
         font-size: 0.85rem;
     }
+    /* Pale-tinted status pill: bold saturated text on a light wash of the
+       same hue, instead of an outlined badge. */
     .status-badge {
         font-size: 0.6rem;
         text-transform: uppercase;
         letter-spacing: 1px;
-        padding: 0.25rem 0.5rem;
-        border: 1px solid var(--border-color);
+        padding: 0.25rem 0.6rem;
+        border: none;
+        border-radius: var(--radius-pill);
+        background: rgba(138,125,116,0.14);
+        color: var(--text-muted);
     }
-    .status-ready { border-color: #10b981; color: #10b981; }
+    .status-ready { background: rgba(16,185,129,0.12); color: #10b981; }
+    /* .status-badge also picks up Bootstrap's border-warning/border-danger +
+       text-warning/text-danger utility classes for the "preparing"/"review"
+       states (assigned in the running-order JS below) — border is already
+       none above, and these two rules give them the same pale-pill look
+       instead of leaving them as plain colored text. */
+    .status-badge.border-warning { background: rgba(245,158,11,0.12); }
+    .status-badge.border-danger { background: rgba(239,68,68,0.12); }
     .review-item-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
     .review-action-btn {
         width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--border-color);
@@ -410,7 +436,7 @@
     /* ── Modal ────────────────────────────────────────────────────── */
     .modal-content {
         background: var(--panel-bg);
-        border-radius: 0;
+        border-radius: var(--radius-lg);
         border: 1px solid var(--border-color);
         color: var(--text-main);
     }
@@ -421,7 +447,7 @@
         background-color: transparent;
         border: 1px solid var(--border-color);
         color: var(--text-main);
-        border-radius: 0;
+        border-radius: var(--radius-sm);
         padding: 0.75rem 1rem;
         font-size: 0.9rem;
         width: 100%;
@@ -447,6 +473,7 @@
         z-index: 1020;
         text-align: center;
         border: none;
+        border-radius: var(--radius-pill);
         min-height: 56px;
         cursor: pointer;
     }
@@ -492,17 +519,20 @@
     }
     .active-order-item:hover { background: var(--bg-color); color: var(--text-main); }
     .active-order-item.current {
-        background: linear-gradient(90deg, rgba(197,160,89,0.1) 0%, transparent 100%);
+        background: linear-gradient(90deg, rgba(236,39,52,0.1) 0%, transparent 100%);
         border-left: 3px solid var(--accent-gold);
     }
     .aoi-token { font-family: 'DM Serif Display', serif; font-size: 1.2rem; min-width: 44px; text-align: center; }
     .aoi-details { flex: 1; min-width: 0; }
     .aoi-customer { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .aoi-amount { font-size: 0.82rem; font-weight: 600; white-space: nowrap; }
-    .aoi-badge { font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1px; padding: 0.2rem 0.5rem; border-radius: 2px; }
+    .aoi-badge { font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1px; padding: 0.2rem 0.6rem; border-radius: var(--radius-pill); }
+    /* Online stays a solid fill — it's the same channel-identity orange used
+       everywhere else in this app (--online), not a status, so it keeps the
+       solid-brand-chip treatment rather than a pale status tint. */
     .aoi-badge.online { background: #fc8019; color: #fff; }
-    .aoi-badge.billing { background: #f59e0b; color: #fff; }
-    .aoi-badge.open { background: var(--border-color); color: var(--text-muted); }
+    .aoi-badge.billing { background: rgba(245,158,11,0.12); color: #f59e0b; }
+    .aoi-badge.open { background: rgba(138,125,116,0.14); color: var(--text-muted); }
     .aoi-empty { padding: 2rem; text-align: center; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
 
     /* ── Small phone tweaks ───────────────────────────────────────── */
@@ -514,15 +544,15 @@
 {% endblock %}
 
 {% block header_left %}
-<div class="d-flex align-items-center gap-2">
-    <div style="width:34px;height:34px;border-radius:8px;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex-shrink:0;">
+<a href="/billing/" class="d-flex align-items-center gap-2 text-decoration-none" style="color:inherit;">
+    <div style="width:34px;height:34px;border-radius:10px;background:rgba(236,39,52,0.12);border:1px solid rgba(236,39,52,0.3);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex-shrink:0;">
         <i class="bi bi-receipt" style="font-size:1.1rem;"></i>
     </div>
     <div>
         <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.5px;color:var(--text-main);">POS Billing</h1>
-        <div class="text-muted" style="font-size:0.72rem;letter-spacing:1px;text-transform:uppercase;">{{ request.user.outlet.name }}</div>
+        <div class="text-muted" style="font-size:0.72rem;letter-spacing:0.5px;">{{ request.user.outlet.name }}</div>
     </div>
-</div>
+</a>
 {% endblock %}
 
 {% block header_right %}
@@ -685,9 +715,9 @@
                     <div style="text-align:right;">
                         <div class="aoi-amount">{% if t.order.grand_total %}₹{{ t.order.grand_total|floatformat:0 }}{% else %}—{% endif %}</div>
                         {% if t.order.status == 'billing' %}
-                        <div class="aoi-badge" style="background:#10b981;color:#fff;">Pay</div>
+                        <div class="aoi-badge" style="background:rgba(16,185,129,0.12);color:#10b981;">Pay</div>
                         {% elif t.order.status == 'paid' or t.order.status == 'closed' %}
-                        <div class="aoi-badge" style="background:#6366f1;color:#fff;">Print</div>
+                        <div class="aoi-badge" style="background:rgba(99,102,241,0.12);color:#6366f1;">Print</div>
                         {% else %}
                         <div class="aoi-badge {{ t.order.status }}">{{ t.order.get_status_display }}</div>
                         {% endif %}
@@ -742,7 +772,7 @@
                 <span>Parcel Charge</span><span>₹{{ request.user.outlet.parcel_charge_amount|floatformat:0 }}</span>
             </div>
             <button class="parcel-btn" onclick="toggleParcel()"
-                style="width:100%;padding:0.55rem;margin-bottom:0.5rem;border:1.5px dashed var(--border-color);
+                style="width:100%;padding:0.55rem;margin-bottom:0.5rem;border:1.5px dashed var(--border-color);border-radius:999px;
                        background:transparent;color:var(--text-muted);font-size:0.72rem;text-transform:uppercase;
                        letter-spacing:1.5px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;
                        justify-content:center;gap:0.5rem;font-family:inherit;">
@@ -871,7 +901,7 @@
                 <span>Parcel Charge</span><span>₹{{ request.user.outlet.parcel_charge_amount|floatformat:0 }}</span>
             </div>
             <button class="parcel-btn" onclick="toggleParcel()"
-                style="width:100%;padding:0.55rem;margin-bottom:0.5rem;border:1.5px dashed var(--border-color);
+                style="width:100%;padding:0.55rem;margin-bottom:0.5rem;border:1.5px dashed var(--border-color);border-radius:999px;
                        background:transparent;color:var(--text-muted);font-size:0.72rem;text-transform:uppercase;
                        letter-spacing:1.5px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;
                        justify-content:center;gap:0.5rem;font-family:inherit;">
@@ -1191,7 +1221,7 @@
         const card = document.getElementById('card-' + id);
         if (card) {
             card.style.borderColor = 'var(--accent-gold)';
-            card.style.background  = 'rgba(197,160,89,0.10)';
+            card.style.background  = 'rgba(236,39,52,0.10)';
             setTimeout(() => {
                 card.style.borderColor = '';
                 card.style.background  = '';
@@ -1461,7 +1491,7 @@
     }
 
     /* ── Print receipt ──────────────────────────────────────────────
-       Inside the Lexnorax Android app, the EC2 server cannot reach the LAN
+       Inside the EasyBillBro Android app, the EC2 server cannot reach the LAN
        printer, so we push the job to the print queue — the app's on-device
        service polls it and sends bytes to the printer over WiFi.
        On desktop/browser, fall back to the thermal-receipt print popup. */
@@ -1531,7 +1561,7 @@
         document.querySelectorAll('.parcel-btn').forEach(btn => {
             btn.style.borderColor = _parcelOn ? 'var(--accent-gold)' : 'var(--border-color)';
             btn.style.color       = _parcelOn ? 'var(--accent-gold)' : 'var(--text-muted)';
-            btn.style.background  = _parcelOn ? 'rgba(197,160,89,0.06)' : 'transparent';
+            btn.style.background  = _parcelOn ? 'rgba(236,39,52,0.06)' : 'transparent';
         });
         document.querySelectorAll('.parcel-btn-text').forEach(el => {
             el.textContent = _parcelOn

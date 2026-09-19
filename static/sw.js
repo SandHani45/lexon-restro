@@ -1,5 +1,5 @@
 /* ============================================================
-   Lexnorax POS — Service Worker
+   EasyBillBro POS — Service Worker
    Handles: offline caching, install prompt.
    (Offline order queuing lives in page JS — see offlineQueue in
    templates/core/base.html — not here. Background Sync API support is

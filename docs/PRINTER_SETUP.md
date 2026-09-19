@@ -1,9 +1,9 @@
-# Lexnorax Printer Setup Guide
+# EasyBillBro Printer Setup Guide
 
 ## What Changed (v1.2 — Printer Overhaul)
 
 ### Problem Solved
-Previously, Lexnorax stored the printer's **IP address** in settings. IP addresses change when:
+Previously, EasyBillBro stored the printer's **IP address** in settings. IP addresses change when:
 - The router restarts and DHCP assigns a new lease
 - The router is replaced or factory-reset (losing DHCP reservations)
 - A technician changes the network
@@ -11,7 +11,7 @@ Previously, Lexnorax stored the printer's **IP address** in settings. IP address
 Every time this happened, the owner had to find the new IP and update it manually — tedious and support-intensive.
 
 ### Solution
-Lexnorax now stores the printer's **MAC address** — a permanent hardware identifier printed on a sticker on every printer. The system resolves MAC → IP automatically at print time using the OS ARP table. If that fails, it falls back through a chain until it finds the printer.
+EasyBillBro now stores the printer's **MAC address** — a permanent hardware identifier printed on a sticker on every printer. The system resolves MAC → IP automatically at print time using the OS ARP table. If that fails, it falls back through a chain until it finds the printer.
 
 ---
 
@@ -72,12 +72,12 @@ outlet.paper_width_mm   # 58 or 80
 3. Read the sticker — look for a line like `MAC: 00:1B:44:11:3A:B7` or `MAC Address: 001B44113AB7`
 4. Copy it (any format works — colons, dashes, or plain digits)
 
-### Step 2 — Enter MAC in Lexnorax
+### Step 2 — Enter MAC in EasyBillBro
 1. Log in as **Owner** or **Manager**
 2. Go to **Setup → Outlet Settings**
 3. Scroll to **Thermal Printer** section
 4. Paste the MAC address into the **Printer MAC Address** field
-   - Lexnorax auto-formats it to `XX:XX:XX:XX:XX:XX` as you type
+   - EasyBillBro auto-formats it to `XX:XX:XX:XX:XX:XX` as you type
 5. Set **Paper Width** — most printers use **80mm** (check your roll)
 6. Leave **Print Agent Host** as `localhost`
 7. Click **Save Outlet Details**
@@ -93,7 +93,7 @@ python lexnorax_agent.py --install
 
 ### Step 4 — Enable agent printing
 1. Go to **Setup → Outlet Settings → Thermal Printer**
-2. Tick **Lexnorax Print Agent** checkbox
+2. Tick **EasyBillBro Print Agent** checkbox
 3. Save
 
 ### Step 5 — Test
@@ -122,10 +122,10 @@ Example: `MAC Address: 00-1B-44-11-3A-B7`
 
 > **Why MAC and not IP?** The IP on this config page will change after a router restart. The MAC never changes.
 
-### Step 3 — Enter MAC in Lexnorax
+### Step 3 — Enter MAC in EasyBillBro
 1. Log in on the tablet browser → **Setup → Outlet Settings**
 2. Scroll to **Thermal Printer**
-3. Paste the MAC address → Lexnorax formats it automatically
+3. Paste the MAC address → EasyBillBro formats it automatically
 4. Set Paper Width (80mm for most)
 5. Leave **Print Agent Host** as `localhost` for now
 6. Save
@@ -147,7 +147,7 @@ pip install websockets
 
 #### Copy the agent to the tablet
 ```bash
-# Option A: download from your Lexnorax server (replace with your actual URL)
+# Option A: download from your EasyBillBro server (replace with your actual URL)
 curl -O https://your-lexnorax-server.com/static/agent/lexnorax_agent.py
 
 # Option B: copy via USB from your PC
@@ -182,12 +182,12 @@ chmod +x ~/.termux/boot/lexnorax_agent.sh
 ```bash
 python ~/lexnorax_agent.py
 # Should print:
-# Lexnorax Print Agent v1.1.0
+# EasyBillBro Print Agent v1.1.0
 # Listening on ws://localhost:8765
 # Platform: linux | win32print: no
 ```
 
-#### Verify in Lexnorax
+#### Verify in EasyBillBro
 1. On the tablet browser → **Setup → Outlet Settings → Thermal Printer**
 2. Agent Host should be `localhost`
 3. Click **Test Agent Connection**
@@ -251,7 +251,7 @@ sudo nano /etc/systemd/system/lexnorax-agent.service
 Paste this content:
 ```ini
 [Unit]
-Description=Lexnorax Print Agent
+Description=EasyBillBro Print Agent
 After=network.target
 
 [Service]
@@ -276,7 +276,7 @@ sudo systemctl start lexnorax-agent
 sudo systemctl status lexnorax-agent
 ```
 
-#### Update Lexnorax to point to the Pi
+#### Update EasyBillBro to point to the Pi
 1. **Setup → Outlet Settings → Thermal Printer**
 2. Change **Print Agent Host** from `localhost` to `192.168.1.200`
 3. Save
@@ -291,7 +291,7 @@ sudo systemctl status lexnorax-agent
 
 ## Day-to-Day: What Happens When the Router Restarts
 
-| Situation | What Lexnorax Does | Owner Action |
+| Situation | What EasyBillBro Does | Owner Action |
 |---|---|---|
 | Router restarts, printer gets new DHCP IP | Agent ARP-resolves MAC → finds new IP automatically | Nothing |
 | Router replaced, DHCP reservations lost | Same — MAC is permanent, ARP still works | Nothing |

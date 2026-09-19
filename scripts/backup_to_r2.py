@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Back up the Lexnorax Postgres database to a PRIVATE Cloudflare R2 bucket.
+Back up the EasyBillBro Postgres database to a PRIVATE Cloudflare R2 bucket.
 
   pg_dump  ->  gzip  ->  R2 (private bucket)  ->  prune backups older than N days
 

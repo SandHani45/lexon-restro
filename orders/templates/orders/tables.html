@@ -26,14 +26,14 @@
   .table-status-line { position: absolute; top: 0; left: 0; right: 0; height: 3px; }
   .table-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
   .table-name { font-family: 'DM Serif Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin: 0; }
-  .table-timer { font-family: 'Space Mono', monospace; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 5px; }
+  .table-timer { font-family: 'Space Mono', monospace; font-size: 0.75rem; padding: 2px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 5px; }
   .table-status { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 0.5rem; }
 
   /* Cooking items badge */
   .cooking-badge {
     display: inline-flex; align-items: center; gap: 4px;
-    font-size: 0.7rem; font-weight: 600; padding: 2px 7px;
-    border-radius: 4px; background: rgba(249,115,22,0.12);
+    font-size: 0.7rem; font-weight: 600; padding: 2px 9px;
+    border-radius: 999px; background: rgba(249,115,22,0.12);
     color: var(--c-prepare); border: 1px solid rgba(249,115,22,0.25);
     margin-bottom: 0.5rem; width: fit-content;
   }
@@ -62,17 +62,22 @@
      .btn-luxury / .btn-luxury-primary classes applied alongside it in the HTML. */
   .btn-card-action { flex: 1; min-width: 30%; text-align: center; }
 
-  /* Metrics */
+  /* Metrics -- soft pastel count tiles, each tinted to its own stat */
   .metric-card {
-    background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px;
-    padding: 1.5rem; text-align: center; display: flex; flex-direction: column;
-    justify-content: center; box-shadow: var(--shadow-soft); transition: var(--transition-smooth);
-    position: relative; overflow: hidden;
+    background: var(--metric-tint-bg, var(--panel-bg));
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.3rem;
+    transition: var(--transition-smooth);
   }
-  .metric-card::before { content: ''; position: absolute; top:0; left:0; width:4px; height:100%; background: var(--accent-gold); }
-  .metric-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
-  .metric-val { font-family: 'DM Serif Display', serif; font-size: 2.5rem; font-weight: 700; color: var(--text-main); line-height: 1; }
-  .metric-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-top: 0.5rem; font-weight: 600; }
+  .metric-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+  .metric-val { font-family: 'DM Serif Display', serif; font-size: 2.25rem; font-weight: 700; color: var(--metric-tint-color, var(--accent-gold)); line-height: 1; }
+  .metric-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-top: 0.15rem; font-weight: 700; }
 
   /* Modal overrides */
   .modal-content { background: var(--bg-color); border-radius: 8px; border: 1px solid var(--border-color); }
@@ -169,8 +174,8 @@
   }
 
   /* Active states */
-  .filter-tab.active                          { border-color: var(--text-muted); color: var(--text-main); background: var(--sidebar-active-bg, rgba(197,160,89,0.08)); }
-  .filter-tab.active.filter-all               { border-color: var(--accent-gold); color: var(--accent-gold); background: rgba(197,160,89,0.1); }
+  .filter-tab.active                          { border-color: var(--text-muted); color: var(--text-main); background: var(--sidebar-active-bg, rgba(236,39,52,0.08)); }
+  .filter-tab.active.filter-all               { border-color: var(--accent-gold); color: #ffffff; background: var(--accent-gold); font-weight: 700; }
   .filter-tab.active.filter-free              { border-color: var(--c-free);    color: var(--c-free);    background: rgba(16,185,129,0.10); }
   .filter-tab.active.filter-ordering          { border-color: var(--c-order);   color: var(--c-order);   background: rgba(234,179,8,0.10); }
   .filter-tab.active.filter-preparing         { border-color: var(--c-prepare); color: var(--c-prepare); background: rgba(249,115,22,0.10); }
@@ -240,7 +245,7 @@
   }
   .floor-map-node:hover {
     transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 8px 24px rgba(197, 160, 89, 0.2);
+    box-shadow: 0 8px 24px rgba(236, 39, 52, 0.2);
     border-color: var(--accent-gold);
     z-index: 10;
   }
@@ -297,8 +302,8 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.6px;
-    padding: 0.2rem 0.6rem;
-    border-radius: 6px;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
@@ -316,8 +321,8 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.6px;
-    padding: 0.22rem 0.65rem;
-    border-radius: 6px;
+    padding: 0.22rem 0.7rem;
+    border-radius: 999px;
     cursor: pointer;
     transition: opacity 0.15s;
     display: inline-flex;
@@ -434,15 +439,15 @@
 {% endblock %}
 
 {% block header_left %}
-<div class="d-flex align-items-center gap-2">
-  <div style="width:34px;height:34px;border-radius:8px;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex-shrink:0;">
+<a href="/tables/" class="d-flex align-items-center gap-2 text-decoration-none" style="color:inherit;">
+  <div style="width:34px;height:34px;border-radius:10px;background:rgba(236,39,52,0.12);border:1px solid rgba(236,39,52,0.3);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex-shrink:0;">
     <i class="bi bi-grid-3x3-gap-fill" style="font-size:1.05rem;"></i>
   </div>
   <div>
     <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.5px;color:var(--text-main);">Floor Plan &amp; Tables</h1>
-    <div class="text-muted" style="font-size:0.72rem;letter-spacing:1px;text-transform:uppercase;">{{ request.user.outlet.name }}</div>
+    <div class="text-muted" style="font-size:0.72rem;letter-spacing:0.5px;">{{ request.user.outlet.name }}</div>
   </div>
-</div>
+</a>
 {% endblock %}
 
 {% block header_right %}
@@ -472,25 +477,25 @@
   <!-- METRICS -->
   <div class="row g-4 mb-5">
     <div class="col-6 col-md-3">
-      <div class="metric-card">
+      <div class="metric-card" style="--metric-tint-bg:rgba(236,39,52,0.08);--metric-tint-color:var(--accent-gold);">
         <div class="metric-val" id="stat-total">0</div>
         <div class="metric-label">Total Tables</div>
       </div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="metric-card" style="--accent-gold:var(--c-free);">
+      <div class="metric-card" style="--metric-tint-bg:rgba(16,185,129,0.10);--metric-tint-color:var(--c-free);">
         <div class="metric-val" id="stat-free">0</div>
         <div class="metric-label">Tables Free</div>
       </div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="metric-card" style="--accent-gold:var(--c-order);">
+      <div class="metric-card" style="--metric-tint-bg:rgba(234,179,8,0.10);--metric-tint-color:var(--c-order);">
         <div class="metric-val" id="stat-active">0</div>
         <div class="metric-label">Active Orders</div>
       </div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="metric-card" style="--accent-gold:#06b6d4;">
+      <div class="metric-card" style="--metric-tint-bg:rgba(6,182,212,0.10);--metric-tint-color:#06b6d4;">
         <div class="metric-val" id="stat-billing">0</div>
         <div class="metric-label">Awaiting Payment</div>
       </div>

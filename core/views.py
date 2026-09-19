@@ -44,7 +44,8 @@ def landing(request):
     # doesn't intercept — e.g. authenticated users who should go to dashboard.
     if request.user.is_authenticated:
         return redirect("/dashboard/")
-    return redirect("/login/")
+    return render(request, "core/landing.html")
+
 
 
 def serve_sw(request):

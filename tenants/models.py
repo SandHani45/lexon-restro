@@ -32,7 +32,7 @@ RESERVED_SLUGS = frozenset({
     'www', 'api', 'app', 'admin', 'superadmin', 'static', 'media',
     'support', 'login', 'logout', 'signup', 'register',
     'help', 'mail', 'smtp', 'lexnorax', 'health', 'favicon',
-    # Reserved to prevent confusion with Lexnorax branding
+    # Reserved to prevent confusion with EasyBillBro branding
     'billing', 'dashboard', 'setup',
 })
 
@@ -460,7 +460,7 @@ class Outlet(models.Model):
         max_length=253,
         default="localhost",
         help_text=(
-            "'localhost' when the Lexnorax Agent runs on this device (Windows PC or Termux on tablet). "
+            "'localhost' when the EasyBillBro Agent runs on this device (Windows PC or Termux on tablet). "
             "Set to a local IP (e.g. 192.168.1.200) when using a Raspberry Pi or separate print server."
         )
     )
@@ -469,7 +469,7 @@ class Outlet(models.Model):
         default=uuid.uuid4,
         editable=False,
         unique=True,
-        help_text="Secret key the Lexnorax Agent uses to poll for print jobs. Never share publicly."
+        help_text="Secret key the EasyBillBro Agent uses to poll for print jobs. Never share publicly."
     )
 
     paper_width_mm = models.IntegerField(

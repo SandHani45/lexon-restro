@@ -117,7 +117,7 @@ def _send_twilio(phone: str, message: str, order_id) -> bool:
 
 def send_subscription_invoice(invoice, payment_link_url: str = "") -> bool:
     """
-    Send a Lexnorax subscription invoice notice to the tenant, via WhatsApp.
+    Send a EasyBillBro subscription invoice notice to the tenant, via WhatsApp.
     Reuses the exact same Meta/Twilio senders as customer bill receipts --
     only the message and phone lookup differ. Never raises, same as
     send_bill_receipt: a failed WhatsApp send must never block the invoice
@@ -158,7 +158,7 @@ def send_subscription_invoice(invoice, payment_link_url: str = "") -> bool:
 
 def _build_subscription_message(invoice, payment_link_url: str) -> str:
     lines = [
-        "*Lexnorax Subscription Invoice*",
+        "*EasyBillBro Subscription Invoice*",
         "",
         f"*{invoice.tenant.name}*",
         f"Period: {invoice.period_start} to {invoice.period_end}",
@@ -202,7 +202,7 @@ def _build_message(order, bill_url: str) -> str:
     if bill_url:
         lines += ["", f"View bill: {bill_url}"]
 
-    lines.append("\nPowered by Lexnorax POS")
+    lines.append("\nPowered by EasyBillBro POS")
     return "\n".join(l for l in lines if l is not None)
 
 

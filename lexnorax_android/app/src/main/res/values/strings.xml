@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Lexnorax</string>
-    <string name="notif_channel_name">Lexnorax Print Service</string>
+    <string name="app_name">EasyBillBro</string>
+    <string name="notif_channel_name">EasyBillBro Print Service</string>
     <string name="notif_channel_desc">Keeps printing active in background</string>
 </resources>

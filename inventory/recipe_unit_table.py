@@ -1,7 +1,7 @@
 # inventory/recipe_unit_table.py
 """
 Parses the free-text quantity phrases Gemini extracts from a recipe
-("2 cups", "a pinch", "1/2 tsp", "200g") into Lexnorax's native unit set
+("2 cups", "a pinch", "1/2 tsp", "200g") into EasyBillBro's native unit set
 (g/kg/ml/l/pcs) — or explicitly refuses to guess when the phrase is genuinely
 ambiguous.
 
@@ -65,7 +65,7 @@ def parse_quantity_text(raw_text: str):
     """
     Returns (quantity: Decimal|None, unit: str|None, needs_manual: bool).
 
-    quantity/unit are only ever set together, in one of Lexnorax's native units
+    quantity/unit are only ever set together, in one of EasyBillBro's native units
     (g/kg/ml/l/pcs). needs_manual=True means: don't guess, show this row
     amber in the review UI, and require the reviewer to type a quantity.
     """

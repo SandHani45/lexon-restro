@@ -4,7 +4,7 @@
 
 {% block extra_css %}
 <style>
-    .card-elegant { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 2rem; box-shadow: var(--shadow-soft); border-radius: 0; height: 100%; transition: var(--transition-smooth); }
+    .card-elegant { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 2rem; box-shadow: var(--shadow-card); border-radius: var(--radius-lg, 20px); height: 100%; transition: var(--transition-smooth); }
     .card-elegant:hover { border-color: var(--accent-gold); transform: translateY(-3px); }
     .metric-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 0.5rem; }
     .metric-value { font-family: 'DM Serif Display', serif; font-size: 2rem; margin: 0; color: var(--accent-gold); }
@@ -12,9 +12,21 @@
     .table-luxury th { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); padding: 1.2rem 1rem; border-bottom: 1px solid var(--border-color); text-align: left; }
     .table-luxury td { padding: 1.2rem 1rem; border-bottom: 1px dashed var(--border-color); font-size: 0.95rem; }
     .agent-name { font-weight: 600; color: var(--text-main); }
-    .revenue-pill { background: rgba(197,160,89,0.1); color: var(--accent-gold); padding: 4px 12px; font-weight: 700; font-family: 'Space Mono', monospace; font-size: 0.85rem; }
-    .progress { height: 6px; border-radius: 10px; background: var(--border-color); margin-top: 8px; }
+    .revenue-pill { background: rgba(236, 39, 52,0.1); color: var(--accent-gold); padding: 5px 14px; border-radius: var(--radius-pill, 999px); font-weight: 700; font-family: 'Space Mono', monospace; font-size: 0.85rem; }
+    .progress { height: 6px; border-radius: var(--radius-pill, 999px); background: var(--border-color); margin-top: 8px; }
     .progress-bar { background: var(--accent-gold); }
+
+    /* ── Bold KPI tiles (KimiPoS style) ──────────────────────── */
+    .kpi-tile { border-radius: var(--radius-lg, 20px); padding: 1.15rem 1.35rem; color: #fff !important; height: 100%; min-height: 132px; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 4px 18px rgba(0,0,0,0.08); transition: transform 0.22s ease, box-shadow 0.22s ease; }
+    .kpi-tile:hover { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(0,0,0,0.18); }
+    .kpi-tile.t1 { background: var(--accent-gold); }
+    .kpi-tile.t2 { background: #a3182a; }
+    .kpi-tile.t3 { background: var(--accent-dark); }
+    .kpi-icon-badge { width: 34px; height: 34px; border-radius: 10px; background: rgba(255,255,255,0.2); display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; margin-bottom: 0.55rem; }
+    .kpi-val { font-family: var(--font-main, 'Outfit', sans-serif); font-size: 1.75rem; font-weight: 800; line-height: 1.1; letter-spacing: -0.3px; }
+    .kpi-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-top: 5px; font-weight: 700; }
+    .kpi-sub { font-size: 0.65rem; opacity: 0.85; margin-top: 4px; }
+    .agent-avatar { width:40px; height:40px; border-radius: var(--radius-sm, 10px); background:var(--bg-color); border:1px solid var(--border-color); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--accent-gold); }
 </style>
 {% endblock %}
 
@@ -44,24 +56,26 @@
     <!-- Metrics -->
     <div class="row g-4 mb-5">
         <div class="col-md-4">
-            <div class="card-elegant">
-                <span class="metric-label">Collective Ecosystem Revenue</span>
-                <p class="metric-value">₹{{ overall_revenue|floatformat:2 }}</p>
-                <div class="progress"><div class="progress-bar w-100"></div></div>
+            <div class="kpi-tile t1">
+                <div class="kpi-icon-badge"><i class="bi bi-currency-rupee"></i></div>
+                <p class="kpi-val mb-0">₹{{ overall_revenue|floatformat:2 }}</p>
+                <span class="kpi-label">Collective Ecosystem Revenue</span>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card-elegant">
-                <span class="metric-label">Networked Restaurants</span>
-                <p class="metric-value">{{ total_tenants }}</p>
-                <p class="small text-muted mt-2">Total active tenants in system</p>
+            <div class="kpi-tile t2">
+                <div class="kpi-icon-badge"><i class="bi bi-shop"></i></div>
+                <p class="kpi-val mb-0">{{ total_tenants }}</p>
+                <span class="kpi-label">Networked Restaurants</span>
+                <div class="kpi-sub">Total active tenants in system</div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card-elegant">
-                <span class="metric-label">Direct (Unassigned) Accounts</span>
-                <p class="metric-value" style="color:var(--text-main);">{{ unassigned_tenants }}</p>
-                <p class="small text-muted mt-2">Brought in directly without agent</p>
+            <div class="kpi-tile t3">
+                <div class="kpi-icon-badge"><i class="bi bi-diagram-3"></i></div>
+                <p class="kpi-val mb-0">{{ unassigned_tenants }}</p>
+                <span class="kpi-label">Direct (Unassigned) Accounts</span>
+                <div class="kpi-sub">Brought in directly without agent</div>
             </div>
         </div>
     </div>
@@ -89,7 +103,7 @@
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center gap-3">
-                                        <div style="width:40px; height:40px; background:var(--bg-color); border:1px solid var(--border-color); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--accent-gold);">
+                                        <div class="agent-avatar">
                                             {{ stat.agent|slice:":1"|upper }}
                                         </div>
                                         <div>

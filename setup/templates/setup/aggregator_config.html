@@ -1,192 +1,805 @@
 {% extends 'core/base.html' %}
 {% load static %}
 
-{% block title %}Online Orders Setup | {{ request.user.tenant.name }}{% endblock %}
+{% block title %}Online Orders & Aggregators | {{ request.user.tenant.name }}{% endblock %}
 
 {% block extra_css %}
 <style>
-    .setup-container { max-width: 800px; margin: 0 auto; padding: 2rem 2rem 4rem; }
+  :root {
+    --pos-red: #EC2734;
+    --pos-red-hover: #d81f2f;
+    --pos-red-soft: #FFF4F4;
+    --pos-red-border: rgba(236, 39, 52, 0.22);
+    --pos-green: #10b981;
+    --pos-green-soft: #ECFDF5;
+  }
 
-    .page-eyebrow { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 4px; color: var(--accent-gold); margin-bottom: 0.5rem; }
-    .page-title { font-family: 'DM Serif Display', serif; font-size: 1.8rem; font-weight: 700; color: var(--text-main); }
-    .divider { width: 40px; height: 1px; background: var(--accent-gold); margin: 1.2rem 0; }
-    .page-sub { color: var(--text-muted); font-size: 0.8rem; line-height: 1.6; margin-bottom: 2rem; }
+  html.dark {
+    --pos-red-soft: rgba(236, 39, 52, 0.16);
+    --pos-red-border: rgba(236, 39, 52, 0.35);
+    --pos-green-soft: rgba(16, 185, 129, 0.16);
+  }
 
-    .alert { padding: 0.8rem 1.2rem; margin-bottom: 1.5rem; font-size: 0.8rem; border-left: 3px solid var(--accent-gold); background: rgba(197,160,89,0.08); }
+  body {
+    background: var(--bg-color) !important;
+  }
 
-    .panel-card { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 2rem; margin-bottom: 2rem; }
-    .form-group { margin-bottom: 1.5rem; }
-    .form-label { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 0.5rem; }
-    .form-control { width: 100%; background: transparent; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.75rem 1rem; transition: 0.2s; font-family: inherit; }
-    .form-control:focus { border-color: var(--accent-gold); outline: none; }
-    .form-control[readonly] { background: rgba(0,0,0,0.02); color: var(--text-muted); cursor: not-allowed; font-family: 'Space Mono', monospace; font-size: 0.85rem; }
+  .setup-wrapper {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 1.5rem 1.5rem 4rem;
+  }
 
-    .code-block { background: rgba(0,0,0,0.05); border: 1px solid var(--border-color); padding: 1rem; font-family: 'Space Mono', monospace; font-size: 0.85rem; color: var(--accent-gold); word-break: break-all; margin-top: 0.5rem; }
-    html.dark .code-block { background: rgba(255,255,255,0.05); }
+  /* ── Subbar Breadcrumbs ── */
+  .setup-subbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .setup-breadcrumb {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+  }
+  .setup-breadcrumb a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .setup-breadcrumb a:hover {
+    color: var(--pos-red);
+  }
+  .setup-breadcrumb .sep {
+    color: var(--border-color);
+    font-size: 0.7rem;
+  }
+  .setup-breadcrumb .active {
+    color: var(--pos-red);
+    font-weight: 700;
+  }
 
-    .switch-wrapper { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid var(--border-color); }
-    .switch-wrapper:last-child { border-bottom: none; }
-    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; inset: 0; background-color: var(--border-color); transition: .2s; border-radius: 24px; }
-    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: var(--text-muted); transition: .2s; border-radius: 50%; }
-    input:checked + .slider { background-color: rgba(197,160,89,0.3); border: 1px solid var(--accent-gold); }
-    input:checked + .slider:before { transform: translateX(20px); background-color: var(--accent-gold); }
+  /* ── Hero Page Header ── */
+  .setup-header-title {
+    font-family: var(--font-display, 'DM Serif Display', serif);
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: -0.4px;
+    margin: 0 0 0.35rem;
+  }
+  .setup-header-sub {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.5;
+  }
 
-    .btn-gold { background: transparent; border: 1px solid var(--accent-gold); color: var(--accent-gold); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; padding: 0.8rem 2rem; cursor: pointer; transition: 0.2s; font-weight: 600; min-height: 48px; }
-    .btn-gold:hover { background: var(--accent-gold); color: #000; }
-
-    @media (max-width: 600px) {
-        .setup-container { padding: 1.25rem 1.1rem 3rem; }
-        .panel-card { padding: 1.25rem; }
-        .switch-wrapper { gap: 1rem; }
-        .btn-gold { width: 100%; }
+  /* ── Status Grid Strip ── */
+  .channel-status-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 1.5rem 0 2rem;
+  }
+  @media (max-width: 768px) {
+    .channel-status-grid {
+      grid-template-columns: repeat(2, 1fr);
     }
+  }
+  .channel-status-card {
+    background: var(--panel-bg);
+    border: 1.5px solid var(--border-color);
+    border-radius: 16px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: var(--shadow-card);
+    transition: all 0.2s ease;
+  }
+  .channel-status-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+  }
+  .channel-icon-squircle {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+  }
+  .channel-info-name {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.2;
+  }
+  .channel-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 2px 8px;
+    margin-top: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .channel-status-pill.connected {
+    background: rgba(16, 185, 129, 0.14);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+  .channel-status-pill.disabled {
+    background: var(--surface-2);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+  }
+
+  /* ── Main Panel Cards ── */
+  .panel-card {
+    background: var(--panel-bg);
+    border: 1.5px solid var(--border-color);
+    border-radius: 20px;
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-card);
+    transition: border-color 0.2s;
+  }
+  .panel-card:hover {
+    border-color: rgba(236, 39, 52, 0.25);
+  }
+
+  .panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .panel-head-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+  }
+  .panel-head-title i {
+    color: var(--pos-red);
+    font-size: 1.15rem;
+  }
+  .panel-head-sub {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin: 2px 0 0;
+  }
+
+  /* ── Form Controls & Monospace Box ── */
+  .form-group-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .code-input-group {
+    display: flex;
+    align-items: center;
+    background: var(--surface-2);
+    border: 1.5px solid var(--border-color);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+  }
+  .code-input-group:focus-within {
+    border-color: var(--pos-red);
+    box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.12);
+  }
+  .code-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 0.75rem 1rem;
+    font-family: var(--font-mono, monospace);
+    font-size: 0.85rem;
+    color: var(--pos-red);
+    outline: none;
+  }
+  .code-copy-btn {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    color: var(--text-main);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 6px 14px;
+    margin-right: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .code-copy-btn:hover {
+    background: var(--pos-red);
+    border-color: var(--pos-red);
+    color: #ffffff;
+  }
+
+  .field-input {
+    width: 100%;
+    height: 44px;
+    background: var(--surface-2);
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-main);
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 0 1rem;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+  .field-input:focus {
+    border-color: var(--pos-red);
+    background: var(--panel-bg);
+    box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.1);
+  }
+  .field-input[readonly] {
+    opacity: 0.9;
+    cursor: default;
+    font-family: var(--font-mono, monospace);
+    background: var(--surface-2);
+  }
+
+  /* ── Interactive Channel Toggles ── */
+  .channel-row {
+    padding: 1.15rem 0;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .channel-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .channel-row-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .channel-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .channel-title {
+    font-size: 0.96rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .channel-desc {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin: 2px 0 0;
+  }
+
+  /* ── Modern iOS Switch Toggle ── */
+  .pos-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+    flex-shrink: 0;
+  }
+  .pos-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .pos-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: var(--border-color);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 999px;
+  }
+  .pos-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #ffffff;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  .pos-switch input:checked + .pos-slider {
+    background-color: var(--pos-red);
+    box-shadow: 0 2px 8px rgba(236, 39, 52, 0.35);
+  }
+  .pos-switch input:checked + .pos-slider:before {
+    transform: translateX(22px);
+  }
+
+  /* Secret Key Input Reveal Box */
+  .secret-box-wrap {
+    background: var(--surface-2);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 1rem 1.15rem;
+    margin-top: 0.85rem;
+  }
+
+  /* ── Save Action Bar ── */
+  .setup-footer-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+  }
+  .btn-save-pill {
+    height: 46px;
+    padding: 0 28px;
+    border-radius: 999px;
+    background: var(--pos-red);
+    color: #ffffff;
+    font-size: 0.88rem;
+    font-weight: 800;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(236, 39, 52, 0.35);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .btn-save-pill:hover {
+    background: var(--pos-red-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(236, 39, 52, 0.45);
+    color: #ffffff;
+  }
 </style>
 {% endblock %}
 
 {% block header_left %}
-<div>
-    <a href="/dashboard/" style="text-decoration:none;color:inherit;">
-        <h1 class="brand-title mb-0">
-            <i class="bi bi-diamond-half" style="color:var(--accent-gold);"></i>
-            {{ request.user.tenant.name }}
-        </h1>
-    </a>
-    <p class="brand-subtitle">Setup — {{ request.user.outlet.name }}</p>
+<div class="d-flex align-items-center gap-3">
+  <a href="/dashboard/" class="d-flex align-items-center text-decoration-none text-reset" title="Back to Dashboard">
+    <span class="btn-icon" style="width:36px;height:36px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border-color);display:inline-flex;align-items:center;justify-content:center;transition:all 0.2s;">
+      <i class="bi bi-arrow-left" style="font-size:1.05rem;color:var(--pos-red);"></i>
+    </span>
+  </a>
+  <div class="d-flex align-items-center gap-2">
+    <div style="width:34px;height:34px;border-radius:10px;background:rgba(236, 39, 52,0.12);border:1px solid rgba(236, 39, 52,0.3);display:flex;align-items:center;justify-content:center;color:var(--pos-red);flex-shrink:0;">
+      <i class="bi bi-diagram-3-fill" style="font-size:1.05rem;"></i>
+    </div>
+    <div>
+      <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.3px;color:var(--text-main);">Aggregator Integrations</h1>
+      <div class="text-muted" style="font-size:0.72rem;">Online Orders • {{ request.user.outlet.name|default:request.user.tenant.name }}</div>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block header_right %}
-<a href="/setup/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Setup Area</a>
-<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme">
+<div class="d-flex align-items-center gap-2">
+  <a href="/billing/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex" style="border-radius:999px;">
+    <i class="bi bi-calculator me-1"></i> Open POS
+  </a>
+  <a href="/setup/" class="btn-luxury text-decoration-none d-none d-md-inline-flex" style="border-radius:999px;">
+    <i class="bi bi-gear-fill me-1"></i> Setup Hub
+  </a>
+  <button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Dark / Light Theme">
     <i class="bi bi-moon" id="themeIcon"></i>
-</button>
+  </button>
+</div>
 {% endblock %}
 
 {% block content %}
-<div class="setup-container py-4">
-    <p class="page-eyebrow">Configuration</p>
-    <h1 class="page-title">Online Order Setup</h1>
-    <div class="divider"></div>
-    <p class="page-sub">Configure Zomato, Swiggy, and Uber Eats webhooks to push orders right to the kitchen.</p>
+<div class="setup-wrapper">
 
-    {% if messages %}
-    <div class="mb-4">
-        {% for msg in messages %}
-        <div class="alert">{{ msg }}</div>
-        {% endfor %}
+  <!-- ── Subbar Breadcrumb Navigation ── -->
+  <div class="setup-subbar">
+    <div class="setup-breadcrumb">
+      <a href="/dashboard/"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
+      <span class="sep">/</span>
+      <a href="/setup/">Setup Hub</a>
+      <span class="sep">/</span>
+      <span class="active">Aggregators &amp; Online Orders</span>
     </div>
-    {% endif %}
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge" style="background:var(--pos-red-soft);color:var(--pos-red);border:1px solid var(--pos-red-border);border-radius:999px;padding:4px 10px;font-size:0.75rem;">
+        <i class="bi bi-broadcast me-1"></i>Live Webhook Engine
+      </span>
+    </div>
+  </div>
 
-    <form method="POST">
-        {% csrf_token %}
+  <!-- ── Hero Page Title ── -->
+  <div class="mb-4">
+    <h1 class="setup-header-title">Online Order Setup</h1>
+    <p class="setup-header-sub">
+      Connect and manage incoming webhook orders from Zomato, Swiggy, Uber Eats, and direct In-House delivery. Orders automatically route to the POS and KDS.
+    </p>
+  </div>
 
-        <div class="panel-card">
-            <h5 style="font-family:'DM Serif Display',serif;color:var(--accent-gold);margin-bottom:0.5rem;">Webhook Endpoints</h5>
-            <p style="color:var(--text-muted);font-size:0.8rem;margin-bottom:1.5rem;">Provide these details to your aggregator account manager to route orders directly into the POS.</p>
+  {% if messages %}
+  <div class="mb-4">
+    {% for msg in messages %}
+    <div class="alert alert-dismissible fade show" role="alert" style="background:var(--panel-bg);border:1.5px solid var(--pos-green);border-radius:14px;color:var(--text-main);box-shadow:var(--shadow-card);">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-check-circle-fill text-success fs-5"></i>
+        <span>{{ msg }}</span>
+      </div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
 
-            <div class="form-group">
-                <label class="form-label">Global Webhook URL</label>
-                <div class="code-block">{{ webhook_url }}</div>
+  <!-- ── 4 Channel Status Overview Strip ── -->
+  <div class="channel-status-grid">
+    <!-- Zomato Status -->
+    <div class="channel-status-card">
+      <div class="channel-icon-squircle" style="background:rgba(226,55,68,0.12);color:#e23744;">
+        <i class="bi bi-cup-straw"></i>
+      </div>
+      <div>
+        <div class="channel-info-name">Zomato</div>
+        <span class="channel-status-pill {% if config.zomato_enabled %}connected{% else %}disabled{% endif %}">
+          <i class="bi {% if config.zomato_enabled %}bi-check-circle-fill{% else %}bi-dash-circle{% endif %}"></i>
+          {% if config.zomato_enabled %}Active{% else %}Inactive{% endif %}
+        </span>
+      </div>
+    </div>
+
+    <!-- Swiggy Status -->
+    <div class="channel-status-card">
+      <div class="channel-icon-squircle" style="background:rgba(252,128,25,0.12);color:#fc8019;">
+        <i class="bi bi-bag-check-fill"></i>
+      </div>
+      <div>
+        <div class="channel-info-name">Swiggy</div>
+        <span class="channel-status-pill {% if config.swiggy_enabled %}connected{% else %}disabled{% endif %}">
+          <i class="bi {% if config.swiggy_enabled %}bi-check-circle-fill{% else %}bi-dash-circle{% endif %}"></i>
+          {% if config.swiggy_enabled %}Active{% else %}Inactive{% endif %}
+        </span>
+      </div>
+    </div>
+
+    <!-- Uber Eats Status -->
+    <div class="channel-status-card">
+      <div class="channel-icon-squircle" style="background:rgba(6,193,103,0.12);color:#06c167;">
+        <i class="bi bi-bicycle"></i>
+      </div>
+      <div>
+        <div class="channel-info-name">Uber Eats</div>
+        <span class="channel-status-pill {% if config.uber_eats_enabled %}connected{% else %}disabled{% endif %}">
+          <i class="bi {% if config.uber_eats_enabled %}bi-check-circle-fill{% else %}bi-dash-circle{% endif %}"></i>
+          {% if config.uber_eats_enabled %}Active{% else %}Inactive{% endif %}
+        </span>
+      </div>
+    </div>
+
+    <!-- In-House Delivery Status -->
+    <div class="channel-status-card">
+      <div class="channel-icon-squircle" style="background:rgba(59,130,246,0.12);color:#3b82f6;">
+        <i class="bi bi-box-seam-fill"></i>
+      </div>
+      <div>
+        <div class="channel-info-name">In-House</div>
+        <span class="channel-status-pill {% if config.inhouse_delivery_enabled %}connected{% else %}disabled{% endif %}">
+          <i class="bi {% if config.inhouse_delivery_enabled %}bi-check-circle-fill{% else %}bi-dash-circle{% endif %}"></i>
+          {% if config.inhouse_delivery_enabled %}Active{% else %}Inactive{% endif %}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <form method="POST" id="aggregatorForm">
+    {% csrf_token %}
+
+    <!-- ══ CARD 1: WEBHOOK ENDPOINTS ═════════════════════════ -->
+    <div class="panel-card">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-head-title">
+            <i class="bi bi-link-45deg"></i>
+            Webhook Endpoints
+          </h2>
+          <p class="panel-head-sub">Provide these endpoint details to your partner portal or aggregator manager to route live orders.</p>
+        </div>
+        <span class="badge" style="background:var(--surface-2);color:var(--text-muted);border:1px solid var(--border-color);border-radius:999px;padding:4px 12px;font-size:0.72rem;">
+          POST Endpoint
+        </span>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-group-label" for="webhookUrlInput">Global Webhook Target URL</label>
+        <div class="code-input-group">
+          <input type="text" id="webhookUrlInput" class="code-input" value="{{ webhook_url }}" readonly>
+          <button type="button" class="code-copy-btn" id="copyUrlBtn" onclick="copyWebhook('{{ webhook_url }}', this)">
+            <i class="bi bi-clipboard"></i>
+            <span>Copy URL</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-12 col-md-6">
+          <label class="form-group-label">System Tenant ID</label>
+          <div class="position-relative">
+            <input type="text" class="field-input" value="{{ tenant_id }}" readonly>
+            <button type="button" class="btn btn-sm text-muted position-absolute" style="right:8px;top:50%;transform:translateY(-50%);border:none;background:none;" onclick="copyWebhook('{{ tenant_id }}', this)" title="Copy Tenant ID">
+              <i class="bi bi-copy"></i>
+            </button>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <label class="form-group-label">Outlet ID</label>
+          <div class="position-relative">
+            <input type="text" class="field-input" value="{{ outlet_id }}" readonly>
+            <button type="button" class="btn btn-sm text-muted position-absolute" style="right:8px;top:50%;transform:translateY(-50%);border:none;background:none;" onclick="copyWebhook('{{ outlet_id }}', this)" title="Copy Outlet ID">
+              <i class="bi bi-copy"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CARD 2: AGGREGATOR CHANNEL TOGGLES ═══════════════ -->
+    <div class="panel-card">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-head-title">
+            <i class="bi bi-sliders"></i>
+            Platform Integrations
+          </h2>
+          <p class="panel-head-sub">Toggle platforms to accept incoming orders and configure secret verification keys.</p>
+        </div>
+      </div>
+
+      <!-- Zomato Row -->
+      <div class="channel-row">
+        <div class="channel-row-header">
+          <div class="channel-title-wrap">
+            <div class="channel-icon-squircle" style="background:rgba(226,55,68,0.12);color:#e23744;">
+              <i class="bi bi-cup-straw"></i>
             </div>
-
-            <div class="row">
-                <div class="col-md-6 form-group">
-                    <label class="form-label">System Tenant ID</label>
-                    <input type="text" class="form-control" value="{{ tenant_id }}" readonly>
-                </div>
-                <div class="col-md-6 form-group">
-                    <label class="form-label">Outlet ID</label>
-                    <input type="text" class="form-control" value="{{ outlet_id }}" readonly>
-                </div>
+            <div>
+              <h3 class="channel-title">
+                Zomato Integration
+                <span class="badge" style="font-size:0.62rem;background:#e23744;color:#ffffff;border-radius:999px;padding:2px 8px;">Partner API</span>
+              </h3>
+              <p class="channel-desc">Receive and auto-process incoming online delivery orders from Zomato.</p>
             </div>
+          </div>
+          <label class="pos-switch">
+            <input type="checkbox" name="zomato_enabled" id="zomato_toggle" {% if config.zomato_enabled %}checked{% endif %}
+                   onchange="document.getElementById('zomato_secret_div').style.display = this.checked ? 'block' : 'none'">
+            <span class="pos-slider"></span>
+          </label>
         </div>
 
-        <div class="panel-card">
-            <h5 style="font-family:'DM Serif Display',serif;color:var(--accent-gold);margin-bottom:1.5rem;">Aggregator Toggles</h5>
+        <div id="zomato_secret_div" class="secret-box-wrap" style="display:{% if config.zomato_enabled %}block{% else %}none{% endif %};">
+          <label class="form-group-label" for="zomato_webhook_secret">Zomato Webhook Secret Key</label>
+          <div class="position-relative">
+            <input type="password" id="zomato_webhook_secret" class="field-input pe-5" name="zomato_webhook_secret"
+                   placeholder="{% if config.zomato_webhook_secret %}•••••••••• (Saved — leave blank to keep){% else %}Enter Zomato secret token (e.g. ZOM-SECRET-1234){% endif %}">
+            <button type="button" class="btn btn-sm text-muted position-absolute" style="right:8px;top:50%;transform:translateY(-50%);border:none;background:none;" onclick="togglePasswordVisibility('zomato_webhook_secret', 'zomatoEye')">
+              <i class="bi bi-eye" id="zomatoEye"></i>
+            </button>
+          </div>
+          <div class="text-muted mt-2" style="font-size:0.72rem;">
+            <i class="bi bi-shield-check text-success me-1"></i>
+            Used by the HMAC engine to verify genuine payload signatures from Zomato webhooks.
+          </div>
+        </div>
+      </div>
 
-            <div class="switch-wrapper">
-                <div>
-                    <strong style="font-size:1rem;">Zomato Integration</strong>
-                    <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Enable incoming Zomato webhooks</div>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" name="zomato_enabled" id="zomato_toggle" {% if config.zomato_enabled %}checked{% endif %}
-                           onchange="document.getElementById('zomato_secret_div').style.display = this.checked ? 'block' : 'none'">
-                    <span class="slider"></span>
-                </label>
+      <!-- Swiggy Row -->
+      <div class="channel-row">
+        <div class="channel-row-header">
+          <div class="channel-title-wrap">
+            <div class="channel-icon-squircle" style="background:rgba(252,128,25,0.12);color:#fc8019;">
+              <i class="bi bi-bag-check-fill"></i>
             </div>
-
-            <div id="zomato_secret_div" style="display:{% if config.zomato_enabled %}block{% else %}none{% endif %};padding:1rem 0;margin-bottom:1rem;border-bottom:1px solid var(--border-color);">
-                <label class="form-label">Zomato Secret Key</label>
-                {% comment %}
-                Masked, and the decrypted value is never echoed into the page — matches the
-                Razorpay secret fields. Leaving this blank on save keeps the existing secret
-                (see setup/views/aggregator_views.py:aggregator_setup).
-                {% endcomment %}
-                <input type="password" class="form-control" name="zomato_webhook_secret"
-                       placeholder="{% if config.zomato_webhook_secret %}•••••••••• (saved — leave blank to keep){% else %}ZOM-SECRET-1234{% endif %}">
+            <div>
+              <h3 class="channel-title">
+                Swiggy Integration
+                <span class="badge" style="font-size:0.62rem;background:#fc8019;color:#ffffff;border-radius:999px;padding:2px 8px;">Order Relay</span>
+              </h3>
+              <p class="channel-desc">Receive and route direct orders placed on the Swiggy customer application.</p>
             </div>
-
-            <div class="switch-wrapper">
-                <div>
-                    <strong style="font-size:1rem;">Swiggy Integration</strong>
-                    <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Enable incoming Swiggy webhooks</div>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" name="swiggy_enabled" id="swiggy_toggle" {% if config.swiggy_enabled %}checked{% endif %}
-                           onchange="document.getElementById('swiggy_secret_div').style.display = this.checked ? 'block' : 'none'">
-                    <span class="slider"></span>
-                </label>
-            </div>
-
-            <div id="swiggy_secret_div" style="display:{% if config.swiggy_enabled %}block{% else %}none{% endif %};padding:1rem 0;margin-bottom:1rem;border-bottom:1px solid var(--border-color);">
-                <label class="form-label">Swiggy App ID</label>
-                <input type="password" class="form-control" name="swiggy_webhook_secret"
-                       placeholder="{% if config.swiggy_webhook_secret %}•••••••••• (saved — leave blank to keep){% else %}SWG-APP-ID{% endif %}">
-            </div>
-
-            <div class="switch-wrapper">
-                <div>
-                    <strong style="font-size:1rem;">Uber Eats Integration</strong>
-                    <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Enable incoming Uber Eats webhooks</div>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" name="uber_eats_enabled" {% if config.uber_eats_enabled %}checked{% endif %}>
-                    <span class="slider"></span>
-                </label>
-            </div>
-
-            <div class="switch-wrapper">
-                <div>
-                    <strong style="font-size:1rem;">In-House Delivery Channel</strong>
-                    <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Enable direct in-house delivery orders for this outlet</div>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" name="inhouse_delivery_enabled" {% if config.inhouse_delivery_enabled %}checked{% endif %}>
-                    <span class="slider"></span>
-                </label>
-            </div>
+          </div>
+          <label class="pos-switch">
+            <input type="checkbox" name="swiggy_enabled" id="swiggy_toggle" {% if config.swiggy_enabled %}checked{% endif %}
+                   onchange="document.getElementById('swiggy_secret_div').style.display = this.checked ? 'block' : 'none'">
+            <span class="pos-slider"></span>
+          </label>
         </div>
 
-        <div class="panel-card">
-            <h5 style="font-family:'DM Serif Display',serif;color:var(--accent-gold);margin-bottom:1.5rem;">Automation Preferences</h5>
-            <div class="switch-wrapper">
-                <div>
-                    <strong style="font-size:1rem;">ZBT (Zero-Touch) Flow</strong>
-                    <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Automatically accept aggregator orders and bypass cashier approval, firing directly to Kitchen Printers.</div>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" name="auto_accept_orders" {% if config.auto_accept_orders %}checked{% endif %}>
-                    <span class="slider"></span>
-                </label>
-            </div>
+        <div id="swiggy_secret_div" class="secret-box-wrap" style="display:{% if config.swiggy_enabled %}block{% else %}none{% endif %};">
+          <label class="form-group-label" for="swiggy_webhook_secret">Swiggy Partner App ID / Secret</label>
+          <div class="position-relative">
+            <input type="password" id="swiggy_webhook_secret" class="field-input pe-5" name="swiggy_webhook_secret"
+                   placeholder="{% if config.swiggy_webhook_secret %}•••••••••• (Saved — leave blank to keep){% else %}Enter Swiggy Partner token (e.g. SWG-APP-ID){% endif %}">
+            <button type="button" class="btn btn-sm text-muted position-absolute" style="right:8px;top:50%;transform:translateY(-50%);border:none;background:none;" onclick="togglePasswordVisibility('swiggy_webhook_secret', 'swiggyEye')">
+              <i class="bi bi-eye" id="swiggyEye"></i>
+            </button>
+          </div>
+          <div class="text-muted mt-2" style="font-size:0.72rem;">
+            <i class="bi bi-shield-check text-success me-1"></i>
+            Used to validate incoming Swiggy webhooks and authenticate order state relays.
+          </div>
         </div>
+      </div>
 
-        <div style="text-align:right;margin-bottom:4rem;">
-            <button type="submit" class="btn-gold"><i class="bi bi-cloud-check me-2"></i> Save Configurations</button>
+      <!-- Uber Eats Row -->
+      <div class="channel-row">
+        <div class="channel-row-header">
+          <div class="channel-title-wrap">
+            <div class="channel-icon-squircle" style="background:rgba(6,193,103,0.12);color:#06c167;">
+              <i class="bi bi-bicycle"></i>
+            </div>
+            <div>
+              <h3 class="channel-title">
+                Uber Eats Integration
+                <span class="badge" style="font-size:0.62rem;background:#06c167;color:#ffffff;border-radius:999px;padding:2px 8px;">Global</span>
+              </h3>
+              <p class="channel-desc">Receive incoming delivery and pickup orders from the Uber Eats network.</p>
+            </div>
+          </div>
+          <label class="pos-switch">
+            <input type="checkbox" name="uber_eats_enabled" {% if config.uber_eats_enabled %}checked{% endif %}>
+            <span class="pos-slider"></span>
+          </label>
         </div>
-    </form>
+      </div>
+
+      <!-- In-House Delivery Row -->
+      <div class="channel-row">
+        <div class="channel-row-header">
+          <div class="channel-title-wrap">
+            <div class="channel-icon-squircle" style="background:rgba(59,130,246,0.12);color:#3b82f6;">
+              <i class="bi bi-box-seam-fill"></i>
+            </div>
+            <div>
+              <h3 class="channel-title">
+                In-House Direct Delivery Channel
+                <span class="badge" style="font-size:0.62rem;background:#3b82f6;color:#ffffff;border-radius:999px;padding:2px 8px;">0% Commission</span>
+              </h3>
+              <p class="channel-desc">Enable in-house fleet assignment and direct phone / online store delivery orders.</p>
+            </div>
+          </div>
+          <label class="pos-switch">
+            <input type="checkbox" name="inhouse_delivery_enabled" {% if config.inhouse_delivery_enabled %}checked{% endif %}>
+            <span class="pos-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CARD 3: ZERO-TOUCH KITCHEN AUTOMATION (ZBT) ═══════ -->
+    <div class="panel-card">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-head-title">
+            <i class="bi bi-lightning-charge-fill text-warning"></i>
+            Kitchen Automation
+          </h2>
+          <p class="panel-head-sub">Configure automatic order acceptance and instant kitchen dispatch.</p>
+        </div>
+      </div>
+
+      <div class="channel-row-header">
+        <div class="channel-title-wrap">
+          <div class="channel-icon-squircle" style="background:rgba(245,158,11,0.14);color:#f59e0b;">
+            <i class="bi bi-fire"></i>
+          </div>
+          <div>
+            <h3 class="channel-title">
+              Zero-Touch Auto Accept (ZBT Flow)
+              <span class="badge" style="font-size:0.62rem;background:#f59e0b;color:#ffffff;border-radius:999px;padding:2px 8px;">High Speed</span>
+            </h3>
+            <p class="channel-desc">
+              Automatically accepts incoming online aggregator orders without requiring manual cashier approval. Fired immediately to Kitchen Displays (KDS) and KOT printers.
+            </p>
+          </div>
+        </div>
+        <label class="pos-switch">
+          <input type="checkbox" name="auto_accept_orders" {% if config.auto_accept_orders %}checked{% endif %}>
+          <span class="pos-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- ══ STICKY SAVE FOOTER ═══════════════════════════════ -->
+    <div class="setup-footer-bar">
+      <a href="/setup/" class="btn-luxury text-decoration-none" style="border-radius:999px;">
+        Cancel
+      </a>
+      <button type="submit" class="btn-save-pill">
+        <i class="bi bi-cloud-check-fill"></i>
+        <span>Save Configurations</span>
+      </button>
+    </div>
+  </form>
+
 </div>
+
+<script>
+  function copyWebhook(text, btn) {
+    if (!navigator.clipboard) {
+      // Fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      flashButton(btn);
+      return;
+    }
+    navigator.clipboard.writeText(text).then(() => {
+      flashButton(btn);
+    });
+  }
+
+  function flashButton(btn) {
+    const origHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-check2"></i> <span>Copied!</span>';
+    btn.style.background = 'var(--pos-green)';
+    btn.style.borderColor = 'var(--pos-green)';
+    btn.style.color = '#ffffff';
+    setTimeout(() => {
+      btn.innerHTML = origHtml;
+      btn.style.background = '';
+      btn.style.borderColor = '';
+      btn.style.color = '';
+    }, 1800);
+  }
+
+  function togglePasswordVisibility(inputId, iconId) {
+    const inp = document.getElementById(inputId);
+    const ico = document.getElementById(iconId);
+    if (!inp || !ico) return;
+    if (inp.type === 'password') {
+      inp.type = 'text';
+      ico.classList.remove('bi-eye');
+      ico.classList.add('bi-eye-slash');
+    } else {
+      inp.type = 'password';
+      ico.classList.remove('bi-eye-slash');
+      ico.classList.add('bi-eye');
+    }
+  }
+</script>
 {% endblock %}

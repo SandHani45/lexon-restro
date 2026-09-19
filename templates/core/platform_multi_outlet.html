@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ── PRIMARY SEO ── -->
+<title>Multi-Outlet & Role-Based Access | EasyBillBro Platform</title>
+<meta name="description" content="Run up to 3 restaurant outlets under one EasyBillBro login, each fully isolated, with role-based access for Owner, Manager, Waiter, Cashier and Chef. Growth Plan adds CRM, reservations and UPI QR payments.">
+<meta name="author" content="EasyBillBro">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<link rel="canonical" href="https://lexnorax.net/platform/multi-outlet/">
+
+<!-- ── FAVICON ── -->
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+<link rel="apple-touch-icon" href="/static/icon-512.svg">
+
+<!-- ── OPEN GRAPH ── -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="EasyBillBro">
+<meta property="og:title" content="Multi-Outlet & Role-Based Access | EasyBillBro Platform">
+<meta property="og:description" content="One login, every outlet, fully isolated — with role-based access per staff member.">
+<meta property="og:url" content="https://lexnorax.net/platform/multi-outlet/">
+<meta property="og:image" content="https://lexnorax.net/static/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_IN">
+
+<!-- ── TWITTER CARD ── -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Multi-Outlet & Role-Based Access | EasyBillBro Platform">
+<meta name="twitter:description" content="One login, every outlet, fully isolated — with role-based access per staff member.">
+<meta name="twitter:image" content="https://lexnorax.net/static/og-image.jpg">
+
+<!-- ── BREADCRUMB SCHEMA ── -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://lexnorax.net/"},
+    {"@type": "ListItem", "position": 2, "name": "Platform", "item": "https://lexnorax.net/#features"},
+    {"@type": "ListItem", "position": 3, "name": "Multi-Outlet", "item": "https://lexnorax.net/platform/multi-outlet/"}
+  ]
+}
+</script>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --ink: #0a0a0a;
+  --ink-soft: #121214;
+  --navy: #18181b;
+  --ivory: #0a0a0a;
+  --white: #18181b;
+  --card: #18181b;
+  --rust: #EC2734;
+  --rust-deep: #c41f2b;
+  --rust-light: #ff4d5a;
+  --text: #f4f4f6;
+  --text-on-dark: #f4f4f6;
+  --muted: #9ca3af;
+  --muted-on-dark: #9ca3af;
+  --border: #27272a;
+  --border-on-dark: rgba(255,255,255,0.08);
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: 'Outfit', sans-serif; background: var(--ivory); color: var(--text); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+
+/* ══════════════════════════════════════
+   NAVIGATION (canonical header — identical on every page)
+══════════════════════════════════════ */
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.1rem 2rem; display: flex; justify-content: center; }
+.nav-inner {
+  width: 100%; max-width: 1180px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(10,10,10,0.55);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 999px;
+  padding: 0.65rem 0.9rem 0.65rem 1.3rem;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: all 0.4s ease;
+}
+.nav-inner.scrolled { background: rgba(10,10,10,0.92); box-shadow: 0 8px 30px rgba(0,0,0,0.35); }
+
+.nav-logo { display: flex; align-items: center; text-decoration: none; }
+.nav-logo-img { height: 40px; width: auto; max-width: 165px; object-fit: contain; display: block; transition: transform 0.25s ease, opacity 0.25s ease; }
+.nav-logo:hover .nav-logo-img { transform: scale(1.04); opacity: 0.95; }
+
+.nav-links { display: flex; align-items: center; gap: 1.6rem; list-style: none; }
+.nav-links a { text-decoration: none; font-size: 0.8rem; letter-spacing: 0.5px; color: #9ca3af; font-weight: 500; transition: color 0.2s; }
+.nav-links a:hover, .nav-links a.current { color: #ff4d5a; }
+
+.nav-dropdown { position: relative; }
+.nav-dropdown-menu {
+  position: absolute; top: calc(100% + 14px); left: 50%; transform: translateX(-50%) translateY(8px);
+  background: #18181b; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px;
+  padding: 0.6rem; min-width: 230px; list-style: none;
+  opacity: 0; visibility: hidden; transition: all 0.25s ease;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+.nav-dropdown:hover .nav-dropdown-menu, .nav-dropdown.open .nav-dropdown-menu { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+.nav-dropdown-menu li a { display: block; padding: 0.55rem 0.8rem; border-radius: 10px; font-size: 0.78rem; white-space: nowrap; }
+.nav-dropdown-menu li a:hover, .nav-dropdown-menu li a.current { background: rgba(236,39,52,0.12); color: #ff4d5a; }
+
+.nav-actions { display: flex; align-items: center; gap: 0.9rem; }
+.nav-login { color: #9ca3af; font-size: 0.8rem; font-weight: 600; text-decoration: none; letter-spacing: 0.5px; padding: 0.5rem 0.3rem; transition: color 0.2s; }
+.nav-login:hover { color: #f4f4f6; }
+
+.nav-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #EC2734 !important; color: #ffffff !important;
+  padding: 0.6rem 1.3rem !important; border-radius: 999px;
+  font-weight: 700 !important; font-size: 0.8rem; text-decoration: none;
+  letter-spacing: 0.3px; transition: all 0.25s ease;
+  box-shadow: 0 4px 20px rgba(236,39,52,0.35);
+}
+.nav-cta:hover { background: #ff4d5a !important; transform: translateY(-1px); box-shadow: 0 6px 28px rgba(236,39,52,0.5); }
+
+.nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 6px; background: none; border: none; }
+.nav-hamburger span { display: block; width: 22px; height: 2px; background: #f4f4f6; border-radius: 2px; transition: all 0.3s ease; }
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.nav-mobile-menu {
+  display: none; position: fixed; top: 0; left: 0; right: 0;
+  padding: 5.5rem 2rem 2.5rem; background: rgba(10,10,10,0.98);
+  backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); z-index: 150;
+  flex-direction: column; gap: 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.08);
+  transform: translateY(-100%); transition: transform 0.35s ease;
+  max-height: 100vh; overflow-y: auto;
+}
+.nav-mobile-menu.open { display: flex; transform: translateY(0); }
+.nav-mobile-menu a { text-decoration: none; font-size: 1.05rem; font-weight: 600; color: #9ca3af; padding: 0.55rem 0; border-bottom: 1px solid rgba(255,255,255,0.08); transition: color 0.2s; }
+.nav-mobile-menu a:hover { color: #EC2734; }
+.nav-mobile-menu .nav-cta { align-self: flex-start; margin-top: 0.6rem; }
+
+@media (max-width: 980px) {
+  .nav-links, .nav-login { display: none; }
+  .nav-hamburger { display: flex; }
+}
+@media (max-width: 640px) {
+  nav { padding: 0.8rem 1rem; }
+  .nav-inner { padding: 0.55rem 0.6rem 0.55rem 1rem; }
+}
+
+/* ── HERO (dark) ── */
+.hero { background: var(--ink); padding: 165px 2rem 100px; text-align: center; }
+.eyebrow-chip { display: inline-flex; align-items: center; gap: 8px; font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; color: var(--rust-light); font-weight: 700; margin-bottom: 1.6rem; border: 1px solid rgba(236,39,52,0.35); background: rgba(236,39,52,0.12); border-radius: 999px; padding: 0.5rem 1.2rem; }
+.eyebrow-chip::before { content: ''; width: 6px; height: 6px; background: var(--rust-light); border-radius: 50%; }
+.hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2.4rem, 5.5vw, 4rem); line-height: 1.1; color: var(--text-on-dark); margin-bottom: 1.2rem; max-width: 800px; margin-left: auto; margin-right: auto; }
+.hero h1 em { color: var(--rust-light); font-style: italic; }
+.hero p.sub { font-size: 1.05rem; color: var(--muted-on-dark); line-height: 1.7; max-width: 620px; margin: 0 auto 2.2rem; font-weight: 300; }
+.hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+.btn-primary { display: inline-flex; align-items: center; gap: 10px; background: var(--rust); color: #fff; text-decoration: none; padding: 1rem 2.1rem; border-radius: 999px; font-weight: 600; font-size: 0.88rem; transition: all 0.25s ease; }
+.btn-primary:hover { background: var(--rust-deep); transform: translateY(-2px); box-shadow: 0 14px 34px rgba(236,39,52,0.3); }
+.btn-secondary { display: inline-flex; align-items: center; gap: 10px; background: transparent; color: var(--text-on-dark); text-decoration: none; padding: 1rem 2.1rem; border-radius: 999px; font-weight: 600; font-size: 0.88rem; border: 1px solid var(--border-on-dark); transition: all 0.25s ease; }
+.btn-secondary:hover { border-color: var(--rust-light); color: var(--rust-light); }
+
+/* ── BLOCKS ── */
+.tour-block { padding: 90px 2rem; max-width: 1200px; margin: 0 auto; }
+.tour-block.on-dark { background: var(--ink); border-radius: 30px; margin: 0 1rem; max-width: none; padding: 90px 3rem; }
+.tour-block.on-dark .tour-inner { max-width: 1140px; margin: 0 auto; }
+.tour-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+.tour-block.reverse .tour-inner { direction: rtl; }
+.tour-block.reverse .tour-inner > * { direction: ltr; }
+.tour-eyebrow { font-size: 0.68rem; letter-spacing: 3px; text-transform: uppercase; color: var(--rust); font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem; }
+.on-dark .tour-eyebrow { color: var(--rust-light); }
+.plan-tag { font-size: 0.6rem; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: rgba(236,39,52,0.14); color: var(--rust); }
+.on-dark .plan-tag { background: rgba(255,77,90,0.18); color: var(--rust-light); }
+.plan-tag.all-plans { background: rgba(244,244,246,0.08); color: var(--muted); }
+.on-dark .plan-tag.all-plans { background: rgba(244,244,246,0.1); color: var(--muted-on-dark); }
+.tour-heading { font-family: 'DM Serif Display', serif; font-size: clamp(1.7rem, 3vw, 2.4rem); color: var(--text); line-height: 1.2; margin-bottom: 1rem; }
+.on-dark .tour-heading { color: var(--text-on-dark); }
+.tour-heading em { color: var(--rust); font-style: italic; }
+.on-dark .tour-heading em { color: var(--rust-light); }
+.tour-desc { font-size: 0.98rem; color: var(--muted); line-height: 1.75; font-weight: 300; margin-bottom: 1.6rem; max-width: 460px; }
+.on-dark .tour-desc { color: var(--muted-on-dark); }
+.tour-link { color: var(--rust); text-decoration: none; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px; }
+.on-dark .tour-link { color: var(--rust-light); }
+.tour-link:hover { gap: 10px; }
+
+.mockup { background: var(--white); border-radius: 22px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); padding: 1.6rem; position: relative; }
+.on-dark .mockup { box-shadow: 0 24px 60px rgba(0,0,0,0.4); }
+.mockup-header { display: flex; align-items: center; gap: 7px; margin-bottom: 1.2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+.mockup-dot { width: 9px; height: 9px; border-radius: 50%; }
+.mockup-label { font-size: 0.68rem; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-left: 6px; }
+
+/* Photo accent alongside a mockup */
+.visual-stack { position: relative; }
+.photo-accent { position: absolute; width: 128px; height: 158px; object-fit: cover; border-radius: 16px; border: 5px solid var(--ink); box-shadow: 0 20px 45px rgba(0,0,0,0.55); z-index: 2; }
+
+/* Outlet switcher mockup */
+.outlet-list { display: flex; flex-direction: column; gap: 0.7rem; }
+.outlet-row { display: flex; justify-content: space-between; align-items: center; background: var(--ivory); border-radius: 12px; padding: 0.8rem 1rem; }
+.outlet-row .o-name { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+.outlet-row .o-sales { font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--rust); font-weight: 700; }
+.outlet-row .o-sub { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+
+/* Role list mockup (dark) */
+.role-list { display: flex; flex-direction: column; gap: 0.6rem; }
+.role-row { display: flex; align-items: center; justify-content: space-between; background: var(--ivory); border-radius: 12px; padding: 0.7rem 1rem; }
+.role-row .r-name { font-size: 0.8rem; font-weight: 600; color: var(--text); }
+.role-row .r-scope { font-size: 0.66rem; color: var(--muted); }
+
+/* Growth bundle mockup */
+.bundle-grid { display: flex; flex-direction: column; gap: 0.7rem; }
+.bundle-item { display: flex; align-items: center; gap: 0.8rem; background: var(--ivory); border-radius: 12px; padding: 0.7rem 1rem; }
+.bundle-icon { width: 34px; height: 34px; border-radius: 10px; background: rgba(236,39,52,0.14); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+.bundle-item .b-name { font-size: 0.8rem; font-weight: 600; color: var(--text); }
+.bundle-item .b-sub { font-size: 0.66rem; color: var(--muted); }
+
+/* ── PLAN NOTE STRIP ── */
+.plan-note { max-width: 1200px; margin: 0 auto; padding: 0 2rem 20px; }
+.plan-note-inner { background: var(--card); border-radius: 18px; padding: 1.3rem 1.6rem; font-size: 0.85rem; color: var(--muted); display: flex; align-items: center; gap: 0.8rem; }
+.plan-note-inner strong { color: var(--text); }
+
+/* ── FINAL CTA ── */
+.final-cta-wrap { padding: 0 1rem; max-width: 1180px; margin: 0 auto; }
+.final-cta { background: var(--rust); border-radius: 30px; padding: 80px 3rem; text-align: center; position: relative; overflow: hidden; }
+.final-cta::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px); background-size: 40px 40px; }
+.final-cta-inner { position: relative; z-index: 1; }
+.final-cta h2 { font-family: 'DM Serif Display', serif; font-size: clamp(2.2rem, 4.5vw, 3.4rem); color: #fff; margin-bottom: 1rem; }
+.final-cta p { font-size: 1rem; color: rgba(255,255,255,0.88); margin-bottom: 2.3rem; font-weight: 300; }
+.final-cta-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+.btn-dark { display: inline-flex; align-items: center; gap: 12px; background: var(--ink); color: #fff; text-decoration: none; padding: 1.05rem 2.3rem; border-radius: 999px; font-weight: 700; font-size: 0.85rem; transition: all 0.3s; }
+.btn-dark:hover { background: #000; transform: translateY(-2px); }
+.btn-dark-outline { display: inline-flex; align-items: center; gap: 10px; background: transparent; color: #fff; text-decoration: none; padding: 1.05rem 2.3rem; border-radius: 999px; font-weight: 700; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.5); transition: all 0.3s; }
+.btn-dark-outline:hover { border-color: #fff; background: rgba(255,255,255,0.12); }
+
+/* ── FOOTER ── */
+footer { background: var(--ink); border-radius: 30px 30px 0 0; margin: 2rem 1rem 0; padding: 3rem 4rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+.footer-left { font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: var(--text-on-dark); text-decoration: none; }
+.footer-left span { color: var(--rust-light); }
+.footer-right { font-size: 0.75rem; color: var(--muted-on-dark); letter-spacing: 1px; }
+.footer-login { font-size: 0.75rem; color: var(--muted-on-dark); text-decoration: none; letter-spacing: 1px; transition: color 0.2s; }
+.footer-login:hover { color: var(--rust-light); }
+
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 768px) {
+  .hero { padding: 130px 1.2rem 60px; }
+  .tour-block { padding: 55px 1.2rem; }
+  .tour-block.on-dark { padding: 55px 1.5rem; border-radius: 24px; margin: 0 0.6rem; }
+  .tour-inner { grid-template-columns: 1fr; gap: 2.2rem; }
+  .tour-block.reverse .tour-inner { direction: ltr; }
+  .final-cta-wrap { padding: 0 0.6rem; }
+  .final-cta { padding: 55px 1.5rem; border-radius: 24px; }
+  footer { padding: 2rem 1.5rem; border-radius: 24px 24px 0 0; flex-direction: column; text-align: center; margin: 1.5rem 0.6rem 0; }
+}
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <div class="nav-inner" id="navInner">
+    <a href="/" class="nav-logo" title="EasyBillBro POS">
+      <img src="/easybillbro_logo.png" alt="EasyBillBro" class="nav-logo-img">
+    </a>
+    <ul class="nav-links">
+      <li class="nav-dropdown">
+        <a href="/#features" class="nav-dropdown-toggle">Platform ▾</a>
+        <ul class="nav-dropdown-menu">
+          <li><a href="/platform/billing/">Billing &amp; POS</a></li>
+          <li><a href="/platform/floor-and-kitchen/">Floor &amp; Kitchen</a></li>
+          <li><a href="/platform/menu/">Menu &amp; QR Ordering</a></li>
+          <li><a href="/platform/inventory/">Inventory &amp; Stock</a></li>
+          <li><a href="/platform/crm/">CRM &amp; Loyalty</a></li>
+          <li><a href="/platform/reports/">Reports &amp; Analytics</a></li>
+          <li><a href="/platform/staff/">Staff &amp; Shifts</a></li>
+          <li><a href="/platform/integrations/">Integrations</a></li>
+          <li><a href="/platform/multi-outlet/" class="current">Multi-Outlet</a></li>
+        </ul>
+      </li>
+      <li><a href="/product-tour/">Product Tour</a></li>
+      <li><a href="/pricing/">Pricing</a></li>
+      <li><a href="/compare/">Compare</a></li>
+      <li><a href="/about/">About</a></li>
+      <li><a href="/contact/">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="/login/" class="nav-login">Login</a>
+      <a href="https://wa.me/917780181920?text=Hi%2C%20I%27d%20like%20to%20request%20a%20demo%20of%20EasyBillBro%20POS" target="_blank" class="nav-cta">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Get a Demo
+      </a>
+      <button class="nav-hamburger" id="hamburger" aria-label="Toggle Menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<div class="nav-mobile-menu" id="mobileMenu">
+  <a href="/platform/billing/" onclick="closeNav()">Billing &amp; POS</a>
+  <a href="/platform/floor-and-kitchen/" onclick="closeNav()">Floor &amp; Kitchen</a>
+  <a href="/platform/menu/" onclick="closeNav()">Menu &amp; QR Ordering</a>
+  <a href="/platform/inventory/" onclick="closeNav()">Inventory &amp; Stock</a>
+  <a href="/platform/crm/" onclick="closeNav()">CRM &amp; Loyalty</a>
+  <a href="/platform/reports/" onclick="closeNav()">Reports &amp; Analytics</a>
+  <a href="/platform/staff/" onclick="closeNav()">Staff &amp; Shifts</a>
+  <a href="/platform/integrations/" onclick="closeNav()">Integrations</a>
+  <a href="/platform/multi-outlet/" onclick="closeNav()">Multi-Outlet</a>
+  <a href="/product-tour/" onclick="closeNav()">Product Tour</a>
+  <a href="/pricing/" onclick="closeNav()">Pricing</a>
+  <a href="/compare/" onclick="closeNav()">Compare</a>
+  <a href="/about/" onclick="closeNav()">About</a>
+  <a href="/contact/" onclick="closeNav()">Contact</a>
+  <a href="/login/" onclick="closeNav()">Customer Login →</a>
+  <a href="https://wa.me/917780181920?text=Hi%2C%20I%27d%20like%20a%20demo" target="_blank" class="nav-cta">Get a Demo</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="eyebrow-chip">Platform · Multi-Outlet</div>
+  <h1>One login.<br><em>Every outlet.</em></h1>
+  <p class="sub">Run up to 3 restaurant outlets under a single EasyBillBro account, each fully isolated with its own data, floor plan, menu and reports — while every staff member only ever sees what their role needs.</p>
+  <div class="hero-actions">
+    <a href="/live-demo/" class="btn-primary">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      Try Live Demo
+    </a>
+    <a href="https://wa.me/917780181920?text=Hi%2C%20I%27d%20like%20to%20know%20more%20about%20Lexnorax%27s%20multi-outlet%20support" target="_blank" class="btn-secondary">Talk to Us</a>
+  </div>
+</section>
+
+<div class="plan-note">
+  <div class="plan-note-inner reveal">
+    <span>ℹ️</span>
+    <span><strong>Plan note:</strong> the Solo Plan covers 1 outlet. Multi-outlet support (up to 3 outlets), CRM &amp; Guest Loyalty, Reservations and UPI QR Payments are part of the Growth Plan (₹2,499/mo) — see the <a href="/pricing/" style="color:var(--rust);font-weight:600;">full pricing breakdown</a>.</span>
+  </div>
+</div>
+
+<!-- BLOCK 1: MULTI-OUTLET SUPPORT -->
+<section class="tour-block">
+  <div class="tour-inner">
+    <div class="reveal">
+      <div class="tour-eyebrow">Multi-Outlet Support <span class="plan-tag">Growth Plan</span></div>
+      <h2 class="tour-heading">Every outlet.<br><em>One clean login.</em></h2>
+      <p class="tour-desc">Manage multiple outlets under one account — each fully isolated with its own data, floor plan, menu and reports. The Growth Plan covers up to 3 outlets; see today's sales across every location without switching accounts.</p>
+      <a href="/live-demo/" class="tour-link">See it live →</a>
+    </div>
+    <div class="reveal">
+      <div class="visual-stack">
+        <div class="mockup">
+          <div class="mockup-header">
+            <div class="mockup-dot" style="background:#EC2734;"></div>
+            <div class="mockup-dot" style="background:#F0A400;"></div>
+            <div class="mockup-dot" style="background:#3F7D4C;"></div>
+            <span class="mockup-label">Your Outlets</span>
+          </div>
+          <div class="outlet-list">
+            <div class="outlet-row"><div><div class="o-name">Indiranagar</div><div class="o-sub">18 tables · isolated data</div></div><div class="o-sales">₹22,140</div></div>
+            <div class="outlet-row"><div><div class="o-name">Koramangala</div><div class="o-sub">14 tables · isolated data</div></div><div class="o-sales">₹18,760</div></div>
+            <div class="outlet-row"><div><div class="o-name">Whitefield</div><div class="o-sub">12 tables · isolated data</div></div><div class="o-sales">₹15,920</div></div>
+          </div>
+        </div>
+        <img src="/static/images/restaurant/multi-outlet-exterior.jpg" alt="Restaurant storefront exterior, one of several outlets" class="photo-accent" style="bottom:-28px; left:-28px; transform:rotate(-6deg);">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BLOCK 2: ROLE-BASED ACCESS (dark) -->
+<section class="tour-block reverse on-dark">
+  <div class="tour-inner">
+    <div class="reveal">
+      <div class="tour-eyebrow">Role-Based Access <span class="plan-tag all-plans">All Plans</span></div>
+      <h2 class="tour-heading">Owner to waiter,<br>everyone sees only their job.</h2>
+      <p class="tour-desc">Owner, Manager, Waiter, Cashier, Chef — each role sees exactly what they need on EasyBillBro, nothing more. Security is built into the architecture, not bolted on with a permissions checklist.</p>
+      <a href="/live-demo/" class="tour-link">See it live →</a>
+    </div>
+    <div class="reveal">
+      <div class="mockup">
+        <div class="mockup-header">
+          <div class="mockup-dot" style="background:#EC2734;"></div>
+          <div class="mockup-dot" style="background:#F0A400;"></div>
+          <div class="mockup-dot" style="background:#3F7D4C;"></div>
+          <span class="mockup-label">Staff Roles</span>
+        </div>
+        <div class="role-list">
+          <div class="role-row"><span class="r-name">Owner</span><span class="r-scope">Full access</span></div>
+          <div class="role-row"><span class="r-name">Manager</span><span class="r-scope">Reports · Floor · Menu</span></div>
+          <div class="role-row"><span class="r-name">Waiter</span><span class="r-scope">Orders · Floor</span></div>
+          <div class="role-row"><span class="r-name">Cashier</span><span class="r-scope">Billing only</span></div>
+          <div class="role-row"><span class="r-name">Chef</span><span class="r-scope">Kitchen queue only</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BLOCK 3: GROWTH-ONLY BUNDLE -->
+<section class="tour-block">
+  <div class="tour-inner">
+    <div class="reveal">
+      <div class="tour-eyebrow">Growth Plan Extras <span class="plan-tag">Growth Plan</span></div>
+      <h2 class="tour-heading">Beyond the till:<br>CRM, reservations, UPI.</h2>
+      <p class="tour-desc">The Growth Plan adds CRM &amp; guest loyalty, table reservations, and UPI QR payments via Razorpay — on top of everything in the Solo Plan. All still under the same month-to-month, no-annual-contract terms.</p>
+      <a href="/pricing/" class="tour-link">See full pricing →</a>
+    </div>
+    <div class="reveal">
+      <div class="mockup">
+        <div class="mockup-header">
+          <div class="mockup-dot" style="background:#EC2734;"></div>
+          <div class="mockup-dot" style="background:#F0A400;"></div>
+          <div class="mockup-dot" style="background:#3F7D4C;"></div>
+          <span class="mockup-label">Growth Plan</span>
+        </div>
+        <div class="bundle-grid">
+          <div class="bundle-item"><div class="bundle-icon">👥</div><div><div class="b-name">CRM & Guest Loyalty</div><div class="b-sub">Repeat-guest tracking</div></div></div>
+          <div class="bundle-item"><div class="bundle-icon">📅</div><div><div class="b-name">Reservations</div><div class="b-sub">Table booking built in</div></div></div>
+          <div class="bundle-item"><div class="bundle-icon">💳</div><div><div class="b-name">UPI QR Payments</div><div class="b-sub">Via Razorpay</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<div class="final-cta-wrap">
+  <div class="final-cta">
+    <div class="final-cta-inner">
+      <h2>Ready to run every outlet from one login?</h2>
+      <p>Explore the full dashboard with sample data — no signup needed — or talk it through with the founder directly.</p>
+      <div class="final-cta-actions">
+        <a href="/live-demo/" class="btn-dark">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Try Live Demo
+        </a>
+        <a href="https://wa.me/917780181920?text=Hi%20Rajath%2C%20I%27d%20like%20to%20see%20a%20demo%20of%20Lexnorax" target="_blank" class="btn-dark-outline">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Message on WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-left">Lex<span>norax</span></div>
+  <div class="footer-right">© 2026 EasyBillBro · Bengaluru, India</div>
+  <a href="/login/" class="footer-login">Customer Login →</a>
+</footer>
+
+<script>
+  const navInner = document.getElementById('navInner');
+  window.addEventListener('scroll', () => {
+    navInner.classList.toggle('scrolled', window.scrollY > 40);
+  }, { passive: true });
+
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+  });
+  function closeNav() {
+    hamburger.classList.remove('open');
+    mobileMenu.classList.remove('open');
+  }
+
+  document.querySelectorAll('.nav-dropdown-toggle').forEach(t => {
+    t.addEventListener('click', e => {
+      if (window.matchMedia('(hover: none)').matches) {
+        e.preventDefault();
+        t.parentElement.classList.toggle('open');
+      }
+    });
+  });
+
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 70);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Fallback: never leave the page blank (matches the homepage's reveal safety net)
+  setTimeout(() => {
+    document.querySelectorAll('.reveal:not(.visible)').forEach(el => el.classList.add('visible'));
+  }, 800);
+</script>
+</body>
+</html>

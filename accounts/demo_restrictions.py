@@ -14,7 +14,7 @@ from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.utils.http import url_has_allowed_host_and_scheme
 
-WHATSAPP_LINK = "https://wa.me/917899814912?text=Hi%2C%20I%27d%20like%20to%20see%20a%20demo%20of%20Lexnorax"
+WHATSAPP_LINK = "https://wa.me/917780181920?text=Hi%2C%20I%27d%20like%20to%20see%20a%20demo%20of%20Lexnorax"
 BLOCKED_MESSAGE = (
     "This is disabled in the live demo. Want to see it in action? "
     "Message us on WhatsApp."

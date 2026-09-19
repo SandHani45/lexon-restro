@@ -9,7 +9,7 @@
         android:fillColor="#C9A84C"
         android:pathData="M54,21 L87,54 L54,87 L21,54 Z"/>
     <!-- Inner dark diamond — same proportions as favicon.svg (inner rect 10/16 = 0.625 ratio)
-         Creates the Lexnorax gold ring/border effect against the #0a0a0a background. -->
+         Creates the EasyBillBro gold ring/border effect against the #0a0a0a background. -->
     <path
         android:fillColor="#0a0a0a"
         android:pathData="M54,33.4 L74.6,54 L54,74.6 L33.4,54 Z"/>

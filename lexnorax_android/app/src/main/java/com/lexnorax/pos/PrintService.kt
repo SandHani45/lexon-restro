@@ -73,7 +73,7 @@ class PrintService : Service() {
         // that declares foregroundServiceType. The 2-arg form throws
         // MissingForegroundServiceTypeException and the service never starts.
         try {
-            val notif = buildNotification("Lexnorax Printing Active")
+            val notif = buildNotification("EasyBillBro Printing Active")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {  // API 34
                 startForeground(NOTIF_ID, notif, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
             } else {
@@ -141,7 +141,7 @@ class PrintService : Service() {
 
                     if (jobs.length() == 0) {
                         status = "active"
-                        notify("Lexnorax Printing Active")
+                        notify("EasyBillBro Printing Active")
                     }
 
                 } catch (e: Exception) {
@@ -219,7 +219,7 @@ class PrintService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Lexnorax Print Service",
+                "EasyBillBro Print Service",
                 NotificationManager.IMPORTANCE_LOW   // LOW = silent, no sound
             ).apply {
                 description = "Keeps printing active in background"
@@ -237,7 +237,7 @@ class PrintService : Service() {
             Notification.Builder(this)
         }
         return builder
-            .setContentTitle("Lexnorax")
+            .setContentTitle("EasyBillBro")
             .setContentText(text)
             .setSmallIcon(R.drawable.ic_notification)
             .setOngoing(true)   // ongoing = cannot be swiped away by user

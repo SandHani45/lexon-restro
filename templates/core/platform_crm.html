@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ── PRIMARY SEO ── -->
+<title>CRM & Customer Loyalty | EasyBillBro Platform</title>
+<meta name="description" content="EasyBillBro builds a guest profile from the phone number captured at billing, tracks loyalty points and visit history, and shows you a guest's past orders the moment they're seated.">
+<meta name="author" content="EasyBillBro">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<link rel="canonical" href="https://lexnorax.net/platform/crm/">
+
+<!-- ── FAVICON ── -->
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+<link rel="apple-touch-icon" href="/static/icon-512.svg">
+
+<!-- ── OPEN GRAPH ── -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="EasyBillBro">
+<meta property="og:title" content="CRM & Customer Loyalty | EasyBillBro Platform">
+<meta property="og:description" content="Every bill auto-builds a guest profile. Loyalty points accrue and redeem at billing, reservations are tracked, and guest history is one click away.">
+<meta property="og:url" content="https://lexnorax.net/platform/crm/">
+<meta property="og:image" content="https://lexnorax.net/static/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_IN">
+
+<!-- ── TWITTER CARD ── -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="CRM & Customer Loyalty | EasyBillBro Platform">
+<meta name="twitter:description" content="Every bill auto-builds a guest profile. Loyalty points accrue and redeem at billing, and guest history is one click away.">
+<meta name="twitter:image" content="https://lexnorax.net/static/og-image.jpg">
+
+<!-- ── BREADCRUMB SCHEMA ── -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://lexnorax.net/"},
+    {"@type": "ListItem", "position": 2, "name": "Platform", "item": "https://lexnorax.net/#features"},
+    {"@type": "ListItem", "position": 3, "name": "CRM & Loyalty", "item": "https://lexnorax.net/platform/crm/"}
+  ]
+}
+</script>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --ink: #121214;
+  --ink-soft: #18181b;
+  --navy: #18181b;
+  --ivory: #0a0a0a;
+  --white: #18181b;
+  --card: #18181b;
+  --rust: #EC2734;
+  --rust-deep: #c41f2b;
+  --rust-light: #ff4d5a;
+  --text: #f4f4f6;
+  --text-on-dark: #f4f4f6;
+  --muted: #9ca3af;
+  --muted-on-dark: #9ca3af;
+  --border: #27272a;
+  --border-on-dark: rgba(255,255,255,0.08);
+  --panel: #121214;
+  --surface: #18181b;
+  --surface3: #222226;
+  --red: #EC2734;
+  --red-hover: #ff4d5a;
+  --red-dark: #c41f2b;
+  --red-soft: rgba(236,39,52,0.14);
+  --red-border: rgba(236,39,52,0.35);
+  --red-glow: rgba(236,39,52,0.22);
+  --gold: #f59e0b;
+  --green: #22c55e;
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: 'Outfit', sans-serif; background: var(--ivory); color: var(--text); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+
+/* ══════════════════════════════════════
+   NAVIGATION (canonical header — identical on every page)
+══════════════════════════════════════ */
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.1rem 2rem; display: flex; justify-content: center; }
+.nav-inner {
+  width: 100%; max-width: 1180px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(10,10,10,0.55);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 999px;
+  padding: 0.65rem 0.9rem 0.65rem 1.3rem;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: all 0.4s ease;
+}
+.nav-inner.scrolled { background: rgba(10,10,10,0.92); box-shadow: 0 8px 30px rgba(0,0,0,0.35); }
+
+.nav-logo { display: flex; align-items: center; text-decoration: none; }
+.nav-logo-img { height: 40px; width: auto; max-width: 165px; object-fit: contain; display: block; transition: transform 0.25s ease, opacity 0.25s ease; }
+.nav-logo:hover .nav-logo-img { transform: scale(1.04); opacity: 0.95; }
+
+.nav-links { display: flex; align-items: center; gap: 1.6rem; list-style: none; }
+.nav-links a { text-decoration: none; font-size: 0.8rem; letter-spacing: 0.5px; color: #9ca3af; font-weight: 500; transition: color 0.2s; }
+.nav-links a:hover, .nav-links a.current { color: #ff4d5a; }
+
+.nav-dropdown { position: relative; }
+.nav-dropdown-menu {
+  position: absolute; top: calc(100% + 14px); left: 50%; transform: translateX(-50%) translateY(8px);
+  background: #18181b; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px;
+  padding: 0.6rem; min-width: 230px; list-style: none;
+  opacity: 0; visibility: hidden; transition: all 0.25s ease;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+.nav-dropdown:hover .nav-dropdown-menu, .nav-dropdown.open .nav-dropdown-menu { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+.nav-dropdown-menu li a { display: block; padding: 0.55rem 0.8rem; border-radius: 10px; font-size: 0.78rem; white-space: nowrap; }
+.nav-dropdown-menu li a:hover, .nav-dropdown-menu li a.current { background: rgba(236,39,52,0.12); color: #ff4d5a; }
+
+.nav-actions { display: flex; align-items: center; gap: 0.9rem; }
+.nav-login { color: #9ca3af; font-size: 0.8rem; font-weight: 600; text-decoration: none; letter-spacing: 0.5px; padding: 0.5rem 0.3rem; transition: color 0.2s; }
+.nav-login:hover { color: #f4f4f6; }
+
+.nav-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #EC2734 !important; color: #ffffff !important;
+  padding: 0.6rem 1.3rem !important; border-radius: 999px;
+  font-weight: 700 !important; font-size: 0.8rem; text-decoration: none;
+  letter-spacing: 0.3px; transition: all 0.25s ease;
+  box-shadow: 0 4px 20px rgba(236,39,52,0.35);
+}
+.nav-cta:hover { background: #ff4d5a !important; transform: translateY(-1px); box-shadow: 0 6px 28px rgba(236,39,52,0.5); }
+
+.nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 6px; background: none; border: none; }
+.nav-hamburger span { display: block; width: 22px; height: 2px; background: #f4f4f6; border-radius: 2px; transition: all 0.3s ease; }
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.nav-mobile-menu {
+  display: none; position: fixed; top: 0; left: 0; right: 0;
+  padding: 5.5rem 2rem 2.5rem; background: rgba(10,10,10,0.98);
+  backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); z-index: 150;
+  flex-direction: column; gap: 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.08);
+  transform: translateY(-100%); transition: transform 0.35s ease;
+  max-height: 100vh; overflow-y: auto;
+}
+.nav-mobile-menu.open { display: flex; transform: translateY(0); }
+.nav-mobile-menu a { text-decoration: none; font-size: 1.05rem; font-weight: 600; color: #9ca3af; padding: 0.55rem 0; border-bottom: 1px solid rgba(255,255,255,0.08); transition: color 0.2s; }
+.nav-mobile-menu a:hover { color: #EC2734; }
+.nav-mobile-menu .nav-cta { align-self: flex-start; margin-top: 0.6rem; }
+
+@media (max-width: 980px) {
+  .nav-links, .nav-login { display: none; }
+  .nav-hamburger { display: flex; }
+}
+@media (max-width: 640px) {
+  nav { padding: 0.8rem 1rem; }
+  .nav-inner { padding: 0.55rem 0.6rem 0.55rem 1rem; }
+}
+
+/* ── HERO (dark) ── */
+.hero { background: var(--ink); padding: 165px 2rem 100px; text-align: center; }
+.eyebrow-chip { display: inline-flex; align-items: center; gap: 8px; font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; color: var(--rust-light); font-weight: 700; margin-bottom: 1.6rem; border: 1px solid rgba(236,39,52,0.35); background: rgba(236,39,52,0.12); border-radius: 999px; padding: 0.5rem 1.2rem; }
+.eyebrow-chip::before { content: ''; width: 6px; height: 6px; background: var(--rust-light); border-radius: 50%; }
+.hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2.4rem, 5.5vw, 4rem); line-height: 1.1; color: var(--text-on-dark); margin-bottom: 1.2rem; max-width: 800px; margin-left: auto; margin-right: auto; }
+.hero h1 em { color: var(--rust-light); font-style: italic; }
+.hero p.sub { font-size: 1.05rem; color: var(--muted-on-dark); line-height: 1.7; max-width: 600px; margin: 0 auto 2.2rem; font-weight: 300; }
+.hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+.btn-primary { display: inline-flex; align-items: center; gap: 10px; background: var(--rust); color: #fff; text-decoration: none; padding: 1rem 2.1rem; border-radius: 999px; font-weight: 600; font-size: 0.88rem; transition: all 0.25s ease; }
+.btn-primary:hover { background: var(--rust-deep); transform: translateY(-2px); box-shadow: 0 14px 34px rgba(236,39,52,0.3); }
+.btn-secondary { display: inline-flex; align-items: center; gap: 10px; background: transparent; color: var(--text-on-dark); text-decoration: none; padding: 1rem 2.1rem; border-radius: 999px; font-weight: 600; font-size: 0.88rem; border: 1px solid var(--border-on-dark); transition: all 0.25s ease; }
+.btn-secondary:hover { border-color: var(--rust-light); color: var(--rust-light); }
+.btn-ink { display: inline-flex; align-items: center; gap: 10px; background: #000; color: var(--ivory); text-decoration: none; padding: 1rem 2.1rem; border-radius: 999px; font-weight: 600; font-size: 0.88rem; transition: all 0.25s ease; }
+.btn-ink:hover { background: #000; transform: translateY(-2px); }
+
+/* ── BLOCKS ── */
+.tour-block { padding: 90px 2rem; max-width: 1200px; margin: 0 auto; }
+.tour-block.on-dark { background: var(--ink); border-radius: 30px; margin: 0 1rem; max-width: none; padding: 90px 3rem; }
+.tour-block.on-dark .tour-inner { max-width: 1140px; margin: 0 auto; }
+.tour-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+.tour-block.reverse .tour-inner { direction: rtl; }
+.tour-block.reverse .tour-inner > * { direction: ltr; }
+.tour-eyebrow { font-size: 0.68rem; letter-spacing: 3px; text-transform: uppercase; color: var(--rust); font-weight: 700; margin-bottom: 1rem; }
+.on-dark .tour-eyebrow { color: var(--rust-light); }
+.tour-heading { font-family: 'DM Serif Display', serif; font-size: clamp(1.7rem, 3vw, 2.4rem); color: var(--text); line-height: 1.2; margin-bottom: 1rem; }
+.on-dark .tour-heading { color: var(--text-on-dark); }
+.tour-heading em { color: var(--rust); font-style: italic; }
+.on-dark .tour-heading em { color: var(--rust-light); }
+.tour-desc { font-size: 0.98rem; color: var(--muted); line-height: 1.75; font-weight: 300; margin-bottom: 1.6rem; max-width: 460px; }
+.on-dark .tour-desc { color: var(--muted-on-dark); }
+.tour-link { color: var(--rust); text-decoration: none; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px; }
+.on-dark .tour-link { color: var(--rust-light); }
+.tour-link:hover { gap: 10px; }
+
+.tour-photo { width: 100%; height: 190px; object-fit: cover; border-radius: 22px; margin-bottom: 1.2rem; box-shadow: 0 8px 30px rgba(0,0,0,0.35); display: block; }
+
+.flow-steps { display: flex; flex-direction: column; gap: 0.9rem; margin-top: 1.4rem; }
+.flow-step { display: flex; align-items: center; gap: 1rem; font-size: 0.85rem; color: var(--text); }
+.on-dark .flow-step { color: var(--text-on-dark); }
+.flow-step-num { width: 26px; height: 26px; border-radius: 50%; background: var(--rust); color: #fff; font-weight: 700; font-size: 0.72rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+.mockup { background: var(--white); border-radius: 22px; box-shadow: 0 8px 30px rgba(0,0,0,0.35); padding: 1.6rem; position: relative; border: 1px solid var(--border); }
+.on-dark .mockup { box-shadow: 0 24px 60px rgba(0,0,0,0.5); }
+.mockup-header { display: flex; align-items: center; gap: 7px; margin-bottom: 1.2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+.mockup-dot { width: 9px; height: 9px; border-radius: 50%; }
+.mockup-label { font-size: 0.68rem; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-left: 6px; }
+
+/* Guest profile mockup */
+.guest-card { display: flex; align-items: center; gap: 1rem; padding: 0.9rem; background: var(--surface3); border-radius: 14px; margin-bottom: 1rem; opacity: 0; transform: translateY(10px); transition: all 0.5s ease; }
+.guest-card.visible { opacity: 1; transform: translateY(0); }
+.guest-avatar { width: 46px; height: 46px; border-radius: 50%; background: var(--rust); color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 1.1rem; flex-shrink: 0; }
+.guest-info { flex: 1; }
+.guest-name { font-size: 0.92rem; color: var(--text); font-weight: 600; margin-bottom: 2px; }
+.guest-phone { font-size: 0.72rem; color: var(--muted); font-family: 'Space Mono', monospace; }
+.guest-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-bottom: 1rem; }
+.guest-stat { background: var(--surface3); border-radius: 12px; padding: 0.7rem; text-align: center; opacity: 0; transform: translateY(10px); transition: all 0.5s ease; }
+.guest-stat.visible { opacity: 1; transform: translateY(0); }
+.guest-stat .v { font-family: 'Space Mono', monospace; font-size: 1rem; color: var(--rust); font-weight: 700; }
+.guest-stat .k { font-size: 0.62rem; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; margin-top: 3px; }
+.guest-last { font-size: 0.75rem; color: var(--muted); padding-top: 0.8rem; border-top: 1px dashed var(--border); }
+.guest-last span { color: var(--text); font-weight: 500; }
+
+/* Reservations / guest history mockup */
+.res-list { display: flex; flex-direction: column; gap: 0.6rem; }
+.res-item { padding: 0.75rem 0.85rem; background: var(--surface3); border-radius: 12px; font-size: 0.78rem; }
+.res-item-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; }
+.res-item-name { color: var(--text-on-dark); font-weight: 500; }
+.res-item-time { font-family: 'Space Mono', monospace; color: var(--rust-light); font-weight: 700; font-size: 0.75rem; }
+.res-item-sub { color: var(--muted-on-dark); font-size: 0.7rem; }
+.res-badge { display: inline-block; font-size: 0.62rem; letter-spacing: 0.5px; text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: 999px; font-weight: 700; }
+.res-badge.confirmed { background: rgba(34,197,94,0.16); color: var(--green); }
+.res-badge.seated { background: rgba(236,39,52,0.16); color: var(--rust-light); }
+.res-badge.regular { background: rgba(245,158,11,0.16); color: var(--gold); }
+
+/* ── FEATURE STRIP ── */
+.strip { padding: 0 2rem 20px; max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.strip-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 1.5rem; }
+.strip-card .n { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--rust); margin-bottom: 0.3rem; }
+.strip-card .l { font-size: 0.8rem; color: var(--muted); }
+
+/* ── FINAL CTA ── */
+.final-cta-wrap { padding: 0 1rem; max-width: 1180px; margin: 0 auto; }
+.final-cta { background: var(--rust); border-radius: 30px; padding: 80px 3rem; text-align: center; position: relative; overflow: hidden; }
+.final-cta::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px); background-size: 40px 40px; }
+.final-cta-inner { position: relative; z-index: 1; }
+.final-cta h2 { font-family: 'DM Serif Display', serif; font-size: clamp(2.2rem, 4.5vw, 3.4rem); color: #fff; margin-bottom: 1rem; }
+.final-cta p { font-size: 1rem; color: rgba(255,255,255,0.88); margin-bottom: 2.3rem; font-weight: 300; }
+.final-cta-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+.btn-dark { display: inline-flex; align-items: center; gap: 12px; background: #000; color: #fff; text-decoration: none; padding: 1.05rem 2.3rem; border-radius: 999px; font-weight: 700; font-size: 0.85rem; transition: all 0.3s; }
+.btn-dark:hover { background: #000; opacity: 0.85; transform: translateY(-2px); }
+.btn-dark-outline { display: inline-flex; align-items: center; gap: 10px; background: transparent; color: #fff; text-decoration: none; padding: 1.05rem 2.3rem; border-radius: 999px; font-weight: 700; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.5); transition: all 0.3s; }
+.btn-dark-outline:hover { border-color: #fff; background: rgba(255,255,255,0.12); }
+
+/* ── FOOTER ── */
+footer { background: var(--ink); border-radius: 30px 30px 0 0; margin: 2rem 1rem 0; padding: 3rem 4rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+.footer-left { font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: var(--text-on-dark); text-decoration: none; }
+.footer-left span { color: var(--rust-light); }
+.footer-right { font-size: 0.75rem; color: var(--muted-on-dark); letter-spacing: 1px; }
+.footer-login { font-size: 0.75rem; color: var(--muted-on-dark); text-decoration: none; letter-spacing: 1px; transition: color 0.2s; }
+.footer-login:hover { color: var(--rust-light); }
+
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 900px) {
+  .strip { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  nav { padding: 0.8rem 1rem; }
+  .nav-inner { padding: 0.6rem 0.7rem 0.6rem 1rem; }
+  .hero { padding: 130px 1.2rem 60px; }
+  .tour-block { padding: 55px 1.2rem; }
+  .tour-block.on-dark { padding: 55px 1.5rem; border-radius: 24px; margin: 0 0.6rem; }
+  .tour-inner { grid-template-columns: 1fr; gap: 2.2rem; }
+  .tour-block.reverse .tour-inner { direction: ltr; }
+  .final-cta-wrap { padding: 0 0.6rem; }
+  .final-cta { padding: 55px 1.5rem; border-radius: 24px; }
+  footer { padding: 2rem 1.5rem; border-radius: 24px 24px 0 0; flex-direction: column; text-align: center; margin: 1.5rem 0.6rem 0; }
+}
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <div class="nav-inner" id="navInner">
+    <a href="/" class="nav-logo">
+      <div class="nav-diamond"><div class="nav-diamond-inner"></div></div>
+      <span class="nav-logo-text">EasyBillBro</span>
+    </a>
+    <ul class="nav-links">
+      <li class="nav-dropdown">
+        <a href="/#features" class="nav-dropdown-toggle">Platform ▾</a>
+        <ul class="nav-dropdown-menu">
+          <li><a href="/platform/billing/">Billing & POS</a></li>
+          <li><a href="/platform/floor-and-kitchen/">Floor & Kitchen</a></li>
+          <li><a href="/platform/menu/">Menu & QR Ordering</a></li>
+          <li><a href="/platform/inventory/">Inventory & Stock</a></li>
+          <li><a href="/platform/crm/" class="current">CRM & Loyalty</a></li>
+          <li><a href="/platform/reports/">Reports & Analytics</a></li>
+          <li><a href="/platform/staff/">Staff & Shifts</a></li>
+          <li><a href="/platform/integrations/">Integrations</a></li>
+          <li><a href="/platform/multi-outlet/">Multi-Outlet</a></li>
+        </ul>
+      </li>
+      <li><a href="/pricing/">Pricing</a></li>
+      <li><a href="/compare/">Compare</a></li>
+      <li><a href="/product-tour/">Product Tour</a></li>
+      <li><a href="/about/">About</a></li>
+      <li><a href="/contact/">Contact</a></li>
+      <li><a href="/live-demo/" class="nav-cta">Try Live Demo</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="eyebrow-chip">Platform · CRM</div>
+  <h1>Turn first-time diners<br>into <em>regulars</em>.</h1>
+  <p class="sub">Every bill you print quietly builds a guest profile — name, phone number, visit history. No separate CRM data entry, no forms for guests to fill. Loyalty points accrue automatically and redeem right at the counter.</p>
+  <div class="hero-actions">
+    <a href="/live-demo/" class="btn-primary">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      Try Live Demo
+    </a>
+    <a href="https://wa.me/917780181920?text=Hi%2C%20I%27d%20like%20to%20know%20more%20about%20Lexnorax%27s%20AI%20menu%20import" target="_blank" class="btn-secondary">Talk to Us</a>
+  </div>
+</section>
+
+<div class="strip">
+  <div class="strip-card reveal"><div class="n">Auto-captured</div><div class="l">Guest phone numbers at billing</div></div>
+  <div class="strip-card reveal"><div class="n">Points-based</div><div class="l">Loyalty rewards</div></div>
+  <div class="strip-card reveal"><div class="n">Repeat-guest</div><div class="l">Recognized at the counter</div></div>
+</div>
+
+<!-- BLOCK 1: GUEST PROFILES & LOYALTY -->
+<section class="tour-block">
+  <div class="tour-inner">
+    <div class="reveal">
+      <div class="tour-eyebrow">Guest Profiles & Loyalty</div>
+      <h2 class="tour-heading">No data entry.<br>Just a <em>phone number</em>.</h2>
+      <p class="tour-desc">The phone number captured at billing quietly builds a full guest profile — name, visit count, order history — with zero extra data entry. Loyalty points accrue on every visit and redeem straight at the bill, so regulars feel recognized every time.</p>
+      <div class="flow-steps">
+        <div class="flow-step"><span class="flow-step-num">1</span> Guest's phone number captured at billing</div>
+        <div class="flow-step"><span class="flow-step-num">2</span> Profile and order history build automatically</div>
+        <div class="flow-step"><span class="flow-step-num">3</span> Loyalty points accrue and redeem at the counter</div>
+      </div>
+      <a href="/live-demo/" class="tour-link" style="margin-top:1.6rem;">See it live →</a>
+    </div>
+    <div class="reveal">
+      <img src="/static/images/restaurant/guest-loyalty.jpg" alt="Restaurant staff warmly greeting a returning guest" class="tour-photo">
+      <div class="mockup">
+        <div class="mockup-header">
+          <div class="mockup-dot" style="background:#EC2734;"></div>
+          <div class="mockup-dot" style="background:#27272a;"></div>
+          <div class="mockup-dot" style="background:#0a0a0a;"></div>
+          <span class="mockup-label">Guest Profile</span>
+        </div>
+        <div class="guest-card" id="guestCard">
+          <div class="guest-avatar">A</div>
+          <div class="guest-info">
+            <div class="guest-name">Ananya Rao</div>
+            <div class="guest-phone">+91 98450 XXXXX</div>
+          </div>
+        </div>
+        <div class="guest-stats">
+          <div class="guest-stat" id="statVisits"><div class="v">14</div><div class="k">Visits</div></div>
+          <div class="guest-stat" id="statPoints"><div class="v">860</div><div class="k">Points</div></div>
+          <div class="guest-stat" id="statSince"><div class="v">2024</div><div class="k">Guest since</div></div>
+        </div>
+        <div class="guest-last">Last order: <span>Paneer Tikka, Garlic Naan, Mango Lassi</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BLOCK 2: RESERVATIONS & GUEST HISTORY (dark) -->
+<section class="tour-block reverse on-dark">
+  <div class="tour-inner">
+    <div class="reveal">
+      <div class="tour-eyebrow">Reservations & Guest History</div>
+      <h2 class="tour-heading">Know them<br>before they <em>sit down</em>.</h2>
+      <p class="tour-desc">Track table reservations end to end, and the moment a guest is seated, see their past orders and preferences right at the counter — the usual table, the dish they always order, the regular who deserves a nod.</p>
+      <a href="/live-demo/" class="tour-link">See it live →</a>
+    </div>
+    <div class="reveal">
+      <div class="mockup">
+        <div class="mockup-header">
+          <div class="mockup-dot" style="background:#EC2734;"></div>
+          <div class="mockup-dot" style="background:#27272a;"></div>
+          <div class="mockup-dot" style="background:#0a0a0a;"></div>
+          <span class="mockup-label">Reservations Today</span>
+        </div>
+        <div class="res-list">
+          <div class="res-item">
+            <div class="res-item-top"><span class="res-item-name">Ananya Rao · Table 5</span><span class="res-item-time">8:00 PM</span></div>
+            <div class="res-item-sub"><span class="res-badge regular">Regular · 14 visits</span> · Usually orders Paneer Tikka</div>
+          </div>
+          <div class="res-item">
+            <div class="res-item-top"><span class="res-item-name">Karthik Menon · Table 2</span><span class="res-item-time">7:30 PM</span></div>
+            <div class="res-item-sub"><span class="res-badge seated">Seated</span> · First-time guest</div>
+          </div>
+          <div class="res-item">
+            <div class="res-item-top"><span class="res-item-name">Priya Nair · Table 9</span><span class="res-item-time">9:00 PM</span></div>
+            <div class="res-item-sub"><span class="res-badge confirmed">Confirmed</span> · Party of 6, birthday note added</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<div class="final-cta-wrap">
+  <div class="final-cta">
+    <div class="final-cta-inner">
+      <h2>See a guest profile build itself.</h2>
+      <p>Explore the full dashboard with sample data — no signup needed — or talk it through with the founder directly.</p>
+      <div class="final-cta-actions">
+        <a href="/live-demo/" class="btn-dark">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Try Live Demo
+        </a>
+        <a href="https://wa.me/917780181920?text=Hi%20Rajath%2C%20I%27d%20like%20to%20see%20a%20demo%20of%20Lexnorax" target="_blank" class="btn-dark-outline">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Message on WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-left">Lex<span>norax</span></div>
+  <div class="footer-right">© 2026 EasyBillBro · Bengaluru, India</div>
+  <a href="/login/" class="footer-login">Customer Login →</a>
+</footer>
+
+<script>
+  const navInner = document.getElementById('navInner');
+  window.addEventListener('scroll', () => {
+    navInner.classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 70);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Fallback: never leave the page blank (matches the homepage's reveal safety net)
+  setTimeout(() => {
+    document.querySelectorAll('.reveal:not(.visible)').forEach(el => el.classList.add('visible'));
+  }, 800);
+
+  // Guest profile card reveal animation
+  function runGuestAnimation() {
+    const els = [document.getElementById('guestCard'), document.getElementById('statVisits'), document.getElementById('statPoints'), document.getElementById('statSince')];
+    els.forEach(el => el && el.classList.remove('visible'));
+    els.forEach((el, i) => {
+      if (el) setTimeout(() => el.classList.add('visible'), i * 200);
+    });
+  }
+  const guestObserver = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) runGuestAnimation();
+  }, { threshold: 0.3 });
+  const guestMockup = document.getElementById('guestCard');
+  if (guestMockup) guestObserver.observe(guestMockup);
+
+  // Nav dropdown on touch devices
+  document.querySelectorAll('.nav-dropdown-toggle').forEach(t => {
+    t.addEventListener('click', e => {
+      if (window.matchMedia('(hover: none)').matches) { e.preventDefault(); t.parentElement.classList.toggle('open'); }
+    });
+  });
+</script>
+</body>
+</html>

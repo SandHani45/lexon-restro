@@ -83,7 +83,7 @@ class PaymentConfig(TenantScopedModel):
                               help_text="UPI ID (VPA) shown as QR on bill — e.g. myrestaurant@okaxis")
 
     # Razorpay — bring-your-own-keys. Each tenant connects their OWN Razorpay
-    # account; money settles to their own bank account, Lexnorax never holds funds.
+    # account; money settles to their own bank account, EasyBillBro never holds funds.
     # key_id is a public identifier (shown in Razorpay's own dashboard URLs,
     # not sensitive) and stays plaintext. key_secret/webhook_secret are real
     # secrets and are encrypted at rest via EncryptedCharField.

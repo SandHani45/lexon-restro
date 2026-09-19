@@ -1,6 +1,7 @@
 /* ============================================================
-   LUXURY THEME — Fine Dining / Premium
-   Black, white, and gold. Sharp edges. Serif headings.
+   LUXURY THEME — Premium Restaurant POS
+   Light: Soft white/pink · Red accent · Rounded pill buttons
+   Dark:  Deep charcoal · Same red accent · Rich shadows
    Google Fonts: Outfit (body) · DM Serif Display (headings) · Space Mono (code)
    ============================================================ */
 
@@ -8,73 +9,127 @@
 :root {
     color-scheme: light;
 
-    --accent-gold:       #c5a059;
-    --accent-hover:      #b59250;
-    --bg-color:          #fafafa;
+    /* Brand — vibrant red kept as --accent-gold for back-compat */
+    --accent-gold:       #EC2734;
+    --accent-hover:      #d81f2f;
+    --accent-orange:     #FA7327;
+    --accent-dark:       #2C170E;
+    --accent-gradient:   linear-gradient(135deg, #EC2734 0%, #ff6b6b 100%);
+
+    /* Surface */
+    --bg-color:          #F7F7F9;
     --panel-bg:          #ffffff;
-    --text-main:         #111111;
-    --text-muted:        #737373;
-    --border-color:      #eaeaea;
-    --border-radius:     0px;
-    --shadow-soft:       0 2px 8px rgba(0,0,0,0.04);
-    --shadow-hover:      0 8px 24px rgba(0,0,0,0.10);
-    --transition-smooth: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --surface-2:         #F2EDE9;
+    --surface-3:         #ECE7E2;
+
+    /* Typography */
+    --text-main:         #2C170E;
+    --text-muted:        #8a7d74;
+    --text-hint:         #b0a49a;
+
+    /* Borders & Shadows */
+    --border-color:      #ECE7E2;
+    --border-focus:      rgba(236, 39, 52, 0.45);
+    --shadow-soft:       0 2px 12px rgba(236, 39, 52, 0.05);
+    --shadow-card:       0 4px 20px rgba(0, 0, 0, 0.06);
+    --shadow-hover:      0 8px 32px rgba(236, 39, 52, 0.14);
+    --shadow-float:      0 4px 16px rgba(0, 0, 0, 0.14);
+
+    /* Radius */
+    --border-radius:     14px;
+    --radius-xs:         6px;
+    --radius-sm:         10px;
+    --radius-md:         14px;
+    --radius-lg:         20px;
+    --radius-xl:         28px;
+    --radius-pill:       999px;
+
+    /* Transitions */
+    --transition-smooth: all 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --transition-fast:   all 0.15s ease;
+
+    /* Tap targets */
     --min-tap-target:    48px;
+
+    /* Status */
     --danger:            #ef4444;
     --success:           #10b981;
+    --warning:           #f59e0b;
+    --info:              #3b82f6;
 
     /* ── Sidebar layout tokens ── */
     --sidebar-width:        220px;
     --sidebar-collapsed:     56px;
-    --topbar-height:         56px;
-    --sidebar-active-bg:    rgba(197,160,89,0.10);
-    --sidebar-active-color: var(--accent-gold);
+    --topbar-height:          56px;
+    --sidebar-active-bg:    rgba(236, 39, 52, 0.09);
+    --sidebar-active-color: #EC2734;
 
     /* ── Font families ── */
     --font-display:  'DM Serif Display', Georgia, serif;
     --font-mono:     'Space Mono', 'Courier New', monospace;
 
-    /* ── Type scale (base 16px) ──
-       Use these variables instead of hardcoding px/rem in templates.
-       All values readable on a tablet at arm's length. */
-    --text-2xs: 0.7rem;    /* 11.2px — use only for legal/tiny labels  */
-    --text-xs:  0.78rem;   /* 12.5px — table headers, chips            */
-    --text-sm:  0.875rem;  /* 14px   — secondary body, hints           */
-    --text-base:1rem;      /* 16px   — main body text                  */
-    --text-lg:  1.125rem;  /* 18px   — slightly prominent body         */
-    --text-xl:  1.25rem;   /* 20px   — small headings                  */
-    --text-2xl: 1.5rem;    /* 24px   — section headings                */
-    --text-3xl: 1.875rem;  /* 30px   — page headings                   */
-    --text-4xl: 2.25rem;   /* 36px   — hero numbers (metrics, totals)  */
+    /* ── Type scale (base 16px) ── */
+    --text-2xs: 0.68rem;   /* 10.9px — tiny labels                    */
+    --text-xs:  0.75rem;   /* 12px   — table headers, chips           */
+    --text-sm:  0.875rem;  /* 14px   — secondary body, hints          */
+    --text-base:1rem;      /* 16px   — main body text                 */
+    --text-lg:  1.125rem;  /* 18px   — slightly prominent body        */
+    --text-xl:  1.25rem;   /* 20px   — small headings                 */
+    --text-2xl: 1.5rem;    /* 24px   — section headings               */
+    --text-3xl: 1.875rem;  /* 30px   — page headings                  */
+    --text-4xl: 2.25rem;   /* 36px   — hero numbers (metrics, totals) */
 }
 
 /* ── Dark mode ───────────────────────────────────────────── */
 html.dark {
     color-scheme: dark;
 
-    --bg-color:    #000000;
-    --panel-bg:    #0a0a0a;
-    --text-main:   #ffffff;
-    --text-muted:  #888888;
-    --border-color:#262626;
-    --accent-gold: #d4af37;
-    --accent-hover:#e5c45e;
-    --shadow-soft: 0 4px 15px rgba(0,0,0,0.3);
-    --shadow-hover:0 10px 30px rgba(0,0,0,0.5);
-    --sidebar-active-bg: rgba(212,175,55,0.12);
+    --bg-color:    #0a0a0a;
+    --panel-bg:    #121214;
+    --surface-2:   #18181b;
+    --surface-3:   #222226;
+    --text-main:   #f4f4f6;
+    --text-muted:  #9ca3af;
+    --text-hint:   #64748b;
+    --border-color: #27272a;
+    --border-focus: rgba(236, 39, 52, 0.6);
+    --accent-gold: #EC2734;
+    --accent-hover:#ff4d5a;
+    --accent-orange:#FA7327;
+    --accent-dark: #000000;
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.5);
+    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.4);
+    --shadow-hover:0 8px 32px rgba(0, 0, 0, 0.65);
+    --shadow-float:0 4px 16px rgba(0, 0, 0, 0.55);
+    --sidebar-active-bg: rgba(236, 39, 52, 0.16);
+    --sidebar-active-color: #ff4d5a;
+}
+
+html.dark .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+html.dark ::selection {
+    background: rgba(236, 39, 52, 0.4);
+    color: #ffffff;
+}
+
+html.dark .modal-backdrop {
+    background-color: #000000;
+    opacity: 0.75 !important;
 }
 
 /* ── Base Typography ─────────────────────────────────────── */
 html {
-    font-size: 16px;                 /* explicit root — prevents browser scaling */
-    -webkit-text-size-adjust: 100%;  /* no iPhone auto-inflate on rotation       */
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
 }
 
 body {
     background-color: var(--bg-color);
     color: var(--text-main);
     font-family: var(--font-main, 'Outfit', sans-serif);
-    font-size: var(--text-base);     /* 16px */
+    font-size: var(--text-base);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -89,21 +144,18 @@ h1, h2, h3, h4, h5, h6,
 .metric-value,
 .section-title {
     font-family: var(--font-display);
-    font-weight: 400;                /* Serif Display looks best at regular weight */
+    font-weight: 400;
     line-height: 1.2;
 }
 
-h1, .h1 { font-size: var(--text-3xl);  } /* 30px */
-h2, .h2 { font-size: var(--text-2xl);  } /* 24px */
-h3, .h3 { font-size: var(--text-xl);   } /* 20px */
-h4, .h4 { font-size: var(--text-lg);   } /* 18px */
-h5, .h5 { font-size: var(--text-base); } /* 16px */
-h6, .h6 { font-size: var(--text-sm);   } /* 14px */
+h1, .h1 { font-size: var(--text-3xl);  }
+h2, .h2 { font-size: var(--text-2xl);  }
+h3, .h3 { font-size: var(--text-xl);   }
+h4, .h4 { font-size: var(--text-lg);   }
+h5, .h5 { font-size: var(--text-base); }
+h6, .h6 { font-size: var(--text-sm);   }
 
-/* Monospace — for order numbers, barcodes, IDs */
-.mono-text,
-code,
-pre,
+.mono-text, code, pre,
 .font-mono { font-family: var(--font-mono); }
 
 /* ── Header / Nav ────────────────────────────────────────── */
@@ -122,7 +174,7 @@ pre,
 
 .brand-title {
     font-family: var(--font-display);
-    font-size: 1.4rem;               /* was not defined — now clear */
+    font-size: 1.4rem;
     font-weight: 400;
     color: var(--text-main);
     text-decoration: none;
@@ -134,7 +186,7 @@ pre,
 .brand-title:hover { color: var(--accent-gold); }
 
 .brand-subtitle {
-    font-size: var(--text-xs);       /* 12.5px — was 0.72rem = 11.5px */
+    font-size: var(--text-xs);
     text-transform: uppercase;
     letter-spacing: 2px;
     color: var(--text-muted);
@@ -144,108 +196,122 @@ pre,
 
 /* ── Button System ───────────────────────────────────────── */
 .btn-luxury {
-    border: 1px solid var(--border-color);
+    border: 1.5px solid var(--border-color);
     background: transparent;
     color: var(--text-main);
-    padding: 0.6rem 1.1rem;
-    font-size: var(--text-xs);       /* 12.5px — was 0.75rem = 12px */
+    padding: 0.55rem 1.1rem;
+    font-size: var(--text-xs);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.8px;
     font-weight: 600;
-    border-radius: 0;
+    border-radius: var(--radius-pill);
     transition: var(--transition-smooth);
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 0.4rem;
     text-decoration: none;
     cursor: pointer;
     min-height: var(--min-tap-target);
     font-family: var(--font-main, 'Outfit', sans-serif);
+    white-space: nowrap;
 }
 .btn-luxury:hover {
-    border-color: var(--text-main);
-    color: var(--panel-bg);
-    background: var(--text-main);
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+    background: var(--sidebar-active-bg);
+    box-shadow: 0 2px 12px rgba(236, 39, 52, 0.15);
 }
 .btn-luxury.btn-luxury-primary,
 .btn-accent {
     background: var(--accent-gold);
     border-color: var(--accent-gold);
     color: #fff !important;
+    box-shadow: 0 4px 14px rgba(236, 39, 52, 0.35);
 }
 .btn-luxury.btn-luxury-primary:hover,
-.btn-accent:hover { opacity: 0.9; }
+.btn-accent:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    box-shadow: 0 6px 20px rgba(236, 39, 52, 0.45);
+    transform: translateY(-1px);
+}
 
 .btn-icon {
     background: transparent;
     border: none;
-    color: var(--text-main);
-    font-size: 1.25rem;
-    padding: 0.5rem;
+    color: var(--text-muted);
+    font-size: 1.15rem;
+    padding: 0.45rem;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: var(--transition-smooth);
-    min-height: var(--min-tap-target);
-    min-width: var(--min-tap-target);
+    transition: var(--transition-fast);
+    min-height: 36px;
+    min-width: 36px;
+    border-radius: var(--radius-sm);
 }
-.btn-icon:hover { color: var(--accent-gold); transform: scale(1.1); }
+.btn-icon:hover {
+    color: var(--accent-gold);
+    background: var(--sidebar-active-bg);
+}
 
 /* ── Cards ───────────────────────────────────────────────── */
 .card {
-    border-radius: 0;
-    border-color: var(--border-color);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
     background: var(--panel-bg);
+    box-shadow: var(--shadow-card);
+    transition: var(--transition-smooth);
 }
-.card-header, .card-footer { border-color: var(--border-color); }
+.card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+}
+.card-header, .card-footer {
+    border-color: var(--border-color);
+    background: transparent;
+}
 
 /* ── Form controls ───────────────────────────────────────── */
 .form-control, .form-select {
     background: var(--panel-bg);
-    border-color: var(--border-color);
+    border: 1.5px solid var(--border-color);
     color: var(--text-main);
-    border-radius: 0;
+    border-radius: var(--radius-sm);
     min-height: var(--min-tap-target);
-    font-size: var(--text-base);     /* 16px — was often unset, defaulting tiny */
+    font-size: var(--text-sm);
     font-family: var(--font-main, 'Outfit', sans-serif);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    padding: 0.5rem 0.85rem;
 }
 .form-control:focus, .form-select:focus {
     border-color: var(--accent-gold);
-    box-shadow: none;
+    box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.12);
     background: var(--panel-bg);
     color: var(--text-main);
+    outline: none;
 }
-.form-control::placeholder { color: var(--text-muted); opacity: 0.7; }
+.form-control::placeholder { color: var(--text-hint); opacity: 1; }
 
-/* The dropdown POPUP for a <select> is drawn by the browser's native
-   widget, not this page's box model - `color-scheme` above is what
-   actually tells the browser to use a dark-appropriate popup palette.
-   This explicit <option> rule is a second line of defense for browsers
-   that honor authored colors but not `color-scheme` for the popup.
-   Deliberately a bare element selector (not scoped to .form-select /
-   .form-control) so it's a site-wide safety net: every <select> on every
-   page that extends base.html gets a readable popup by default, including
-   pages with their own one-off select classes (.form-select-luxury,
-   .category-select, .field-select, etc). Its low specificity means any
-   page that already declares its own `<class> option { ... }` rule keeps
-   winning for the properties it sets - this just fills the gaps. */
 option {
     background-color: var(--panel-bg);
     color: var(--text-main);
 }
 
-/* Luxury minimal input (underline style used on many forms) */
+/* Luxury minimal input (underline style) */
 .form-input-luxury {
     background: transparent;
     border: none;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1.5px solid var(--border-color);
     border-radius: 0;
     color: var(--text-main);
     font-size: var(--text-base);
     padding: 0.5rem 0;
     width: 100%;
     font-family: var(--font-main, 'Outfit', sans-serif);
+    transition: border-color 0.2s;
 }
 .form-input-luxury:focus {
     outline: none;
@@ -253,39 +319,46 @@ option {
 }
 
 /* ── Tables ──────────────────────────────────────────────── */
-.table { color: var(--text-main); font-size: var(--text-sm); } /* 14px */
+.table { color: var(--text-main); font-size: var(--text-sm); }
 .table th {
     border-color: var(--border-color);
     color: var(--text-muted);
-    font-size: var(--text-xs);       /* 12.5px — was 0.7rem = 11.2px */
+    font-size: var(--text-xs);
     text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: 600;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+    padding-top: 0.85rem;
+    padding-bottom: 0.85rem;
+    background: var(--surface-2);
 }
-.table td { border-color: var(--border-color); }
+.table td { border-color: var(--border-color); vertical-align: middle; }
+.table tbody tr:hover { background: var(--surface-2); }
 
 /* ── Badges ──────────────────────────────────────────────── */
 .badge {
-    border-radius: 0;
-    letter-spacing: 0.5px;
-    font-size: var(--text-xs);       /* 12.5px — was 0.65rem = 10.4px */
+    border-radius: var(--radius-pill);
+    letter-spacing: 0.3px;
+    font-size: var(--text-xs);
     text-transform: uppercase;
+    font-weight: 700;
     font-family: var(--font-main, 'Outfit', sans-serif);
+    padding: 0.28rem 0.65rem;
 }
 
 /* ── Modals ──────────────────────────────────────────────── */
 .modal-content {
-    border-radius: 0;
+    border-radius: var(--radius-lg);
     border: 1px solid var(--border-color);
     background: var(--panel-bg);
     color: var(--text-main);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
 }
 .modal-header, .modal-footer { border-color: var(--border-color); }
 .modal-title {
     font-family: var(--font-display);
-    font-size: var(--text-xl);       /* 20px */
+    font-size: var(--text-xl);
 }
-.modal-body { font-size: var(--text-sm); } /* 14px */
+.modal-body { font-size: var(--text-sm); }
 
 /* ── Offcanvas ───────────────────────────────────────────── */
 .offcanvas {
@@ -297,34 +370,39 @@ option {
 /* ── Dropdown menus ──────────────────────────────────────── */
 .dropdown-menu {
     background: var(--panel-bg);
-    border-color: var(--border-color);
-    border-radius: 0;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
     font-size: var(--text-sm);
+    box-shadow: var(--shadow-float);
+    padding: 0.4rem;
 }
 .dropdown-item {
     color: var(--text-main);
     font-size: var(--text-sm);
+    border-radius: var(--radius-xs);
+    padding: 0.45rem 0.85rem;
 }
 .dropdown-item:hover {
-    background: var(--border-color);
-    color: var(--text-main);
+    background: var(--surface-2);
+    color: var(--accent-gold);
 }
 
-/* ── Scrollbars (thin, luxury) ───────────────────────────── */
-::-webkit-scrollbar { width: 4px; height: 4px; }
+/* ── Scrollbars (thin, premium) ──────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 0; }
-::-webkit-scrollbar-thumb:hover { background: var(--accent-gold); }
+::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: var(--radius-pill); }
+::-webkit-scrollbar-thumb:hover { background: rgba(236, 39, 52, 0.35); }
 
 /* ── Utility helpers ─────────────────────────────────────── */
-.text-accent  { color: var(--accent-gold) !important; }
-.border-accent{ border-color: var(--accent-gold) !important; }
-.bg-panel     { background: var(--panel-bg); }
-.bg-surface   { background: var(--bg-color); }
-.font-display { font-family: var(--font-display) !important; }
-.font-mono    { font-family: var(--font-mono) !important; }
+.text-accent   { color: var(--accent-gold) !important; }
+.border-accent { border-color: var(--accent-gold) !important; }
+.bg-panel      { background: var(--panel-bg); }
+.bg-surface    { background: var(--bg-color); }
+.bg-surface-2  { background: var(--surface-2); }
+.font-display  { font-family: var(--font-display) !important; }
+.font-mono     { font-family: var(--font-mono) !important; }
 
-/* Text size utilities matching the scale */
+/* Text size utilities */
 .text-2xs  { font-size: var(--text-2xs); }
 .text-xs   { font-size: var(--text-xs);  }
 .text-sm   { font-size: var(--text-sm);  }
@@ -336,11 +414,47 @@ option {
 .text-4xl  { font-size: var(--text-4xl); }
 
 /* ── Placeholder ─────────────────────────────────────────── */
-::placeholder { color: var(--text-muted) !important; opacity: 0.7 !important; }
+::placeholder { color: var(--text-hint) !important; opacity: 1 !important; }
 
-/* ── Alerts / toasts ─────────────────────────────────────── */
-.alert { border-radius: 0; font-size: var(--text-sm); }
+/* ── Alerts ──────────────────────────────────────────────── */
+.alert { border-radius: var(--radius-md); font-size: var(--text-sm); }
 
 /* ── Navigation active states ────────────────────────────── */
-.nav-link { color: var(--text-muted); font-size: var(--text-sm); }
+.nav-link { color: var(--text-muted); font-size: var(--text-sm); transition: color 0.15s; }
 .nav-link:hover, .nav-link.active { color: var(--accent-gold); }
+
+/* ── Status color pills ──────────────────────────────────── */
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.7rem;
+    border-radius: var(--radius-pill);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.status-pill.open    { background: rgba(59,130,246,0.12); color: #2563eb; }
+.status-pill.served  { background: rgba(16,185,129,0.12); color: #059669; }
+.status-pill.paid    { background: rgba(16,185,129,0.12); color: #059669; }
+.status-pill.pending { background: rgba(245,158,11,0.12); color: #b45309; }
+.status-pill.new     { background: rgba(236,39,52,0.12);  color: #EC2734; }
+.status-pill.cancelled { background: rgba(100,116,139,0.12); color: #64748b; }
+
+/* ── Metric/KPI cards ────────────────────────────────────── */
+.metric-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.25rem 1.5rem;
+    box-shadow: var(--shadow-card);
+}
+.metric-card-accent {
+    background: var(--accent-gradient);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 1.25rem 1.5rem;
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(236,39,52,0.3);
+}

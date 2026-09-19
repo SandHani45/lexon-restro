@@ -51,6 +51,7 @@ urlpatterns = [
     path('staff/<int:user_id>/edit-role/', edit_staff_role, name='edit_staff_role'),
     path('staff/<int:user_id>/edit-outlet/', edit_staff_outlet, name='edit_staff_outlet'),
     path('staff/<int:user_id>/edit-pay-rate/', edit_pay_rate, name='edit_pay_rate'),
+    path('roles/', setup_staff, name='setup_roles'),
     path("set-default-station/<int:station_id>/", set_default_station, name="set-default-station"),
     path('tables/<int:table_id>/rename/', rename_table, name='rename_table'),
     path("aggregators/", aggregator_setup, name="setup_aggregators"),

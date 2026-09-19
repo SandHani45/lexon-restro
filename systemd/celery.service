@@ -1,5 +1,5 @@
 [Unit]
-Description=Lexnorax POS — Celery Worker
+Description=EasyBillBro POS — Celery Worker
 After=network.target redis.service
 
 # -B embeds the beat scheduler in this same worker process rather than a

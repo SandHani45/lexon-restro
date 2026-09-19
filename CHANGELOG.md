@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Lexnorax are recorded here, newest first. This file starts
+All notable changes to EasyBillBro are recorded here, newest first. This file starts
 2026-09-05 — it is not a retroactive rewrite of the full project history.
 For anything earlier than the "Recent history" section below, `git log` is
 the source of truth.

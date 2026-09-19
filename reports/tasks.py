@@ -124,7 +124,7 @@ def send_daily_digest_email(self):
 
         try:
             send_mail(
-                subject=f"Lexnorax daily digest - {tenant.name} ({business_date})",
+                subject=f"EasyBillBro daily digest - {tenant.name} ({business_date})",
                 message="\n".join(lines),
                 from_email=None,  # falls back to settings.DEFAULT_FROM_EMAIL
                 recipient_list=recipients,

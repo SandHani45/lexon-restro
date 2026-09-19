@@ -11,12 +11,12 @@
     html.dark { --shadow-hover: 0 10px 30px rgba(0,0,0,0.5); }
 
     .btn-gold { background: var(--accent-gold); border-color: var(--accent-gold); color: #fff; }
-    .btn-gold:hover { background: #b59250; border-color: #b59250; color: #fff; }
-    .btn-gold-solid { background: var(--accent-gold); border-color: var(--accent-gold); color: #000; font-weight: 700; }
-    .btn-gold-solid:hover { background: #b59250; border-color: #b59250; color: #000; }
+    .btn-gold:hover { background: #C8212C; border-color: #C8212C; color: #fff; }
+    .btn-gold-solid { background: var(--accent-gold); border-color: var(--accent-gold); color: #fff; font-weight: 700; }
+    .btn-gold-solid:hover { background: #C8212C; border-color: #C8212C; color: #fff; }
 
     .category-card {
-        background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 0;
+        background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: var(--radius-md);
         padding: 2.5rem 2rem; height: 100%; transition: var(--transition-smooth);
         margin-bottom: 2rem; box-shadow: var(--shadow-soft);
     }
@@ -44,7 +44,7 @@
     .item-price { font-family: 'DM Serif Display', serif; font-weight: 700; color: var(--accent-gold); font-size: 1.2rem; font-style: italic; cursor: pointer; }
     .item-price:hover { opacity: 0.8; }
 
-    .luxury-badge { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; padding: 2px 8px; border-radius: 0; margin-left: 8px; }
+    .luxury-badge { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; padding: 2px 8px; border-radius: var(--radius-pill); margin-left: 8px; }
     .badge-disabled { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; }
 
     .switch { position: relative; display: inline-block; width: 46px; height: 24px; }
@@ -54,7 +54,7 @@
     input:checked + .slider { background-color: #22c55e; }
     input:checked + .slider:before { transform: translateX(22px); }
 
-    .modal-content { background: var(--panel-bg); border-radius: 0; border: 1px solid var(--border-color); }
+    .modal-content { background: var(--panel-bg); border-radius: var(--radius-lg); border: 1px solid var(--border-color); }
     .modal-header { border-bottom: 1px solid var(--border-color); padding: 1.5rem; }
     .modal-footer { border-top: 1px solid var(--border-color); padding: 1.2rem; }
     .modal-title { font-family: 'DM Serif Display', serif; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
@@ -63,7 +63,7 @@
     .form-select-luxury, .form-input-luxury {
         background-color: transparent !important; border: none;
         border-bottom: 1px solid var(--border-color); color: var(--text-main) !important;
-        border-radius: 0; padding: 0.5rem 0; font-family: inherit; font-size: 0.9rem; font-weight: 500;
+        border-radius: var(--radius-sm); padding: 0.5rem 0; font-family: inherit; font-size: 0.9rem; font-weight: 500;
     }
     .form-select-luxury:focus, .form-input-luxury:focus { box-shadow: none; border-bottom-color: var(--accent-gold); }
 
@@ -71,7 +71,7 @@
 
     .cat-nav-bar {
         background: var(--panel-bg); border-bottom: 1px solid var(--border-color);
-        padding: 0.75rem 2rem; display: flex; gap: 1.5rem; overflow-x: auto;
+        padding: 0.75rem 2rem; display: flex; gap: 0.6rem; overflow-x: auto;
         white-space: nowrap; position: sticky; top: 62px; z-index: 99;
         box-shadow: 0 4px 10px rgba(0,0,0,0.02);
         -ms-overflow-style: none; scrollbar-width: none;
@@ -79,14 +79,17 @@
     .cat-nav-bar::-webkit-scrollbar { display: none; }
     .cat-nav-link {
         color: var(--text-muted); text-decoration: none; font-size: 0.7rem;
-        text-transform: uppercase; letter-spacing: 2px; font-weight: 700; transition: var(--transition-smooth);
+        text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; transition: var(--transition-smooth);
+        padding: 0.5rem 1rem; border-radius: var(--radius-pill);
+        background: var(--bg-color); border: 1px solid var(--border-color);
     }
-    .cat-nav-link:hover { color: var(--accent-gold); }
+    .cat-nav-link:hover { color: var(--accent-gold); border-color: var(--accent-gold); }
+    .cat-nav-link.active { background: var(--accent-gold); border-color: var(--accent-gold); color: #fff; }
 
     .category-section { scroll-margin-top: 150px; }
 
     .dropdown-item { color: var(--text-main); transition: var(--transition-smooth); }
-    .dropdown-item:hover { background-color: rgba(197, 160, 89, 0.1); color: var(--accent-gold); }
+    .dropdown-item:hover { background-color: rgba(236, 39, 52, 0.1); color: var(--accent-gold); }
     .dropdown-item.text-danger:hover { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; }
 
     #qsr-toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: var(--text-main); color: var(--bg-color); padding: 0.75rem 1.5rem; font-size: 0.85rem; letter-spacing: 0.5px; z-index: 9999; display: none; white-space: nowrap; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
@@ -201,7 +204,7 @@
                         </div>
 
                         <!-- Recipe Block -->
-                        <div class="recipe-block p-3 mb-3 mx-2" id="recipe-block-{{item.id}}" style="display:none; background:rgba(197,160,89,0.05); border-left:2px solid var(--accent-gold);">
+                        <div class="recipe-block p-3 mb-3 mx-2" id="recipe-block-{{item.id}}" style="display:none; background:rgba(236,39,52,0.05); border-left:2px solid var(--accent-gold);">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span style="font-size:0.75rem; text-transform:uppercase; font-weight:bold; color:var(--accent-gold);">Linked Inventory Recipe</span>
                                 <button class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size:0.7rem; border-color:var(--border-color); color:var(--text-main);" onclick="openRecipeModal('{{item.id}}')">+ Add Ingredient</button>
@@ -556,5 +559,21 @@
             else showToast(data.error || "Sync failed", "error");
         }).catch(() => showToast("Network error", "error"));
     }
+
+    // Category tab scroll-spy — highlights the pill for whichever category
+    // section is currently in view.
+    const catNavLinks = document.querySelectorAll('.cat-nav-link');
+    const catSections  = document.querySelectorAll('.category-section');
+    function updateActiveCatTab() {
+        let current = '';
+        catSections.forEach(section => {
+            if (window.scrollY >= section.offsetTop - 170) current = section.id;
+        });
+        catNavLinks.forEach(link => {
+            link.classList.toggle('active', link.getAttribute('href') === `#${current}`);
+        });
+    }
+    window.addEventListener('scroll', updateActiveCatTab, { passive: true });
+    updateActiveCatTab();
 </script>
 {% endblock %}

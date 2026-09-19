@@ -1,5 +1,5 @@
 """
-Concurrency load test for the Lexnorax POS order pipeline.
+Concurrency load test for the EasyBillBro POS order pipeline.
 
 Runs the REAL service layer (get_or_create_open_order -> add_items_to_order ->
 create_kot -> process_payment) under concurrent threads and reports throughput,

@@ -23,27 +23,52 @@
 
     .dashboard-container { max-width: 1400px; margin: 0 auto; padding: 1.75rem 1.5rem; }
 
-    /* ── Aggregator bar (header) ── */
-    .aggregator-bar { background: var(--panel); border: 1px solid var(--border); padding: 0.25rem; border-radius: 4px; display: flex; align-items: center; }
-    .aggregator-bar span { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin: 0 0.5rem; }
+
     /* Missing interaction state on the shared primary button, kept local to this page */
     .btn-luxury.btn-luxury-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* ── Stats row ── */
+
+    /* ── Stats row — bold KPI tiles ── */
     .stats-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1rem; margin-bottom: 2rem; }
     @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 480px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
-    .stat-card { background: var(--panel); border: 1px solid var(--border); padding: 1.25rem; text-align: center; }
-    .stat-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 0.4rem; }
-    .stat-value { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--accent-gold); line-height: 1; }
-    .stat-value.neutral { color: var(--text); }
-    .stat-value.online-color { color: var(--online); }
+    .stat-card {
+        background: var(--accent-gold);
+        border: none;
+        border-radius: 20px;
+        padding: 1.1rem 1rem;
+        text-align: center;
+        position: relative;
+        color: #fff;
+        overflow: hidden;
+    }
+    /* Rotate the three brand tones across tiles so a row of KPIs still
+       reads as distinct cards rather than one solid strip. */
+    .stat-card:nth-child(3n+2) { background: #a3182a; }
+    .stat-card:nth-child(3n)   { background: var(--accent-orange); }
+    .stat-icon-badge {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 0.6rem;
+        color: #fff;
+        font-size: 1rem;
+    }
+    .stat-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.8); margin-bottom: 0.3rem; }
+    .stat-value { font-family: 'DM Serif Display', serif; font-size: 1.7rem; font-weight: 700; color: #fff; line-height: 1; }
+    .stat-value.neutral { color: #fff; }
+    .stat-value.online-color { color: #fff; }
+    .stat-card.stat-card--ring { box-shadow: 0 0 0 3px rgba(255,255,255,0.55) inset; }
 
     /* ── Section header ── */
     .section-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 1rem; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; }
     .section-header h2 { font-family: 'DM Serif Display', serif; font-size: 1.3rem; display: flex; align-items: center; gap: 0.5rem; margin: 0; }
-    .section-tag { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; padding: 0.2rem 0.5rem; border-radius: 2px; font-family: 'Outfit', sans-serif; font-weight: 600; }
-    .section-tag.counter { background: rgba(197,160,89,0.12); color: var(--accent-gold); }
+    .section-tag { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; padding: 0.2rem 0.6rem; border-radius: var(--radius-pill); font-family: 'Outfit', sans-serif; font-weight: 600; }
+    .section-tag.counter { background: rgba(236,39,52,0.12); color: var(--accent-gold); }
     .section-tag.online-tag { background: rgba(252,128,25,0.12); color: var(--online); }
 
     /* ── Token grid ── */
@@ -60,10 +85,12 @@
 
     .token-number { font-family: 'DM Serif Display', serif; font-size: 2.2rem; line-height: 1; margin-bottom: 0.4rem; }
     .token-amount { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.4rem; }
-    .token-badge { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; padding: 0.15rem 0.5rem; border: 1px solid var(--border); display: inline-block; color: var(--muted); }
-    .token-badge.billing { border-color: var(--warning); color: var(--warning); }
-    .token-badge.paid { border-color: var(--success); color: var(--success); }
-    .token-badge.platform { border: none; padding: 0.2rem 0.5rem; border-radius: 2px; font-weight: 600; }
+    .token-badge { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; padding: 0.15rem 0.6rem; border: none; border-radius: var(--radius-pill); display: inline-block; background: rgba(138,125,116,0.12); color: var(--muted); }
+    .token-badge.billing { background: rgba(245,158,11,0.12); color: var(--warning); }
+    .token-badge.paid { background: rgba(34,197,94,0.12); color: var(--success); }
+    /* Aggregator source badges stay solid brand fills, not pale-tint pills —
+       they identify a real third-party platform (Zomato/Swiggy), not a status. */
+    .token-badge.platform { border: none; padding: 0.2rem 0.6rem; border-radius: var(--radius-pill); font-weight: 600; }
     .token-badge.zomato { background: var(--zomato); color: #fff; }
     .token-badge.swiggy { background: var(--online); color: #fff; }
     .token-badge.web { background: #6366f1; color: #fff; }
@@ -90,15 +117,15 @@
 {% endblock %}
 
 {% block header_left %}
-<div class="d-flex align-items-center gap-2">
-    <div style="width:34px;height:34px;border-radius:8px;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex-shrink:0;">
+<a href="/tokens/" class="d-flex align-items-center gap-2 text-decoration-none" style="color:inherit;">
+    <div style="width:34px;height:34px;border-radius:10px;background:rgba(236,39,52,0.12);border:1px solid rgba(236,39,52,0.3);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex-shrink:0;">
         <i class="bi bi-123" style="font-size:1.15rem;"></i>
     </div>
     <div>
         <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.5px;color:var(--text-main);">Tokens Dashboard</h1>
-        <div class="text-muted" style="font-size:0.72rem;letter-spacing:1px;text-transform:uppercase;">{{ request.user.outlet.name }}</div>
+        <div class="text-muted" style="font-size:0.72rem;letter-spacing:0.5px;">{{ request.user.outlet.name }}</div>
     </div>
-</div>
+</a>
 {% endblock %}
 
 {% block header_right %}
@@ -126,28 +153,34 @@
     <!-- Stats row -->
     <div class="stats-row">
         <div class="stat-card">
+            <div class="stat-icon-badge"><i class="bi bi-hash"></i></div>
             <div class="stat-label">Next Token</div>
             <div class="stat-value">#{{ next_token }}</div>
         </div>
         <div class="stat-card">
+            <div class="stat-icon-badge"><i class="bi bi-people-fill"></i></div>
             <div class="stat-label">Counter Active</div>
             <div class="stat-value neutral" id="activeCount">{{ counter_tokens|length }}</div>
         </div>
-        <div class="stat-card" style="{% if online_count > 0 %}border-color:var(--online);{% endif %}">
+        <div class="stat-card{% if online_count > 0 %} stat-card--ring{% endif %}">
+            <div class="stat-icon-badge"><i class="bi bi-wifi"></i></div>
             <div class="stat-label">Online Active</div>
             <div class="stat-value online-color">{{ online_count }}</div>
         </div>
         <div class="stat-card">
+            <div class="stat-icon-badge"><i class="bi bi-check2-circle"></i></div>
             <div class="stat-label">Completed</div>
             <div class="stat-value neutral">{{ closed_tokens }}</div>
         </div>
         <div class="stat-card">
+            <div class="stat-icon-badge"><i class="bi bi-cash-stack"></i></div>
             <div class="stat-label">Revenue</div>
             <div class="stat-value">₹{{ today_revenue|floatformat:0 }}</div>
         </div>
-        <div class="stat-card" style="{% if cancelled_tokens > 0 %}border-color:var(--danger);{% endif %}">
+        <div class="stat-card{% if cancelled_tokens > 0 %} stat-card--ring{% endif %}">
+            <div class="stat-icon-badge"><i class="bi bi-x-circle"></i></div>
             <div class="stat-label">Cancelled</div>
-            <div class="stat-value" style="{% if cancelled_tokens > 0 %}color:var(--danger);{% else %}color:var(--muted);{% endif %}">{{ cancelled_tokens }}</div>
+            <div class="stat-value">{{ cancelled_tokens }}</div>
         </div>
     </div>
 

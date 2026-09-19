@@ -1,5 +1,5 @@
 """
-Smoke + access-control tests for the Portal (internal Lexnorax staff ops panel).
+Smoke + access-control tests for the Portal (internal EasyBillBro staff ops panel).
 
 Portal can create tenants and staff, so access must be locked to superusers.
 We prove:

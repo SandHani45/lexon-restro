@@ -1,6 +1,6 @@
-# Lexnorax POS Printing Agent
+# EasyBillBro POS Printing Agent
 
-A thin native Android shell that does two jobs: hosts the Lexnorax web dashboard in a full-screen WebView, and runs a background service that polls the Lexnorax backend for print jobs and sends them straight to a LAN printer over a raw TCP socket. This is the "phone becomes the printer bridge" piece of Lexnorax's printing architecture, no dedicated hardware needed at a cafe.
+A thin native Android shell that does two jobs: hosts the EasyBillBro web dashboard in a full-screen WebView, and runs a background service that polls the EasyBillBro backend for print jobs and sends them straight to a LAN printer over a raw TCP socket. This is the "phone becomes the printer bridge" piece of EasyBillBro's printing architecture, no dedicated hardware needed at a cafe.
 
 ## What this actually is
 
@@ -8,7 +8,7 @@ There's almost no native UI here on purpose. `MainActivity` is a single Activity
 
 ## Architecture
 
-- **`MainActivity.kt`**: full-screen WebView, first-launch setup screen (type a subdomain, or scan a QR code from the Lexnorax dashboard's Setup > Printer page), splash overlay, custom offline/SSL-error pages styled to match the brand.
+- **`MainActivity.kt`**: full-screen WebView, first-launch setup screen (type a subdomain, or scan a QR code from the EasyBillBro dashboard's Setup > Printer page), splash overlay, custom offline/SSL-error pages styled to match the brand.
 - **`PrintService.kt`**: a background `Service` (not bound) that owns the polling loop and printer communication. This is where almost all the real logic lives.
 - **`JSBridge.kt`**: the JS-to-native bridge, injected into the WebView as `window.Android`. Three methods the Django frontend's JS calls: `startPrinting(pollUrl)`, `getPrintingStatus()`, `isNativeApp()`.
 - **`BootReceiver.kt`**: restarts `PrintService` after a phone reboot, reading the saved poll URL from SharedPreferences, no user interaction needed.

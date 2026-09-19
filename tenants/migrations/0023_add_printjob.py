@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='outlet',
             name='print_agent_key',
-            field=models.UUIDField(default=uuid.uuid4, editable=False, help_text='Secret key the Lexnorax Agent uses to poll for print jobs. Never share publicly.', unique=True),
+            field=models.UUIDField(default=uuid.uuid4, editable=False, help_text='Secret key the EasyBillBro Agent uses to poll for print jobs. Never share publicly.', unique=True),
         ),
     ]

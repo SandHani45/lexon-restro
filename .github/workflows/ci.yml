@@ -1,4 +1,4 @@
-name: Lexnorax CI/CD
+name: EasyBillBro CI/CD
 
 on:
   push:

@@ -1,10 +1,10 @@
-# Lexnorax POS — Compressed Context Prompt
+# EasyBillBro POS — Compressed Context Prompt
 ### Paste this at the start of any new Claude session to restore full context
 
 ---
 
 ## Project
-**Lexnorax POS** — cloud-based multi-tenant restaurant POS for India.
+**EasyBillBro POS** — cloud-based multi-tenant restaurant POS for India.
 - Repo: `github.com/Rajathtuesday/restaurant-pos` branch `qsr`
 - Live: `lexnorax.net` (landing) · `spice.lexnorax.net` (demo tenant)
 - Server: AWS EC2 t3.micro · Ubuntu · `18.60.238.104` · ap-south-2 Hyderabad
@@ -38,7 +38,7 @@ Features are per-tenant-type, overridable via `TenantFeatureOverride`
 ## Printing architecture
 **Cloud can't reach local printer** (NAT). Two modes:
 1. **Browser print** — `thermal_receipt.html` opens in popup, `window.print()`, uses OS printer. Works with USB. With Chrome `--kiosk-printing` flag = zero-click automatic.
-2. **ESC/POS** — `python-escpos` over TCP:9100. Only works when printer is on SAME NETWORK as Django server (localhost dev or local Lexnorax install).
+2. **ESC/POS** — `python-escpos` over TCP:9100. Only works when printer is on SAME NETWORK as Django server (localhost dev or local EasyBillBro install).
 
 **Print modes detected automatically in `print_bill_task`:**
 - QSR + no station printers → Token + KOTs as connected strip (FULL cut at end)
@@ -48,7 +48,7 @@ Features are per-tenant-type, overridable via `TenantFeatureOverride`
 
 **`scripts/virtual_printer.py`** — run locally for ESC/POS testing, listens on `127.0.0.1:9100`
 
-**For cloud-hosted Lexnorax (spice.lexnorax.net) + USB printer at restaurant:**
+**For cloud-hosted EasyBillBro (spice.lexnorax.net) + USB printer at restaurant:**
 - Leave printer IP empty in Kitchen Stations
 - Create Chrome shortcut with `--kiosk-printing --app=https://spice.lexnorax.net`
 - Browser popup opens after payment → prints via USB to Windows default printer

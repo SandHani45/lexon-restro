@@ -1,5 +1,5 @@
 {% extends 'core/base.html' %}
-{% block title %}Lexnorax Control Panel{% endblock %}
+{% block title %}EasyBillBro Control Panel{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -13,17 +13,17 @@
   .su-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border-color); font-size: 0.88rem; vertical-align: middle; }
   .su-table tr:hover td { background: var(--panel-bg); }
 
-  .type-badge { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; padding: 3px 8px; border: 1px solid var(--border-color); color: var(--text-muted); }
-  .type-badge.franchise { border-color: #f97316; color: #f97316; }
-  .type-badge.fine_dining { border-color: var(--accent-gold); color: var(--accent-gold); }
-  .type-badge.cafe { border-color: #a855f7; color: #a855f7; }
+  .type-badge { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; padding: 3px 10px; border-radius: var(--radius-pill); border: none; background: rgba(138,125,116,.12); color: var(--text-muted); }
+  .type-badge.franchise { background: rgba(249,115,22,.12); color: #f97316; }
+  .type-badge.fine_dining { background: rgba(236,39,52,.12); color: var(--accent-gold); }
+  .type-badge.cafe { background: rgba(168,85,247,.12); color: #a855f7; }
 
-  .btn-su { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; padding: 0.35rem 0.8rem; border: 1px solid var(--border-color); background: transparent; color: var(--text-main); cursor: pointer; text-decoration: none; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px; }
+  .btn-su { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; padding: 0.4rem 0.9rem; border: 1px solid var(--border-color); border-radius: var(--radius-pill); background: transparent; color: var(--text-main); cursor: pointer; text-decoration: none; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px; }
   .btn-su:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
   .btn-su-primary { background: var(--accent-gold); border-color: var(--accent-gold); color: #fff; }
-  .btn-su-primary:hover { background: #b59250; color: #fff; }
+  .btn-su-primary:hover { background: #d81f2f; color: #fff; }
 
-  .create-panel { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 2rem; margin-bottom: 2rem; }
+  .create-panel { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: var(--radius-md, 14px); box-shadow: var(--shadow-card); padding: 2rem; margin-bottom: 2rem; }
   .field-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
   .field label { display: block; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 0.35rem; }
   .field input, .field select { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border-color); color: var(--text-main); padding: 0.4rem 0; font-size: 0.9rem; font-family: inherit; outline: none; }
@@ -33,12 +33,16 @@
   .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
   .dot-active { background: #10b981; }
   .dot-inactive { background: #ef4444; }
+  .su-status-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 10px; border-radius: var(--radius-pill); }
+  .su-status-pill.active  { background: rgba(16,185,129,.12); color: #10b981; }
+  .su-status-pill.trial   { background: rgba(245,158,11,.12); color: #b45309; }
+  .su-status-pill.suspended { background: rgba(239,68,68,.12); color: #ef4444; }
 </style>
 {% endblock %}
 
 {% block header_left %}
 <div>
-  <p style="font-size:0.6rem;text-transform:uppercase;letter-spacing:3px;color:var(--accent-gold);margin:0;">Lexnorax Staff</p>
+  <p style="font-size:0.6rem;text-transform:uppercase;letter-spacing:3px;color:var(--accent-gold);margin:0;">EasyBillBro Staff</p>
   <h1 class="brand-title mb-0"><i class="bi bi-shield-lock me-2" style="color:var(--accent-gold);"></i>Control Panel</h1>
 </div>
 {% endblock %}
@@ -128,8 +132,8 @@
         <td style="font-size:0.85rem;color:var(--text-muted);">{{ row.outlet.name|default:"—" }}</td>
         <td style="font-size:0.85rem;">{{ row.user_count }}</td>
         <td>
-          <span class="status-dot {% if row.tenant.is_active %}dot-active{% else %}dot-inactive{% endif %}"></span>
-          <span style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;">
+          <span class="su-status-pill {{ row.tenant.subscription_status }}">
+            <span class="status-dot {% if row.tenant.is_active %}dot-active{% else %}dot-inactive{% endif %}" style="margin-right:0;"></span>
             {{ row.tenant.subscription_status }}
           </span>
         </td>

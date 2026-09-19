@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='outlet',
             name='agent_host',
-            field=models.CharField(default='localhost', help_text="'localhost' when the Lexnorax Agent runs on this device (Windows PC or Termux on tablet). Set to a local IP (e.g. 192.168.1.200) when using a Raspberry Pi or separate print server.", max_length=253),
+            field=models.CharField(default='localhost', help_text="'localhost' when the EasyBillBro Agent runs on this device (Windows PC or Termux on tablet). Set to a local IP (e.g. 192.168.1.200) when using a Raspberry Pi or separate print server.", max_length=253),
         ),
         migrations.AddField(
             model_name='outlet',

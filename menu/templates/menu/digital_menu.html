@@ -51,23 +51,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #fafafa;
+            --bg-color: #F7F7F9;
             --panel-bg: #ffffff;
-            --text-main: #111111;
-            --text-muted: #737373;
-            --border-color: #eaeaea;
-            --accent-gold: #c5a059;
+            --text-main: #2C170E;
+            --text-muted: #8a7d74;
+            --border-color: #ECE7E2;
+            --accent-gold: #EC2734;
             --veg-color: #16a34a;
             --nonveg-color: #dc2626;
             --transition-smooth: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         body.dark {
             --bg-color: #0a0a0a;
-            --panel-bg: #111111;
-            --text-main: #f5f5f5;
-            --text-muted: #888888;
-            --border-color: #262626;
-            --accent-gold: #d4af37;
+            --panel-bg: #241a16;
+            --text-main: #f7f1ec;
+            --text-muted: #a89a90;
+            --border-color: #3a2c26;
+            --accent-gold: #EC2734;
         }
         body {
             background-color: var(--bg-color);
@@ -138,18 +138,22 @@
             transition: all 0.2s ease;
         }
         .diet-filter.active {
-            border-color: var(--text-main);
-            color: var(--text-main);
+            background: var(--accent-gold);
+            border-color: var(--accent-gold);
+            color: #fff;
         }
         .dot-veg { color: var(--veg-color); font-size: 0.6rem; }
         .dot-nonveg { color: var(--nonveg-color); font-size: 0.6rem; }
+        .diet-filter.active .dot-veg,
+        .diet-filter.active .dot-nonveg { color: #fff; }
 
         /* HORIZONTAL TABS */
         .category-tabs {
             display: flex;
+            gap: 0.5rem;
             overflow-x: auto;
             white-space: nowrap;
-            padding: 0 1rem;
+            padding: 0.6rem 1rem;
             background: var(--panel-bg);
             border-bottom: 1px solid var(--border-color);
             position: sticky;
@@ -159,19 +163,23 @@
         }
         .category-tabs::-webkit-scrollbar { display: none; }
         .cat-tab {
-            padding: 1rem 1.5rem;
+            padding: 0.55rem 1.1rem;
             color: var(--text-muted);
             font-weight: 600;
             text-decoration: none;
-            border-bottom: 2px solid transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 999px;
+            background: var(--bg-color);
             text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 1px;
+            font-size: 0.72rem;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
             transition: all 0.2s ease;
         }
         .cat-tab.active {
-            color: var(--accent-gold);
-            border-bottom-color: var(--accent-gold);
+            color: #fff;
+            background: var(--accent-gold);
+            border-color: var(--accent-gold);
         }
 
         /* MENU CARDS */
@@ -267,14 +275,14 @@
 
         /* BUTTONS & CONTROLS */
         .add-btn {
-            background: transparent;
-            color: var(--accent-gold);
+            background: var(--accent-gold);
+            color: #fff;
             border: 1px solid var(--accent-gold);
             padding: 0.5rem 1.1rem;
             min-height: 40px;
-            border-radius: 6px;
+            border-radius: 999px;
             font-size: 0.85rem;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
             transition: all 0.2s ease;
         }
@@ -284,7 +292,7 @@
             gap: 0.2rem;
             background: var(--panel-bg);
             border: 1px solid var(--accent-gold);
-            border-radius: 8px;
+            border-radius: 999px;
             padding: 0.1rem;
         }
         .qty-controls.active {
@@ -334,8 +342,8 @@
             background: var(--accent-gold);
             color: #fff; border: none;
             padding: 0.6rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
+            border-radius: 999px;
+            font-weight: 700;
             letter-spacing: 1px;
             text-transform: uppercase;
         }
@@ -396,7 +404,7 @@
         .place-order-btn {
             background: var(--text-main); color: #fff;
             border: none; padding: 1rem;
-            border-radius: 12px; font-weight: 600;
+            border-radius: 999px; font-weight: 600;
             font-size: 1rem; letter-spacing: 1px;
             text-transform: uppercase;
             display: flex; justify-content: center; align-items: center; gap: 0.5rem;
@@ -429,7 +437,7 @@
         .modifier-item-title { font-family: 'DM Serif Display', serif; font-size: 1.2rem; margin-bottom: 1rem; }
         .modifier-group-section { margin-bottom: 1.5rem; }
         .modifier-group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
-        .modifier-req-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; font-weight: 600; background: var(--border-color); color: var(--text-muted); }
+        .modifier-req-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 999px; font-weight: 600; background: var(--border-color); color: var(--text-muted); }
         .modifier-options { display: flex; flex-direction: column; gap: 0.5rem; }
         .modifier-option {
             display: flex; align-items: center; gap: 0.75rem;
@@ -446,8 +454,8 @@
         .modifier-total { font-size: 1rem; font-weight: 700; color: var(--text-main); }
         .confirm-modifier-btn {
             background: var(--accent-gold); color: #fff; border: none;
-            padding: 0.75rem 1.5rem; border-radius: 10px;
-            font-weight: 600; font-size: 0.95rem; text-transform: uppercase;
+            padding: 0.75rem 1.5rem; border-radius: 999px;
+            font-weight: 700; font-size: 0.95rem; text-transform: uppercase;
         }
         .cart-modifier-names { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; }
 
@@ -511,7 +519,7 @@
         .status-stage { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; z-index: 1; background: var(--bg-color); padding: 0 0.3rem; }
         .status-stage .dot { width: 18px; height: 18px; border-radius: 50%; background: var(--border-color); border: 2px solid var(--border-color); }
         .status-stage.done .dot { background: var(--veg-color); border-color: var(--veg-color); }
-        .status-stage.active .dot { background: var(--bg-color); border-color: var(--accent-gold); box-shadow: 0 0 0 4px rgba(197,160,89,0.2); }
+        .status-stage.active .dot { background: var(--bg-color); border-color: var(--accent-gold); box-shadow: 0 0 0 4px rgba(236,39,52,0.2); }
         .status-stage .t { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; }
         .status-stage.done .t, .status-stage.active .t { color: var(--text-main); }
         .status-sheet-item-row {
@@ -585,7 +593,7 @@
            narrower, breaking the letterboxed look. */
         @media (min-width: 640px) {
             html { background: #e5e5e5; }
-            html:has(body.dark) { background: #050505; }
+            html:has(body.dark) { background: #100c0a; }
             body {
                 max-width: 480px;
                 margin: 0 auto;
@@ -772,11 +780,11 @@
         <textarea id="specialInstructions" class="special-instructions" rows="2" placeholder="📝 Special instructions (e.g. less spicy)"></textarea>
 
         <div class="prep-time-banner mt-3 p-2 text-center" id="etaBanner" style="background: #fdf6e3; border: 1px solid #fde08b; border-radius: 8px; font-size: 0.85rem; color: #92400e; font-weight: 600;">
-            <i class="bi bi-clock-history me-1" style="color:#c5a059;"></i> Estimated time: <span id="etaText">—</span>
+            <i class="bi bi-clock-history me-1" style="color:#c98a1f;"></i> Estimated time: <span id="etaText">—</span>
         </div>
 
         <div class="d-flex gap-2 mt-3">
-            <button class="btn btn-outline-danger w-25" style="border-radius: 12px; font-weight: 600;" onclick="clearCart()" title="Clear Cart">
+            <button class="btn btn-outline-danger w-25" style="border-radius: 999px; font-weight: 600;" onclick="clearCart()" title="Clear Cart">
                 <i class="bi bi-trash3"></i>
             </button>
             <button class="place-order-btn w-75 m-0" id="placeOrderBtn" onclick="submitOrder()">

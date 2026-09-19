@@ -25,7 +25,7 @@
   .card-elegant {
     background: var(--panel-bg);
     border: 1px solid var(--border-color);
-    border-radius: 0;
+    border-radius: var(--radius-lg, 20px);
     padding: 2.5rem 2rem;
     height: 100%;
     transition: var(--transition-smooth);
@@ -41,6 +41,34 @@
     font-family: 'DM Serif Display', serif; font-size: 2.75rem;
     font-weight: 400; color: var(--text-main); line-height: 1; margin: 0;
   }
+
+  /* ── Bold KPI tiles (KimiPoS style) ──────────────────────── */
+  .kpi-tile {
+    border-radius: var(--radius-lg, 20px);
+    padding: 1.15rem 1.35rem;
+    color: #fff !important;
+    height: 100%;
+    min-height: 132px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+  }
+  .kpi-tile:hover { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(0,0,0,0.18); }
+  .kpi-tile.t1 { background: var(--accent-gold); }
+  .kpi-tile.t2 { background: #a3182a; }
+  .kpi-tile.t3 { background: var(--accent-orange); }
+  .kpi-tile.t4 { background: var(--accent-dark); }
+  .kpi-icon-badge {
+    width: 34px; height: 34px; border-radius: 10px;
+    background: rgba(255,255,255,0.2);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 1rem; margin-bottom: 0.55rem;
+  }
+  .kpi-val { font-family: var(--font-main, 'Outfit', sans-serif); font-size: 1.75rem; font-weight: 800; line-height: 1.1; letter-spacing: -0.3px; }
+  .kpi-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-top: 5px; font-weight: 700; }
+  .kpi-sub { font-size: 0.65rem; opacity: 0.85; margin-top: 4px; }
 
   .section-title {
     font-size: 1.2rem; color: var(--text-main); margin-bottom: 2rem;
@@ -82,13 +110,13 @@
   .report-subnav-right { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; padding: 0.5rem 0; }
 
   .report-tab {
-    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px;
-    color: var(--text-muted); text-decoration: none; padding: 0.9rem 1rem;
-    border-bottom: 2px solid transparent; white-space: nowrap;
-    transition: color 0.2s, border-color 0.2s; display: inline-block;
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--text-muted); text-decoration: none; padding: 0.55rem 1.1rem;
+    border-radius: var(--radius-pill, 999px); white-space: nowrap; font-weight: 600;
+    transition: all 0.2s ease; display: inline-block; margin: 0.4rem 0.15rem 0.4rem 0;
   }
-  .report-tab:hover   { color: var(--text-main); }
-  .report-tab.active  { color: var(--accent-gold); border-bottom-color: var(--accent-gold); font-weight: 600; }
+  .report-tab:hover   { color: var(--text-main); background: var(--surface-2); }
+  .report-tab.active  { color: #fff; background: var(--accent-gold); font-weight: 700; }
 
   .subnav-sep { width: 1px; height: 20px; background: var(--border-color); margin: 0 0.25rem; }
 
@@ -102,7 +130,8 @@
 
   .subnav-btn {
     font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;
-    padding: 0.35rem 0.8rem; border: 1px solid var(--border-color);
+    padding: 0.4rem 0.9rem; border: 1px solid var(--border-color);
+    border-radius: var(--radius-pill, 999px);
     background: transparent; color: var(--text-main); cursor: pointer;
     white-space: nowrap; text-decoration: none; display: inline-flex;
     align-items: center; gap: 5px; font-family: inherit;
@@ -194,7 +223,7 @@
       <button class="subnav-btn dropdown-toggle" data-bs-toggle="dropdown">
         <i class="bi bi-download"></i> Export
       </button>
-      <ul class="dropdown-menu dropdown-menu-end" style="border-radius:0;border-color:var(--border-color);min-width:200px;">
+      <ul class="dropdown-menu dropdown-menu-end" style="border-radius:var(--radius-md, 14px);border-color:var(--border-color);min-width:200px;">
         <li><h6 class="dropdown-header" style="font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;">CSV</h6></li>
         <li><a class="dropdown-item" href="#" onclick="triggerExport('orders')">Orders Details</a></li>
         <li><a class="dropdown-item" href="#" onclick="triggerExport('items')">Items Sales</a></li>
@@ -243,12 +272,12 @@
       {% endif %}
     </strong>
     {% if gst_inclusive %}
-    <span class="ms-3" style="font-size:0.65rem;background:rgba(16,185,129,.1);color:#10b981;padding:2px 8px;border-radius:3px;border:1px solid rgba(16,185,129,.3);letter-spacing:1px;text-transform:uppercase;">
+    <span class="ms-3" style="font-size:0.65rem;font-weight:700;background:rgba(16,185,129,.12);color:#10b981;padding:3px 10px;border-radius:var(--radius-pill, 999px);letter-spacing:1px;text-transform:uppercase;">
       GST Inclusive Pricing
     </span>
     {% endif %}
     {% if is_limited_view %}
-    <span class="ms-3 badge bg-info" style="font-size:0.6rem;letter-spacing:1px;">CHANNEL OVERSIGHT MODE</span>
+    <span class="ms-3" style="font-size:0.6rem;font-weight:700;letter-spacing:1px;background:rgba(59,130,246,.12);color:#3b82f6;padding:3px 10px;border-radius:var(--radius-pill, 999px);text-transform:uppercase;">CHANNEL OVERSIGHT MODE</span>
     {% endif %}
   </div>
 
@@ -266,33 +295,37 @@
   <!-- HIGH LEVEL METRICS -->
   <div class="row g-4 mb-5">
     <div class="col-12 col-md-6 col-xl-3">
-      <div class="card-elegant metric-group">
-        <span class="metric-label">
+      <div class="kpi-tile t1">
+        <div class="kpi-icon-badge"><i class="bi bi-currency-rupee"></i></div>
+        <p class="kpi-val mb-0">₹{{ sales.total_sales|floatformat:0 }}</p>
+        <span class="kpi-label">
           {% if gst_inclusive %}Revenue (incl. GST){% else %}Net Sales Revenue{% endif %}
         </span>
-        <p class="metric-value">₹{{ sales.total_sales|floatformat:0 }}</p>
         {% if gst_inclusive %}
-        <div style="font-size:0.65rem;color:var(--text-muted);margin-top:4px;">GST inside: ₹{{ sales.gst_total|floatformat:0 }}</div>
+        <div class="kpi-sub">GST inside: ₹{{ sales.gst_total|floatformat:0 }}</div>
         {% endif %}
       </div>
     </div>
     <div class="col-12 col-md-6 col-xl-3">
-      <div class="card-elegant metric-group">
-        <span class="metric-label">Total Orders</span>
-        <p class="metric-value">{{ sales.orders }}</p>
+      <div class="kpi-tile t2">
+        <div class="kpi-icon-badge"><i class="bi bi-receipt-cutoff"></i></div>
+        <p class="kpi-val mb-0">{{ sales.orders }}</p>
+        <span class="kpi-label">Total Orders</span>
       </div>
     </div>
     {% if not is_limited_view %}
     <div class="col-12 col-md-6 col-xl-3">
-      <div class="card-elegant metric-group">
-        <span class="metric-label">Average Order Value</span>
-        <p class="metric-value">₹{{ sales.avg_order_value|floatformat:0 }}</p>
+      <div class="kpi-tile t3">
+        <div class="kpi-icon-badge"><i class="bi bi-graph-up-arrow"></i></div>
+        <p class="kpi-val mb-0">₹{{ sales.avg_order_value|floatformat:0 }}</p>
+        <span class="kpi-label">Average Order Value</span>
       </div>
     </div>
     <div class="col-12 col-md-6 col-xl-3">
-      <div class="card-elegant metric-group">
-        <span class="metric-label">Payment Methods</span>
-        <p class="metric-value">{{ sales.payments|length }}</p>
+      <div class="kpi-tile t4">
+        <div class="kpi-icon-badge"><i class="bi bi-credit-card-2-front"></i></div>
+        <p class="kpi-val mb-0">{{ sales.payments|length }}</p>
+        <span class="kpi-label">Payment Methods</span>
       </div>
     </div>
     {% endif %}
@@ -628,8 +661,8 @@
 
   if (document.getElementById('paymentChart')) {
     const paymentColors = dark
-      ? ['#ffffff', '#d4af37', '#555555', '#333333']
-      : ['#111111', '#c5a059', '#aaaaaa', '#e0e0e0'];
+      ? ['#ffffff', '#EC2734', '#555555', '#333333']
+      : ['#111111', '#EC2734', '#aaaaaa', '#e0e0e0'];
 
     new Chart(document.getElementById('paymentChart'), {
       type: 'doughnut',
@@ -661,13 +694,13 @@
     const ctx = document.getElementById('salesChart').getContext('2d');
     let grad = ctx.createLinearGradient(0, 0, 0, 350);
     if (dark) {
-      grad.addColorStop(0, 'rgba(212,175,55,0.4)');
-      grad.addColorStop(1, 'rgba(212,175,55,0)');
+      grad.addColorStop(0, 'rgba(236, 39, 52,0.4)');
+      grad.addColorStop(1, 'rgba(236, 39, 52,0)');
     } else {
       grad.addColorStop(0, 'rgba(17,17,17,0.15)');
       grad.addColorStop(1, 'rgba(17,17,17,0)');
     }
-    const lineColor = dark ? '#d4af37' : '#111111';
+    const lineColor = dark ? '#EC2734' : '#111111';
 
     new Chart(document.getElementById('salesChart'), {
       type: 'line',

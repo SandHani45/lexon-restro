@@ -1,6 +1,6 @@
 {
-  "name": "Lexnorax POS",
-  "short_name": "Lexnorax",
+  "name": "EasyBillBro POS",
+  "short_name": "EasyBillBro",
   "description": "Restaurant POS — Billing, KOT, Reports",
   "start_url": "/dashboard/",
   "display": "standalone",

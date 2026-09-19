@@ -1,6 +1,6 @@
 # billing/tasks.py
 """
-The two scheduled jobs behind Lexnorax's own subscription billing.
+The two scheduled jobs behind EasyBillBro's own subscription billing.
 Both registered in CELERY_BEAT_SCHEDULE (core/settings.py).
 
 Each per-tenant iteration is wrapped in try/except so one tenant's failure
@@ -28,7 +28,7 @@ def generate_monthly_invoices():
     """
     For every tenant with subscription_status='active' whose current
     billing period has ended (or who has never been billed), create the
-    next SubscriptionInvoice, a Razorpay Payment Link under Lexnorax's own
+    next SubscriptionInvoice, a Razorpay Payment Link under EasyBillBro's own
     account, the PDF, and send it by email + WhatsApp.
 
     Trial tenants and the documented first-month-free customer are
@@ -88,8 +88,8 @@ def generate_monthly_invoices():
             pdf_bytes = render_invoice_pdf(invoice, payment_link_url=link_url)
             if owner and owner.email:
                 email = EmailMessage(
-                    subject=f"Lexnorax subscription invoice — {tenant.name}",
-                    body=f"Your Lexnorax invoice for {period_start} to {period_end} is attached.\n\nPay online: {link_url}",
+                    subject=f"EasyBillBro subscription invoice — {tenant.name}",
+                    body=f"Your EasyBillBro invoice for {period_start} to {period_end} is attached.\n\nPay online: {link_url}",
                     to=[owner.email],
                 )
                 email.attach(f"lexnorax_invoice_{invoice.id}.pdf", pdf_bytes, "application/pdf")

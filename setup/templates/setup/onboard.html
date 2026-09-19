@@ -1,5 +1,5 @@
 {% extends 'core/base.html' %}
-{% block title %}Setup Lexnorax — Step {{ step }} of {{ total_steps }}{% endblock %}
+{% block title %}Setup EasyBillBro — Step {{ step }} of {{ total_steps }}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -69,7 +69,7 @@
     .btn-next {
         width: 100%; padding: 0.6rem 1.1rem; background: var(--gold); border: none; color: #fff;
         font-size: var(--text-xs, 0.78rem); text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
-        border-radius: 0; cursor: pointer; margin-top: 2rem; min-height: var(--min-tap-target, 48px);
+        border-radius: var(--radius-pill); cursor: pointer; margin-top: 2rem; min-height: var(--min-tap-target, 48px);
         transition: var(--transition-smooth, opacity 0.2s); font-family: var(--font-main, 'Outfit', sans-serif);
     }
     .btn-next:hover { opacity: 0.9; }
@@ -82,7 +82,7 @@
     .file-btn {
         display: inline-block; border: 1px dashed var(--border); padding: 0.6rem 1.1rem;
         font-size: var(--text-xs, 0.75rem); text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
-        border-radius: 0; cursor: pointer; color: var(--muted); min-height: var(--min-tap-target, 48px);
+        border-radius: var(--radius-pill); cursor: pointer; color: var(--muted); min-height: var(--min-tap-target, 48px);
         transition: var(--transition-smooth, border-color 0.2s); font-family: var(--font-main, 'Outfit', sans-serif);
     }
     .file-btn:hover { border-color: var(--gold); color: var(--gold); }
@@ -93,7 +93,7 @@
 <div>
     <h1 class="brand-title mb-0">
         <i class="bi bi-diamond-half" style="color:var(--accent-gold);"></i>
-        Lexnorax Setup
+        EasyBillBro Setup
     </h1>
     <p class="brand-subtitle">Let's get your restaurant running</p>
 </div>
@@ -186,23 +186,28 @@
                     </label>
                 </div>
                 <style>
-                .gst-seg { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border-color); }
+                .gst-seg {
+                    display: grid; grid-template-columns: 1fr 1fr; gap: 5px;
+                    background: var(--bg-color); border: 1px solid var(--border-color);
+                    border-radius: var(--radius-pill); padding: 5px;
+                }
                 .gst-seg-opt {
                     padding: 0.6rem 0.9rem;
+                    border-radius: var(--radius-pill);
                     cursor: pointer;
                     user-select: none;
-                    transition: background 0.15s, border-color 0.15s;
+                    transition: background 0.15s, color 0.15s;
                     display: flex;
                     flex-direction: column;
                     gap: 2px;
                 }
-                .gst-seg-opt:first-child { border-right: 1px solid var(--border-color); }
                 .gst-seg-opt input { display: none; }
                 .gst-seg-opt.active {
-                    background: rgba(197,160,89,0.08);
-                    outline: 1.5px solid var(--accent-gold);
-                    outline-offset: -1px;
+                    background: var(--accent-gold);
                 }
+                .gst-seg-opt.active .gst-seg-name,
+                .gst-seg-opt.active .gst-seg-sub { color: #fff; }
+                .gst-seg-opt.active .gst-seg-badge { background: rgba(255,255,255,0.25); color: #fff; }
                 .gst-seg-name {
                     font-size: 0.8rem;
                     font-weight: 700;
@@ -210,9 +215,10 @@
                     display: flex;
                     align-items: center;
                     gap: 0.4rem;
+                    transition: color 0.15s;
                 }
-                .gst-seg-sub { font-size: 0.68rem; color: var(--text-muted); font-family: 'Space Mono', monospace; }
-                .gst-seg-badge { font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1px; background: rgba(16,185,129,.12); color: #10b981; padding: 1px 5px; }
+                .gst-seg-sub { font-size: 0.68rem; color: var(--text-muted); font-family: 'Space Mono', monospace; transition: color 0.15s; }
+                .gst-seg-badge { font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1px; background: rgba(16,185,129,.12); color: #10b981; padding: 1px 5px; border-radius: var(--radius-pill); transition: background 0.15s, color 0.15s; }
                 </style>
                 <script>
                 function syncGstSeg() {
@@ -271,7 +277,7 @@
                 .subdomain-input-row {
                     display: flex; align-items: center;
                     border: 1px solid var(--accent-gold);
-                    background: rgba(197,160,89,0.04);
+                    background: rgba(236,39,52,0.04);
                 }
                 .subdomain-input-row input {
                     flex: 1; background: transparent; border: none;

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Lexnorax POS — one-shot bootstrap for a FRESH Ubuntu/Debian server.
+# EasyBillBro POS — one-shot bootstrap for a FRESH Ubuntu/Debian server.
 #
 # Installs everything and brings the app up: system packages, PostgreSQL,
 # Redis, nginx, the Python venv, the .env (with freshly generated secrets),

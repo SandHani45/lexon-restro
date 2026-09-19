@@ -1,5 +1,5 @@
 #!/bin/bash
-# Lexnorax production deploy script
+# EasyBillBro production deploy script
 set -e
 
 APP_DIR=/home/ubuntu/lexnorax

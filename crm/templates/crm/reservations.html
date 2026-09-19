@@ -9,15 +9,18 @@
     .booking-table { width: 100%; border-collapse: collapse; }
     .booking-table th { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); padding: 0.8rem 1rem; border-bottom: 1px solid var(--border-color); text-align: left; }
     .booking-table td { padding: 0.9rem 1rem; border-bottom: 1px dashed var(--border-color); font-size: 0.9rem; vertical-align: middle; }
-    .booking-table tr:hover td { background: rgba(197,160,89,0.04); }
-    .status-badge { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; padding: 2px 8px; border-radius: 2px; font-weight: 600; }
-    .status-pending   { background: #fff3cd; color: #856404; }
-    .status-confirmed { background: #d4edda; color: #155724; }
-    .status-seated    { background: #d1ecf1; color: #0c5460; }
-    .status-cancelled { background: #f8d7da; color: #721c24; }
-    .status-no_show   { background: #e2e3e5; color: #383d41; }
-    .modal-content { border-radius: 0; border: 1px solid var(--border-color); background: var(--panel-bg); color: var(--text-main); }
-    .form-control { border-radius: 0; border: 1px solid var(--border-color); background: transparent; color: var(--text-main); }
+    .booking-table tr:hover td { background: rgba(236, 39, 52,0.04); }
+    .status-badge { display: inline-flex; align-items: center; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 10px; border-radius: var(--radius-pill, 999px); font-weight: 700; }
+    .status-pending   { background: rgba(245, 158, 11, 0.12); color: #b45309; }
+    .status-confirmed { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+    .status-seated    { background: rgba(59, 130, 246, 0.12); color: #2563eb; }
+    .status-cancelled { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+    .status-no_show   { background: rgba(100, 116, 139, 0.12); color: #64748b; }
+    .res-count-tile { border-radius: var(--radius-lg, 20px); padding: 1.1rem 1.25rem; text-align: center; background: rgba(236, 39, 52, 0.08); }
+    .res-count-val { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--accent-gold); }
+    .res-count-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-top: 0.3rem; }
+    .modal-content { border-radius: var(--radius-lg, 20px); border: 1px solid var(--border-color); background: var(--panel-bg); color: var(--text-main); }
+    .form-control { border-radius: var(--radius-sm, 10px); border: 1px solid var(--border-color); background: transparent; color: var(--text-main); }
     .form-control:focus { border-color: var(--accent-gold); box-shadow: none; background: transparent; color: var(--text-main); }
     html.dark .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
 </style>
@@ -34,7 +37,7 @@
 {% endblock %}
 
 {% block header_right %}
-<input type="date" value="{{ view_date|date:'Y-m-d' }}" class="form-control d-none d-sm-block" style="width:160px; border-radius:0; background:transparent; border-color:var(--border-color); color:var(--text-main);" onchange="window.location.href='?date='+encodeURIComponent(this.value)">
+<input type="date" value="{{ view_date|date:'Y-m-d' }}" class="form-control d-none d-sm-block" style="width:160px; background:transparent; border-color:var(--border-color); color:var(--text-main);" onchange="window.location.href='?date='+encodeURIComponent(this.value)">
 <button class="btn-luxury" data-bs-toggle="modal" data-bs-target="#newBookingModal">New Booking</button>
 <a href="/dashboard/" class="btn-luxury d-none d-sm-inline-flex">Exit</a>
 {{ block.super }}
@@ -46,6 +49,16 @@
     <!-- Mobile date picker -->
     <div class="d-sm-none mb-3">
         <input type="date" value="{{ view_date|date:'Y-m-d' }}" class="form-control w-100" onchange="window.location.href='?date='+encodeURIComponent(this.value)">
+    </div>
+
+    <!-- Quick count tile -->
+    <div class="row g-3 mb-3">
+        <div class="col-6 col-md-3">
+            <div class="res-count-tile">
+                <div class="res-count-val">{{ reservations|length }}</div>
+                <div class="res-count-label">Bookings Today</div>
+            </div>
+        </div>
     </div>
 
     <div class="dashboard-card p-0">

@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>EasyBillBro — Brag</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="assets/music/audio-data.js"></script>
+    <style>
+      :root {
+        --gold: #c5a059;
+        --gold-light: #e8d5a3;
+        --black: #0a0a0a;
+        --panel: #161616;
+        --border: rgba(197, 160, 89, 0.18);
+        --text-primary: #ffffff;
+        --text-secondary: rgba(255, 255, 255, 0.72);
+        --text-tertiary: rgba(255, 255, 255, 0.62);
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: var(--black);
+        color: var(--text-primary);
+        font-family: "Outfit", sans-serif;
+        overflow: hidden;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--black);
+      }
+      /* persistent brand backdrop: hairline grid + gold glow, audio-reactive */
+      #bg-glow {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      #bg-grid {
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(rgba(197, 160, 89, 0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(197, 160, 89, 0.05) 1px, transparent 1px);
+        background-size: 64px 64px;
+        -webkit-mask-image: radial-gradient(ellipse 75% 75% at 50% 45%, black 35%, transparent 100%);
+        mask-image: radial-gradient(ellipse 75% 75% at 50% 45%, black 35%, transparent 100%);
+      }
+      #bg-radial {
+        position: absolute;
+        top: 14%;
+        left: 50%;
+        width: 900px;
+        height: 900px;
+        transform: translateX(-50%);
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(197, 160, 89, 0.16) 0%, transparent 70%);
+      }
+
+      .clip {
+        position: absolute;
+        inset: 0;
+      }
+      .scene-fade {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* ── Scene 1: Hook ── */
+      .hook-lines {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 6px;
+      }
+      .hook-line {
+        font-family: "DM Serif Display", serif;
+        font-size: 108px;
+        line-height: 1.08;
+        letter-spacing: -1px;
+        color: var(--text-primary);
+      }
+      .hook-line em {
+        color: var(--gold);
+        font-style: italic;
+      }
+      .hook-muted {
+        color: var(--text-secondary);
+      }
+
+      /* ── Scene 2: AI Menu Import ── */
+      .ai-card {
+        width: 760px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 44px 48px;
+        box-shadow: 0 0 0 rgba(197, 160, 89, 0);
+      }
+      .ai-card-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-bottom: 22px;
+        margin-bottom: 22px;
+        border-bottom: 1px solid var(--border);
+      }
+      .ai-dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+      }
+      .ai-card-label {
+        font-family: "Space Mono", monospace;
+        font-size: 15px;
+        letter-spacing: 3px;
+        color: var(--gold);
+        margin-left: 6px;
+      }
+      .ai-rows {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .ai-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border: 1px solid var(--border);
+        border-radius: 3px;
+      }
+      .ai-row-name {
+        font-size: 22px;
+        color: var(--text-secondary);
+      }
+      .ai-row-price {
+        font-family: "Space Mono", monospace;
+        font-size: 20px;
+        color: var(--gold);
+        font-variant-numeric: tabular-nums;
+      }
+      .ai-footer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 28px;
+      }
+      .ai-timer {
+        font-family: "Space Mono", monospace;
+        font-size: 40px;
+        color: var(--text-primary);
+        font-variant-numeric: tabular-nums;
+      }
+      .ai-timer.settled {
+        color: var(--gold);
+      }
+      .ai-caption {
+        font-size: 14px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--text-tertiary);
+        margin-top: 8px;
+        opacity: 0;
+      }
+
+      /* ── Scene 3: No annual contract ── */
+      .contract-lines {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 22px;
+        text-align: center;
+      }
+      .contract-line-main {
+        font-family: "DM Serif Display", serif;
+        font-size: 88px;
+        color: var(--text-primary);
+        letter-spacing: -0.5px;
+      }
+      .contract-line-sub {
+        font-family: "Outfit", sans-serif;
+        font-weight: 700;
+        font-size: 30px;
+        letter-spacing: 1px;
+        color: var(--gold);
+      }
+
+      /* ── Scene 4: Outro ── */
+      .outro-stack {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 22px;
+      }
+      .outro-mark {
+        width: 64px;
+        height: 64px;
+        background: var(--gold);
+        transform: rotate(45deg) scale(0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .outro-mark-inner {
+        width: 26px;
+        height: 26px;
+        background: var(--black);
+      }
+      .outro-wordmark {
+        font-family: "DM Serif Display", serif;
+        font-size: 78px;
+        letter-spacing: 1px;
+        color: var(--text-primary);
+      }
+      .outro-tagline {
+        font-family: "Space Mono", monospace;
+        font-size: 20px;
+        letter-spacing: 1px;
+        color: var(--text-tertiary);
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="lexnorax-brag"
+      data-start="0"
+      data-width="1920"
+      data-height="1080"
+      data-duration="19"
+    >
+      <div id="bg-glow">
+        <div id="bg-radial"></div>
+        <div id="bg-grid"></div>
+      </div>
+
+      <!-- SCENE 1 — Hook — 0s to 4.5s -->
+      <section class="clip" id="scene-1" data-start="0" data-duration="4.5">
+        <div class="scene-fade" id="s1-fade">
+          <div class="hook-lines">
+            <div class="hook-line" id="s1-line1">Your restaurant.</div>
+            <div class="hook-line" id="s1-line2"><em>Finally</em></div>
+            <div class="hook-line hook-muted" id="s1-line3">running like it should.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCENE 2 — AI Menu Import — 4.5s to 11.5s -->
+      <section class="clip" id="scene-2" data-start="4.5" data-duration="7">
+        <div class="scene-fade" id="s2-fade">
+          <div class="ai-card" id="ai-card">
+            <div class="ai-card-header" id="ai-header">
+              <div class="ai-dot" style="background:#ef4444;"></div>
+              <div class="ai-dot" style="background:#f59e0b;"></div>
+              <div class="ai-dot" style="background:#10b981;"></div>
+              <div class="ai-card-label">AI MENU IMPORT</div>
+            </div>
+            <div class="ai-rows">
+              <div class="ai-row" id="ai-row-1"><span class="ai-row-name">Paneer Tikka</span><span class="ai-row-price">₹280</span></div>
+              <div class="ai-row" id="ai-row-2"><span class="ai-row-name">Garlic Naan</span><span class="ai-row-price">₹55</span></div>
+              <div class="ai-row" id="ai-row-3"><span class="ai-row-name">Dal Makhani</span><span class="ai-row-price">₹180</span></div>
+              <div class="ai-row" id="ai-row-4"><span class="ai-row-name">Mango Lassi</span><span class="ai-row-price">₹120</span></div>
+              <div class="ai-row" id="ai-row-5"><span class="ai-row-name">Chicken Biryani</span><span class="ai-row-price">₹320</span></div>
+              <div class="ai-row" id="ai-row-6"><span class="ai-row-name">Masala Chai</span><span class="ai-row-price">₹60</span></div>
+            </div>
+            <div class="ai-footer">
+              <div class="ai-timer" id="ai-timer">0s</div>
+              <div class="ai-caption" id="ai-caption">Menu imported.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCENE 3 — No annual contract — 11.5s to 15s -->
+      <section class="clip" id="scene-3" data-start="11.5" data-duration="3.5">
+        <div class="scene-fade" id="s3-fade">
+          <div class="contract-lines">
+            <div class="contract-line-main" id="s3-line1">No annual contract.</div>
+            <div class="contract-line-sub" id="s3-line2">Cancel anytime.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCENE 4 — Outro — 15s to 19s -->
+      <section class="clip" id="scene-4" data-start="15" data-duration="4">
+        <div class="scene-fade" id="s4-fade">
+          <div class="outro-stack">
+            <div class="outro-mark" id="s4-mark">
+              <div class="outro-mark-inner"></div>
+            </div>
+            <div class="outro-wordmark" id="s4-wordmark">EasyBillBro</div>
+            <div class="outro-tagline" id="s4-tagline">₹999/month. No contract. Built in Bengaluru.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AUDIO -->
+      <audio
+        id="music-bed"
+        src="assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3"
+        data-start="0"
+        data-duration="19"
+        data-track-index="10"
+        data-volume="0.30"
+        data-automation='{"version":1,"lanes":[{"target":"volume","points":[
+          {"t":0,"v":0},
+          {"t":0.3,"v":0.30},
+          {"t":0.5,"v":0.14},
+          {"t":3.422,"v":0.14},
+          {"t":3.65,"v":0.30},
+          {"t":4.6,"v":0.30},
+          {"t":4.8,"v":0.14},
+          {"t":9.003,"v":0.14},
+          {"t":9.2,"v":0.30},
+          {"t":11.55,"v":0.30},
+          {"t":11.7,"v":0.14},
+          {"t":14.601,"v":0.14},
+          {"t":14.8,"v":0.30},
+          {"t":15.3,"v":0.30},
+          {"t":15.5,"v":0.14},
+          {"t":18.167,"v":0.14},
+          {"t":18.5,"v":0.20},
+          {"t":19,"v":0}
+        ]}]}'
+      ></audio>
+
+      <audio id="vo-1" src="assets/voice/vo-1-hook.wav" data-start="0.35" data-duration="3.072" data-track-index="3" data-volume="1"></audio>
+      <audio id="vo-2" src="assets/voice/vo-2-import.wav" data-start="4.8" data-duration="4.203" data-track-index="4" data-volume="1"></audio>
+      <audio id="vo-3" src="assets/voice/vo-3-contract.wav" data-start="11.7" data-duration="2.901" data-track-index="5" data-volume="1"></audio>
+      <audio id="vo-4" src="assets/voice/vo-4-outro.wav" data-start="15.5" data-duration="2.667" data-track-index="6" data-volume="1"></audio>
+
+      <!-- beat-locked: 8.70s (countdown settle) vs strong cue 8.74s, |Δ|=0.04s -->
+      <audio id="sfx-row1" src="assets/sfx/impact/impactSoft_medium_002.ogg" data-start="5.20" data-duration="0.14" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="sfx-settle" src="assets/sfx/impact/impactSoft_medium_000.ogg" data-start="8.68" data-duration="0.12" data-track-index="12" data-volume="0.6"></audio>
+      <audio id="sfx-logo" src="assets/sfx/interface/bong_001.ogg" data-start="15.32" data-duration="0.13" data-track-index="13" data-volume="0.55"></audio>
+    </div>
+
+    <script>
+      document.fonts.ready.then(function () {
+        var tl = gsap.timeline({ paused: true });
+
+        // ── Scene fade-to-black transitions (the whole video sits on pure
+        // black, so a fade-to/from-black reads as a soft crossfade) ──
+        tl.fromTo("#s1-fade", { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "none" }, 0);
+        tl.to("#s1-fade", { opacity: 0, duration: 0.35, ease: "none" }, 4.15);
+
+        tl.fromTo("#s2-fade", { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "none" }, 4.5);
+        tl.to("#s2-fade", { opacity: 0, duration: 0.35, ease: "none" }, 11.15);
+
+        tl.fromTo("#s3-fade", { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "none" }, 11.5);
+        tl.to("#s3-fade", { opacity: 0, duration: 0.35, ease: "none" }, 14.65);
+
+        tl.fromTo("#s4-fade", { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "none" }, 15.0);
+        tl.to("#s4-fade", { opacity: 0, duration: 0.3, ease: "none" }, 18.7);
+
+        // ── Scene 1: Hook ──
+        tl.fromTo("#s1-line1", { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.15);
+        tl.fromTo(
+          "#s1-line2",
+          { y: 20, opacity: 0, scale: 0.94 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.55, ease: "back.out(1.5)" },
+          0.85,
+        );
+        tl.fromTo("#s1-line3", { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 1.45);
+
+        // ── Scene 2: AI Menu Import (the flow) ──
+        tl.fromTo("#ai-card", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "power2.out" }, 4.55);
+        tl.fromTo("#ai-header", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "none" }, 4.75);
+
+        // Rows arrive one by one. Spacing (0.48s) is chosen for reading
+        // clarity, not snapped to the 0.546s beat grid — rows stack and
+        // remain visible, so settle time is generous regardless (see
+        // brag-plan.md Step 2 reading-time-floor guidance).
+        var rowStarts = [5.25, 5.73, 6.21, 6.69, 7.17, 7.65];
+        rowStarts.forEach(function (t, i) {
+          tl.fromTo(
+            "#ai-row-" + (i + 1),
+            { x: -18, opacity: 0 },
+            { x: 0, opacity: 1, duration: 0.4, ease: "power2.out" },
+            t,
+          );
+        });
+
+        // Countdown — eased readout landing under 60s at the settle beat.
+        var counter = { v: 0 };
+        tl.to(
+          counter,
+          {
+            v: 47,
+            duration: 3.45,
+            ease: "power1.inOut",
+            onUpdate: function () {
+              document.getElementById("ai-timer").textContent = Math.round(counter.v) + "s";
+            },
+          },
+          5.25,
+        );
+        // beat-locked: 8.70s
+        tl.call(
+          function () {
+            var timer = document.getElementById("ai-timer");
+            timer.textContent = "47s";
+            timer.classList.add("settled");
+          },
+          [],
+          8.7,
+        );
+        tl.fromTo("#ai-caption", { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "none" }, 8.7);
+
+        // ── Scene 3: No annual contract ──
+        tl.fromTo("#s3-line1", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 11.65);
+        tl.fromTo("#s3-line2", { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 12.35);
+
+        // ── Scene 4: Outro ──
+        tl.fromTo(
+          "#s4-mark",
+          { scale: 0, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(1.6)" },
+          15.35,
+        );
+        tl.fromTo("#s4-wordmark", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 15.85);
+        tl.fromTo("#s4-tagline", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "none" }, 16.4);
+
+        // ── Audio-reactive: subtle brand-glow breathing (bg glow + AI card
+        // presence) driven by pre-extracted music RMS/bass — no waveform or
+        // equalizer visuals. ──
+        if (typeof AUDIO_DATA !== "undefined") {
+          for (var f = 0; f < AUDIO_DATA.totalFrames; f++) {
+            (function (frame) {
+              tl.call(
+                function () {
+                  var rms = frame.rms || 0;
+                  var bass = (frame.bands && frame.bands[0]) || 0;
+                  gsap.set("#bg-radial", {
+                    opacity: 0.75 + rms * 0.35,
+                    scale: 1 + rms * 0.035,
+                  });
+                  var card = document.getElementById("ai-card");
+                  if (card) {
+                    card.style.boxShadow = "0 0 " + (18 + bass * 26) + "px rgba(197,160,89," + (0.06 + bass * 0.1) + ")";
+                  }
+                },
+                [],
+                f / AUDIO_DATA.fps,
+              );
+            })(AUDIO_DATA.frames[f]);
+          }
+        }
+
+        window.__timelines["lexnorax-brag"] = tl;
+      });
+    </script>
+  </body>
+</html>

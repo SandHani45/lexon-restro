@@ -6,24 +6,24 @@
 <style>
     /* Kitchen is ALWAYS dark — readable under bright/hot kitchen conditions */
     :root {
-        --bg-color:    #050505;
-        --panel-bg:    #111111;
-        --card-bg:     #1a1a1a;
-        --text-main:   #f5f5f5;
-        --text-muted:  #888888;
-        --border-color: #262626;
-        --c-fresh:  #d4af37;
+        --bg-color:    #0a0a0a;
+        --panel-bg:    #241a16;
+        --card-bg:     #2a1f1a;
+        --text-main:   #f7f1ec;
+        --text-muted:  #a89686;
+        --border-color: #3a2c26;
+        --c-fresh:  #FA7327;
         --c-warn:   #f59e0b;
         --c-urgent: #ef4444;
     }
     /* Staff can toggle to light if they prefer */
     html.kitchen-light {
-        --bg-color:    #fafafa;
+        --bg-color:    #F7F7F9;
         --panel-bg:    #ffffff;
         --card-bg:     #ffffff;
-        --text-main:   #111111;
-        --text-muted:  #737373;
-        --border-color: #eaeaea;
+        --text-main:   #2C170E;
+        --text-muted:  #8a7d74;
+        --border-color: #ECE7E2;
     }
 
     body { overflow-x: hidden; }
@@ -31,7 +31,7 @@
     /* ── Station tabs ─────────────────────────────────── */
     .station-tabs {
         display: flex;
-        gap: 1.5rem;
+        gap: 0.6rem;
         padding: 0.75rem 1.5rem;
         background: var(--panel-bg);
         border-bottom: 1px solid var(--border-color);
@@ -41,19 +41,20 @@
     .station-tabs::-webkit-scrollbar { display: none; }
     .station-btn {
         background: transparent;
-        border: none;
+        border: 1px solid var(--border-color);
         color: var(--text-muted);
-        font-family: 'DM Serif Display', serif;
-        font-size: 1.05rem;
+        font-family: 'Outfit', sans-serif;
+        font-weight: 600;
+        font-size: 0.85rem;
         cursor: pointer;
         transition: var(--transition-smooth);
         white-space: nowrap;
-        padding: 0.5rem 0;
-        border-bottom: 2px solid transparent;
+        padding: 0.55rem 1.1rem;
+        border-radius: var(--radius-pill);
         min-height: 44px;
     }
-    .station-btn:hover { color: var(--text-main); }
-    .station-btn.active { color: var(--c-fresh); border-bottom-color: var(--c-fresh); font-style: italic; }
+    .station-btn:hover { color: var(--text-main); border-color: var(--text-muted); }
+    .station-btn.active { background: var(--c-fresh); border-color: var(--c-fresh); color: #fff; }
 
     /* ── Orders grid ─────────────────────────────────── */
     .orders-grid { padding: 1.5rem; }
@@ -62,7 +63,7 @@
     .order-card {
         background: var(--card-bg);
         border: 1px solid var(--border-color);
-        border-radius: 0;
+        border-radius: var(--radius-md);
         display: flex;
         flex-direction: column;
         height: 100%;
@@ -103,7 +104,14 @@
         letter-spacing: 2px;
         text-transform: uppercase;
     }
-    .timer { font-size: 1.6rem; font-weight: 700; font-family: 'DM Serif Display', serif; }
+    .timer {
+        font-size: 1rem;
+        font-weight: 700;
+        font-family: 'Outfit', sans-serif;
+        padding: 0.3rem 0.75rem;
+        border-radius: var(--radius-pill);
+        white-space: nowrap;
+    }
 
     /* BUMP — mark entire KOT done, big enough for a knuckle tap */
     .btn-bump {
@@ -114,10 +122,10 @@
         transition: background .2s;
         min-height: 56px;
     }
-    .btn-bump:hover { background: rgba(212,175,55,.12); }
-    .card-fresh  .timer { color: var(--c-fresh); }
-    .card-warn   .timer { color: var(--c-warn); }
-    .card-urgent .timer { color: var(--c-urgent); }
+    .btn-bump:hover { background: rgba(250,115,39,.12); }
+    .card-fresh  .timer { color: var(--c-fresh);  background: rgba(250,115,39,.14); }
+    .card-warn   .timer { color: var(--c-warn);   background: rgba(245,158,11,.14); }
+    .card-urgent .timer { color: var(--c-urgent); background: rgba(239,68,68,.14); }
 
     /* ── Item rows ───────────────────────────────────── */
     .items-container { padding: 1.25rem 1.5rem; flex-grow: 1; }
@@ -150,7 +158,7 @@
         font-weight: 600;
         padding: 0.6rem 1.1rem;
         border: 1px solid var(--border-color);
-        border-radius: 0;
+        border-radius: var(--radius-sm);
         color: var(--text-main);
         transition: var(--transition-smooth);
         width: 100%;
@@ -160,12 +168,15 @@
     .btn-start:hover { border-color: var(--c-warn); color: var(--c-warn); }
     .btn-ready:hover { border-color: var(--c-fresh); color: var(--c-fresh); }
     .badge-done {
-        color: var(--text-muted);
+        color: #059669;
+        background: rgba(16,185,129,.12);
         font-size: 0.75rem;
+        font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 1px;
         padding: 0.6rem 1rem;
-        border: 1px dashed var(--border-color);
+        border: none;
+        border-radius: var(--radius-pill);
         text-align: center;
         width: 100%;
         display: inline-block;
@@ -191,20 +202,17 @@
         background: var(--panel-bg) !important;
         color: var(--text-main) !important;
         border: 1px solid var(--border-color) !important;
-        border-radius: 0 !important;
+        border-radius: var(--radius-lg) !important;
     }
 </style>
 {% endblock %}
 
 {% block header_left %}
-<div class="d-flex align-items-center gap-2">
-    <div style="width:34px;height:34px;border-radius:8px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;color:#10b981;flex-shrink:0;">
-        <i class="bi bi-egg-fried" style="font-size:1.1rem;"></i>
-    </div>
-    <div>
-        <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.5px;color:var(--text-main);">Kitchen Display</h1>
-        <div class="text-muted" style="font-size:0.72rem;letter-spacing:1px;text-transform:uppercase;">{{ request.user.outlet.name }}</div>
-    </div>
+<div class="d-flex flex-column">
+  <a href="/dashboard/" style="text-decoration:none;color:inherit;">
+    <h1 class="brand-title mb-0" style="font-size:1.3rem;"><i class="bi bi-egg-fried me-2" style="color:var(--c-fresh);"></i>Kitchen Display</h1>
+  </a>
+  <p class="mb-0 text-muted" style="font-size:0.75rem;letter-spacing:1px;text-transform:uppercase;">{{ request.user.outlet.name }}</p>
 </div>
 {% endblock %}
 

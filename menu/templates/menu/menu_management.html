@@ -20,7 +20,7 @@
   .brand-title i { color: var(--accent-gold); font-size: 1.2rem; }
 
   .category-card {
-    background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 0;
+    background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: var(--radius-md);
     padding: 2.5rem 2rem; height: 100%; transition: var(--transition-smooth);
     margin-bottom: 2rem; box-shadow: var(--shadow-soft);
   }
@@ -34,16 +34,16 @@
   .item-name { font-size: 0.95rem; font-weight: 500; color: var(--text-main); margin-bottom: 2px; }
   .item-price { font-family: 'DM Serif Display', serif; font-weight: 700; color: var(--accent-gold); font-size: 1.1rem; font-style: italic; }
 
-  .luxury-badge { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; padding: 2px 8px; border-radius: 0; margin-left: 8px; }
+  .luxury-badge { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; padding: 2px 8px; border-radius: var(--radius-pill); margin-left: 8px; }
   .badge-station  { background: rgba(31,41,55,0.1); color: var(--text-main); border: 1px solid var(--border-color); }
   .badge-disabled { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid #ef4444; }
-  .badge-platform { background: rgba(197,160,89,0.1); color: var(--accent-gold); border: 1px solid var(--accent-gold); font-size: 0.55rem; cursor: pointer; }
+  .badge-platform { background: rgba(236,39,52,0.1); color: var(--accent-gold); border: 1px solid var(--accent-gold); font-size: 0.55rem; cursor: pointer; }
   .badge-platform.off { background: transparent; color: var(--text-muted); border-color: var(--border-color); }
 
   .recipe-block { padding-left: 1rem; margin-top: 8px; border-left: 1px solid var(--accent-gold); font-size: 0.8rem; color: var(--text-muted); }
   .recipe-item { margin-bottom: 4px; font-family: 'Space Mono', monospace; }
 
-  .modal-content { background: var(--panel-bg); border-radius: 0; border: 1px solid var(--border-color); box-shadow: var(--shadow-hover); }
+  .modal-content { background: var(--panel-bg); border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-hover); }
   .modal-header { border-bottom: 1px solid var(--border-color); padding: 1.5rem; }
   .modal-footer { border-top: 1px solid var(--border-color); padding: 1.2rem; }
   .modal-title { font-family: 'DM Serif Display', serif; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
@@ -51,14 +51,14 @@
   .form-select-luxury, .form-input-luxury {
     background-color: transparent !important; border: none;
     border-bottom: 1px solid var(--border-color); color: var(--text-main) !important;
-    border-radius: 0; padding: 0.5rem 0; font-family: inherit; font-size: 0.9rem; font-weight: 500;
+    border-radius: var(--radius-sm); padding: 0.5rem 0; font-family: inherit; font-size: 0.9rem; font-weight: 500;
   }
   .form-select-luxury:focus, .form-input-luxury:focus { box-shadow: none; border-bottom-color: var(--accent-gold); }
 
   .station-select {
     background: transparent; border: 1px solid var(--border-color); color: var(--text-muted);
     font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;
-    padding: 2px 5px; border-radius: 0; cursor: pointer; transition: var(--transition-smooth);
+    padding: 2px 5px; border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition-smooth);
   }
   .station-select:hover { border-color: var(--accent-gold); color: var(--text-main); }
   html.dark .station-select option { background: var(--panel-bg); color: var(--text-main); }
@@ -66,15 +66,22 @@
 
   .cat-nav-bar {
     background: var(--panel-bg); border-bottom: 1px solid var(--border-color);
-    padding: 0.75rem 2rem; display: flex; gap: 1.5rem;
+    padding: 0.75rem 2rem; display: flex; gap: 0.6rem;
     overflow-x: auto; white-space: nowrap;
     position: sticky; top: 0; z-index: 999;
     box-shadow: 0 4px 10px rgba(0,0,0,0.02);
     -ms-overflow-style: none; scrollbar-width: none;
   }
   .cat-nav-bar::-webkit-scrollbar { display: none; }
-  .cat-nav-link { color: var(--text-muted); text-decoration: none; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; transition: var(--transition-smooth); }
-  .cat-nav-link:hover { color: var(--accent-gold); }
+  .cat-nav-link {
+    color: var(--text-muted); text-decoration: none; font-size: 0.7rem;
+    text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700;
+    transition: var(--transition-smooth);
+    padding: 0.5rem 1rem; border-radius: var(--radius-pill);
+    background: var(--bg-color); border: 1px solid var(--border-color);
+  }
+  .cat-nav-link:hover { color: var(--accent-gold); border-color: var(--accent-gold); }
+  .cat-nav-link.active { background: var(--accent-gold); border-color: var(--accent-gold); color: #fff; }
   .category-section { scroll-margin-top: 150px; }
 
   /* Mobile burger drawer */
@@ -175,7 +182,7 @@
 </div>
 {% else %}
 <div class="container-fluid mx-auto px-4 mt-3" style="max-width:1400px;padding:0 2rem;">
-  <div style="background:rgba(197,160,89,.07);border:1px solid rgba(197,160,89,.2);border-left:3px solid var(--accent-gold);padding:0.6rem 1rem;font-size:0.82rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
+  <div style="background:rgba(236,39,52,.07);border:1px solid rgba(236,39,52,.2);border-left:3px solid var(--accent-gold);padding:0.6rem 1rem;font-size:0.82rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
     <span><i class="bi bi-info-circle me-2" style="color:var(--accent-gold);"></i><strong>GST Exclusive Pricing</strong> — prices shown here are base prices. GST is added on top when billing.</span>
     <a href="/setup/outlet/" style="font-size:0.72rem;color:var(--accent-gold);text-decoration:none;white-space:nowrap;">Change in Settings →</a>
   </div>
@@ -708,5 +715,21 @@
   }
   fixStickyNav();
   window.addEventListener('resize', fixStickyNav);
+
+  // Category tab scroll-spy — highlights the pill for whichever category
+  // section is currently in view, same idea as digital_menu.html's tab bar.
+  const catNavLinks = document.querySelectorAll('.cat-nav-link');
+  const catSections  = document.querySelectorAll('.category-section');
+  function updateActiveCatTab() {
+    let current = '';
+    catSections.forEach(section => {
+      if (window.scrollY >= section.offsetTop - 170) current = section.id;
+    });
+    catNavLinks.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === `#${current}`);
+    });
+  }
+  window.addEventListener('scroll', updateActiveCatTab, { passive: true });
+  updateActiveCatTab();
 </script>
 {% endblock %}

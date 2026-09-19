@@ -3,8 +3,8 @@
 Razorpay UPI QR integration — bring-your-own-keys.
 
 Each tenant connects their OWN Razorpay account (own Key ID + Key Secret).
-Money settles directly to the restaurant's bank account; Lexnorax never holds
-or routes funds. This keeps Lexnorax outside RBI's Payment Aggregator
+Money settles directly to the restaurant's bank account; EasyBillBro never holds
+or routes funds. This keeps EasyBillBro outside RBI's Payment Aggregator
 regulatory perimeter — a marketplace/split-payment model is out of scope.
 
 Uses `requests` directly (matches the rest of the app's convention — no SDK

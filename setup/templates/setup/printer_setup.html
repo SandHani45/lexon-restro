@@ -34,7 +34,7 @@
 
     /* How-it-works explainer */
     .ps-explain {
-        border: 1px solid var(--border-color); background: rgba(197,160,89,0.05);
+        border: 1px solid var(--border-color); background: rgba(236, 39, 52,0.05);
         border-left: 3px solid var(--accent-gold); padding: 1.1rem 1.3rem; margin-bottom: 1.5rem;
     }
     .ps-explain h5 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent-gold); margin: 0 0 0.5rem; font-weight: 700; }
@@ -62,7 +62,7 @@
 
     .hint {
         margin-top: 1rem; padding: 0.75rem 1rem;
-        background: rgba(197,160,89,0.06); border-left: 2px solid var(--accent-gold);
+        background: rgba(236, 39, 52,0.06); border-left: 2px solid var(--accent-gold);
         font-size: 0.75rem; color: var(--text-muted); line-height: 1.7;
     }
     .hint strong { color: var(--text-main); }
@@ -75,7 +75,7 @@
         flex-direction: column; align-items: center; gap: 0.4rem; user-select: none;
     }
     .width-card:hover { border-color: var(--accent-gold); }
-    .width-card.selected { border-color: var(--accent-gold); background: rgba(197,160,89,0.07); }
+    .width-card.selected { border-color: var(--accent-gold); background: rgba(236, 39, 52,0.07); }
     .width-num { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--accent-gold); line-height: 1; }
     .width-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 700; }
     .width-badge { font-size: 0.6rem; padding: 1px 6px; background: rgba(16,185,129,0.1); color: #10b981; border-radius: 3px; }
@@ -94,7 +94,7 @@
         font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px;
         font-weight: 700; cursor: pointer; font-family: 'Outfit', sans-serif; transition: background 0.2s;
     }
-    .btn-save:hover { background: #b59250; }
+    .btn-save:hover { background: #d81f2f; }
     .btn-test {
         padding: 1rem; background: transparent; border: 1px solid var(--border-color); color: var(--text-main);
         font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px;
@@ -137,7 +137,7 @@
     <div class="success-banner">
         <i class="bi bi-check-circle-fill"></i>
         <h4>Saved</h4>
-        <p>Printer IP stored. Tap <strong>Test Print</strong> below to confirm — make sure the Lexnorax app is open and logged in on the counter device.</p>
+        <p>Printer IP stored. Tap <strong>Test Print</strong> below to confirm — make sure the EasyBillBro app is open and logged in on the counter device.</p>
     </div>
     {% endif %}
 
@@ -147,12 +147,12 @@
             <div style="display:flex; align-items:center; gap:1rem;">
                 <div class="ps-num" style="background:var(--accent-gold); border-color:var(--accent-gold); color:#fff; font-size:0.65rem;">APK</div>
                 <div>
-                    <div class="ps-step-title">Install Lexnorax on Android</div>
+                    <div class="ps-step-title">Install EasyBillBro on Android</div>
                     <div class="ps-step-sub">Scan to download · No Play Store needed</div>
                 </div>
             </div>
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https://lexnorax.net/android/lexnorax.apk&bgcolor=161616&color=c5a059&margin=4"
-                 alt="Scan to download Lexnorax Android app"
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https://lexnorax.net/android/lexnorax.apk&bgcolor=FFFFFF&color=2C170E&margin=4"
+                 alt="Scan to download EasyBillBro Android app"
                  style="border:1px solid var(--border-color); flex-shrink:0;">
         </div>
         <div class="ps-body" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.75rem; padding-top:1rem;">
@@ -178,7 +178,7 @@
                     <div class="ps-step-sub">After installing — open app → tap "Scan QR Code" → scan this</div>
                 </div>
             </div>
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https://{{ request.user.tenant.slug }}.lexnorax.net/login/&bgcolor=161616&color=c5a059&margin=4"
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https://{{ request.user.tenant.slug }}.lexnorax.net/login/&bgcolor=FFFFFF&color=2C170E&margin=4"
                  alt="Scan to connect app to this restaurant"
                  style="border:1px solid var(--border-color); flex-shrink:0;">
         </div>
@@ -194,7 +194,7 @@
     <div class="ps-explain">
         <h5><i class="bi bi-info-circle me-1"></i> How printing works</h5>
         <p>
-            Your <strong>Lexnorax app is the print agent</strong>. When you print a receipt, the app sends it
+            Your <strong>EasyBillBro app is the print agent</strong>. When you print a receipt, the app sends it
             over WiFi to your network printer at the IP below. Keep the app <strong>open and logged in</strong>
             on a device that stays on the counter, on the <strong>same WiFi</strong> as the printer.
         </p>

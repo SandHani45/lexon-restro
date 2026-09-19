@@ -138,7 +138,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Scan the QR code from Setup → Printer in your Lexnorax dashboard"
+            android:text="Scan the QR code from Setup → Printer in your EasyBillBro dashboard"
             android:textColor="#444444"
             android:textSize="11sp"
             android:gravity="center"

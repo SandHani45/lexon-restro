@@ -30,10 +30,16 @@
 
     .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
     .stat-card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.1rem 1.3rem; }
+    .stat-card--gold   { background: rgba(236,39,52,0.06);  border-color: rgba(236,39,52,0.18); }
+    .stat-card--green  { background: rgba(16,185,129,0.06); border-color: rgba(16,185,129,0.18); }
+    .stat-card--purple { background: rgba(139,92,246,0.06); border-color: rgba(139,92,246,0.18); }
+    .stat-card--blue   { background: rgba(59,130,246,0.06); border-color: rgba(59,130,246,0.18); }
     .stat-label { font-size: .6rem; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: .3rem; }
     .stat-val   { font-size: 1.8rem; font-weight: 700; color: var(--text); }
-    .stat-val.gold  { color: var(--accent-gold); }
-    .stat-val.green { color: var(--success); }
+    .stat-val.gold   { color: var(--accent-gold); }
+    .stat-val.green  { color: var(--success); }
+    .stat-val.purple { color: #7c3aed; }
+    .stat-val.blue   { color: #2563eb; }
 
     .layout { display: grid; grid-template-columns: 1fr 360px; gap: 1.5rem; align-items: start; }
     @media(max-width: 760px) { .layout { grid-template-columns: 1fr; } }
@@ -52,7 +58,7 @@
     .promo-table th { font-size: .6rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); padding: .6rem .8rem; border-bottom: 1px solid var(--border); text-align: left; }
     .promo-table td { padding: .75rem .8rem; border-bottom: 1px solid var(--border); font-size: .82rem; vertical-align: middle; }
     .promo-table tr:last-child td { border-bottom: none; }
-    .promo-table tr:hover td { background: rgba(197,160,89,.04); }
+    .promo-table tr:hover td { background: rgba(236,39,52,.04); }
 
     .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
     .badge-active   { background: #dcfce7; color: #15803d; }
@@ -138,21 +144,21 @@
 
     <!-- Stats -->
     <div class="stats-bar">
-        <div class="stat-card">
+        <div class="stat-card stat-card--gold">
             <div class="stat-label">Total Promos</div>
             <div class="stat-val gold">{{ promos.count }}</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card stat-card--green">
             <div class="stat-label">Active Now</div>
             <div class="stat-val green"><span id="active-count">—</span></div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card stat-card--purple">
             <div class="stat-label">All-Outlet Promos</div>
-            <div class="stat-val" id="alloutlet-count">—</div>
+            <div class="stat-val purple" id="alloutlet-count">—</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card stat-card--blue">
             <div class="stat-label">Total Uses</div>
-            <div class="stat-val" id="uses-count">—</div>
+            <div class="stat-val blue" id="uses-count">—</div>
         </div>
     </div>
 

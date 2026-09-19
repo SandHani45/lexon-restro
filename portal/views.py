@@ -1,6 +1,6 @@
 """
-Lexnorax Portal — /portal/
-Internal operations panel for Lexnorax staff (is_superuser=True).
+EasyBillBro Portal — /portal/
+Internal operations panel for EasyBillBro staff (is_superuser=True).
 """
 import logging
 

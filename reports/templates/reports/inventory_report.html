@@ -14,23 +14,23 @@
     .report-subnav-left  { display: flex; align-items: center; gap: 0; }
     .report-subnav-right { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; padding: 0.5rem 0; }
     .report-tab {
-      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px;
-      color: var(--text-muted); text-decoration: none; padding: 0.9rem 1rem;
-      border-bottom: 2px solid transparent; white-space: nowrap;
-      transition: color 0.2s, border-color 0.2s; display: inline-block;
+      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--text-muted); text-decoration: none; padding: 0.55rem 1.1rem;
+      border-radius: var(--radius-pill, 999px); white-space: nowrap; font-weight: 600;
+      transition: all 0.2s ease; display: inline-block; margin: 0.4rem 0.15rem 0.4rem 0;
     }
-    .report-tab:hover  { color: var(--text-main); }
-    .report-tab.active { color: var(--accent-gold); border-bottom-color: var(--accent-gold); font-weight: 600; }
+    .report-tab:hover  { color: var(--text-main); background: var(--surface-2); }
+    .report-tab.active { color: #fff; background: var(--accent-gold); font-weight: 700; }
     .subnav-select {
       background: transparent; border: 1px solid var(--border-color);
-      color: var(--text-main); border-radius: 6px;
-      padding: 0.3rem 0.6rem; font-size: 0.8rem; font-family: inherit;
+      color: var(--text-main); border-radius: var(--radius-pill, 999px);
+      padding: 0.3rem 0.9rem; font-size: 0.8rem; font-family: inherit;
     }
     .subnav-select:focus { border-color: var(--accent-gold); outline: none; }
     .subnav-btn {
       background: none; border: 1px solid var(--border-color);
-      color: var(--text-muted); border-radius: 6px;
-      padding: 0.3rem 0.75rem; font-size: 0.8rem;
+      color: var(--text-muted); border-radius: var(--radius-pill, 999px);
+      padding: 0.3rem 0.9rem; font-size: 0.8rem;
       cursor: pointer; font-family: inherit;
       transition: var(--transition-smooth);
     }
@@ -42,7 +42,8 @@
     .panel {
       background: var(--panel-bg);
       border: 1px solid var(--border-color);
-      border-radius: 10px;
+      border-radius: var(--radius-lg, 20px);
+      box-shadow: var(--shadow-card);
       overflow: hidden;
     }
     .panel-header {
@@ -57,12 +58,16 @@
     }
     .panel-body { padding: 1rem; }
 
-    /* ── Stat cards ─────────────────────────────────── */
+    /* ── Stat cards (soft pastel count tiles) ────────── */
     .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
     .stat-card {
-      background: var(--panel-bg); border: 1px solid var(--border-color);
-      border-radius: 10px; padding: 1rem 1.2rem;
+      border-radius: var(--radius-lg, 20px); padding: 1rem 1.2rem;
+      background: rgba(138,125,116,0.08);
     }
+    .stat-card.tint-red   { background: rgba(236,39,52,0.08); }
+    .stat-card.tint-red   .stat-value { color: var(--accent-gold); }
+    .stat-card.tint-green { background: rgba(16,185,129,0.08); }
+    .stat-card.tint-green .stat-value { color: #10b981; }
     .stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 0.25rem; }
     .stat-value { font-size: 1.4rem; font-weight: 700; color: var(--text-main); }
     .stat-unit { font-size: 0.75rem; color: var(--text-muted); }
@@ -82,12 +87,12 @@
       color: var(--text-main);
     }
     .data-table tr:last-child td { border-bottom: none; }
-    .data-table tr:hover td { background: rgba(197,160,89,0.04); }
+    .data-table tr:hover td { background: rgba(236, 39, 52,0.04); }
     .mono { font-family: 'Space Mono', monospace; }
     .text-gold { color: var(--accent-gold); }
     .badge-type {
-      display: inline-block; padding: 0.15rem 0.5rem;
-      border-radius: 4px; font-size: 0.7rem; font-weight: 600;
+      display: inline-block; padding: 0.2rem 0.65rem;
+      border-radius: var(--radius-pill, 999px); font-size: 0.7rem; font-weight: 700;
       text-transform: uppercase; letter-spacing: 0.04em;
     }
     .badge-consume  { background: rgba(34,197,94,0.12);  color: #16a34a; }
@@ -96,15 +101,16 @@
     .badge-adjustment { background: rgba(234,179,8,0.12); color: #ca8a04; }
     .empty-state { text-align: center; padding: 2.5rem; color: var(--text-muted); font-size: 0.9rem; }
 
-    /* ── Section tabs ───────────────────────────────── */
-    .section-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border-color); margin-bottom: 0; }
+    /* ── Section tabs (pill filter group) ────────────── */
+    .section-tabs { display: flex; gap: 0.4rem; flex-wrap: wrap; border-bottom: 1px solid var(--border-color); padding: 0.75rem 1rem; margin-bottom: 0; }
     .section-tab {
-      padding: 0.7rem 1.1rem; font-size: 0.8rem; font-weight: 500;
+      padding: 0.5rem 1rem; font-size: 0.78rem; font-weight: 600;
       cursor: pointer; border: none; background: none;
-      color: var(--text-muted); border-bottom: 2px solid transparent;
+      color: var(--text-muted); border-radius: var(--radius-pill, 999px);
       transition: var(--transition-smooth);
     }
-    .section-tab.active { color: var(--accent-gold); border-bottom-color: var(--accent-gold); }
+    .section-tab:hover { background: var(--surface-2); color: var(--text-main); }
+    .section-tab.active { color: #fff; background: var(--accent-gold); }
 
     @media print {
       .pos-header, .report-subnav, .section-tabs, .subnav-btn { display: none !important; }
@@ -194,12 +200,12 @@
 
   <!-- Summary cards -->
   <div class="stat-grid">
-    <div class="stat-card">
+    <div class="stat-card tint-green">
       <div class="stat-label">Items Consumed</div>
       <div class="stat-value">{{ usage|length }}</div>
       <div class="stat-unit">unique ingredients</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card tint-red">
       <div class="stat-label">Consumption Cost</div>
       <div class="stat-value mono">₹{{ total_cost|floatformat:2 }}</div>
       <div class="stat-unit">at cost price</div>

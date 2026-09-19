@@ -34,7 +34,7 @@
     transition: border-color 0.15s, background 0.15s; font-family: inherit;
   }
   .print-mode-opt:hover  { border-color: var(--accent-gold); }
-  .print-mode-opt.active { border-color: var(--accent-gold); background: rgba(197,160,89,0.07); }
+  .print-mode-opt.active { border-color: var(--accent-gold); background: rgba(236, 39, 52,0.07); }
   .pm-icon  { font-size: 1.2rem; margin-bottom: 0.2rem; }
   .pm-title { font-size: 0.78rem; font-weight: 700; color: var(--text-main); }
   .pm-desc  { font-size: 0.65rem; color: var(--text-muted); line-height: 1.4; }
@@ -126,7 +126,7 @@
 
     {% if messages %}
       {% for msg in messages %}
-        <div style="background:rgba(197,160,89,0.07);border-left:3px solid var(--accent-gold);padding:0.9rem 1.1rem;font-size:0.75rem;line-height:1.6;color:var(--text-main);margin-bottom:1.5rem;">{{ msg }}</div>
+        <div style="background:rgba(236, 39, 52,0.07);border-left:3px solid var(--accent-gold);padding:0.9rem 1.1rem;font-size:0.75rem;line-height:1.6;color:var(--text-main);margin-bottom:1.5rem;">{{ msg }}</div>
       {% endfor %}
     {% endif %}
 
@@ -145,7 +145,7 @@
     <div class="agent-row">
       <span class="agent-pill">
         <span class="dot" id="agentDot"></span>
-        <span id="agentStatusText" style="color:var(--text-muted);">Checking Lexnorax Agent…</span>
+        <span id="agentStatusText" style="color:var(--text-muted);">Checking EasyBillBro Agent…</span>
       </span>
       <a href="{% url 'printer_setup' %}" style="font-size:0.7rem;color:var(--accent-gold);text-decoration:none;letter-spacing:1px;text-transform:uppercase;">
         Printer Settings <i class="bi bi-arrow-right ms-1"></i>
@@ -328,7 +328,7 @@
   {% else %}
   <div style="background:var(--panel-bg);border:1px solid var(--border-color);padding:1.5rem;">
     <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1.25rem;">
-      <span style="font-size:0.65rem;text-transform:uppercase;letter-spacing:2px;font-weight:700;color:var(--accent-gold);background:rgba(197,160,89,.1);padding:3px 10px;">Cashier Strip Mode</span>
+      <span style="font-size:0.65rem;text-transform:uppercase;letter-spacing:2px;font-weight:700;color:var(--accent-gold);background:rgba(236, 39, 52,.1);padding:3px 10px;">Cashier Strip Mode</span>
       <span style="font-size:0.75rem;color:var(--text-muted);">Bill + all KOTs print as one connected strip at payment</span>
     </div>
     <div style="display:flex;align-items:stretch;gap:0;flex-wrap:wrap;row-gap:0.5rem;">
@@ -380,7 +380,7 @@ async function checkAgentStatus() {
     const ws = await connectAgent(2000);
     ws.send(JSON.stringify({ type: 'ping' }));
     dot.className  = 'dot green';
-    text.textContent = 'Lexnorax Agent running';
+    text.textContent = 'EasyBillBro Agent running';
     text.style.color = '#10b981';
   } catch {
     dot.className  = 'dot red';
@@ -483,7 +483,7 @@ async function testPrint(id) {
     ESC + '@',
     ESC + 'a\x01',
     ESC + '!\x18',
-    'Lexnorax\n',
+    'EasyBillBro\n',
     ESC + '!\x00',
     ESC + 'a\x01',
     'Test Print\n',
@@ -514,7 +514,7 @@ async function testPrint(id) {
     const dots = document.getElementById(`card-${id}`).querySelectorAll('.dot');
     if (dots.length) dots[0].style.background = '#10b981';
   } catch(e) {
-    const msg = e.message === 'not running' ? 'Lexnorax Agent not running' : (e.message || 'Could not reach printer');
+    const msg = e.message === 'not running' ? 'EasyBillBro Agent not running' : (e.message || 'Could not reach printer');
     setStatus(id, 'err', msg);
     ui.toast(msg, 'error');
   } finally {
@@ -559,7 +559,7 @@ async function discoverPrinterIp(id) {
       result.style.color = 'var(--text-muted)';
     }
   } catch(e) {
-    result.textContent = e.message === 'not running' ? 'Lexnorax Agent not running' : 'Scan failed: ' + e.message;
+    result.textContent = e.message === 'not running' ? 'EasyBillBro Agent not running' : 'Scan failed: ' + e.message;
     result.style.color = '#ef4444';
   } finally {
     btn.disabled = false;

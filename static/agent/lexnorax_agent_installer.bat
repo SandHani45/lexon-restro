@@ -2,14 +2,14 @@
 setlocal enabledelayedexpansion
 
 :: ============================================================
-::  Lexnorax Print Agent Installer
+::  EasyBillBro Print Agent Installer
 ::  One-click setup for Windows laptops in a QSR outlet.
 ::  No admin rights required (uses %APPDATA%).
 :: ============================================================
 
 echo.
 echo  =========================================================
-echo   Lexnorax Print Agent Installer
+echo   EasyBillBro Print Agent Installer
 echo   Setting up the billing printer bridge...
 echo  =========================================================
 echo.
@@ -72,20 +72,20 @@ echo  [OK] Python installed successfully via winget.
 :python_ready
 echo.
 
-:: ── Step 2: Create %APPDATA%\Lexnorax directory ───────────────
-echo  [2/5] Creating Lexnorax data folder...
-if not exist "%APPDATA%\Lexnorax" (
-    mkdir "%APPDATA%\Lexnorax"
-    echo  [OK] Created: %APPDATA%\Lexnorax
+:: ── Step 2: Create %APPDATA%\EasyBillBro directory ───────────────
+echo  [2/5] Creating EasyBillBro data folder...
+if not exist "%APPDATA%\EasyBillBro" (
+    mkdir "%APPDATA%\EasyBillBro"
+    echo  [OK] Created: %APPDATA%\EasyBillBro
 ) else (
-    echo  [OK] Folder already exists: %APPDATA%\Lexnorax
+    echo  [OK] Folder already exists: %APPDATA%\EasyBillBro
 )
 echo.
 
 :: ── Step 3: Download lexnorax_agent.py from GitHub ────────────
-echo  [3/5] Downloading Lexnorax Print Agent from GitHub...
+echo  [3/5] Downloading EasyBillBro Print Agent from GitHub...
 set "AGENT_URL=https://raw.githubusercontent.com/Rajathtuesday/restaurant-pos/qsr/lexnorax_agent.py"
-set "AGENT_PATH=%APPDATA%\Lexnorax\lexnorax_agent.py"
+set "AGENT_PATH=%APPDATA%\EasyBillBro\lexnorax_agent.py"
 
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
     "try { Invoke-WebRequest -Uri '%AGENT_URL%' -OutFile '%AGENT_PATH%' -UseBasicParsing -ErrorAction Stop; Write-Host '  [OK] Downloaded lexnorax_agent.py' } catch { Write-Host ('  [ERROR] Download failed: ' + $_.Exception.Message); exit 1 }"
@@ -117,17 +117,17 @@ echo.
 echo  [5/5] Setup complete!
 echo.
 echo  =========================================================
-echo   Lexnorax Print Agent is now installed.
+echo   EasyBillBro Print Agent is now installed.
 echo.
 echo   - It will auto-start silently at every Windows login.
 echo   - To test right now: open a new terminal and run:
-echo       python "%APPDATA%\Lexnorax\lexnorax_agent.py"
+echo       python "%APPDATA%\EasyBillBro\lexnorax_agent.py"
 echo.
-echo   - Log file: %APPDATA%\Lexnorax\agent.log
-echo   - Config:   %APPDATA%\Lexnorax\agent_config.json
+echo   - Log file: %APPDATA%\EasyBillBro\agent.log
+echo   - Config:   %APPDATA%\EasyBillBro\agent_config.json
 echo.
 echo   To uninstall auto-start later:
-echo     python "%APPDATA%\Lexnorax\lexnorax_agent.py" --uninstall
+echo     python "%APPDATA%\EasyBillBro\lexnorax_agent.py" --uninstall
 echo  =========================================================
 echo.
 

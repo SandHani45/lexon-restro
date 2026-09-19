@@ -1,5 +1,5 @@
 {% extends 'core/base.html' %}
-{% block title %}POS | {{ request.user.tenant.name }}{% endblock %}
+{% block title %}POS Billing | {{ request.user.tenant.name }}{% endblock %}
 
 {% block extra_css %}
 <link rel="manifest" href="/manifest.json">
@@ -7,185 +7,1405 @@
   ::placeholder { color: var(--text-muted) !important; opacity: 0.7 !important; }
   ::-webkit-input-placeholder { color: var(--text-muted) !important; opacity: 0.7 !important; }
 
-  /* Override base header for sticky app mode */
-  .pos-header {
-    padding: 1rem 1.5rem;
-    background: var(--bg-color);
-    z-index: 100;
+  /* ── Layout Framework ── */
+  :root {
+    --header-h: 60px;
+    --pos-red: #EC2734;
+    --pos-red-hover: #d81f2f;
+    --pos-red-soft: #FFF4F4;
+    --pos-red-border: rgba(236, 39, 52, 0.22);
+    --pos-green: #10b981;
+    --pos-green-hover: #059669;
+    --pos-green-soft: #ECFDF5;
+  }
+
+  body {
+    background: var(--bg-color) !important;
+    overflow-x: hidden;
+  }
+
+  /* ── Top Header Customization ── */
+  .pos-top-header {
+    background: var(--panel-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.65rem 1.25rem;
     position: sticky;
     top: 0;
+    z-index: 100;
   }
-  .brand-title { font-size: 1.3rem; margin: 0; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
-  .brand-title i { color: var(--accent-gold); }
-
-  .btn-luxury-primary { background: var(--accent-gold); border-color: var(--accent-gold); color: #fff; }
-  .btn-luxury-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: #fff; }
-
-  :root { --header-h: 65px; }
-  .workspace { display: flex; height: calc(100vh - var(--header-h)); }
-
-  .category-sidebar {
-    width: 260px; border-right: 1px solid var(--border-color);
-    padding: 1.5rem; overflow-y: auto; background: var(--panel-bg); flex-shrink: 0;
+  .pos-brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    padding: 4px 12px 4px 6px;
   }
-  .mobile-category-nav {
-    display: none; overflow-x: auto; white-space: nowrap; padding: 1rem;
-    background: var(--panel-bg); border-bottom: 1px solid var(--border-color); scrollbar-width: none;
+  .pos-brand-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--pos-red);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
   }
-  .mobile-category-nav::-webkit-scrollbar { display: none; }
-  .category-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px; color: var(--text-muted); margin-bottom: 1.5rem; font-weight: 600; }
-  .category-list { list-style: none; padding: 0; margin: 0; }
-  .category-item { padding: 0.8rem 0; cursor: pointer; font-size: 1.1rem; color: var(--text-muted); transition: var(--transition-smooth); font-family: 'DM Serif Display', serif; position: relative; }
-  .category-item:hover { color: var(--text-main); }
-  .category-item.active { color: var(--accent-gold); font-weight: 700; font-style: italic; }
-  .category-sidebar .category-item.active::before { content: ''; position: absolute; left: -1.5rem; top: 50%; transform: translateY(-50%); width: 3px; height: 50%; background: var(--accent-gold); }
-  .mobile-category-nav .category-item { display: inline-block; margin-right: 1.5rem; padding: 0.5rem 0; }
-  .mobile-category-nav .category-item.active { border-bottom: 2px solid var(--accent-gold); }
 
-  .menu-area { flex-grow: 1; padding: 2rem; overflow-y: auto; background: var(--bg-color); }
-  .search-box { background: transparent; border: none; border-bottom: 1px solid var(--border-color); color: var(--text-main); border-radius: 0; padding: 0.75rem 0; font-size: 1rem; box-shadow: none !important; margin-bottom: 2rem; }
-  .search-box:focus { border-color: var(--accent-gold); }
-  .menu-section-title { font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--text-main); padding-top: 1rem; }
-
-  .menu-card { background: transparent; border: 1px solid var(--border-color); border-radius: 0; padding: 1.25rem; cursor: pointer; transition: var(--transition-smooth); height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
-  .menu-card:hover { border-color: var(--accent-gold); background: var(--panel-bg); transform: translateY(-2px); }
-  .item-name { font-family: 'DM Serif Display', serif; font-size: 1.05rem; color: var(--text-main); margin-bottom: 0.5rem; line-height: 1.2; }
-  .item-price { font-size: 0.9rem; color: var(--accent-gold); font-weight: 500; letter-spacing: 1px; }
-
-  .context-sidebar { width: 380px; border-left: 1px solid var(--border-color); background: var(--panel-bg); display: flex; flex-direction: column; flex-shrink: 0; transition: transform 0.3s ease; }
-  .context-tabs { display: flex; border-bottom: 1px solid var(--border-color); }
-  .context-tab { flex: 1; text-align: center; padding: 1rem 0; cursor: pointer; font-family: 'DM Serif Display', serif; font-size: 1rem; color: var(--text-muted); border-bottom: 2px solid transparent; }
-  .context-tab.active { color: var(--text-main); border-bottom-color: var(--accent-gold); }
-  .context-body { flex-grow: 1; padding: 1.5rem; overflow-y: auto; }
-
-  /* Collapsed table/source summary -- replaces two always-visible dropdowns
-     that rarely change once an order's started with one compact row,
-     expanded only when actually needed. */
-  .order-summary-bar {
-    width: 100%; display: flex; align-items: center; justify-content: space-between;
-    background: transparent; border: 1px solid var(--border-color); border-radius: 4px;
-    padding: 0.65rem 0.9rem; margin-bottom: 1rem; color: var(--text-main);
-    font-size: 0.85rem; cursor: pointer; transition: var(--transition-smooth);
+  /* ── Main Workspace ── */
+  .pos-workspace {
+    display: flex;
+    height: calc(100vh - var(--topbar-height));
+    overflow: hidden;
+    background: var(--bg-color);
   }
-  .order-summary-bar:hover { border-color: var(--accent-gold); }
-  .order-settings-panel { margin-bottom: 1rem; }
 
-  /* Bill/Clear are used far less often than Dispatch -- visually demoted
-     so Dispatch reads as the one obvious action, not one of three equals. */
-  .secondary-actions .btn-luxury { font-size: 0.72rem; padding: 0.5rem 1rem; color: var(--text-muted); }
-
-  .cart-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 1rem 0; border-bottom: 1px dashed var(--border-color); }
-  .cart-item-name { font-family: 'DM Serif Display', serif; font-size: 0.95rem; color: var(--text-main); margin-bottom: 0.25rem; }
-  .cart-item-note { font-size: 0.75rem; color: var(--accent-gold); font-style: italic; }
-  .cart-controls { display: flex; align-items: center; gap: 10px; }
-  .qty-controls { display: flex; align-items: center; border: 1px solid var(--border-color); }
-  .qty-btn { min-width: 36px; min-height: 44px; border: none; background: transparent; color: var(--text-main); display: flex; align-items: center; justify-content: center; font-size: 1rem; }
-  .qty-value { font-size: 0.85rem; width: 20px; text-align: center; }
-  .cart-item-price { font-weight: 500; font-size: 0.85rem; width: 55px; text-align: right; color: var(--text-main); }
-
-  /* Veg / non-veg indicator — Indian standard */
-  .veg-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; flex-shrink: 0; vertical-align: middle; position: relative; top: -1px; }
-  .veg-dot.veg { background: #22c55e; }
-  .veg-dot.nonveg { background: #ef4444; }
-
-  /* Printer error banner */
-  #printer-error-banner { display:none; position:fixed; top:0; left:0; right:0; z-index:9999; background:#dc2626; color:#fff; padding:10px 20px; font-size:var(--text-sm); font-weight:600; align-items:center; gap:10px; }
-  #printer-error-banner i { font-size:1.1rem; }
-  #printer-error-banner .dismiss { margin-left:auto; cursor:pointer; opacity:0.8; font-size:1.1rem; }
-
-  /* Offline indicator */
-  #offline-banner { display:none; position:fixed; bottom:70px; left:50%; transform:translateX(-50%); background:#1e293b; color:#fcd34d; border-radius:20px; padding:6px 18px; font-size:var(--text-xs); font-weight:600; z-index:9998; letter-spacing:1px; }
-
-  .cart-summary { border-top: 1px solid var(--border-color); padding: 1.5rem; background: var(--panel-bg); }
-  .summary-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-  .summary-total { display: flex; justify-content: space-between; margin: 1rem 0 1.5rem; font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: var(--text-main); }
-
-  .form-select-luxury, .form-control-minimal { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-main); border-radius: 0; padding: 0.75rem 1rem; font-size: 0.9rem; width: 100%; }
-  .form-select-luxury { margin-bottom: 1.5rem; }
-  .form-select-luxury:focus, .form-control-minimal:focus { box-shadow: none; border-color: var(--accent-gold); }
-
-  .running-row { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; color: var(--text-main); }
-  .status-badge { font-size: 0.6rem; text-transform: uppercase; padding: 0.3rem 0.5rem; border: 1px solid var(--border-color); }
-
-  .modal-content { background: var(--bg-color); border-radius: 0; border: 1px solid var(--border-color); }
-  .modal-header { border-bottom: 1px solid var(--border-color); padding: 1.5rem; }
-  .modal-title { font-family: 'DM Serif Display', serif; font-size: 1.3rem; }
-  .modal-body { padding: 1.5rem; }
-  .modal-footer { border-top: 1px solid var(--border-color); padding: 1.5rem; }
-
-  .fab-cart {
-    display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-    width: calc(100% - 40px); background: var(--accent-gold); color: #fff; padding: 1rem;
-    border-radius: 0; font-size: 0.9rem; font-weight: 500; text-transform: uppercase; letter-spacing: 2px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 1020; text-align: center; border: none;
-    transition: var(--transition-smooth);
+  /* ── Left Column: Menu Area ── */
+  .pos-menu-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+    background: var(--bg-color);
   }
-  .offcanvas-header { border-bottom: 1px solid var(--border-color); padding: 1.5rem; }
 
-  /* Mobile cart -- full-viewport "page" overlay, not a Bootstrap offcanvas drawer.
-     A capped-width side drawer left the item list squeezed into a small nested-scroll
-     pocket beneath the settings bar and above a tall pinned footer; this instead makes
-     the item list the one naturally-scrolling region with a slim pinned Dispatch bar. */
-  .mobile-cart-page {
-    position: fixed; inset: 0; z-index: 1045;
-    background: var(--panel-bg); color: var(--text-main);
-    display: flex; flex-direction: column;
-    transform: translateX(100%); transition: var(--transition-smooth); visibility: hidden;
+  /* ── Sub-Header Bar (KimiPoS POS Sub-Header) ── */
+  .pos-subbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 0.85rem 1.5rem 0.35rem;
+    background: var(--bg-color);
   }
-  .mobile-cart-page.show { transform: translateX(0); visibility: visible; }
-  .mobile-cart-page-body { flex: 1 1 auto; overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; }
-  .mobile-cart-page .context-body { overflow-y: visible; flex-grow: 0; }
-  .cart-page-breakdown { border-top: 1px dashed var(--border-color); margin-top: 1rem; padding-top: 1rem; }
-  #cartSummaryBlockMobile { flex-shrink: 0; }
-
-  .toast-minimal {
-    position: fixed; top: 20px; right: 20px; background: var(--text-main); color: var(--bg-color);
-    padding: 1rem 1.5rem; z-index: 1060; opacity: 0; transition: opacity 0.3s ease;
-    pointer-events: none; text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem;
+  .pos-subbar-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin: 0;
+    letter-spacing: -0.4px;
+    font-family: var(--font-display);
   }
-  .toast-minimal.show { opacity: 1; pointer-events: auto; }
+  .pos-subbar-breadcrumb {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+  }
+  .pos-subbar-breadcrumb a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s;
+  }
+  .pos-subbar-breadcrumb a:hover {
+    color: var(--pos-red);
+  }
+  .pos-subbar-breadcrumb .sep {
+    color: var(--border-color);
+    font-size: 0.7rem;
+  }
+  .pos-subbar-breadcrumb .active {
+    color: var(--pos-red);
+    font-weight: 700;
+  }
+  .pos-subbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .btn-subbar-new {
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 999px;
+    background: var(--pos-red);
+    color: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 12px rgba(236, 39, 52, 0.25);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .btn-subbar-new:hover {
+    background: var(--pos-red-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(236, 39, 52, 0.35);
+    color: #fff;
+  }
+  .btn-subbar-pill {
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 999px;
+    background: var(--panel-bg);
+    color: var(--text-main);
+    border: 1.5px solid var(--border-color);
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .btn-subbar-pill:hover {
+    background: var(--surface-2);
+    border-color: rgba(236, 39, 52, 0.3);
+    color: var(--pos-red);
+  }
 
+  /* ── Category Cards Strip (Horizontal Carousel) ── */
+  .pos-category-section {
+    position: relative;
+    padding: 0.35rem 1.5rem 0.5rem;
+  }
+  .pos-category-scroll-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 4px 2px 10px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .pos-category-scroll-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pos-cat-card {
+    flex-shrink: 0;
+    width: 96px;
+    height: 90px;
+    background: var(--panel-bg);
+    border: 1.5px solid var(--border-color);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 6px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    user-select: none;
+  }
+  .pos-cat-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--pos-red-border);
+    box-shadow: 0 6px 16px rgba(236, 39, 52, 0.08);
+  }
+  .pos-cat-card.active {
+    background: var(--pos-red);
+    border-color: var(--pos-red);
+    color: #ffffff !important;
+    box-shadow: 0 8px 20px rgba(236, 39, 52, 0.32);
+    transform: translateY(-2px);
+  }
+  .pos-cat-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+    background: transparent;
+    transition: all 0.2s ease;
+  }
+  .pos-cat-card.active .pos-cat-icon-wrap {
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  }
+  .pos-cat-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+    transition: transform 0.2s ease;
+  }
+  .pos-cat-card.active .pos-cat-icon {
+    font-size: 1.35rem;
+  }
+  .pos-cat-card:hover .pos-cat-icon {
+    transform: scale(1.1);
+  }
+  .pos-cat-name {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-main);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    letter-spacing: -0.2px;
+  }
+  .pos-cat-card.active .pos-cat-name {
+    color: #ffffff;
+  }
+
+  /* Category Scroll Arrows for Desktop */
+  .cat-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 5;
+    color: var(--text-main);
+    transition: all 0.15s ease;
+  }
+  .cat-nav-btn:hover {
+    background: var(--surface-2);
+    color: var(--pos-red);
+  }
+  .cat-nav-btn.prev { left: 8px; }
+  .cat-nav-btn.next { right: 8px; }
+
+  /* ── Menu Section Heading Row (KimiPoS "All Menu Items" + "See All >") ── */
+  .pos-menu-heading-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.4rem 1.5rem 0.5rem;
+  }
+  .pos-menu-heading-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin: 0;
+    letter-spacing: -0.3px;
+    font-family: var(--font-display);
+  }
+  .pos-see-all-btn {
+    background: none;
+    border: none;
+    color: var(--pos-red);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 6px;
+    transition: all 0.15s;
+  }
+  .pos-see-all-btn:hover {
+    background: var(--pos-red-soft);
+  }
+
+  /* ── Menu Items Scroll Area ── */
+  .pos-menu-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.25rem 1.5rem 2.5rem;
+    scroll-behavior: smooth;
+  }
+
+  .pos-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 1rem 0 0.75rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+  }
+  .pos-section-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pos-section-count {
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: var(--surface-2);
+    color: var(--text-muted);
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+  }
+
+  /* ── Item Cards Grid: 5 Columns on Desktop (Matching KimiPoS Screenshot) ── */
+  .pos-items-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 1.5rem;
+  }
+  @media (max-width: 1440px) {
+    .pos-items-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  @media (max-width: 1199px) {
+    .pos-items-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
   @media (max-width: 991px) {
-    :root { --header-h: 60px; }
-    .category-sidebar { display: none; }
-    .mobile-category-nav { display: block; }
-    .context-sidebar { display: none; }
-    .fab-cart { display: block; }
-    .workspace { flex-direction: column; overflow-y: auto; height: 100vh; padding-bottom: 80px; }
-    .menu-area { padding: 1.5rem 1rem; overflow-y: visible; }
-    .pos-header { padding: 0.85rem 1rem; }
-    body { overflow-x: hidden; overflow-y: auto; }
+    .pos-items-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
   @media (max-width: 480px) {
-    .brand-title { font-size: 1.05rem; }
-    .btn-icon { font-size: 1.1rem; padding: 0.35rem; }
-    .pos-header { gap: 0.25rem; }
-    .pos-header .d-flex.align-items-center.gap-2 { gap: 0.1rem !important; }
+    .pos-items-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   }
+
+  .pos-item-card {
+    background: var(--panel-bg);
+    border: 1.5px solid var(--border-color);
+    border-radius: 18px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    position: relative;
+    overflow: hidden;
+  }
+  .pos-item-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(236, 39, 52, 0.3);
+    box-shadow: 0 10px 24px rgba(236, 39, 52, 0.12);
+  }
+
+  /* Food Thumbnail Container */
+  .pos-item-thumb {
+    width: 100%;
+    height: 105px;
+    border-radius: 14px;
+    background: var(--surface-2);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+  .pos-item-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  .pos-item-card:hover .pos-item-thumb img {
+    transform: scale(1.06);
+  }
+
+  /* Fallback Emoji Visual */
+  .pos-item-emoji-box {
+    font-size: 2.75rem;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.08));
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .pos-item-card:hover .pos-item-emoji-box {
+    transform: scale(1.15) rotate(4deg);
+  }
+
+  /* Veg / Non-Veg Indicator (FSSAI standard) */
+  .fssai-mark {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 17px;
+    height: 17px;
+    border-radius: 4px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    z-index: 2;
+  }
+  .fssai-mark.veg {
+    border: 2px solid #22c55e;
+  }
+  .fssai-mark.veg::after {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #22c55e;
+  }
+  .fssai-mark.nonveg {
+    border: 2px solid #ef4444;
+  }
+  .fssai-mark.nonveg::after {
+    content: '';
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 7px solid #ef4444;
+  }
+
+  /* Prep Time Badge */
+  .pos-prep-chip {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(4px);
+    border-radius: 999px;
+    padding: 2px 7px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  }
+
+  /* Item Info */
+  .pos-item-body {
+    padding: 2px 4px 6px;
+    flex-grow: 1;
+  }
+  .pos-item-name {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0 0 2px;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Price & Add Row */
+  .pos-item-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 4px 2px;
+  }
+  .pos-item-price {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--pos-red);
+    font-family: var(--font-display);
+    letter-spacing: -0.3px;
+  }
+  .btn-pos-add {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--pos-red-soft);
+    border: 1px solid var(--pos-red-border);
+    color: var(--pos-red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    transition: all 0.2s ease;
+  }
+  .pos-item-card:hover .btn-pos-add {
+    background: var(--pos-red);
+    color: #ffffff;
+    transform: scale(1.08);
+    box-shadow: 0 4px 10px rgba(236, 39, 52, 0.35);
+  }
+
+  /* ── Right Column: Order / Cart Sidebar (KimiPoS Right Panel) ── */
+  .pos-cart-sidebar {
+    width: 390px;
+    flex-shrink: 0;
+    background: var(--panel-bg);
+    border-left: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-shadow: -4px 0 20px rgba(0,0,0,0.02);
+    z-index: 10;
+  }
+
+  /* Cart Top: Search, Selectors & Order Header */
+  .pos-cart-header {
+    padding: 0.85rem 1.15rem 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--panel-bg);
+  }
+
+  /* Cart Search Input (KimiPoS: "Search in Ordering...") */
+  .pos-cart-search-wrap {
+    position: relative;
+    width: 100%;
+    margin-bottom: 0.65rem;
+  }
+  .pos-cart-search-input {
+    width: 100%;
+    height: 38px;
+    padding: 0 14px 0 36px;
+    background: var(--surface-2);
+    border: 1.5px solid var(--border-color);
+    border-radius: 999px;
+    color: var(--text-main);
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  .pos-cart-search-input:focus {
+    outline: none;
+    border-color: var(--pos-red);
+    background: var(--panel-bg);
+    box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.1);
+  }
+  .pos-cart-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    pointer-events: none;
+  }
+
+  /* Side-by-Side Pill Selectors (Select Dining & Select Tables) */
+  .pos-pill-select-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 0.65rem;
+  }
+  .pos-pill-select {
+    width: 100%;
+    height: 38px;
+    background: var(--surface-2);
+    border: 1.5px solid var(--border-color);
+    border-radius: 999px;
+    padding: 0 0.85rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+    appearance: auto;
+  }
+  .pos-pill-select:focus {
+    outline: none;
+    border-color: var(--pos-red);
+  }
+
+  /* Order Header Bar (KimiPoS "Order #28" + Tab Switcher) */
+  .pos-cart-order-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.35rem 0 0.2rem;
+  }
+  .pos-cart-order-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-display);
+  }
+
+  /* Context Tabs: Order vs Active */
+  .pos-cart-nav-tabs {
+    display: inline-flex;
+    background: var(--surface-2);
+    border-radius: 999px;
+    padding: 2px;
+    border: 1px solid var(--border-color);
+  }
+  .pos-cart-tab {
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+  .pos-cart-tab.active {
+    background: var(--panel-bg);
+    color: var(--pos-red);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  }
+
+  /* Cart Items Container */
+  .pos-cart-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem 1.15rem;
+  }
+
+  /* Cart Item Card (Matching KimiPoS Screenshot) */
+  .pos-cart-item-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    transition: all 0.15s ease;
+  }
+  .pos-cart-item-card:hover {
+    border-color: rgba(236, 39, 52, 0.3);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+  }
+  /* Inline Veg / Non-Veg Mark for Cart Items */
+  .cart-veg-mark {
+    width: 15px;
+    height: 15px;
+    min-width: 15px;
+    border-radius: 4px;
+    background: transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+  .cart-veg-mark.veg {
+    border: 1.5px solid #22c55e !important;
+  }
+  .cart-veg-mark.veg::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #22c55e;
+    display: block;
+  }
+  .cart-veg-mark.nonveg {
+    border: 1.5px solid #ef4444 !important;
+  }
+  .cart-veg-mark.nonveg::after {
+    content: '';
+    width: 0;
+    height: 0;
+    border-left: 3.5px solid transparent;
+    border-right: 3.5px solid transparent;
+    border-bottom: 6px solid #ef4444;
+    display: block;
+  }
+
+  .pos-cart-item-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .pos-cart-item-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+  }
+  .pos-cart-item-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .btn-cart-trash {
+    background: none;
+    border: none;
+    color: #ef4444;
+    font-size: 0.95rem;
+    padding: 2px 4px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: all 0.15s;
+    line-height: 1;
+  }
+  .btn-cart-trash:hover {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  .pos-cart-item-note {
+    font-size: 0.72rem;
+    color: var(--pos-red);
+    font-style: italic;
+    margin-bottom: 6px;
+    padding-left: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pos-cart-item-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .pos-cart-item-price-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .pos-cart-item-price {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--pos-red);
+    font-family: var(--font-display);
+    line-height: 1;
+  }
+  .pos-cart-item-price-orig {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-decoration: line-through;
+  }
+
+  /* Stepper ([-] 1 [+]) */
+  .pos-stepper {
+    display: inline-flex;
+    align-items: center;
+    align-self: center;
+    background: var(--surface-2);
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    padding: 2px 4px;
+    gap: 4px;
+  }
+  .btn-step {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-step-dec {
+    background: var(--panel-bg);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+  }
+  .btn-step-dec:hover {
+    background: #fee2e2;
+    color: #ef4444;
+  }
+  .step-qty {
+    font-size: 0.82rem;
+    font-weight: 700;
+    min-width: 18px;
+    text-align: center;
+    color: var(--text-main);
+  }
+  .btn-step-inc {
+    background: var(--pos-red);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(236, 39, 52, 0.3);
+  }
+  .btn-step-inc:hover {
+    background: var(--pos-red-hover);
+  }
+
+  /* Add Notes Button (KimiPoS: "+ Add Notes" in green) */
+  .btn-cart-add-notes {
+    background: #ecfdf5;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    color: #10b981;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.15s ease;
+  }
+  .btn-cart-add-notes:hover {
+    background: #10b981;
+    color: #ffffff;
+  }
+
+  /* Empty Cart Visual */
+  .pos-empty-cart {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+  }
+  .pos-empty-cart-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--pos-red-soft);
+    color: var(--pos-red);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.7rem;
+    margin-bottom: 0.75rem;
+  }
+
+  /* ── Bottom Summary & Actions Pinned (Matching KimiPoS) ── */
+  .pos-cart-footer {
+    border-top: 1px solid var(--border-color);
+    background: var(--panel-bg);
+    padding: 0.85rem 1.15rem 1.15rem;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.03);
+  }
+  .pos-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.35rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .pos-summary-row.total-row {
+    margin-top: 0.65rem;
+    padding-top: 0.65rem;
+    border-top: 1px dashed var(--border-color);
+    margin-bottom: 0.85rem;
+  }
+  .pos-total-label {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text-main);
+  }
+  .pos-total-val {
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: var(--pos-red);
+    font-family: var(--font-display);
+  }
+
+  /* Parcel Pill Button */
+  .pos-parcel-btn {
+    width: 100%;
+    height: 38px;
+    border: 1.5px dashed var(--border-color);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s ease;
+  }
+  .pos-parcel-btn:hover {
+    border-color: var(--pos-red);
+    color: var(--pos-red);
+    background: var(--pos-red-soft);
+  }
+
+  /* ── 4 KimiPoS Action Buttons Grid ── */
+  .pos-action-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .pos-action-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  /* Button Styles */
+  .btn-pos-kot {
+    height: 44px;
+    border-radius: 999px;
+    background: var(--pos-green);
+    border: none;
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+  }
+  .btn-pos-kot:hover {
+    background: var(--pos-green-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+  }
+
+  .btn-pos-draft {
+    height: 44px;
+    border-radius: 999px;
+    background: var(--panel-bg);
+    border: 1.5px solid var(--border-color);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .btn-pos-draft:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: #fff5f5;
+  }
+
+  .btn-pos-pay {
+    height: 46px;
+    border-radius: 999px;
+    background: var(--pos-red);
+    border: none;
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(236, 39, 52, 0.3);
+  }
+  .btn-pos-pay:hover {
+    background: var(--pos-red-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(236, 39, 52, 0.4);
+  }
+
+  .btn-pos-print {
+    height: 46px;
+    border-radius: 999px;
+    background: var(--panel-bg);
+    border: 1.5px solid var(--pos-red);
+    color: var(--pos-red);
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .btn-pos-print:hover {
+    background: var(--pos-red-soft);
+    transform: translateY(-1px);
+  }
+
+  /* ── Mobile Floating Cart Bar (FAB) ── */
+  .pos-fab-cart {
+    display: none;
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    height: 54px;
+    background: linear-gradient(135deg, #EC2734 0%, #ff4d5a 100%);
+    border-radius: 999px;
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 8px 24px rgba(236, 39, 52, 0.4);
+    z-index: 1030;
+    padding: 0 1.25rem;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .pos-fab-cart:active {
+    transform: scale(0.98);
+  }
+  .pos-fab-count-badge {
+    background: rgba(255, 255, 255, 0.25);
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  /* ── Mobile Cart Page (Slide-up Overlay) ── */
+  .mobile-cart-page {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    background: var(--panel-bg);
+    display: flex;
+    flex-direction: column;
+    transform: translateY(100%);
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    visibility: hidden;
+  }
+  .mobile-cart-page.show {
+    transform: translateY(0);
+    visibility: visible;
+  }
+  .mobile-cart-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* ── Printer & Offline Banners ── */
+  #printer-error-banner {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: #dc2626;
+    color: #fff;
+    padding: 10px 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    align-items: center;
+    gap: 10px;
+  }
+  #offline-banner {
+    display: none;
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e293b;
+    color: #fcd34d;
+    border-radius: 999px;
+    padding: 8px 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    z-index: 9998;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+  }
+
+  .toast-minimal {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    background: #1e293b;
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 0.85rem 1.4rem;
+    z-index: 1070;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.25s ease;
+    pointer-events: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  }
+  .toast-minimal.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* ── Responsive Adaptations ── */
+  @media (max-width: 991px) {
+    .pos-cart-sidebar { display: none; }
+    .pos-fab-cart { display: flex; }
+    .pos-workspace {
+      flex-direction: column;
+      height: 100vh;
+      padding-bottom: 80px;
+    }
+    .pos-menu-scroll-area {
+      overflow-y: visible;
+      padding: 0.5rem 1rem 1rem;
+    }
+    .pos-items-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .cat-nav-btn { display: none; }
+  }
+
+  @media (max-width: 480px) {
+    .pos-items-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .pos-cat-card {
+      width: 82px;
+      height: 76px;
+      border-radius: 14px;
+    }
+    .pos-cat-icon { font-size: 1.35rem; }
+    .pos-cat-name { font-size: 0.72rem; }
+    .pos-item-thumb { height: 90px; }
+  }
+
   @media (min-width: 992px) {
     .mobile-cart-page { display: none !important; }
+  }
+
+  /* ── Dedicated Obsidian Dark Mode for POS Billing ── */
+  html.dark {
+    --pos-red-soft: rgba(236, 39, 52, 0.16);
+    --pos-red-border: rgba(236, 39, 52, 0.35);
+    --pos-green-soft: rgba(16, 185, 129, 0.16);
+  }
+
+  html.dark .pos-workspace,
+  html.dark .pos-menu-column,
+  html.dark .pos-subbar {
+    background: #0a0a0a !important;
+  }
+
+  html.dark .pos-item-card {
+    background: #121214;
+    border-color: #27272a;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  }
+  html.dark .pos-item-card:hover {
+    border-color: rgba(236, 39, 52, 0.5);
+    box-shadow: 0 10px 28px rgba(236, 39, 52, 0.18);
+  }
+
+  html.dark .pos-item-thumb {
+    background: radial-gradient(circle at center, #24242a 0%, #161618 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  html.dark .fssai-mark {
+    background: #18181b;
+  }
+
+  /* Prep Time Badge in Dark Mode - Sleek Frosted Obsidian Chip (fixes white box) */
+  html.dark .pos-prep-chip {
+    background: rgba(18, 18, 20, 0.88) !important;
+    color: #e4e4e7 !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  }
+  html.dark .pos-prep-chip i {
+    color: #ff4d5a;
+  }
+
+  /* Add item '+' circular button in dark mode */
+  html.dark .btn-pos-add {
+    background: rgba(236, 39, 52, 0.18);
+    border-color: rgba(236, 39, 52, 0.4);
+    color: #ff4d5a;
+  }
+  html.dark .pos-item-card:hover .btn-pos-add {
+    background: #EC2734;
+    border-color: #EC2734;
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(236, 39, 52, 0.45);
+  }
+
+  /* Category Cards in Dark Mode */
+  html.dark .pos-cat-card {
+    background: #121214;
+    border-color: #27272a;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  }
+  html.dark .pos-cat-card:hover {
+    border-color: rgba(236, 39, 52, 0.45);
+    box-shadow: 0 6px 18px rgba(236, 39, 52, 0.15);
+  }
+  html.dark .pos-cat-card.active {
+    background: #EC2734;
+    border-color: #EC2734;
+    box-shadow: 0 8px 22px rgba(236, 39, 52, 0.4);
+  }
+  html.dark .pos-cat-card.active .pos-cat-icon-wrap {
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow: none;
+  }
+
+  /* Cart Sidebar in Dark Mode */
+  html.dark .pos-cart-sidebar {
+    background: #0f0f11;
+    border-left-color: #222226;
+    box-shadow: -6px 0 24px rgba(0, 0, 0, 0.45);
+  }
+  html.dark .pos-cart-header,
+  html.dark .pos-cart-footer {
+    background: #0f0f11;
+    border-color: #222226;
+  }
+  html.dark .pos-cart-search-input,
+  html.dark .pos-pill-select {
+    background: #18181b;
+    border-color: #27272a;
+    color: #f4f4f6;
+  }
+  html.dark .pos-cart-search-input:focus,
+  html.dark .pos-pill-select:focus {
+    border-color: #EC2734;
+    background: #121214;
+  }
+  html.dark .pos-cart-nav-tabs {
+    background: #18181b;
+    border-color: #27272a;
+  }
+  html.dark .pos-cart-tab.active {
+    background: #121214;
+    color: #ff4d5a;
+  }
+
+  /* Cart Item Card */
+  html.dark .pos-cart-item-card {
+    background: #141417;
+    border-color: #27272a;
+  }
+  html.dark .pos-cart-item-card:hover {
+    border-color: rgba(236, 39, 52, 0.35);
+  }
+  html.dark .cart-veg-mark {
+    background: rgba(255, 255, 255, 0.04);
+  }
+  html.dark .pos-stepper {
+    background: #18181b;
+    border-color: #27272a;
+  }
+  html.dark .btn-step-dec {
+    background: #121214;
+    color: #f4f4f6;
+    border-color: #27272a;
+  }
+  html.dark .btn-step-dec:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+  }
+  html.dark .btn-cart-add-notes {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.3);
+    color: #34d399;
+  }
+  html.dark .btn-cart-add-notes:hover {
+    background: #10b981;
+    color: #ffffff;
+  }
+
+  /* Empty Cart Visual */
+  html.dark .pos-empty-cart-icon {
+    background: rgba(236, 39, 52, 0.15);
+    color: #ff4d5a;
+  }
+
+  /* Action Buttons in Dark Mode */
+  html.dark .btn-pos-draft {
+    background: #141417;
+    border-color: #27272a;
+    color: #a1a1aa;
+  }
+  html.dark .btn-pos-draft:hover {
+    border-color: #ef4444;
+    color: #f87171;
+    background: rgba(239, 68, 68, 0.14);
+  }
+  html.dark .btn-pos-print {
+    background: #141417;
+    border-color: rgba(236, 39, 52, 0.5);
+    color: #ff4d5a;
+  }
+  html.dark .btn-pos-print:hover {
+    background: rgba(236, 39, 52, 0.15);
+  }
+  html.dark .btn-subbar-pill {
+    background: #141417;
+    border-color: #27272a;
+    color: #e4e4e7;
+  }
+  html.dark .btn-subbar-pill:hover {
+    background: #1f1f23;
+    border-color: rgba(236, 39, 52, 0.4);
+    color: #ff4d5a;
+  }
+  html.dark .pos-parcel-btn {
+    border-color: #3f3f46;
+    color: #a1a1aa;
+  }
+  html.dark .pos-parcel-btn:hover {
+    border-color: #ff4d5a;
+    color: #ff4d5a;
+    background: rgba(236, 39, 52, 0.12);
+  }
+  html.dark .pos-see-all-btn:hover {
+    background: rgba(236, 39, 52, 0.15);
+  }
+  html.dark .cat-nav-btn {
+    background: #18181b;
+    border-color: #27272a;
+    color: #f4f4f6;
+  }
+  html.dark .cat-nav-btn:hover {
+    background: #27272a;
+    color: #ff4d5a;
+  }
+  html.dark .mobile-cart-page {
+    background: #0f0f11;
+  }
+  html.dark .mobile-cart-header {
+    border-color: #222226;
   }
 </style>
 {% endblock %}
 
 {% block header_left %}
-<div class="d-flex flex-column">
-  <a href="/dashboard/" style="text-decoration:none;color:inherit;">
-    <h1 class="brand-title mb-0"><i class="bi bi-diamond-half me-2"></i>{{ request.user.tenant.name }}</h1>
+<div class="d-flex align-items-center gap-3">
+  <a href="/dashboard/" class="d-flex align-items-center text-decoration-none text-reset" title="Back to Dashboard">
+    <span class="btn-icon" style="width:36px;height:36px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border-color);display:inline-flex;align-items:center;justify-content:center;transition:all 0.2s;">
+      <i class="bi bi-arrow-left" style="font-size:1.05rem;color:var(--pos-red);"></i>
+    </span>
   </a>
-  <p class="mb-0 text-muted" style="font-size:0.75rem;letter-spacing:1px;text-transform:uppercase;">POS Billing — {{ request.user.outlet.name }}</p>
+  <div class="d-none d-md-flex align-items-center position-relative" style="width:280px;">
+    <i class="bi bi-search" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.88rem;pointer-events:none;"></i>
+    <input type="text" id="menuSearch" class="form-control" placeholder="Search menu dishes... (Press /)" autocomplete="off" style="padding-left:36px;padding-right:30px;height:38px;border-radius:999px;background:var(--surface-2);border:1.5px solid var(--border-color);font-size:0.82rem;color:var(--text-main);">
+    <button type="button" id="menuSearchClear" onclick="clearMenuSearch()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);font-size:0.85rem;display:none;cursor:pointer;">✕</button>
+  </div>
+  <div class="d-md-none">
+    <h1 class="brand-title mb-0" style="font-size:1.05rem;font-weight:800;">POS Billing</h1>
+  </div>
 </div>
 {% endblock %}
 
 {% block header_right %}
 <div class="d-flex align-items-center gap-2">
   {% if 'kitchen_display' in tenant_features %}
-  <a href="/kitchen/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Kitchen</a>
-  <a href="/kitchen/" class="btn-icon d-sm-none" title="Kitchen"><i class="bi bi-fire"></i></a>
+  <a href="/kitchen/" class="btn btn-sm d-none d-sm-inline-flex align-items-center gap-1" style="background:var(--surface-2);border:1px solid var(--border-color);border-radius:999px;padding:6px 14px;font-size:0.82rem;font-weight:700;color:var(--text-main);">
+    <i class="bi bi-fire text-danger"></i> Kitchen KDS
+  </a>
   {% endif %}
+  <a href="{% url 'order-history' %}" class="btn btn-sm d-none d-md-inline-flex align-items-center gap-1" style="background:var(--surface-2);border:1px solid var(--border-color);border-radius:999px;padding:6px 14px;font-size:0.82rem;font-weight:700;color:var(--text-main);">
+    <i class="bi bi-clock-history"></i> History
+  </a>
   {% include "core/_notif_badges_luxury.html" %}
-
-  <button class="btn-icon ms-1" onclick="themeManager.toggle()" title="Toggle Dark / Light Mode">
+  <button class="btn-icon ms-1" onclick="themeManager.toggle()" title="Toggle Dark / Light Mode" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--border-color);background:var(--panel-bg);display:flex;align-items:center;justify-content:center;">
     <i class="bi bi-moon" id="themeIcon"></i>
   </button>
 </div>
@@ -194,278 +1414,570 @@
 {% block content %}
 <div id="toastBox" class="toast-minimal">Message</div>
 
-<div id="printer-error-banner" style="display:none;">
+<div id="printer-error-banner">
   <i class="bi bi-printer-fill"></i>
   <span id="printer-error-text">Kitchen printer is not responding — check the connection or call the manager.</span>
-  <span class="dismiss" onclick="this.parentElement.style.display='none'">✕</span>
+  <span class="dismiss ms-auto cursor-pointer" onclick="this.parentElement.style.display='none'">✕</span>
 </div>
-<div id="offline-banner"><i class="bi bi-wifi-off"></i>&nbsp; Offline — orders will sync when reconnected</div>
+<div id="offline-banner"><i class="bi bi-wifi-off me-1"></i> Offline Mode — Orders will sync automatically once reconnected</div>
 
-<div class="workspace">
+<div class="pos-workspace">
 
-  <!-- DESKTOP CATEGORIES -->
-  <aside class="category-sidebar">
-    <div class="category-title">Menu</div>
-    <ul class="category-list">
-      {% for category in categories %}
-      <li class="category-item" onclick="scrollToCategory('cat{{ category.id }}', this)">{{ category.name }}</li>
-      {% endfor %}
-    </ul>
-  </aside>
+  <!-- ══════════════════════════════════════════════════════
+       LEFT: MAIN MENU COLUMN (KimiPoS POS Layout)
+       ══════════════════════════════════════════════════════ -->
+  <main class="pos-menu-column">
 
-  <!-- MOBILE CATEGORIES -->
-  <div class="mobile-category-nav">
-    {% for category in categories %}
-    <div class="category-item" onclick="scrollToCategory('cat{{ category.id }}', this)">{{ category.name }}</div>
-    {% endfor %}
-  </div>
+    <!-- Sub-Header Bar: Breadcrumb + Action Buttons -->
+    <div class="pos-subbar">
+      <div class="pos-subbar-left">
+        <h1 class="pos-subbar-title">Point of Sale (POS)</h1>
+        <div class="pos-subbar-breadcrumb">
+          <a href="/dashboard/">Dashboard</a>
+          <span class="sep">&gt;</span>
+          <span class="active">POS</span>
+        </div>
+      </div>
+      <div class="pos-subbar-right">
+        <button type="button" class="btn-subbar-new" onclick="newPOSOrder()">
+          <i class="bi bi-plus-lg"></i> New
+        </button>
+        <a href="{% url 'order-history' %}" class="btn-subbar-pill">
+          <i class="bi bi-card-checklist"></i> All Menu Orders
+        </a>
+        <button type="button" class="btn-subbar-pill" onclick="switchTab('running')">
+          <i class="bi bi-journal-text"></i> Draft List
+        </button>
+        <a href="/tables/" class="btn-subbar-pill">
+          <i class="bi bi-grid-3x3-gap"></i> Table Order
+        </a>
+      </div>
+    </div>
 
-  <!-- MAIN MENU AREA -->
-  <main class="menu-area">
-    <input type="text" id="menuSearch" class="form-control search-box" placeholder="Search the menu...">
-    <div id="menuCardsContainer">
-      {% for category in categories %}
-      <h3 id="cat{{ category.id }}" class="menu-section-title">{{ category.name }}</h3>
-      <div class="row g-3 g-md-4 mb-5">
-        {% for item in category.items.all %}
-        <div class="col-12 col-sm-6 col-lg-4 menu-item-searchable">
-          <div class="menu-card" onclick="openItemModal('{{ item.id }}', '{{ item.name|escapejs }}', '{{ item.price }}', '{{ item.gst_percentage|default:5 }}', {{ item.is_veg|yesno:'true,false' }})">
-            <div>
-              <div class="item-name">
-                <span class="veg-dot {% if item.is_veg %}veg{% else %}nonveg{% endif %}"></span>{{ item.name }}
-              </div>
-            </div>
-            <div class="item-price">₹{{ item.price|floatformat:0 }}</div>
+    <!-- Horizontal Category Scroll Strip -->
+    <div class="pos-category-section">
+      <button type="button" class="cat-nav-btn prev" onclick="scrollCategoryNav(-200)" aria-label="Previous categories">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+
+      <div class="pos-category-scroll-container" id="categoryScrollContainer">
+        <!-- "All Items" active category card -->
+        <div class="pos-cat-card active" onclick="filterByCategory('all', this)" id="catCardAll">
+          <div class="pos-cat-icon-wrap">
+            <span class="pos-cat-icon">🍽️</span>
           </div>
+          <div class="pos-cat-name">All Items</div>
+        </div>
+
+        {% for category in categories %}
+        <div class="pos-cat-card" onclick="filterByCategory('cat{{ category.id }}', this)" id="catCard{{ category.id }}" data-cat-name="{{ category.name|lower }}">
+          <div class="pos-cat-icon-wrap">
+            <span class="pos-cat-icon">
+              {% with n=category.name|lower %}
+                {% if "snack" in n or "fry" in n or "fries" in n %}🍟
+                {% elif "pizza" in n %}🍕
+                {% elif "burger" in n %}🍔
+                {% elif "salad" in n %}🥗
+                {% elif "pasta" in n or "noodle" in n %}🍝
+                {% elif "drink" in n or "beverage" in n or "juice" in n %}🍹
+                {% elif "dessert" in n or "sweet" in n or "cake" in n or "ice" in n %}🧁
+                {% elif "coffee" in n or "tea" in n or "cafe" in n %}☕
+                {% elif "biryani" in n or "rice" in n %}🍛
+                {% elif "chicken" in n or "meat" in n or "non" in n %}🍗
+                {% elif "soup" in n %}🥣
+                {% elif "bread" in n or "roti" in n or "naan" in n %}🫓
+                {% elif "sandwich" in n %}🥪
+                {% elif "starter" in n or "appetizer" in n %}🥟
+                {% elif "combo" in n or "thali" in n %}🍱
+                {% elif "breakfast" in n or "egg" in n %}🍳
+                {% elif "fish" in n or "seafood" in n %}🦐
+                {% else %}🍲{% endif %}
+              {% endwith %}
+            </span>
+          </div>
+          <div class="pos-cat-name" title="{{ category.name }}">{{ category.name }}</div>
         </div>
         {% endfor %}
       </div>
-      {% endfor %}
-    </div>
-  </main>
 
-  <!-- DESKTOP CONTEXT SIDEBAR -->
-  <aside class="context-sidebar">
-    <div class="context-tabs">
-      <div class="context-tab active" id="tabCart" onclick="switchTab('cart')">Order</div>
-      <div class="context-tab" id="tabRunning" onclick="switchTab('running')">Active</div>
-    </div>
-
-    <div class="context-body" id="cartView">
-      <button type="button" class="order-summary-bar" onclick="toggleOrderSettings('desktop')">
-        <span><i class="bi bi-geo-alt me-1"></i><span id="orderSummaryLabel">Walk-in &middot; Dine-in</span></span>
-        <i class="bi bi-chevron-down"></i>
+      <button type="button" class="cat-nav-btn next" onclick="scrollCategoryNav(200)" aria-label="Next categories">
+        <i class="bi bi-chevron-right"></i>
       </button>
-      <div class="order-settings-panel d-none" id="orderSettingsPanelDesktop">
-        <select id="tableSelectDesktop" class="form-select-luxury table-syncer mb-2" onchange="syncTableSelect(this.value)">
-          <option value="">Walk-in</option>
-          {% for table in tables %}
-          <option value="{{ table.id }}" {% if selected_table|stringformat:"s" == table.id|stringformat:"s" %}selected{% endif %}>{{ table.name }}</option>
+    </div>
+
+    <!-- Section Heading Row: All Menu Items + See All > -->
+    <div class="pos-menu-heading-row">
+      <div class="d-flex align-items-center gap-2">
+        <h2 class="pos-menu-heading-title">All Menu Items</h2>
+      </div>
+      <button type="button" class="pos-see-all-btn" onclick="seeAllMenu()">
+        See All <i class="bi bi-chevron-right ms-1"></i>
+      </button>
+    </div>
+
+    <!-- Scrollable Food Items Grid (5 Columns) -->
+    <div class="pos-menu-scroll-area" id="menuCardsContainer">
+      {% for category in categories %}
+      <div class="category-section-block mb-4" id="cat{{ category.id }}" data-cat-id="{{ category.id }}">
+        <div class="pos-section-header">
+          <h3 class="pos-section-title">
+            <span>{{ category.name }}</span>
+            <span class="pos-section-count">{{ category.items.all|length }} items</span>
+          </h3>
+        </div>
+
+        <div class="pos-items-grid">
+          {% for item in category.items.all %}
+          <div class="menu-item-searchable" data-item-name="{{ item.name|lower }}">
+            <div class="pos-item-card" onclick="openItemModal('{{ item.id }}', '{{ item.name|escapejs }}', '{{ item.price }}', '{{ item.gst_percentage|default:5 }}', {{ item.is_veg|yesno:'true,false' }})">
+              <!-- Item Thumbnail -->
+              <div class="pos-item-thumb">
+                <!-- FSSAI Veg / Non-Veg Mark -->
+                <div class="fssai-mark {% if item.is_veg %}veg{% else %}nonveg{% endif %}" title="{% if item.is_veg %}Vegetarian{% else %}Non-Vegetarian{% endif %}"></div>
+
+                {% if item.estimated_prep_time %}
+                <div class="pos-prep-chip">
+                  <i class="bi bi-clock"></i>{{ item.estimated_prep_time }}m
+                </div>
+                {% endif %}
+
+                {% if item.image %}
+                <img src="{{ item.image.url }}" alt="{{ item.name }}" loading="lazy">
+                {% else %}
+                <div class="pos-item-emoji-box">
+                  {% with iname=item.name|lower cname=category.name|lower %}
+                    {% if "burger" in iname or "burger" in cname %}🍔
+                    {% elif "pizza" in iname or "pizza" in cname %}🍕
+                    {% elif "fry" in iname or "fries" in iname or "snack" in cname %}🍟
+                    {% elif "salad" in iname or "salad" in cname %}🥗
+                    {% elif "pasta" in iname or "pasta" in cname %}🍝
+                    {% elif "noodle" in iname or "chowmein" in iname %}🍜
+                    {% elif "rice" in iname or "biryani" in iname or "pulao" in iname %}🍛
+                    {% elif "chicken" in iname or "wings" in iname or "kebab" in iname %}🍗
+                    {% elif "sandwich" in iname or "sub" in iname or "wrap" in iname %}🥪
+                    {% elif "drink" in iname or "shake" in iname or "juice" in iname or "beverage" in cname %}🍹
+                    {% elif "coffee" in iname or "cappuccino" in iname or "latte" in iname %}☕
+                    {% elif "tea" in iname or "chai" in iname %}🫖
+                    {% elif "cake" in iname or "pastry" in iname or "brownie" in iname %}🍰
+                    {% elif "ice cream" in iname or "sundae" in iname %}🍨
+                    {% elif "donut" in iname or "doughnut" in iname %}🍩
+                    {% elif "soup" in iname %}🥣
+                    {% elif "roti" in iname or "naan" in iname or "paratha" in iname %}🫓
+                    {% elif "paneer" in iname or "curry" in iname or "dal" in iname %}🍲
+                    {% elif "fish" in iname or "prawn" in iname or "shrimp" in iname %}🦐
+                    {% elif "dosa" in iname or "idli" in iname or "vada" in iname %}🥞
+                    {% else %}🍽️{% endif %}
+                  {% endwith %}
+                </div>
+                {% endif %}
+              </div>
+
+              <!-- Item Info -->
+              <div class="pos-item-body">
+                <h4 class="pos-item-name">{{ item.name }}</h4>
+              </div>
+
+              <!-- Item Footer -->
+              <div class="pos-item-footer">
+                <span class="pos-item-price">₹{{ item.price|floatformat:0 }}</span>
+                <button type="button" class="btn-pos-add" aria-label="Add {{ item.name }}">
+                  <i class="bi bi-plus-lg"></i>
+                </button>
+              </div>
+            </div>
+          </div>
           {% endfor %}
-        </select>
-        <select id="sourceSelectDesktop" class="form-select-luxury mb-2" onchange="toggleAggregator(this.value, 'desktop')">
-          <option value="dine_in">Dine-in</option>
-          <option value="takeaway">Takeaway</option>
-          <option value="delivery">Delivery</option>
-          <option value="zomato">Zomato</option>
-          <option value="swiggy">Swiggy</option>
-          <option value="uber_eats">Uber Eats</option>
-          <option value="web">Website</option>
-        </select>
-        <input type="text" id="aggregatorIdDesktop" class="form-control-minimal mb-2 d-none" placeholder="Aggregator Order ID">
-        <div id="deliveryInfoDesktop" class="d-none">
-          <input type="text" id="customerNameDesktop" class="form-control-minimal mb-2" placeholder="Customer Name" maxlength="100">
-          <input type="tel" id="customerPhoneDesktop" class="form-control-minimal mb-2" placeholder="Customer Phone" maxlength="10">
         </div>
       </div>
-      <div id="cartItemsContainerDesktop" style="min-height:200px;"></div>
+      {% endfor %}
     </div>
 
-    <div class="context-body d-none" id="runningView">
-      <div id="runningItemsDesktop"></div>
-    </div>
+  </main>
 
-    <div class="cart-summary" id="cartSummaryBlock">
-      <div class="summary-row"><span>Sub-total</span><span class="view-subtotal">₹0</span></div>
-      <div class="summary-row"><span>GST</span><span class="view-gst">₹0</span></div>
-      {% if outlet.parcel_charge_amount %}
-      <div class="summary-row parcel-row" style="display:none;color:var(--text-muted);">
-        <span>Parcel Charge</span><span>₹{{ outlet.parcel_charge_amount|floatformat:0 }}</span>
+  <!-- ══════════════════════════════════════════════════════
+       RIGHT: ORDER & CART SIDEBAR (KimiPoS Right Column)
+       ══════════════════════════════════════════════════════ -->
+  <aside class="pos-cart-sidebar" id="contextSidebarDesktop">
+    <!-- Top Header: Search, Pill Selectors & Order Title -->
+    <div class="pos-cart-header">
+      <!-- Search in Ordering Input -->
+      <div class="pos-cart-search-wrap">
+        <i class="bi bi-search pos-cart-search-icon"></i>
+        <input type="text" id="cartSearchDesktop" class="pos-cart-search-input" placeholder="Search in Ordering..." oninput="filterCartList(this.value)">
       </div>
-      <button class="parcel-btn" onclick="toggleParcel()"
-        style="width:100%;padding:0.6rem;margin:0.4rem 0;border:1.5px dashed var(--border-color);
-               background:transparent;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;
-               letter-spacing:1.5px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;
-               justify-content:center;gap:0.5rem;font-family:inherit;">
-        <i class="bi bi-bag"></i>
+
+      <!-- Dining & Table Selector Row (Matching KimiPoS Screenshot) -->
+      <div class="pos-pill-select-grid">
+        <select id="sourceSelectDesktop" class="pos-pill-select" onchange="toggleAggregator(this.value, 'desktop')">
+          <option value="dine_in">🍽️ Dine-in</option>
+          <option value="takeaway">🛍️ Takeaway</option>
+          <option value="delivery">🛵 Delivery</option>
+          <option value="zomato">🔴 Zomato</option>
+          <option value="swiggy">🟠 Swiggy</option>
+          <option value="uber_eats">🟢 Uber Eats</option>
+          <option value="web">🌐 Website</option>
+        </select>
+
+        <select id="tableSelectDesktop" class="pos-pill-select table-syncer" onchange="syncTableSelect(this.value)">
+          <option value="">Select Tables</option>
+          {% for table in tables %}
+          <option value="{{ table.id }}" {% if selected_table|stringformat:"s" == table.id|stringformat:"s" %}selected{% endif %}>Table {{ table.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Aggregator / Delivery dynamic inputs -->
+      <input type="text" id="aggregatorIdDesktop" class="form-control pos-pill-select mb-2 d-none" placeholder="Aggregator Order ID #">
+      <div id="deliveryInfoDesktop" class="d-none mb-2">
+        <input type="text" id="customerNameDesktop" class="form-control pos-pill-select mb-1" placeholder="Customer Name" maxlength="100">
+        <input type="tel" id="customerPhoneDesktop" class="form-control pos-pill-select" placeholder="Customer Phone (10 digits)" maxlength="10">
+      </div>
+
+      <!-- Hidden hook for existing script compatibility -->
+      <div id="orderSettingsPanelDesktop" class="d-none"></div>
+      <span id="orderSummaryLabel" class="d-none"></span>
+
+      <!-- Order ID Header & Tabs (KimiPoS: Order #28 + Cart / Active tabs) -->
+      <div class="pos-cart-order-head">
+        <span class="pos-cart-order-title" id="activeOrderTitleDesktop">
+          <i class="bi bi-receipt-cutoff text-danger"></i>
+          Order #{{ active_order.id|default:"28" }}
+        </span>
+        <div class="pos-cart-nav-tabs">
+          <div class="pos-cart-tab active" id="tabCart" onclick="switchTab('cart')">
+            Current
+          </div>
+          <div class="pos-cart-tab" id="tabRunning" onclick="switchTab('running')">
+            Active
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cart Items Scroll View -->
+    <div class="pos-cart-body" id="cartView">
+      <div id="cartItemsContainerDesktop">
+        <div class="pos-empty-cart">
+          <div class="pos-empty-cart-icon"><i class="bi bi-cart3"></i></div>
+          <h6 class="fw-bold mb-1">Your cart is empty</h6>
+          <p class="small text-muted mb-0">Select dishes from the menu to start an order</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active / Running Table Orders View -->
+    <div class="pos-cart-body d-none" id="runningView">
+      <div id="runningItemsDesktop">
+        <div class="text-center text-muted py-4">Select a table to see active orders</div>
+      </div>
+    </div>
+
+    <!-- Pinned Bottom Summary & KimiPoS Action Buttons -->
+    <div class="pos-cart-footer" id="cartSummaryBlock">
+      <div class="pos-summary-row">
+        <span>Sub Total</span>
+        <span class="view-subtotal fw-bold">₹0</span>
+      </div>
+      <div class="pos-summary-row" id="productDiscountRow" style="color:var(--pos-green);">
+        <span>Product Discount</span>
+        <span class="view-prod-discount fw-bold">-₹0</span>
+      </div>
+      <div class="pos-summary-row" id="extraDiscountRow">
+        <span>Extra Discount</span>
+        <span class="fw-bold">₹0</span>
+      </div>
+      <div class="pos-summary-row" id="couponDiscountRow">
+        <span>Coupon Discount</span>
+        <span class="fw-bold">₹0</span>
+      </div>
+      <div class="pos-summary-row">
+        <span>GST (5%)</span>
+        <span class="view-gst fw-bold">₹0</span>
+      </div>
+
+      {% if outlet.parcel_charge_amount %}
+      <div class="pos-summary-row parcel-row" style="display:none;color:var(--pos-red);">
+        <span><i class="bi bi-box-seam me-1"></i>Parcel Charge</span>
+        <span class="fw-bold">₹{{ outlet.parcel_charge_amount|floatformat:0 }}</span>
+      </div>
+      <button type="button" class="pos-parcel-btn parcel-btn" onclick="toggleParcel()">
+        <i class="bi bi-box-seam"></i>
         <span class="parcel-btn-text">Add Parcel +₹{{ outlet.parcel_charge_amount|floatformat:0 }}</span>
       </button>
       {% endif %}
-      <div class="summary-total"><span>Total</span><span class="view-total">₹0</span></div>
-      <div class="d-flex flex-column gap-2 mt-3">
-        {% if auto_kot_mode %}
-        <button class="btn-luxury btn-luxury-primary w-100 py-3 send-btn" onclick="submitQSROrder()" style="background:#10b981;border-color:#10b981;font-size:0.85rem;letter-spacing:2px;">
-          <i class="bi bi-cash-coin me-2"></i>PAY &amp; PRINT SLIP
-        </button>
-        {% else %}
-        <button class="btn-luxury btn-luxury-primary w-100 py-3 send-btn" onclick="submitOrder()">Dispatch <i class="bi bi-arrow-right ms-2"></i></button>
-        <div class="d-flex gap-2 secondary-actions">
-          <button class="btn-luxury w-50" onclick="generateBill()">Bill</button>
-          <button class="btn-luxury w-50" onclick="clearCart()">Clear</button>
+
+      <div class="pos-summary-row total-row">
+        <span class="pos-total-label">Total</span>
+        <span class="pos-total-val view-total">₹0</span>
+      </div>
+
+      <!-- Exactly 4 Buttons matching KimiPoS Reference -->
+      <div class="pos-action-grid">
+        <div class="pos-action-row">
+          {% if auto_kot_mode %}
+          <button type="button" class="btn-pos-kot send-btn" onclick="submitQSROrder()">
+            <i class="bi bi-check-lg"></i> KOT &amp; Print
+          </button>
+          {% else %}
+          <button type="button" class="btn-pos-kot send-btn" onclick="submitOrder()">
+            <i class="bi bi-check-lg"></i> KOT &amp; Print
+          </button>
+          {% endif %}
+          <button type="button" class="btn-pos-draft" onclick="clearCart()">
+            Draft
+          </button>
         </div>
-        {% endif %}
+
+        <div class="pos-action-row">
+          {% if auto_kot_mode %}
+          <button type="button" class="btn-pos-pay" onclick="submitQSROrder()">
+            Bill &amp; Payment
+          </button>
+          <button type="button" class="btn-pos-print" onclick="submitQSROrder()">
+            Bill &amp; Print
+          </button>
+          {% else %}
+          <button type="button" class="btn-pos-pay" onclick="generateBill()">
+            Bill &amp; Payment
+          </button>
+          <button type="button" class="btn-pos-print" onclick="generateBill()">
+            Bill &amp; Print
+          </button>
+          {% endif %}
+        </div>
       </div>
     </div>
   </aside>
 
 </div>
 
-<!-- MOBILE FAB -->
-<button class="fab-cart" onclick="openCartMobile()">
-  View Order (<span class="view-total">₹0</span>)
+<!-- ══════════════════════════════════════════════════════
+     MOBILE FLOATING CART BUTTON (FAB)
+     ══════════════════════════════════════════════════════ -->
+<button class="pos-fab-cart fab-cart" onclick="openCartMobile()">
+  <div class="d-flex align-items-center gap-2">
+    <span class="pos-fab-count-badge" id="mobileCartFabCount">0 items</span>
+    <span class="fw-bold">View Order</span>
+  </div>
+  <div class="d-flex align-items-center gap-2">
+    <span class="fw-bold view-total">₹0</span>
+    <i class="bi bi-chevron-right" style="font-size:1.1rem;"></i>
+  </div>
 </button>
 
-<!-- MOBILE CART PAGE (full-viewport overlay, not a drawer -- see openCartMobile/closeCartMobile) -->
+<!-- ══════════════════════════════════════════════════════
+     MOBILE CART OVERLAY (Full-viewport Bottom Sheet)
+     ══════════════════════════════════════════════════════ -->
 <div class="mobile-cart-page" id="mobileCartPage" role="dialog" aria-modal="true" aria-label="Current Order">
-  <div class="offcanvas-header">
-    <h5 class="m-0" style="font-family:'DM Serif Display',serif;">Current Order</h5>
-    <button type="button" class="btn-icon" onclick="closeCartMobile()" aria-label="Close order"><i class="bi bi-arrow-left"></i></button>
+  <div class="mobile-cart-header">
+    <div class="d-flex align-items-center gap-2">
+      <h5 class="m-0 fw-bold" style="font-size:1.15rem;">Current Order</h5>
+      <span class="badge rounded-pill bg-danger" id="mobileCartHeaderCount">0</span>
+    </div>
+    <button type="button" class="btn-icon" onclick="closeCartMobile()" aria-label="Close order" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--border-color);background:var(--surface-2);display:flex;align-items:center;justify-content:center;">
+      <i class="bi bi-x-lg"></i>
+    </button>
   </div>
-  <div class="context-tabs">
-    <div class="context-tab active" id="tabCartMobile" onclick="switchTabMobile('cart')">Order</div>
-    <div class="context-tab" id="tabRunningMobile" onclick="switchTabMobile('running')">Active</div>
-  </div>
-  <div class="mobile-cart-page-body">
-    <div class="context-body flex-grow-1" id="cartViewMobile">
-      <button type="button" class="order-summary-bar" onclick="toggleOrderSettings('mobile')">
-        <span><i class="bi bi-geo-alt me-1"></i><span id="orderSummaryLabelMobile">Walk-in &middot; Dine-in</span></span>
-        <i class="bi bi-chevron-down"></i>
-      </button>
-      <div class="order-settings-panel d-none" id="orderSettingsPanelMobile">
-        <select id="tableSelectMobile" class="form-select-luxury table-syncer mb-2" onchange="syncTableSelect(this.value)">
-          <option value="">Walk-in</option>
-          {% for table in tables %}
-          <option value="{{ table.id }}" {% if selected_table|stringformat:"s" == table.id|stringformat:"s" %}selected{% endif %}>{{ table.name }}</option>
-          {% endfor %}
-        </select>
-        <select id="sourceSelectMobile" class="form-select-luxury mb-2" onchange="toggleAggregator(this.value, 'mobile')">
-          <option value="dine_in">Dine-in</option>
-          <option value="takeaway">Takeaway</option>
-          <option value="delivery">Delivery</option>
-          <option value="zomato">Zomato</option>
-          <option value="swiggy">Swiggy</option>
-          <option value="uber_eats">Uber Eats</option>
-          <option value="web">Website</option>
-        </select>
-        <input type="text" id="aggregatorIdMobile" class="form-control-minimal mb-2 d-none" placeholder="Aggregator Order ID">
-        <div id="deliveryInfoMobile" class="d-none">
-          <input type="text" id="customerNameMobile" class="form-control-minimal mb-2" placeholder="Customer Name" maxlength="100">
-          <input type="tel" id="customerPhoneMobile" class="form-control-minimal mb-2" placeholder="Customer Phone" maxlength="10">
-        </div>
+
+  <!-- Dining & Table Selector Row on Mobile -->
+  <div style="padding: 0.75rem 1rem 0; background: var(--panel-bg);">
+    <div class="pos-pill-select-grid">
+      <select id="sourceSelectMobile" class="pos-pill-select" onchange="toggleAggregator(this.value, 'mobile')">
+        <option value="dine_in">🍽️ Dine-in</option>
+        <option value="takeaway">🛍️ Takeaway</option>
+        <option value="delivery">🛵 Delivery</option>
+        <option value="zomato">🔴 Zomato</option>
+        <option value="swiggy">🟠 Swiggy</option>
+        <option value="uber_eats">🟢 Uber Eats</option>
+        <option value="web">🌐 Website</option>
+      </select>
+
+      <select id="tableSelectMobile" class="pos-pill-select table-syncer" onchange="syncTableSelect(this.value)">
+        <option value="">Walk-in</option>
+        {% for table in tables %}
+        <option value="{{ table.id }}" {% if selected_table|stringformat:"s" == table.id|stringformat:"s" %}selected{% endif %}>Table {{ table.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <input type="text" id="aggregatorIdMobile" class="form-control pos-pill-select mb-2 d-none" placeholder="Aggregator Order ID #">
+    <div id="deliveryInfoMobile" class="d-none mb-2">
+      <input type="text" id="customerNameMobile" class="form-control pos-pill-select mb-1" placeholder="Customer Name" maxlength="100">
+      <input type="tel" id="customerPhoneMobile" class="form-control pos-pill-select" placeholder="Customer Phone (10 digits)" maxlength="10">
+    </div>
+
+    <!-- Hidden hook for existing script compatibility -->
+    <div id="orderSettingsPanelMobile" class="d-none"></div>
+    <span id="orderSummaryLabelMobile" class="d-none"></span>
+
+    <!-- Mobile Tabs -->
+    <div class="pos-cart-nav-tabs mb-2">
+      <div class="pos-cart-tab active" id="tabCartMobile" onclick="switchTabMobile('cart')">
+        <i class="bi bi-cart3 me-1"></i>Current Order
       </div>
-      <div id="cartItemsContainerMobile"></div>
-      <div class="cart-page-breakdown">
-        <div class="summary-row"><span>Sub-total</span><span class="view-subtotal">₹0</span></div>
-        <div class="summary-row"><span>GST</span><span class="view-gst">₹0</span></div>
-        {% if outlet.parcel_charge_amount %}
-        <div class="summary-row parcel-row" style="display:none;color:var(--text-muted);">
-          <span>Parcel Charge</span><span>₹{{ outlet.parcel_charge_amount|floatformat:0 }}</span>
-        </div>
-        <button class="parcel-btn" onclick="toggleParcel()"
-          style="width:100%;padding:0.6rem;margin:0.4rem 0;border:1.5px dashed var(--border-color);
-                 background:transparent;color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;
-                 letter-spacing:1.5px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;
-                 justify-content:center;gap:0.5rem;font-family:inherit;">
-          <i class="bi bi-bag"></i>
-          <span class="parcel-btn-text">Add Parcel +₹{{ outlet.parcel_charge_amount|floatformat:0 }}</span>
-        </button>
-        {% endif %}
-        {% if not auto_kot_mode %}
-        <div class="d-flex gap-2 secondary-actions mt-2">
-          <button class="btn-luxury w-50" onclick="generateBill()">Bill</button>
-          <button class="btn-luxury w-50" onclick="clearCart()">Clear</button>
-        </div>
-        {% endif %}
+      <div class="pos-cart-tab" id="tabRunningMobile" onclick="switchTabMobile('running')">
+        <i class="bi bi-fire me-1"></i>Active Orders
       </div>
     </div>
-    <div class="context-body flex-grow-1 d-none" id="runningViewMobile">
+  </div>
+
+  <!-- Mobile Cart Items Body -->
+  <div class="pos-cart-body" style="flex:1;overflow-y:auto;padding:0.75rem 1rem;">
+    <div id="cartViewMobile">
+      <div id="cartItemsContainerMobile"></div>
+    </div>
+    <div id="runningViewMobile" class="d-none">
       <div id="runningItemsMobile"></div>
     </div>
   </div>
-  <div class="cart-summary" style="border-top:1px solid var(--border-color);" id="cartSummaryBlockMobile">
-    <div class="summary-total"><span>Total</span><span class="view-total">₹0</span></div>
-    {% if auto_kot_mode %}
-    <button class="btn-luxury btn-luxury-primary w-100 py-3 send-btn" onclick="submitQSROrder()" style="background:#10b981;border-color:#10b981;font-size:0.85rem;letter-spacing:2px;">
-      <i class="bi bi-cash-coin me-2"></i>PAY &amp; PRINT SLIP
+
+  <!-- Mobile Footer Summary & Buttons -->
+  <div class="pos-cart-footer" id="cartSummaryBlockMobile">
+    <div class="pos-summary-row">
+      <span>Sub-total</span>
+      <span class="view-subtotal fw-bold">₹0</span>
+    </div>
+    <div class="pos-summary-row">
+      <span>GST (5%)</span>
+      <span class="view-gst fw-bold">₹0</span>
+    </div>
+
+    {% if outlet.parcel_charge_amount %}
+    <div class="pos-summary-row parcel-row" style="display:none;color:var(--pos-red);">
+      <span><i class="bi bi-box-seam me-1"></i>Parcel Charge</span>
+      <span class="fw-bold">₹{{ outlet.parcel_charge_amount|floatformat:0 }}</span>
+    </div>
+    <button type="button" class="pos-parcel-btn parcel-btn" onclick="toggleParcel()">
+      <i class="bi bi-box-seam"></i>
+      <span class="parcel-btn-text">Add Parcel +₹{{ outlet.parcel_charge_amount|floatformat:0 }}</span>
     </button>
-    {% else %}
-    <button class="btn-luxury btn-luxury-primary w-100 py-3 send-btn" onclick="submitOrder()">Dispatch Order <i class="bi bi-arrow-right ms-2"></i></button>
     {% endif %}
+
+    <div class="pos-summary-row total-row">
+      <span class="pos-total-label">Total Payable</span>
+      <span class="pos-total-val view-total">₹0</span>
+    </div>
+
+    <div class="pos-action-grid">
+      <div class="pos-action-row">
+        {% if auto_kot_mode %}
+        <button type="button" class="btn-pos-kot send-btn" onclick="submitQSROrder()">
+          <i class="bi bi-printer-fill"></i>KOT &amp; Print
+        </button>
+        {% else %}
+        <button type="button" class="btn-pos-kot send-btn" onclick="submitOrder()">
+          <i class="bi bi-fire"></i>KOT &amp; Dispatch
+        </button>
+        {% endif %}
+        <button type="button" class="btn-pos-draft" onclick="clearCart()">
+          <i class="bi bi-trash3"></i>Draft
+        </button>
+      </div>
+
+      <div class="pos-action-row">
+        {% if auto_kot_mode %}
+        <button type="button" class="btn-pos-pay" onclick="submitQSROrder()">
+          <i class="bi bi-credit-card-fill"></i>Bill &amp; Payment
+        </button>
+        <button type="button" class="btn-pos-print" onclick="submitQSROrder()">
+          <i class="bi bi-receipt"></i>Bill &amp; Print
+        </button>
+        {% else %}
+        <button type="button" class="btn-pos-pay" onclick="generateBill()">
+          <i class="bi bi-credit-card-fill"></i>Bill &amp; Payment
+        </button>
+        <button type="button" class="btn-pos-print" onclick="generateBill()">
+          <i class="bi bi-receipt"></i>Bill &amp; Print
+        </button>
+        {% endif %}
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- ITEM MODAL -->
+<!-- ══════════════════════════════════════════════════════
+     ITEM MODIFIERS & CUSTOMIZATION MODAL
+     ══════════════════════════════════════════════════════ -->
 <div class="modal fade" id="itemModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header border-0 pb-0">
-        <h5 class="modal-title" id="modalItemName">Item Name</h5>
+    <div class="modal-content" style="border-radius:22px;border:1.5px solid var(--border-color);background:var(--panel-bg);overflow:hidden;box-shadow:0 12px 36px rgba(0,0,0,0.15);">
+      <div class="modal-header border-0 pb-1" style="background:var(--surface-2);padding:1.25rem 1.5rem;">
+        <div>
+          <span class="badge mb-1" style="background:var(--pos-red-soft);color:var(--pos-red);border:1px solid var(--pos-red-border);font-size:0.7rem;font-weight:700;border-radius:999px;padding:2px 8px;">Customization</span>
+          <h5 class="modal-title fw-bold" id="modalItemName" style="font-size:1.25rem;color:var(--text-main);">Item Name</h5>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" style="padding:1.25rem 1.5rem;">
         <div id="modifierContainer"></div>
-        <p class="text-muted text-uppercase mt-3" style="font-size:0.75rem;letter-spacing:1px;">Special Instructions</p>
-        <textarea id="itemNote" class="form-control form-control-minimal" rows="2" placeholder="Dietary requirements or prep notes..."></textarea>
-        <div class="form-check mt-3">
-          <input class="form-check-input" type="checkbox" id="itemTakeaway">
-          <label class="form-check-label text-uppercase" style="font-size:0.75rem;letter-spacing:1px;" for="itemTakeaway">Pack as Takeaway</label>
+        <label class="form-label fw-bold mt-2" style="font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);">
+          Special Kitchen Notes
+        </label>
+        <textarea id="itemNote" class="form-control" rows="2" placeholder="e.g. Less spicy, extra sauce, no onions..." style="border-radius:12px;background:var(--surface-2);border:1.5px solid var(--border-color);color:var(--text-main);font-size:0.85rem;"></textarea>
+        <div class="form-check mt-3" style="background:var(--surface-2);padding:10px 14px 10px 36px;border-radius:12px;border:1px solid var(--border-color);">
+          <input class="form-check-input" type="checkbox" id="itemTakeaway" style="cursor:pointer;">
+          <label class="form-check-label fw-bold" style="font-size:0.85rem;cursor:pointer;" for="itemTakeaway">
+            🥡 Pack this specific dish as Takeaway
+          </label>
         </div>
       </div>
-      <div class="modal-footer border-0 pt-0">
-        <button class="btn-luxury" style="border-color:transparent;" data-bs-dismiss="modal">Cancel</button>
-        <button class="btn-luxury btn-luxury-primary" onclick="addItemWithModifiers()">Add to Order</button>
+      <div class="modal-footer border-0 pt-0" style="padding:1rem 1.5rem 1.25rem;">
+        <button type="button" class="btn" style="border-radius:999px;padding:8px 18px;font-weight:600;color:var(--text-muted);" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn" style="border-radius:999px;background:var(--pos-red);color:#fff;font-weight:700;padding:9px 24px;box-shadow:0 4px 14px rgba(236, 39, 52, 0.35);" onclick="addItemWithModifiers()">
+          <i class="bi bi-plus-lg me-1"></i>Add to Order
+        </button>
       </div>
     </div>
   </div>
 </div>
 
 {% if auto_kot_mode %}
-<!-- QSR inline payment modal — appears after order is created, before payment -->
+<!-- ══════════════════════════════════════════════════════
+     QSR INSTANT PAYMENT MODAL
+     ══════════════════════════════════════════════════════ -->
 <div class="modal fade" id="qsrPayModal" tabindex="-1" data-bs-backdrop="static">
-  <div class="modal-dialog modal-dialog-centered" style="max-width:380px;">
-    <div class="modal-content" style="border-radius:0;background:var(--panel-bg);border:1px solid var(--border-color);">
-      <div class="modal-header border-0 pb-0">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:400px;">
+    <div class="modal-content" style="border-radius:24px;background:var(--panel-bg);border:1.5px solid var(--border-color);box-shadow:0 16px 40px rgba(0,0,0,0.18);overflow:hidden;">
+      <div class="modal-header border-0 pb-0" style="padding:1.5rem 1.5rem 0.5rem;">
         <div>
-          <p style="font-size:0.6rem;text-transform:uppercase;letter-spacing:3px;color:var(--accent-gold);margin:0;">QSR Counter</p>
-          <h5 class="modal-title" style="font-family:'DM Serif Display',serif;font-size:1.4rem;">Collect Payment</h5>
+          <span class="badge mb-1" style="background:var(--pos-red-soft);color:var(--pos-red);border:1px solid var(--pos-red-border);font-size:0.7rem;font-weight:700;border-radius:999px;padding:2px 8px;">QSR Fast Billing</span>
+          <h5 class="modal-title fw-bold" style="font-size:1.35rem;color:var(--text-main);">Collect Payment</h5>
         </div>
+        <button type="button" class="btn-close" onclick="cancelQSROrder()"></button>
       </div>
-      <div class="modal-body pt-2">
-        <div style="font-size:2.2rem;font-family:'DM Serif Display',serif;text-align:center;padding:0.5rem 0 1rem;" id="qsrGrandTotal">₹ —</div>
-        <div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.2rem;" id="qsrMethodBtns">
-          <button class="qsr-method-btn" data-method="cash" onclick="selectQSRMethod(this)" style="padding:0.75rem;border:1px solid var(--border-color);background:transparent;color:var(--text-main);cursor:pointer;font-size:0.85rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;transition:all 0.15s;">
-            <i class="bi bi-cash-coin me-2"></i>Cash
+      <div class="modal-body" style="padding:1rem 1.5rem 1.25rem;">
+        <div style="background:var(--surface-2);border-radius:18px;padding:1rem;text-align:center;margin-bottom:1.2rem;border:1px solid var(--border-color);">
+          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:var(--text-muted);margin-bottom:2px;">Grand Total Due</div>
+          <div style="font-size:2.4rem;font-family:var(--font-display);font-weight:800;color:var(--pos-red);" id="qsrGrandTotal">₹ —</div>
+        </div>
+
+        <label style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.5rem;">Payment Method</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1.2rem;" id="qsrMethodBtns">
+          <button type="button" class="qsr-method-btn" data-method="cash" onclick="selectQSRMethod(this)" style="height:44px;border-radius:999px;border:1.5px solid var(--border-color);background:var(--panel-bg);color:var(--text-main);font-size:0.82rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer;transition:all 0.15s;">
+            <i class="bi bi-cash-coin text-success"></i>Cash
           </button>
-          <button class="qsr-method-btn" data-method="upi" onclick="selectQSRMethod(this)" style="padding:0.75rem;border:1px solid var(--border-color);background:transparent;color:var(--text-main);cursor:pointer;font-size:0.85rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;transition:all 0.15s;">
-            <i class="bi bi-qr-code-scan me-2"></i>UPI / GPay
+          <button type="button" class="qsr-method-btn" data-method="upi" onclick="selectQSRMethod(this)" style="height:44px;border-radius:999px;border:1.5px solid var(--border-color);background:var(--panel-bg);color:var(--text-main);font-size:0.82rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer;transition:all 0.15s;">
+            <i class="bi bi-qr-code-scan text-primary"></i>UPI
           </button>
-          <button class="qsr-method-btn" data-method="card" onclick="selectQSRMethod(this)" style="padding:0.75rem;border:1px solid var(--border-color);background:transparent;color:var(--text-main);cursor:pointer;font-size:0.85rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;transition:all 0.15s;">
-            <i class="bi bi-credit-card me-2"></i>Card
+          <button type="button" class="qsr-method-btn" data-method="card" onclick="selectQSRMethod(this)" style="height:44px;border-radius:999px;border:1.5px solid var(--border-color);background:var(--panel-bg);color:var(--text-main);font-size:0.82rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer;transition:all 0.15s;">
+            <i class="bi bi-credit-card text-warning"></i>Card
           </button>
         </div>
+
         <div style="margin-bottom:0.75rem;" id="qsrAmountRow">
-          <label style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);display:block;margin-bottom:0.3rem;">Amount Tendered</label>
-          <input type="number" id="qsrAmount" min="0" step="0.01" placeholder="Enter amount"
-            style="width:100%;background:transparent;border:none;border-bottom:1px solid var(--border-color);color:var(--text-main);font-size:1.2rem;padding:0.4rem 0;outline:none;"
+          <label style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.3rem;">Amount Tendered (₹)</label>
+          <input type="number" id="qsrAmount" min="0" step="0.01" placeholder="Enter amount received"
+            style="width:100%;height:44px;background:var(--surface-2);border:1.5px solid var(--border-color);border-radius:12px;color:var(--text-main);font-size:1.15rem;font-weight:700;padding:0 12px;outline:none;"
             oninput="updateQSRChange()">
         </div>
-        <div id="qsrChangeLine" style="display:none;text-align:right;font-size:0.9rem;color:#10b981;font-weight:600;"></div>
+        <div id="qsrChangeLine" style="display:none;padding:8px 12px;background:var(--pos-green-soft);border-radius:10px;border:1px solid rgba(16,185,129,0.3);text-align:center;font-size:0.95rem;color:#059669;font-weight:700;margin-top:8px;"></div>
       </div>
-      <div class="modal-footer border-0 pt-0 flex-column gap-2">
-        <button id="qsrPayBtn" class="btn-luxury btn-luxury-primary w-100 py-3" onclick="submitQSRPayment()" disabled
-          style="font-size:0.78rem;letter-spacing:2px;background:#10b981;border-color:#10b981;">
-          <i class="bi bi-printer me-2"></i>CONFIRM &amp; PRINT SLIP
+      <div class="modal-footer border-0 pt-0 flex-column gap-2" style="padding:0 1.5rem 1.5rem;">
+        <button id="qsrPayBtn" class="btn w-100" onclick="submitQSRPayment()" disabled
+          style="height:48px;border-radius:999px;font-size:0.88rem;font-weight:800;letter-spacing:1px;background:var(--pos-green);color:#fff;border:none;box-shadow:0 4px 14px rgba(16,185,129,0.35);">
+          <i class="bi bi-printer-fill me-2"></i>CONFIRM &amp; PRINT SLIP
         </button>
-        <button class="btn-luxury w-100" style="font-size:0.75rem;color:var(--text-muted);border-color:transparent;" onclick="cancelQSROrder()">
+        <button type="button" class="btn w-100" style="font-size:0.8rem;color:var(--text-muted);border:none;background:none;font-weight:600;" onclick="cancelQSROrder()">
           Cancel Order
         </button>
       </div>
@@ -473,14 +1985,14 @@
   </div>
 </div>
 
-<!-- QSR confirmation overlay — shown after successful payment + print queued -->
-<div id="qsrConfirm" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:none;align-items:center;justify-content:center;flex-direction:column;">
+<!-- QSR Confirmation Screen Overlay -->
+<div id="qsrConfirm" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);backdrop-filter:blur(6px);z-index:9999;align-items:center;justify-content:center;flex-direction:column;">
   <div style="text-align:center;color:#fff;">
-    <div style="font-size:5rem;margin-bottom:1rem;">✓</div>
-    <div style="font-family:'DM Serif Display',serif;font-size:2rem;margin-bottom:0.5rem;">Paid</div>
-    <div id="qsrConfirmNum" style="font-size:1rem;color:rgba(255,255,255,0.7);letter-spacing:2px;text-transform:uppercase;"></div>
-    <div style="margin-top:1rem;font-size:0.8rem;color:rgba(255,255,255,0.5);">Slip printing… next customer</div>
-    <div style="margin-top:0.5rem;font-size:0.75rem;color:rgba(255,255,255,0.35);" id="qsrChangeDue"></div>
+    <div style="width:84px;height:84px;border-radius:50%;background:var(--pos-green);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:2.8rem;margin-bottom:1.25rem;box-shadow:0 8px 24px rgba(16,185,129,0.4);">✓</div>
+    <div style="font-size:2.2rem;font-weight:800;font-family:var(--font-display);margin-bottom:0.25rem;">Payment Success!</div>
+    <div id="qsrConfirmNum" style="font-size:1.1rem;color:rgba(255,255,255,0.8);letter-spacing:1px;font-weight:700;"></div>
+    <div style="margin-top:1rem;font-size:0.85rem;color:rgba(255,255,255,0.6);">Printing thermal slip &amp; preparing next customer...</div>
+    <div style="margin-top:0.6rem;font-size:0.95rem;color:#34d399;font-weight:700;" id="qsrChangeDue"></div>
   </div>
 </div>
 {% endif %}
@@ -495,36 +2007,132 @@
     });
   }
 
+  /* ── Category Scrolling & Filtering ── */
+  function scrollCategoryNav(delta) {
+    const container = document.getElementById('categoryScrollContainer');
+    if (container) {
+      container.scrollBy({ left: delta, behavior: 'smooth' });
+    }
+  }
+
+  function filterByCategory(targetCatId, cardEl) {
+    document.querySelectorAll('.pos-cat-card').forEach(c => c.classList.remove('active'));
+    if (cardEl) cardEl.classList.add('active');
+
+    const sections = document.querySelectorAll('.category-section-block');
+    if (targetCatId === 'all') {
+      sections.forEach(s => s.style.display = '');
+      document.querySelector('.pos-menu-scroll-area').scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      const targetSec = document.getElementById(targetCatId);
+      if (targetSec) {
+        sections.forEach(s => s.style.display = '');
+        const scrollArea = document.querySelector('.pos-menu-scroll-area');
+        const offset = targetSec.offsetTop - scrollArea.offsetTop - 12;
+        scrollArea.scrollTo({ top: offset, behavior: 'smooth' });
+      }
+    }
+  }
+
+  function scrollToCategory(id, el) {
+    // Back-compat hook
+    filterByCategory(id, el);
+  }
+
+  /* ── Menu Search Filter with Keyboard Shortcut ── */
+  const searchInput = document.getElementById("menuSearch");
+  const searchClear = document.getElementById("menuSearchClear");
+
+  if (searchInput) {
+    searchInput.addEventListener("input", function() {
+      const q = this.value.toLowerCase().trim();
+      if (searchClear) searchClear.style.display = q ? 'block' : 'none';
+
+      document.querySelectorAll(".category-section-block").forEach(sec => {
+        let anyVisible = false;
+        sec.querySelectorAll(".menu-item-searchable").forEach(card => {
+          const name = card.getAttribute('data-item-name') || card.innerText.toLowerCase();
+          const match = !q || name.includes(q);
+          card.style.display = match ? "" : "none";
+          if (match) anyVisible = true;
+        });
+        sec.style.display = anyVisible || !q ? "" : "none";
+      });
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "/" && document.activeElement !== searchInput && !document.querySelector('.modal.show')) {
+        e.preventDefault();
+        searchInput.focus();
+      }
+    });
+  }
+
+  function clearMenuSearch() {
+    if (searchInput) {
+      searchInput.value = "";
+      searchInput.dispatchEvent(new Event("input"));
+      searchInput.focus();
+    }
+  }
+
+  /* ── Aggregator & Delivery Settings Sync ── */
   function toggleAggregator(val, view) {
-    const inputId = view === 'desktop' ? 'aggregatorIdDesktop' : 'aggregatorIdMobile';
-    const el = document.getElementById(inputId);
-    if (el) {
-      const isAggregator = ['zomato', 'swiggy', 'uber_eats', 'web'].includes(val);
-      el.classList.toggle('d-none', !isAggregator);
-      if (!isAggregator) el.value = '';
+    const isMobile = view === 'mobile';
+    const aggIdEl = document.getElementById(isMobile ? 'aggregatorIdMobile' : 'aggregatorIdDesktop');
+    const delBoxEl = document.getElementById(isMobile ? 'deliveryInfoMobile' : 'deliveryInfoDesktop');
+    const otherView = isMobile ? 'desktop' : 'mobile';
+    const otherSelect = document.getElementById(isMobile ? 'sourceSelectDesktop' : 'sourceSelectMobile');
+
+    if (otherSelect && otherSelect.value !== val) {
+      otherSelect.value = val;
     }
 
-    // Delivery needs a name/phone to actually deliver to — dine-in has the
-    // table selector for this, takeaway has the parcel-charge toggle, but
-    // delivery had nothing until now.
-    const deliveryBox = document.getElementById(view === 'desktop' ? 'deliveryInfoDesktop' : 'deliveryInfoMobile');
-    if (deliveryBox) {
-      const isDelivery = val === 'delivery';
-      deliveryBox.classList.toggle('d-none', !isDelivery);
+    const isAggregator = ['zomato', 'swiggy', 'uber_eats', 'web'].includes(val);
+    if (aggIdEl) {
+      aggIdEl.classList.toggle('d-none', !isAggregator);
+      if (!isAggregator) aggIdEl.value = '';
+    }
+
+    const isDelivery = val === 'delivery';
+    if (delBoxEl) {
+      delBoxEl.classList.toggle('d-none', !isDelivery);
       if (!isDelivery) {
-        deliveryBox.querySelectorAll('input').forEach(i => i.value = '');
+        delBoxEl.querySelectorAll('input').forEach(i => i.value = '');
       }
     }
 
     updateOrderSummaryText(view);
   }
 
-  /* ── Collapsed table/source summary ─────────────────────────── */
   function toggleOrderSettings(view) {
     const panel = document.getElementById(view === 'desktop' ? 'orderSettingsPanelDesktop' : 'orderSettingsPanelMobile');
     if (panel) panel.classList.toggle('d-none');
   }
 
+  function syncTableSelect(val) {
+    document.querySelectorAll(".table-syncer").forEach(s => s.value = val);
+    const src = val ? "dine_in" : "takeaway";
+    const srcDesktop = document.getElementById("sourceSelectDesktop");
+    const srcMobile = document.getElementById("sourceSelectMobile");
+    if (srcDesktop) srcDesktop.value = src;
+    if (srcMobile) srcMobile.value = src;
+    toggleAggregator(src, 'desktop');
+    toggleAggregator(src, 'mobile');
+    loadRunningOrder();
+  }
+
+  function updateOrderSummaryText(view) {
+    const tableSel = document.getElementById(view === 'desktop' ? 'tableSelectDesktop' : 'tableSelectMobile');
+    const srcSel   = document.getElementById(view === 'desktop' ? 'sourceSelectDesktop' : 'sourceSelectMobile');
+    const label    = document.getElementById(view === 'desktop' ? 'orderSummaryLabel' : 'orderSummaryLabelMobile');
+    if (!tableSel || !srcSel || !label) return;
+    const tableName = tableSel.selectedIndex >= 0 ? tableSel.options[tableSel.selectedIndex].text : 'Walk-in';
+    const srcName   = srcSel.selectedIndex >= 0 ? srcSel.options[srcSel.selectedIndex].text : 'Dine-in';
+    label.textContent = tableName + ' · ' + srcName;
+  }
+
+  /* ── Mobile Cart Overlay Controls ── */
   function openCartMobile() {
     const page = document.getElementById('mobileCartPage');
     if (!page) return;
@@ -540,31 +2148,40 @@
   }
 
   document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape') return;
-    const page = document.getElementById('mobileCartPage');
-    if (!page || !page.classList.contains('show')) return;
-    if (document.querySelector('.modal.show')) return;
-    closeCartMobile();
+    if (e.key === 'Escape') {
+      if (document.querySelector('.modal.show')) return;
+      closeCartMobile();
+    }
   });
 
-  function updateOrderSummaryText(view) {
-    const tableSel = document.getElementById(view === 'desktop' ? 'tableSelectDesktop' : 'tableSelectMobile');
-    const srcSel   = document.getElementById(view === 'desktop' ? 'sourceSelectDesktop' : 'sourceSelectMobile');
-    const label    = document.getElementById(view === 'desktop' ? 'orderSummaryLabel' : 'orderSummaryLabelMobile');
-    if (!tableSel || !srcSel || !label) return;
-    const tableName = tableSel.selectedIndex >= 0 ? tableSel.options[tableSel.selectedIndex].text : 'Walk-in';
-    const srcName   = srcSel.selectedIndex >= 0 ? srcSel.options[srcSel.selectedIndex].text : 'Dine-in';
-    label.textContent = tableName + ' · ' + srcName;
-  }
-
+  /* ── Toast Notifications ── */
   function showToast(msg) {
     const t = document.getElementById("toastBox");
-    t.innerText = msg; t.classList.add("show");
+    if (!t) return;
+    t.innerText = msg;
+    t.classList.add("show");
     setTimeout(() => t.classList.remove("show"), 3000);
   }
 
-  const AUTO_KOT_MODE = {{ auto_kot_mode|yesno:"true,false" }};
+  /* ── Tab Switchers (Order vs Active) ── */
+  function switchTab(tab) {
+    document.getElementById("tabCart")?.classList.toggle("active", tab === 'cart');
+    document.getElementById("tabRunning")?.classList.toggle("active", tab === 'running');
+    document.getElementById("cartView")?.classList.toggle("d-none", tab !== 'cart');
+    document.getElementById("runningView")?.classList.toggle("d-none", tab !== 'running');
+    document.getElementById("cartSummaryBlock")?.classList.toggle("d-none", tab !== 'cart');
+  }
 
+  function switchTabMobile(tab) {
+    document.getElementById("tabCartMobile")?.classList.toggle("active", tab === 'cart');
+    document.getElementById("tabRunningMobile")?.classList.toggle("active", tab === 'running');
+    document.getElementById("cartViewMobile")?.classList.toggle("d-none", tab !== 'cart');
+    document.getElementById("runningViewMobile")?.classList.toggle("d-none", tab !== 'running');
+    document.getElementById("cartSummaryBlockMobile")?.classList.toggle("d-none", tab !== 'cart');
+  }
+
+  /* ── State & Cart Core ── */
+  const AUTO_KOT_MODE = {{ auto_kot_mode|yesno:"true,false" }};
   let cart = [];
   let selectedItem = null;
   let sending = false;
@@ -572,72 +2189,7 @@
   let activeModal = null;
   let qsrPendingOrderId = null;
 
-  function switchTab(tab) {
-    document.getElementById("tabCart").classList.toggle("active", tab === 'cart');
-    document.getElementById("tabRunning").classList.toggle("active", tab === 'running');
-    document.getElementById("cartView").classList.toggle("d-none", tab !== 'cart');
-    document.getElementById("runningView").classList.toggle("d-none", tab !== 'running');
-    document.getElementById("cartSummaryBlock").classList.toggle("d-none", tab !== 'cart');
-  }
-
-  function switchTabMobile(tab) {
-    document.getElementById("tabCartMobile").classList.toggle("active", tab === 'cart');
-    document.getElementById("tabRunningMobile").classList.toggle("active", tab === 'running');
-    document.getElementById("cartViewMobile").classList.toggle("d-none", tab !== 'cart');
-    document.getElementById("runningViewMobile").classList.toggle("d-none", tab !== 'running');
-    document.getElementById("cartSummaryBlockMobile").classList.toggle("d-none", tab !== 'cart');
-  }
-
-  document.getElementById("menuSearch").addEventListener("input", function () {
-    const t = this.value.toLowerCase().trim();
-    document.querySelectorAll("h3.menu-section-title").forEach(header => {
-      const row = header.nextElementSibling;
-      if (!row) return;
-      let anyVisible = false;
-      row.querySelectorAll(".menu-item-searchable").forEach(card => {
-        const matches = !t || card.querySelector(".item-name").innerText.toLowerCase().includes(t);
-        card.style.display = matches ? "" : "none";
-        if (matches) anyVisible = true;
-      });
-      header.style.display = anyVisible || !t ? "" : "none";
-      row.style.display = anyVisible || !t ? "" : "none";
-    });
-  });
-
-  function scrollToCategory(id, el) {
-    document.querySelectorAll(".category-item").forEach(i => i.classList.remove("active"));
-    if (el) el.classList.add("active");
-    const idx = Array.from(el.parentNode.children).indexOf(el);
-    const sidebarItems = document.querySelectorAll('.category-sidebar .category-item');
-    const mobileItems  = document.querySelectorAll('.mobile-category-nav .category-item');
-    if (sidebarItems[idx]) sidebarItems[idx].classList.add("active");
-    if (mobileItems[idx])  mobileItems[idx].classList.add("active");
-    const target = document.getElementById(id);
-    if (!target) return;
-    if (window.innerWidth < 992) {
-      const mobileNavH = document.querySelector('.mobile-category-nav')?.offsetHeight || 60;
-      const headerH = document.querySelector('.pos-header')?.offsetHeight || 60;
-      const top = target.getBoundingClientRect().top + window.scrollY - headerH - mobileNavH - 12;
-      window.scrollTo({ top, behavior: 'smooth' });
-    } else {
-      const menuArea = document.querySelector(".menu-area");
-      const top = target.getBoundingClientRect().top - menuArea.getBoundingClientRect().top + menuArea.scrollTop - 24;
-      menuArea.scrollTo({ top, behavior: 'smooth' });
-    }
-  }
-
-  function syncTableSelect(val) {
-    document.querySelectorAll(".table-syncer").forEach(s => s.value = val);
-    const srcDesktop = document.getElementById("sourceSelectDesktop");
-    const srcMobile  = document.getElementById("sourceSelectMobile");
-    const src = val ? "dine_in" : "takeaway";
-    if (srcDesktop) srcDesktop.value = src;
-    if (srcMobile)  srcMobile.value  = src;
-    toggleAggregator(src, 'desktop');
-    toggleAggregator(src, 'mobile');
-    loadRunningOrder();
-  }
-
+  /* ── Item Customization Modal ── */
   function openItemModal(id, name, price, gst, isVeg) {
     selectedItem = { id, name, price, gst_percentage: parseFloat(gst), is_veg: isVeg !== false };
     const modalEl = document.getElementById("itemModal");
@@ -646,10 +2198,12 @@
     const takeawayEl = document.getElementById("itemTakeaway");
     const modCont = document.getElementById("modifierContainer");
     if (!modalEl || !nameEl || !modCont) return;
+
     nameEl.innerText = name;
     if (noteEl) noteEl.value = "";
     if (takeawayEl) takeawayEl.checked = false;
-    modCont.innerHTML = "<p class='text-center text-muted py-3'>Checking for modifiers...</p>";
+    modCont.innerHTML = "<p class='text-center text-muted py-3 small'>Checking customization options...</p>";
+
     fetch(`/menu/item-modifiers/${id}/`)
       .then(r => r.json())
       .then(data => {
@@ -659,36 +2213,34 @@
             const inputType = g.max_select === 1 ? 'radio' : 'checkbox';
             const inputName = `mod_${g.group_name.replace(/\s+/g, '')}`;
             const limitHint = g.max_select === 1
-              ? `<span style="font-size:0.7rem;color:var(--text-muted);font-weight:400;margin-left:6px;">Pick 1</span>`
-              : `<span style="font-size:0.7rem;color:var(--text-muted);font-weight:400;margin-left:6px;">Pick up to ${g.max_select}</span>`;
+              ? `<span style="font-size:0.7rem;color:var(--text-muted);font-weight:400;margin-left:6px;">(Pick 1)</span>`
+              : `<span style="font-size:0.7rem;color:var(--text-muted);font-weight:400;margin-left:6px;">(Pick up to ${g.max_select})</span>`;
             html += `<div class="mb-3" data-group="${g.group_name}" data-max="${g.max_select}">
-              <label class="form-label fw-bold text-uppercase" style="font-size:0.8rem;letter-spacing:1px;">
+              <label class="form-label fw-bold text-uppercase" style="font-size:0.8rem;letter-spacing:1px;color:var(--text-main);">
                 ${g.group_name} ${g.is_required ? '<span class="text-danger">*</span>' : ''}${limitHint}
               </label>`;
             g.modifiers.forEach(m => {
-              html += `<div class="form-check"><input class="form-check-input modifier-check" type="${inputType}" name="${inputName}" value="${m.name}" data-price="${m.price}" data-group="${g.group_name}" data-max="${g.max_select}" id="mod_${m.id}" onchange="enforceModifierLimit(this)"><label class="form-check-label d-flex justify-content-between w-100" for="mod_${m.id}"><span>${m.name}</span>${m.price > 0 ? `<span class="text-muted">+₹${m.price}</span>` : ''}</label></div>`;
+              html += `<div class="form-check py-1"><input class="form-check-input modifier-check" type="${inputType}" name="${inputName}" value="${m.name}" data-price="${m.price}" data-group="${g.group_name}" data-max="${g.max_select}" id="mod_${m.id}" onchange="enforceModifierLimit(this)"><label class="form-check-label d-flex justify-content-between w-100 fw-semibold" for="mod_${m.id}" style="cursor:pointer;font-size:0.85rem;"><span>${m.name}</span>${m.price > 0 ? `<span class="badge rounded-pill bg-light text-danger">+₹${m.price}</span>` : ''}</label></div>`;
             });
             html += `</div>`;
           });
           modCont.innerHTML = html;
         } else {
-          modCont.innerHTML = "<p class='text-center text-muted py-2 small'>No modifiers available.</p>";
+          modCont.innerHTML = "<p class='text-center text-muted py-2 small'>No extra modifiers for this dish.</p>";
         }
       })
       .catch(() => { modCont.innerHTML = ""; });
+
     activeModal = new bootstrap.Modal(modalEl);
     activeModal.show();
   }
 
   function enforceModifierLimit(checkbox) {
-    if (checkbox.type !== 'checkbox') return; // radios enforce themselves
+    if (checkbox.type !== 'checkbox') return;
     const groupName = checkbox.dataset.group;
     const max = parseInt(checkbox.dataset.max);
-    const checked = document.querySelectorAll(
-      `.modifier-check[data-group="${groupName}"]:checked`
-    );
+    const checked = document.querySelectorAll(`.modifier-check[data-group="${groupName}"]:checked`);
     if (checked.length > max) {
-      // Deselect the first one (oldest) to stay within limit
       checked[0].checked = false;
     }
   }
@@ -705,68 +2257,188 @@
     if (note) finalNote += (finalNote ? " | " : "") + note;
     const finalPrice = parseFloat(selectedItem.price) + addedPrice;
     const isTakeaway = document.getElementById("itemTakeaway").checked;
+
     const existing = cart.find(i => i.id === selectedItem.id && i.note === finalNote && i.is_takeaway === isTakeaway);
     if (existing) {
       existing.quantity++;
     } else {
-      cart.push({ id: selectedItem.id, name: selectedItem.name, price: finalPrice, quantity: 1, note: finalNote, is_takeaway: isTakeaway, modifiers: modsSelectedIds, gst_percentage: selectedItem.gst_percentage, is_veg: selectedItem.is_veg });
+      cart.push({
+        id: selectedItem.id,
+        name: selectedItem.name,
+        price: finalPrice,
+        quantity: 1,
+        note: finalNote,
+        is_takeaway: isTakeaway,
+        modifiers: modsSelectedIds,
+        gst_percentage: selectedItem.gst_percentage,
+        is_veg: selectedItem.is_veg
+      });
     }
     renderCart();
     if (activeModal) activeModal.hide();
   }
 
+  /* ── Render Cart Items ── */
   function renderCart() {
     const dc = document.getElementById("cartItemsContainerDesktop");
     const mc = document.getElementById("cartItemsContainerMobile");
-    dc.innerHTML = ""; mc.innerHTML = "";
-    let subtotal = 0, gst = 0;
+    if (dc) dc.innerHTML = "";
+    if (mc) mc.innerHTML = "";
+
+    let subtotal = 0, gst = 0, totalCount = 0;
+
     if (cart.length === 0) {
-      const emptyMsg = `<div class="text-center text-muted" style="margin-top:20px;text-transform:uppercase;letter-spacing:2px;font-size:0.75rem;">Empty Order</div>`;
-      dc.innerHTML = emptyMsg; mc.innerHTML = emptyMsg;
+      const emptyMsg = `
+        <div class="pos-empty-cart">
+          <div class="pos-empty-cart-icon"><i class="bi bi-cart3"></i></div>
+          <h6 class="fw-bold mb-1">Your cart is empty</h6>
+          <p class="small text-muted mb-0">Select dishes from the menu to start an order</p>
+        </div>`;
+      if (dc) dc.innerHTML = emptyMsg;
+      if (mc) mc.innerHTML = emptyMsg;
+    } else {
+      cart.forEach((i, idx) => {
+        const total = i.price * i.quantity;
+        subtotal += total;
+        totalCount += i.quantity;
+        gst += total * ((i.gst_percentage || 5) / 100);
+
+        const vegIcon = i.is_veg !== false
+          ? '<span class="cart-veg-mark veg"></span>'
+          : '<span class="cart-veg-mark nonveg"></span>';
+
+        const rowHtml = `
+          <div class="pos-cart-item-card" data-idx="${idx}" data-name="${i.name.toLowerCase()}">
+            <div class="pos-cart-item-top">
+              <div class="pos-cart-item-title-wrap">
+                ${vegIcon}
+                <span class="pos-cart-item-title">${i.name}</span>
+                ${i.is_takeaway ? '<span class="badge bg-warning text-dark ms-1" style="font-size:0.62rem;border-radius:999px;">Takeaway</span>' : ''}
+              </div>
+              <button type="button" class="btn-cart-trash" onclick="removeItem(${idx})" title="Remove item">
+                <i class="bi bi-trash3"></i>
+              </button>
+            </div>
+            ${i.note ? `<div class="pos-cart-item-note"><i class="bi bi-chat-left-text me-1"></i>${i.note}</div>` : ''}
+            <div class="pos-cart-item-bottom">
+              <div class="pos-cart-item-price-wrap">
+                <span class="pos-cart-item-price">₹${total}</span>
+              </div>
+              <div class="pos-stepper">
+                <button type="button" class="btn-step btn-step-dec" onclick="dec(${idx})" aria-label="Decrease quantity"><i class="bi bi-dash"></i></button>
+                <span class="step-qty">${i.quantity}</span>
+                <button type="button" class="btn-step btn-step-inc" onclick="inc(${idx})" aria-label="Increase quantity"><i class="bi bi-plus"></i></button>
+              </div>
+              <button type="button" class="btn-cart-add-notes" onclick="editCartItemNote(${idx})">
+                <i class="bi bi-plus me-1"></i>${i.note ? 'Edit Note' : 'Add Notes'}
+              </button>
+            </div>
+          </div>`;
+
+        if (dc) dc.innerHTML += rowHtml;
+        if (mc) mc.innerHTML += rowHtml;
+      });
     }
-    cart.forEach((i, idx) => {
-      const total = i.price * i.quantity;
-      subtotal += total;
-      gst += total * ((i.gst_percentage || 5) / 100);
-      const vegDot = `<span class="veg-dot ${i.is_veg !== false ? 'veg' : 'nonveg'}"></span>`;
-      const html = `<div class="cart-row"><div style="flex-grow:1;padding-right:10px;"><div class="cart-item-name">${vegDot}${i.name}${i.is_takeaway ? '<span class="luxury-badge badge-platform ms-1" style="font-size:0.5rem;vertical-align:middle;">Takeaway</span>' : ''}</div>${i.note ? `<div class="cart-item-note">${i.note}</div>` : ''}</div><div class="cart-controls"><div class="qty-controls"><button class="qty-btn" onclick="dec(${idx})"><i class="bi bi-dash"></i></button><span class="qty-value">${i.quantity}</span><button class="qty-btn" onclick="inc(${idx})"><i class="bi bi-plus"></i></button></div><div class="cart-item-price">₹${total}</div></div></div>`;
-      dc.innerHTML += html;
-      mc.innerHTML += html;
-    });
+
     gst = Math.round(gst);
-    // Parcel is a flat surcharge on top, added here so the Total shown
-    // actually matches what checkout will charge once toggled on (see
-    // toggleParcel/_syncParcelUI).
     const grandTotal = subtotal + gst + (_parcelOn ? _parcelChargeAmount : 0);
+
     document.querySelectorAll(".view-subtotal").forEach(e => e.innerText = "₹" + subtotal);
     document.querySelectorAll(".view-gst").forEach(e => e.innerText = "₹" + gst);
     document.querySelectorAll(".view-total").forEach(e => e.innerText = "₹" + grandTotal);
+
+    // Update Mobile FAB Count
+    const fabBadge = document.getElementById("mobileCartFabCount");
+    if (fabBadge) fabBadge.innerText = totalCount + (totalCount === 1 ? " item" : " items");
+    const headerBadge = document.getElementById("mobileCartHeaderCount");
+    if (headerBadge) headerBadge.innerText = totalCount;
   }
 
   function inc(i) { cart[i].quantity++; renderCart(); }
   function dec(i) { cart[i].quantity--; if (cart[i].quantity <= 0) cart.splice(i, 1); renderCart(); }
+  function removeItem(i) { cart.splice(i, 1); renderCart(); }
   function clearCart() { cart = []; renderCart(); }
 
-  /* ── Parcel charge toggle ───────────────────────────────────── */
+  /* ── New POS Order Reset ── */
+  function newPOSOrder() {
+    if (cart.length > 0) {
+      Swal.fire({
+        title: 'Start New Order?',
+        text: 'This will clear your current cart.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#EC2734',
+        confirmButtonText: 'Yes, Start New'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          clearCart();
+          const tableSel = document.getElementById('tableSelectDesktop');
+          if (tableSel) tableSel.value = '';
+          syncTableSelect('');
+        }
+      });
+    } else {
+      clearCart();
+    }
+  }
+
+  /* ── Edit Cart Item Note Prompt ── */
+  async function editCartItemNote(idx) {
+    const item = cart[idx];
+    if (!item) return;
+    const { value: note } = await Swal.fire({
+      title: 'Kitchen Notes: ' + item.name,
+      input: 'text',
+      inputValue: item.note || '',
+      inputPlaceholder: 'e.g. Less spicy, extra sauce, no onions...',
+      showCancelButton: true,
+      confirmButtonColor: '#EC2734',
+      confirmButtonText: 'Save Note',
+      cancelButtonText: 'Cancel'
+    });
+    if (note !== undefined) {
+      cart[idx].note = note.trim();
+      renderCart();
+    }
+  }
+
+  /* ── Filter Cart List in Right Panel (Search in Ordering...) ── */
+  function filterCartList(q) {
+    const term = (q || '').trim().toLowerCase();
+    document.querySelectorAll('.pos-cart-item-card').forEach(card => {
+      const name = card.getAttribute('data-name') || '';
+      if (!term || name.includes(term)) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  /* ── See All Menu Reset ── */
+  function seeAllMenu() {
+    filterByCategory('all', document.getElementById('catCardAll'));
+    const searchEl = document.getElementById('menuSearch');
+    if (searchEl) {
+      searchEl.value = '';
+      clearMenuSearch();
+    }
+    const container = document.getElementById('menuCardsContainer');
+    if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ── Parcel Charge Logic ── */
   let _parcelOn = false;
-  let _parcelAppliedToOrder = null;  // order_id that parcel is currently applied to on the server
-  // Real, server-computed charge (qty/mode-aware -- ₹5/item on 3 items is
-  // ₹15, not the flat per-unit rate this starts at). renderCart() below
-  // adds this into the Total whenever _parcelOn is true -- it used to
-  // ignore parcel entirely, so toggling it on left the Subtotal/GST/Total
-  // block showing a Total that didn't match what checkout would actually
-  // charge, even though the real bill was always correct server-side.
+  let _parcelAppliedToOrder = null;
   let _parcelChargeAmount = {{ outlet.parcel_charge_amount|default:0 }};
 
   async function toggleParcel() {
     const orderId = qsrPendingOrderId || currentOrderId;
     if (!orderId) {
-      // No order yet — just toggle the visual indicator
       _parcelOn = !_parcelOn;
       _syncParcelUI();
       return;
     }
-    // Order exists — call server to toggle
     try {
       const d = await apiClient.post(
         "{% url 'toggle-parcel' 0 %}".replace('/0/', '/' + orderId + '/'), {}
@@ -774,43 +2446,36 @@
       _parcelOn = d.parcel_on;
       _parcelAppliedToOrder = d.parcel_on ? orderId : null;
       _parcelChargeAmount = d.parcel_amount || 0;
-      // _syncParcelUI() -> renderCart() below picks up the new amount and
-      // recomputes the Total from it -- no need to set .view-total here
-      // directly too (that used to get immediately clobbered by
-      // renderCart() anyway, since it never factored parcel in).
       _syncParcelUI();
     } catch(e) { ui.toast("Could not update parcel charge", "error"); }
   }
 
   function _syncParcelUI() {
-    // Show/hide parcel row, and show the real computed amount on it (not
-    // the flat per-unit rate -- per-item mode multiplies by quantity).
     document.querySelectorAll(".parcel-row").forEach(el => {
       el.style.display = _parcelOn ? "flex" : "none";
       const amountEl = el.querySelector("span:last-child");
       if (amountEl) amountEl.textContent = "₹" + Math.round(_parcelChargeAmount);
     });
-    // Update button appearance
     document.querySelectorAll(".parcel-btn").forEach(btn => {
-      btn.style.borderColor = _parcelOn ? "var(--accent-gold)" : "var(--border-color)";
-      btn.style.color       = _parcelOn ? "var(--accent-gold)" : "var(--text-muted)";
-      btn.style.background  = _parcelOn ? "rgba(197,160,89,0.06)" : "transparent";
+      btn.style.borderColor = _parcelOn ? "var(--pos-red)" : "var(--border-color)";
+      btn.style.color       = _parcelOn ? "var(--pos-red)" : "var(--text-muted)";
+      btn.style.background  = _parcelOn ? "var(--pos-red-soft)" : "transparent";
     });
     document.querySelectorAll(".parcel-btn-text").forEach(el =>
       el.textContent = _parcelOn
         ? "Parcel Added ✓ (tap to remove)"
         : `Add Parcel +₹${_parcelChargeAmount}`
     );
-    // Update running total in cart
     renderCart();
   }
 
+  /* ── Load Running Order for Selected Table ── */
   function loadRunningOrder() {
     const tableId = document.getElementById("tableSelectDesktop").value;
     const rd = document.getElementById("runningItemsDesktop");
     const rm = document.getElementById("runningItemsMobile");
     if (!tableId) {
-      const msg = "<div class='text-center text-muted mt-4' style='text-transform:uppercase;letter-spacing:2px;font-size:0.75rem;'>Select table</div>";
+      const msg = "<div class='text-center text-muted py-4 small'>Select a table to inspect open orders</div>";
       if (rd) rd.innerHTML = msg;
       if (rm) rm.innerHTML = msg;
       return;
@@ -819,31 +2484,41 @@
       .then(r => r.json())
       .then(d => {
         currentOrderId = d.order_id || null;
-        // Sync parcel state from server — handles session resume and table switches
         if (d.order_id) {
           const serverParcelOn = !!d.parcel_on;
           _parcelOn = serverParcelOn;
           _parcelAppliedToOrder = serverParcelOn ? d.order_id : null;
-          // _syncParcelUI() below re-renders the parcel-row amount (and the
-          // Total, via renderCart()) FROM _parcelChargeAmount -- it must be
-          // updated here too, or it clobbers this with a stale value.
           if (d.parcel_amount) _parcelChargeAmount = d.parcel_amount;
         } else {
-          // No open order on this table — reset so parcel intent doesn't bleed across tables
           _parcelOn = false;
           _parcelAppliedToOrder = null;
         }
         _syncParcelUI();
+
         let html = "";
         if (!d.items || d.items.length === 0) {
-          html = "<div class='text-center text-muted mt-4' style='text-transform:uppercase;letter-spacing:2px;font-size:0.75rem;'>No active services</div>";
+          html = "<div class='text-center text-muted py-4 small'>No active dishes being prepared</div>";
         } else {
           d.items.forEach(i => {
-            const statusClass = i.status === "ready" ? "status-ready" : (i.status === "preparing" ? "border-warning text-warning" : "");
-            html += `<div class="running-row d-flex flex-column align-items-start"><div class="d-flex justify-content-between w-100"><span style="font-family:'DM Serif Display',serif;">${i.quantity} × ${i.name || "Item"}</span><span class="status-badge ${statusClass}">${i.status}</span></div>${i.modifiers && i.modifiers.length > 0 ? `<div style="font-size:0.7rem;color:var(--accent-gold);font-style:italic;">+ ${i.modifiers.join(', ')}</div>` : ''}</div>`;
+            const statusBadge = i.status === "ready"
+              ? '<span class="badge bg-success" style="font-size:0.7rem;border-radius:999px;">Ready</span>'
+              : (i.status === "preparing"
+                ? '<span class="badge bg-warning text-dark" style="font-size:0.7rem;border-radius:999px;">Preparing</span>'
+                : '<span class="badge bg-secondary" style="font-size:0.7rem;border-radius:999px;">Pending</span>');
+
+            html += `
+              <div class="pos-cart-item mb-2">
+                <div class="pos-cart-item-info">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="fw-bold">${i.quantity} × ${i.name || "Item"}</span>
+                    ${statusBadge}
+                  </div>
+                  ${i.modifiers && i.modifiers.length > 0 ? `<div class="pos-cart-item-note">+ ${i.modifiers.join(', ')}</div>` : ''}
+                </div>
+              </div>`;
           });
           if (d.order_id) {
-            html += `<div class="mt-4"><button class="btn-luxury w-100 border-danger text-danger" onclick="cancelOrder(${d.order_id})"><i class="bi bi-x-circle me-1"></i> Cancel Entire Order</button></div>`;
+            html += `<button class="btn btn-sm btn-outline-danger w-100 mt-3" style="border-radius:999px;" onclick="cancelOrder(${d.order_id})"><i class="bi bi-x-circle me-1"></i>Cancel Entire Order</button>`;
           }
         }
         if (rd) rd.innerHTML = html;
@@ -851,26 +2526,27 @@
       }).catch(err => console.error(err));
   }
 
+  /* ── Dispatch Order (Restaurant / Table Mode) ── */
   function submitOrder() {
     if (sending) return;
-    if (cart.length === 0) { showToast("Empty order."); return; }
+    if (cart.length === 0) { showToast("Cart is empty."); return; }
     const tableId = document.getElementById("tableSelectDesktop").value;
     sending = true;
-    document.querySelectorAll(".send-btn").forEach(b => { b.disabled = true; b.innerHTML = 'Dispatching...'; });
+    document.querySelectorAll(".send-btn").forEach(b => { b.disabled = true; b.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Dispatching...'; });
+
     const isMobile = window.innerWidth < 992;
     const source   = document.getElementById(isMobile ? "sourceSelectMobile"  : "sourceSelectDesktop").value;
     const aggId    = document.getElementById(isMobile ? "aggregatorIdMobile"   : "aggregatorIdDesktop").value;
     const custName = document.getElementById(isMobile ? "customerNameMobile"  : "customerNameDesktop").value;
     const custPhone = document.getElementById(isMobile ? "customerPhoneMobile" : "customerPhoneDesktop").value;
+
     const orderPayload = { cart, table_id: tableId, source, aggregator_id: aggId, customer_name: custName, customer_phone: custPhone };
     if (currentOrderId) orderPayload.order_id = currentOrderId;
 
-    // Edge case: already offline before the cashier even hits submit — don't
-    // attempt the request at all, queue it straight away.
     if (!navigator.onLine) {
       offlineQueue.add(orderPayload)
         .then(() => { ui.toast('Saved — will send to kitchen once back online', 'success'); clearCart(); })
-        .catch(() => { showToast('Could not save order offline on this device. Please note it down manually.'); });
+        .catch(() => { showToast('Could not save order offline on this device.'); });
       resetSendBtn();
       return;
     }
@@ -883,20 +2559,17 @@
       .then(r => r.json())
       .then(d => {
         if (!d.success) { showToast(d.error); resetSendBtn(); return; }
-        // Order now exists server-side (d.order_id) — everything below this
-        // line must NOT be retried via the offline queue, or it risks creating
-        // a duplicate order. Its own .catch() below just stops the spinner;
-        // staff can retry kitchen-send manually from the running order screen.
         const afterCreate = () => fetch("{% url 'send-to-kitchen' 0 %}".replace('0', d.order_id), { method: "POST", headers: { "X-CSRFToken": apiClient.getCsrf() } });
         const needsParcel = _parcelOn && _parcelChargeAmount > 0 && _parcelAppliedToOrder !== d.order_id;
         const applyParcel = needsParcel
           ? fetch("{% url 'toggle-parcel' 0 %}".replace('/0/', '/' + d.order_id + '/'), { method: "POST", headers: { "X-CSRFToken": apiClient.getCsrf() } })
               .then(r => { if (r.ok) _parcelAppliedToOrder = d.order_id; return r; })
           : Promise.resolve();
+
         applyParcel.then(() => afterCreate())
           .then(r => r.json())
           .then(k => {
-            showToast(k.error && k.error !== "No items to send to kitchen" ? k.error : "Order Sent");
+            showToast(k.error && k.error !== "No items to send to kitchen" ? k.error : "Order Sent to Kitchen!");
             clearCart();
             resetSendBtn();
             if (source !== 'dine_in' || !tableId) {
@@ -908,15 +2581,10 @@
           }).catch(() => resetSendBtn());
       })
       .catch(err => {
-        // Only reachable for the initial create-order call (the inner chain
-        // above has its own catch) — no order_id exists yet, so it's safe to
-        // queue. err instanceof TypeError = genuine network failure (same
-        // heuristic apiClient.request() already uses), as opposed to a server
-        // error response, which should not be queued/retried blindly.
         if (err instanceof TypeError) {
           offlineQueue.add(orderPayload)
-            .then(() => { ui.toast('Connection dropped — order saved, will send to kitchen once back online', 'success'); clearCart(); })
-            .catch(() => { showToast('Could not save order offline on this device. Please note it down manually.'); });
+            .then(() => { ui.toast('Connection dropped — order saved offline', 'success'); clearCart(); })
+            .catch(() => { showToast('Could not save order offline.'); });
         } else {
           showToast('Could not create order. Please try again.');
         }
@@ -926,26 +2594,25 @@
 
   function resetSendBtn() {
     sending = false;
-    document.querySelectorAll(".send-btn").forEach(b => { b.disabled = false; b.innerHTML = 'Dispatch <i class="bi bi-arrow-right ms-2"></i>'; });
+    document.querySelectorAll(".send-btn").forEach(b => {
+      b.disabled = false;
+      b.innerHTML = AUTO_KOT_MODE
+        ? '<i class="bi bi-printer-fill me-1"></i>KOT &amp; Print'
+        : '<i class="bi bi-fire me-1"></i>KOT &amp; Dispatch';
+    });
   }
 
-  /* ── Agent-based printing (EC2 → ESC/POS JSON → local agent → TCP 9100) ── */
-  // Android phones run the agent on-device → always localhost.
-  // Desktops/tablets use the outlet-configured agent host.
+  /* ── Printing via Local Agent ── */
   const _agentHost = (typeof lexnoraxPlatform !== 'undefined' && lexnoraxPlatform.android)
                       ? 'localhost'
                       : "{{ outlet.agent_host|default:'localhost' }}";
   const _stationPrinterIp = "{{ station_printer_ip }}";
 
   async function printViaAgent(orderId) {
-    // iOS — no agent, open receipt page for browser/AirPrint
     if (typeof lexnoraxPlatform !== 'undefined' && lexnoraxPlatform.ios) {
       window.open(`/orders/bill/${orderId}/?print=1`, '_blank');
       return;
     }
-
-    // Android — push to server-side print queue; agent polls and prints
-    // No WebSocket, no open port, survives background killing
     if (typeof lexnoraxPlatform !== 'undefined' && lexnoraxPlatform.android) {
       const resp = await fetch('/orders/agent/add-job/', {
         method: 'POST',
@@ -956,10 +2623,8 @@
         const d = await resp.json().catch(() => ({}));
         throw new Error(d.error || 'Queue failed');
       }
-      return; // agent will print within ~2 s
+      return;
     }
-
-    // Desktop — existing WebSocket path (instant, no round-trip delay)
     const qzResp = await fetch(`/orders/qz-data/${orderId}/`, { headers: { "X-CSRFToken": apiClient.getCsrf() } });
     const qzData = await qzResp.json();
     if (!qzData.success || !qzData.lines) throw new Error("receipt-data-failed");
@@ -1011,29 +2676,21 @@
       });
   }
 
-  // Waiter/QR/system badges on this page are kept in sync by the one
-  // global poller in core/base.html (runs every 8s, covers all three
-  // badges) -- this used to run its own separate, identically-scoped
-  // pollNotifications() hitting the same /api/notifications/ endpoint
-  // just to update the waiter badge, the same redundant-poller pattern
-  // already found and removed from tables.html.
-
+  /* ── Initializations ── */
   document.addEventListener("DOMContentLoaded", () => {
     renderCart();
     loadRunningOrder();
     updateOrderSummaryText('desktop');
     updateOrderSummaryText('mobile');
     setInterval(loadRunningOrder, 5000);
-    const f1 = document.querySelector(".category-sidebar .category-item"); if (f1) f1.classList.add("active");
-    const f2 = document.querySelector(".mobile-category-nav .category-item"); if (f2) f2.classList.add("active");
 
-    // ── Printer error polling ──────────────────────────────
+    // Printer polling
     function checkPrinterStatus() {
       fetch("{% url 'printer-status' %}")
         .then(r => r.json())
         .then(d => {
           const banner = document.getElementById("printer-error-banner");
-          if (d.error) {
+          if (banner && d.error) {
             document.getElementById("printer-error-text").textContent = d.message;
             banner.style.display = "flex";
           }
@@ -1043,10 +2700,10 @@
     setInterval(checkPrinterStatus, 20000);
     checkPrinterStatus();
 
-    // ── Offline / online banner ────────────────────────────
+    // Offline banner
     const offlineBanner = document.getElementById("offline-banner");
     function syncOnlineState() {
-      offlineBanner.style.display = navigator.onLine ? "none" : "block";
+      if (offlineBanner) offlineBanner.style.display = navigator.onLine ? "none" : "block";
     }
     window.addEventListener("online",  syncOnlineState);
     window.addEventListener("offline", syncOnlineState);
@@ -1054,13 +2711,13 @@
   });
 
   {% if auto_kot_mode %}
-  // ── QSR AUTO-KOT MODE FUNCTIONS ──────────────────────────────────────
+  /* ── QSR Auto-KOT Flow ── */
   let _qsrMethod = null;
   let _qsrTotal  = 0;
 
   async function submitQSROrder() {
     if (sending) return;
-    if (cart.length === 0) { showToast("Add items first."); return; }
+    if (cart.length === 0) { showToast("Add items to cart first."); return; }
     sending = true;
     document.querySelectorAll(".send-btn").forEach(b => { b.disabled = true; b.textContent = "Creating order…"; });
 
@@ -1068,7 +2725,6 @@
     const source   = document.getElementById(isMobile ? "sourceSelectMobile" : "sourceSelectDesktop").value;
 
     try {
-      // Step 1: create order (items remain pending — no send-to-kitchen)
       const r1 = await fetch("{% url 'create-order' %}", {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-CSRFToken": apiClient.getCsrf() },
@@ -1079,7 +2735,6 @@
 
       qsrPendingOrderId = d1.order_id;
 
-      // Apply parcel charge if toggled ON before order creation
       if (_parcelOn && _parcelChargeAmount > 0) {
         await fetch("{% url 'toggle-parcel' 0 %}".replace('/0/', '/' + qsrPendingOrderId + '/'), {
           method: "POST", headers: { "X-CSRFToken": apiClient.getCsrf() }
@@ -1087,7 +2742,6 @@
         _parcelAppliedToOrder = qsrPendingOrderId;
       }
 
-      // Step 2: generate bill to calculate totals
       const r2 = await fetch("{% url 'generate-bill' 0 %}".replace("0", qsrPendingOrderId), {
         method: "POST", headers: { "X-CSRFToken": apiClient.getCsrf() }
       });
@@ -1099,7 +2753,11 @@
       document.getElementById("qsrAmount").value = "";
       document.getElementById("qsrChangeLine").style.display = "none";
       _qsrMethod = null;
-      document.querySelectorAll(".qsr-method-btn").forEach(b => b.style.background = "transparent");
+      document.querySelectorAll(".qsr-method-btn").forEach(b => {
+        b.style.background = "var(--panel-bg)";
+        b.style.color = "var(--text-main)";
+        b.style.borderColor = "var(--border-color)";
+      });
       document.getElementById("qsrPayBtn").disabled = true;
 
       new bootstrap.Modal(document.getElementById("qsrPayModal")).show();
@@ -1112,14 +2770,13 @@
   function selectQSRMethod(btn) {
     _qsrMethod = btn.dataset.method;
     document.querySelectorAll(".qsr-method-btn").forEach(b => {
-      b.style.background = "transparent";
+      b.style.background = "var(--panel-bg)";
       b.style.color = "var(--text-main)";
       b.style.borderColor = "var(--border-color)";
     });
-    btn.style.background = "var(--accent-gold)";
-    btn.style.color = "#fff";
-    btn.style.borderColor = "var(--accent-gold)";
-    // Auto-fill amount for non-cash (exact amount)
+    btn.style.background = "var(--pos-red)";
+    btn.style.color = "#ffffff";
+    btn.style.borderColor = "var(--pos-red)";
     if (_qsrMethod !== "cash") {
       document.getElementById("qsrAmount").value = parseFloat(_qsrTotal).toFixed(2);
     }
@@ -1134,7 +2791,7 @@
       const change = (amt - _qsrTotal).toFixed(2);
       if (parseFloat(change) > 0) {
         changeLine.style.display = "block";
-        changeLine.textContent = "Change due: ₹" + change;
+        changeLine.textContent = "Change to return: ₹" + change;
       } else {
         changeLine.style.display = "none";
       }
@@ -1148,20 +2805,18 @@
   async function submitQSRPayment() {
     if (!qsrPendingOrderId || !_qsrMethod) return;
     const amount = parseFloat(document.getElementById("qsrAmount").value);
-    if (!amount || amount <= 0) { showToast("Enter amount"); return; }
+    if (!amount || amount <= 0) { showToast("Enter amount received"); return; }
 
     const payBtn = document.getElementById("qsrPayBtn");
 
-    // Offline: only cash can be confirmed without a live gateway
-    // round-trip — same reasoning as recordPay() in bill.html.
     if (!navigator.onLine) {
       if (_qsrMethod !== 'cash') {
-        showToast("You are offline. Only cash payments can be taken right now.");
+        showToast("Offline mode: Only cash payments can be accepted right now.");
         return;
       }
       try {
         await offlinePaymentQueue.add(qsrPendingOrderId, amount.toFixed(2));
-        ui.toast('Offline — cash payment saved, will sync when back online. Print the slip manually for now.', 'success');
+        ui.toast('Offline — cash payment saved, will sync when back online.', 'success');
         const modal = bootstrap.Modal.getInstance(document.getElementById("qsrPayModal"));
         if (modal) modal.hide();
         clearCart();
@@ -1169,13 +2824,13 @@
         _qsrMethod = null;
         _qsrTotal = 0;
       } catch (e) {
-        showToast("Could not save payment offline on this device. Please note it down manually.");
+        showToast("Could not save payment offline.");
       }
       return;
     }
 
     payBtn.disabled = true;
-    payBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Processing…';
+    payBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing…';
 
     try {
       const r = await fetch("{% url 'pay-order' 0 %}".replace("0", qsrPendingOrderId), {
@@ -1186,50 +2841,43 @@
       const d = await r.json();
 
       if (d.success) {
-        // Close payment modal
         const modal = bootstrap.Modal.getInstance(document.getElementById("qsrPayModal"));
         if (modal) modal.hide();
 
-        // Print via local Lexnorax Agent (agent bridges EC2 → local printer over TCP 9100)
         const orderId = qsrPendingOrderId;
         try {
           await printViaAgent(orderId);
         } catch(printErr) {
-          // Agent offline or no printer configured — fall back to browser print popup
           const receiptUrl = `/thermal-receipt/${orderId}/`;
           const win = window.open(receiptUrl, '_blank', 'width=420,height=680,menubar=no,toolbar=no,location=no,status=no');
           if (!win || win.closed) ui.toast('Popup blocked — <a href="' + receiptUrl + '" target="_blank">open receipt</a>', 'warning');
           if (printErr.message === 'agent-offline')
-            ui.toast('Agent not running — start lexnorax_agent.py on the billing laptop', 'warning');
+            ui.toast('Agent not running — start lexnorax_agent.py on billing laptop', 'warning');
         }
 
-        // Show full-screen confirmation briefly
         const confirm = document.getElementById("qsrConfirm");
-        document.getElementById("qsrConfirmNum").textContent = "Order " + (d.order_number || qsrPendingOrderId);
+        document.getElementById("qsrConfirmNum").textContent = "Order #" + (d.order_number || qsrPendingOrderId);
         const change = parseFloat(d.change_due || 0);
-        document.getElementById("qsrChangeDue").textContent = change > 0 ? "Change: ₹" + change.toFixed(2) : "";
+        document.getElementById("qsrChangeDue").textContent = change > 0 ? "Change to return: ₹" + change.toFixed(2) : "";
         confirm.style.display = "flex";
 
-        // Auto-reset after 2.5 seconds
         setTimeout(() => {
           confirm.style.display = "none";
           clearCart();
           qsrPendingOrderId = null;
           _qsrMethod = null;
           _qsrTotal = 0;
-        }, 2500);
+        }, 2200);
       } else {
         showToast(d.error || "Payment failed");
         payBtn.disabled = false;
-        payBtn.innerHTML = '<i class="bi bi-printer me-2"></i>CONFIRM & PRINT SLIP';
+        payBtn.innerHTML = '<i class="bi bi-printer-fill me-2"></i>CONFIRM &amp; PRINT SLIP';
       }
     } catch (e) {
-      // Connection dropped mid-request — same TypeError heuristic used
-      // elsewhere. Only cash is safe to queue after the fact.
       if (e instanceof TypeError && _qsrMethod === 'cash') {
         try {
           await offlinePaymentQueue.add(qsrPendingOrderId, amount.toFixed(2));
-          ui.toast('Connection dropped — cash payment saved, will sync once back online.', 'success');
+          ui.toast('Connection dropped — cash payment saved offline.', 'success');
           const modal = bootstrap.Modal.getInstance(document.getElementById("qsrPayModal"));
           if (modal) modal.hide();
           clearCart();
@@ -1238,13 +2886,13 @@
           _qsrTotal = 0;
           return;
         } catch (queueErr) {
-          showToast("Could not save payment offline on this device. Please note it down manually.");
+          showToast("Could not save payment offline.");
         }
       } else {
         showToast("Network error during payment");
       }
       payBtn.disabled = false;
-      payBtn.innerHTML = '<i class="bi bi-printer me-2"></i>CONFIRM & PRINT SLIP';
+      payBtn.innerHTML = '<i class="bi bi-printer-fill me-2"></i>CONFIRM &amp; PRINT SLIP';
     }
   }
 

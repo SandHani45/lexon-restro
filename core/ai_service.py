@@ -34,14 +34,14 @@ class AIService:
         #
         # A second Google account's key, tried only when the primary key's
         # call actually fails at runtime (free-tier quota exhausted, rate
-        # limited, etc). This exists purely because Lexnorax has no paying
+        # limited, etc). This exists purely because EasyBillBro has no paying
         # customers yet, so every request today is our own testing burning
         # through a 20/day free-tier cap — not because "two free accounts"
         # is the right long-term architecture. Relying on multiple free-tier
         # accounts to route around a rate limit is exactly what Google's
         # terms discourage; keep this short-lived.
         #
-        # >>> REMINDER: the day Lexnorax gets its first real paying customer,
+        # >>> REMINDER: the day EasyBillBro gets its first real paying customer,
         # >>> retire this. Upgrade GOOGLE_API_KEY's account to a paid Gemini
         # >>> tier (removes the cap entirely, costs pennies at real volume),
         # >>> then delete GOOGLE_API_KEY_FALLBACK from .env. Don't let this

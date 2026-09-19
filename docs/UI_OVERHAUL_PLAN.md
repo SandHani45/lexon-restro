@@ -194,7 +194,7 @@ Wide data tables should get horizontal scroll on small screens:
 ┌─────────────────────┐
 │                     │
 │       LOGO          │
-│    Lexnorax POS       │
+│    EasyBillBro POS       │
 │                     │
 │  ┌───────────────┐  │
 │  │  username     │  │

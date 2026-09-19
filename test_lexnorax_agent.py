@@ -35,7 +35,7 @@ class _TempDirsMixin:
     def setUp(self):
         self._tmp = tempfile.mkdtemp(prefix="lexnorax_agent_test_")
         self._startup_dir = os.path.join(self._tmp, "Startup")
-        self._config_dir = os.path.join(self._tmp, "Lexnorax")
+        self._config_dir = os.path.join(self._tmp, "EasyBillBro")
         os.makedirs(self._startup_dir, exist_ok=True)
         os.makedirs(self._config_dir, exist_ok=True)
 

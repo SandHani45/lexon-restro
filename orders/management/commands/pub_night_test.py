@@ -1,5 +1,5 @@
 """
-Pub-night simulation for Lexnorax.
+Pub-night simulation for EasyBillBro.
 
 load_test.py already proves the order pipeline under a QSR-shaped pattern
 (one order, immediate payment, on a loop). A pub doesn't behave like that --

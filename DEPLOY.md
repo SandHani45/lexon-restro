@@ -1,4 +1,4 @@
-# Lexnorax POS — Complete Deployment Runbook
+# EasyBillBro POS — Complete Deployment Runbook
 ### EC2 · Ubuntu · Nginx · Gunicorn · PostgreSQL · WhiteNoise · CI/CD
 *Every command is copy-pasteable. Follow in order. Never skip a step.*
 
@@ -543,4 +543,4 @@ Domain:           lexnorax.net
 
 ---
 
-*Lexnorax POS · Branch: `qsr` · Founder: Rajath · fortunecloudmentors@gmail.com*
+*EasyBillBro POS · Branch: `qsr` · Founder: Rajath · fortunecloudmentors@gmail.com*

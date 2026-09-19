@@ -5,16 +5,16 @@
 <style>
   /* ── FULLSCREEN LIVE TABLES OVERVIEW (Matches Reference Screenshot) ── */
   :root {
-    --live-bg: #090c10;
-    --live-panel-bg: #0f131a;
-    --live-card-dark: #141822;
+    --live-bg: #0a0a0a;
+    --live-panel-bg: #241a16;
+    --live-card-dark: #2a1f19;
     --live-card-dark-border: rgba(255, 255, 255, 0.09);
-    --live-card-light: #fffdf5;
-    --live-card-light-border: #fed7aa;
-    --live-text-main: #f8fafc;
-    --live-text-muted: #717e94;
-    --live-accent-amber: #f59e0b;
-    --live-accent-orange: #ea580c;
+    --live-card-light: #fff8f0;
+    --live-card-light-border: #fdd5be;
+    --live-text-main: #f7f1ec;
+    --live-text-muted: #a89a90;
+    --live-accent-amber: #EC2734;
+    --live-accent-orange: #FA7327;
     --live-accent-red: #ef4444;
   }
 
@@ -50,7 +50,7 @@
     align-items: center;
     justify-content: center;
     border-radius: 8px;
-    background: rgba(245, 158, 11, 0.12);
+    background: rgba(236, 39, 52, 0.12);
     color: var(--live-accent-amber);
     font-size: 1.25rem;
   }
@@ -59,7 +59,7 @@
     font-weight: 700;
     letter-spacing: -0.3px;
     margin: 0;
-    color: #ffffff;
+    color: var(--live-text-main);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -82,13 +82,13 @@
     gap: 0.5rem;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 8px;
+    border-radius: 999px;
     padding: 0.4rem 0.85rem;
     transition: border-color 0.15s, background 0.15s;
   }
   .party-filter-box:focus-within {
     border-color: var(--live-accent-amber);
-    background: rgba(245, 158, 11, 0.05);
+    background: rgba(236, 39, 52, 0.05);
   }
   .party-filter-box svg, .party-filter-box i {
     color: var(--live-text-muted);
@@ -99,7 +99,7 @@
     background: transparent;
     border: none;
     outline: none;
-    color: #ffffff;
+    color: var(--live-text-main);
     font-size: 0.85rem;
     width: 90px;
     font-family: inherit;
@@ -117,7 +117,7 @@
     padding: 0 2px;
     display: none;
   }
-  .party-clear-btn:hover { color: #ffffff; }
+  .party-clear-btn:hover { color: var(--live-text-main); }
 
   .live-close-btn {
     width: 38px;
@@ -173,7 +173,7 @@
   }
 
   .floor-canvas-frame {
-    background: #0a0d13;
+    background: #150d0a;
     border: 1px solid rgba(255, 255, 255, 0.09);
     border-radius: 12px;
     position: relative;
@@ -234,9 +234,9 @@
 
   /* State: Free */
   .canvas-table-node.state-free {
-    background: #131722;
+    background: var(--live-card-dark);
     border: 1px solid rgba(255, 255, 255, 0.12);
-    color: #e2e8f0;
+    color: var(--live-text-muted);
   }
   .canvas-table-node.state-free .node-name {
     font-weight: 700;
@@ -245,10 +245,10 @@
 
   /* State: Busy (<= 15 min) */
   .canvas-table-node.state-busy {
-    background: rgba(234, 88, 12, 0.09);
+    background: rgba(250, 115, 39, 0.09);
     border: 1.5px solid var(--live-accent-orange);
-    color: #fdba74;
-    box-shadow: 0 0 10px rgba(234, 88, 12, 0.25);
+    color: #fcab7d;
+    box-shadow: 0 0 10px rgba(250, 115, 39, 0.25);
   }
   .canvas-table-node.state-busy .node-name {
     font-weight: 800;
@@ -259,7 +259,7 @@
     font-size: 0.68rem;
     font-family: var(--font-mono, monospace);
     font-weight: 700;
-    color: #fdba74;
+    color: #fcab7d;
     margin-top: 1px;
   }
 
@@ -321,7 +321,7 @@
     background: var(--live-accent-red);
     box-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
   }
-  .dot-free { background: #475569; }
+  .dot-free { background: var(--live-text-muted); }
 
   /* ── Bottom Section: ALL TABLES (N) ── */
   .all-tables-section {
@@ -376,7 +376,7 @@
   .live-table-card.card-free .card-title {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #ffffff;
+    color: var(--live-text-main);
     line-height: 1.1;
   }
   .live-table-card.card-free .card-meta {
@@ -391,7 +391,7 @@
   .live-table-card.card-occupied {
     background: var(--live-card-light);
     border: 1.5px solid var(--live-card-light-border);
-    box-shadow: 0 4px 14px rgba(234, 88, 12, 0.12);
+    box-shadow: 0 4px 14px rgba(250, 115, 39, 0.12);
   }
   .live-table-card.card-occupied .card-badge-occ {
     position: absolute;
@@ -409,7 +409,7 @@
   .live-table-card.card-occupied .card-label {
     font-size: 0.72rem;
     font-weight: 600;
-    color: #ea580c;
+    color: var(--live-accent-orange);
     opacity: 0.9;
   }
   .live-table-card.card-occupied .card-title {
@@ -421,7 +421,7 @@
   .live-table-card.card-occupied .card-meta {
     font-size: 0.68rem;
     font-weight: 600;
-    color: #c2410c;
+    color: #af511b;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

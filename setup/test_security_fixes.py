@@ -385,7 +385,7 @@ class EditStaffRoleTest(_Base):
         self.assertEqual(self.waiter.role, "waiter")
 
     def test_cannot_set_role_to_agent(self):
-        # "agent" is a Lexnorax-internal sales role, not assignable by a tenant.
+        # "agent" is a EasyBillBro-internal sales role, not assignable by a tenant.
         client = Client()
         client.force_login(self.owner)
         resp = self._post(client, self.waiter.id, "agent")
