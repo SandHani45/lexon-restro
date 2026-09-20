@@ -31,7 +31,7 @@ def send_bill_receipt(order, bill_url: str = "") -> bool:
     if not phone:
         return False
 
-    phone = _normalize_phone(phone)
+    phone = normalize_phone(phone)
     if not phone:
         return False
 
@@ -139,7 +139,7 @@ def send_subscription_invoice(invoice, payment_link_url: str = "") -> bool:
     if not phone:
         return False
 
-    phone = _normalize_phone(phone)
+    phone = normalize_phone(phone)
     if not phone:
         return False
 
@@ -210,7 +210,7 @@ def _build_message(order, bill_url: str) -> str:
 # PHONE NORMALIZER
 # -------------------------------------------------------
 
-def _normalize_phone(phone: str) -> str:
+def normalize_phone(phone: str) -> str:
     """Normalize to E.164. Handles Indian 10-digit, 0-prefix, 91-prefix."""
     digits = "".join(c for c in str(phone) if c.isdigit())
     if len(digits) == 10:

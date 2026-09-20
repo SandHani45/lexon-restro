@@ -1404,11 +1404,14 @@
   <a href="{% url 'order-history' %}" class="btn btn-sm d-none d-md-inline-flex align-items-center gap-1" style="background:var(--surface-2);border:1px solid var(--border-color);border-radius:999px;padding:6px 14px;font-size:0.82rem;font-weight:700;color:var(--text-main);">
     <i class="bi bi-clock-history"></i> History
   </a>
-  {% include "core/_notif_badges_luxury.html" %}
   <button class="btn-icon ms-1" onclick="themeManager.toggle()" title="Toggle Dark / Light Mode" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--border-color);background:var(--panel-bg);display:flex;align-items:center;justify-content:center;">
     <i class="bi bi-moon" id="themeIcon"></i>
   </button>
 </div>
+{% endblock %}
+
+{% block header_notifications %}
+{% include "core/_notif_badges_luxury.html" %}
 {% endblock %}
 
 {% block content %}
@@ -1720,10 +1723,10 @@
           </button>
           {% else %}
           <button type="button" class="btn-pos-kot send-btn" onclick="submitOrder()">
-            <i class="bi bi-check-lg"></i> KOT &amp; Print
+            <i class="bi bi-check-lg"></i> KOT &amp; Dispatch
           </button>
           {% endif %}
-          <button type="button" class="btn-pos-draft" onclick="clearCart()">
+          <button type="button" class="btn-pos-draft" onclick="saveDraft()">
             Draft
           </button>
         </div>
@@ -1740,7 +1743,7 @@
           <button type="button" class="btn-pos-pay" onclick="generateBill()">
             Bill &amp; Payment
           </button>
-          <button type="button" class="btn-pos-print" onclick="generateBill()">
+          <button type="button" class="btn-pos-print" onclick="generateBill(null, true)">
             Bill &amp; Print
           </button>
           {% endif %}
@@ -1869,8 +1872,8 @@
           <i class="bi bi-fire"></i>KOT &amp; Dispatch
         </button>
         {% endif %}
-        <button type="button" class="btn-pos-draft" onclick="clearCart()">
-          <i class="bi bi-trash3"></i>Draft
+        <button type="button" class="btn-pos-draft" onclick="saveDraft()">
+          <i class="bi bi-save2"></i>Draft
         </button>
       </div>
 
@@ -1886,7 +1889,7 @@
         <button type="button" class="btn-pos-pay" onclick="generateBill()">
           <i class="bi bi-credit-card-fill"></i>Bill &amp; Payment
         </button>
-        <button type="button" class="btn-pos-print" onclick="generateBill()">
+        <button type="button" class="btn-pos-print" onclick="generateBill(null, true)">
           <i class="bi bi-receipt"></i>Bill &amp; Print
         </button>
         {% endif %}
@@ -2120,6 +2123,7 @@
     toggleAggregator(src, 'desktop');
     toggleAggregator(src, 'mobile');
     loadRunningOrder();
+    restoreDraftIfAny();
   }
 
   function updateOrderSummaryText(view) {
@@ -2359,6 +2363,43 @@
   function removeItem(i) { cart.splice(i, 1); renderCart(); }
   function clearCart() { cart = []; renderCart(); }
 
+  /* ── Draft: save the in-progress cart per-table so it survives a table
+     switch or an accidental navigation away, instead of "Draft" silently
+     discarding whatever wasn't sent to the kitchen yet. ── */
+  function draftKey() {
+    const tableId = document.getElementById("tableSelectDesktop")?.value || "";
+    return "pos-draft-" + (tableId || "takeaway");
+  }
+
+  function saveDraft() {
+    if (cart.length === 0) { showToast("Nothing to save — cart is empty."); return; }
+    try {
+      localStorage.setItem(draftKey(), JSON.stringify(cart));
+    } catch (e) { /* storage unavailable/full — fail quiet, don't block the cashier */ }
+    showToast("Draft saved. You can resume this order from this table anytime.");
+    clearCart();
+  }
+
+  function restoreDraftIfAny() {
+    if (cart.length > 0) return; // never clobber an order already in progress
+    let saved;
+    try { saved = localStorage.getItem(draftKey()); } catch (e) { return; }
+    if (!saved) return;
+    try {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        cart = parsed;
+        renderCart();
+        showToast("Restored your saved draft for this table.");
+      }
+    } catch (e) { /* corrupt entry — ignore */ }
+    try { localStorage.removeItem(draftKey()); } catch (e) {}
+  }
+
+  function clearDraftForCurrentTable() {
+    try { localStorage.removeItem(draftKey()); } catch (e) {}
+  }
+
   /* ── New POS Order Reset ── */
   function newPOSOrder() {
     if (cart.length > 0) {
@@ -2571,6 +2612,7 @@
           .then(k => {
             showToast(k.error && k.error !== "No items to send to kitchen" ? k.error : "Order Sent to Kitchen!");
             clearCart();
+            clearDraftForCurrentTable();
             resetSendBtn();
             if (source !== 'dine_in' || !tableId) {
               generateBill(d.order_id);
@@ -2649,7 +2691,7 @@
     });
   }
 
-  function generateBill(orderId = null) {
+  function generateBill(orderId = null, autoprint = false) {
     if (!orderId) {
       if (!currentOrderId) { showToast("No active order to bill."); return; }
       orderId = currentOrderId;
@@ -2658,7 +2700,8 @@
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          window.location.href = "{% url 'bill-view' 0 %}".replace('0', data.order_id);
+          const billUrl = "{% url 'bill-view' 0 %}".replace('0', data.order_id);
+          window.location.href = autoprint ? (billUrl + "?autoprint=1") : billUrl;
         } else {
           showToast(data.error || "Failed to generate bill.");
         }
@@ -2666,8 +2709,8 @@
       .catch(() => showToast("Error generating bill."));
   }
 
-  function cancelOrder(orderId) {
-    if (!confirm("Cancel this entire order? This cannot be undone.")) return;
+  async function cancelOrder(orderId) {
+    if (!await ui.confirm("Cancel Entire Order?", "Are you sure you want to cancel this entire order? This cannot be undone.", "Cancel Order")) return;
     fetch("{% url 'cancel-order' 0 %}".replace('0', orderId), { method: "POST", headers: { "X-CSRFToken": apiClient.getCsrf() } })
       .then(res => res.json())
       .then(data => {
@@ -2679,6 +2722,7 @@
   /* ── Initializations ── */
   document.addEventListener("DOMContentLoaded", () => {
     renderCart();
+    restoreDraftIfAny();
     loadRunningOrder();
     updateOrderSummaryText('desktop');
     updateOrderSummaryText('mobile');
@@ -2734,6 +2778,7 @@
       if (!d1.success) { showToast(d1.error || "Order creation failed"); resetSendBtn(); return; }
 
       qsrPendingOrderId = d1.order_id;
+      clearDraftForCurrentTable();
 
       if (_parcelOn && _parcelChargeAmount > 0) {
         await fetch("{% url 'toggle-parcel' 0 %}".replace('/0/', '/' + qsrPendingOrderId + '/'), {

@@ -445,15 +445,15 @@
             .catch(() => location.reload());
     }
 
-    function deleteItem(id) {
-        if (!confirm("Erase this menu item permanently?")) return;
+    async function deleteItem(id) {
+        if (!await ui.confirm("Delete Menu Item?", "Erase this menu item permanently? This cannot be undone.", "Delete Item")) return;
         fetch("{% url 'delete_menu_item' 0 %}".replace('0', id), {
             method: "POST", headers: { "X-CSRFToken": getCookie("csrftoken2") }
         }).then(() => location.reload());
     }
 
-    function deleteCategory(id, name) {
-        if (!confirm(`DANGER: This will permanently delete the category "${name}" and ALL its menu items. Continue?`)) return;
+    async function deleteCategory(id, name) {
+        if (!await ui.confirm("Delete Category?", `DANGER: This will permanently delete the category "${name}" and ALL its menu items. Continue?`, "Delete Category")) return;
         fetch("{% url 'delete_category' 0 %}".replace('0', id), {
             method: "POST", headers: { "X-CSRFToken": getCookie("csrftoken2") }
         }).then(() => location.reload());
@@ -549,13 +549,13 @@
         }, 2000);
     }
 
-    function syncMenu() {
-        if (!confirm("Push this menu to all branches? This will instantly sync all categories, items, prices, and recipe ingredients.")) return;
+    async function syncMenu() {
+        if (!await ui.confirm("Sync Menu Across Branches?", "Push this menu to all branches? This will instantly sync all categories, items, prices, and recipe ingredients.", "Sync Branches")) return;
         showToast("Syncing across branches...", "");
         fetch("{% url 'sync_menu_to_outlets' %}", {
             method: "POST", headers: { "X-CSRFToken": getCookie("csrftoken2") }
         }).then(res => res.json()).then(data => {
-            if (data.success) alert(`Sync Complete!\nCreated: ${data.stats.categories_created} categories, ${data.stats.items_created} items, ${data.stats.recipes_created} recipes across ${data.stats.outlets_updated} branches.`);
+            if (data.success) ui.alert("Sync Complete", `Categories: ${data.stats.categories_created}, Items: ${data.stats.items_created}, Recipes: ${data.stats.recipes_created} across ${data.stats.outlets_updated} branches.`, "success");
             else showToast(data.error || "Sync failed", "error");
         }).catch(() => showToast("Network error", "error"));
     }

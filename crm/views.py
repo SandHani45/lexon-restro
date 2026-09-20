@@ -15,21 +15,150 @@ logger = logging.getLogger("pos.crm")
 POINTS_PER_RUPEE = 0.1
 
 
+from django.db.models import Sum, Count, Avg, Q
+from django.core.paginator import Paginator
+from .feedback_models import GuestFeedback
+
 @login_required
 @tenant_required
 @feature_required("crm")
 def crm_dashboard(request):
-    """Guest list searchable by name/phone."""
+    """Guest list searchable by name/phone with KPI metrics and sorting."""
     if request.user.role not in ("manager", "owner", "cashier", "captain") and not request.user.is_superuser:
         from django.http import HttpResponseForbidden
         return HttpResponseForbidden()
 
-    query = request.GET.get("q", "").strip()
-    guests = Guest.objects.filter(tenant=request.user.tenant).order_by("-created_at")
-    if query:
-        guests = guests.filter(phone__icontains=query) | guests.filter(name__icontains=query)
+    tenant = request.user.tenant
+    base_qs = Guest.objects.filter(tenant=tenant)
 
-    return render(request, "crm/crm_dashboard.html", {"guests": guests, "query": query})
+    # Aggregate summary metrics across all tenant guests
+    stats = base_qs.aggregate(
+        total_guests=Count("id"),
+        total_spent=Sum("total_spent"),
+        total_points=Sum("total_points"),
+    )
+    total_guests = stats["total_guests"] or 0
+    total_spent = stats["total_spent"] or 0
+    total_points = stats["total_points"] or 0
+    repeat_guests = base_qs.filter(visit_count__gt=1).count()
+    repeat_rate = round((repeat_guests / total_guests * 100)) if total_guests > 0 else 0
+
+    # Search & Sorting
+    query = request.GET.get("q", "").strip()
+    sort_by = request.GET.get("sort", "recent")
+
+    guests_qs = base_qs
+    if query:
+        guests_qs = guests_qs.filter(
+            Q(phone__icontains=query) | Q(name__icontains=query) | Q(email__icontains=query)
+        )
+
+    if sort_by == "spend":
+        guests_qs = guests_qs.order_by("-total_spent", "-created_at")
+    elif sort_by == "visits":
+        guests_qs = guests_qs.order_by("-visit_count", "-created_at")
+    elif sort_by == "points":
+        guests_qs = guests_qs.order_by("-total_points", "-created_at")
+    elif sort_by == "name":
+        guests_qs = guests_qs.order_by("name", "-created_at")
+    else:  # "recent"
+        guests_qs = guests_qs.order_by("-created_at")
+
+    paginator = Paginator(guests_qs, 25)
+    page_number = request.GET.get("page", 1)
+    page = paginator.get_page(page_number)
+
+    return render(request, "crm/crm_dashboard.html", {
+        "guests": page.object_list,
+        "page": page,
+        "query": query,
+        "sort_by": sort_by,
+        "total_guests": total_guests,
+        "total_spent": total_spent,
+        "total_points": total_points,
+        "repeat_guests": repeat_guests,
+        "repeat_rate": repeat_rate,
+    })
+
+
+@login_required
+@tenant_required
+@feature_required("crm")
+def reviews_list(request):
+    """
+    Customer reviews & ratings feedback dashboard.
+    Shows star ratings breakdown, guest comments, and order links.
+    """
+    if request.user.role not in ("manager", "owner", "cashier", "captain") and not request.user.is_superuser:
+        from django.http import HttpResponseForbidden
+        return HttpResponseForbidden()
+
+    tenant = request.user.tenant
+    feedback_qs = GuestFeedback.objects.filter(tenant=tenant)
+    if hasattr(request.user, "outlet") and request.user.outlet:
+        outlet_filter = request.GET.get("outlet", "")
+        if outlet_filter == "all" and request.user.role in ("owner", "manager"):
+            pass
+        else:
+            feedback_qs = feedback_qs.filter(outlet=request.user.outlet)
+
+    # Calculate overall KPIs before filter
+    total_reviews = feedback_qs.count()
+    agg = feedback_qs.aggregate(avg_rating=Avg("rating"))
+    avg_rating = round(agg["avg_rating"] or 0.0, 1)
+
+    # Star distribution
+    counts_by_star = feedback_qs.values("rating").annotate(count=Count("id"))
+    dist_map = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0}
+    for row in counts_by_star:
+        r = row["rating"]
+        if r in dist_map:
+            dist_map[r] = row["count"]
+
+    dist_pct = {}
+    for star, count in dist_map.items():
+        dist_pct[star] = round((count / total_reviews * 100)) if total_reviews > 0 else 0
+
+    pos_count = dist_map[4] + dist_map[5]
+    pos_pct = round((pos_count / total_reviews * 100)) if total_reviews > 0 else 0
+    crit_count = dist_map[1] + dist_map[2]
+
+    # Filters
+    rating_filter = request.GET.get("rating", "").strip()
+    if rating_filter.isdigit() and 1 <= int(rating_filter) <= 5:
+        feedback_qs = feedback_qs.filter(rating=int(rating_filter))
+    elif rating_filter == "critical":
+        feedback_qs = feedback_qs.filter(rating__lte=2)
+    elif rating_filter == "positive":
+        feedback_qs = feedback_qs.filter(rating__gte=4)
+
+    query = request.GET.get("q", "").strip()
+    if query:
+        feedback_qs = feedback_qs.filter(
+            Q(guest_name__icontains=query)
+            | Q(comment__icontains=query)
+            | Q(order__order_number__icontains=query)
+        )
+
+    feedback_qs = feedback_qs.select_related("order", "outlet").order_by("-created_at")
+
+    paginator = Paginator(feedback_qs, 15)
+    page_number = request.GET.get("page", 1)
+    page = paginator.get_page(page_number)
+
+    return render(request, "crm/reviews.html", {
+        "page": page,
+        "reviews": page.object_list,
+        "total_reviews": total_reviews,
+        "avg_rating": avg_rating,
+        "dist_map": dist_map,
+        "dist_pct": dist_pct,
+        "pos_pct": pos_pct,
+        "crit_count": crit_count,
+        "rating_filter": rating_filter,
+        "query": query,
+    })
+
 
 
 @login_required

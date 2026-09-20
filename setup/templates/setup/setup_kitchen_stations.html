@@ -1,363 +1,1124 @@
 {% extends 'core/base.html' %}
 {% load static %}
-{% block title %}Kitchen Stations | Setup{% endblock %}
+
+{% block title %}Kitchen Stations | {{ request.user.tenant.name|default:"Setup" }}{% endblock %}
 
 {% block extra_css %}
 <style>
-  .page-eyebrow { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 4px; color: var(--accent-gold); margin-bottom: 0.5rem; }
-  .page-title   { font-family: 'DM Serif Display', serif; font-size: 1.8rem; font-weight: 700; }
-  .divider      { width: 40px; height: 1px; background: var(--accent-gold); margin: 1.2rem 0; }
-  .page-sub     { color: var(--text-muted); font-size: 0.8rem; line-height: 1.6; margin-bottom: 2rem; }
-  .section-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; margin-bottom: 1rem; }
+    /* ══════════════════════════════════════════════════════════════
+       KIMIPOS LUXURY KITCHEN STATIONS DESIGN SYSTEM
+       ══════════════════════════════════════════════════════════════ */
+    :root {
+        --pos-red: #EC2734;
+        --pos-red-hover: #d81f2f;
+        --pos-red-soft: rgba(236, 39, 52, 0.08);
+        --pos-red-border: rgba(236, 39, 52, 0.22);
+        --pos-green: #10b981;
+        --pos-green-soft: rgba(16, 185, 129, 0.10);
+        --pos-green-border: rgba(16, 185, 129, 0.25);
+        --pos-amber: #f59e0b;
+        --pos-amber-soft: rgba(245, 158, 11, 0.10);
+        --pos-amber-border: rgba(245, 158, 11, 0.25);
+        --pos-blue: #3b82f6;
+        --pos-blue-soft: rgba(59, 130, 246, 0.10);
+        --pos-blue-border: rgba(59, 130, 246, 0.25);
+    }
 
-  .page-body { max-width: 960px; margin: 0 auto; padding: 3rem 1.5rem; display: grid; grid-template-columns: 1fr 1.6fr; gap: 3rem; align-items: start; }
-  @media(max-width: 700px) { .page-body { grid-template-columns: 1fr; } }
+    body {
+        background: var(--bg-color) !important;
+    }
 
-  /* Add-station form */
-  .field-label { display: block; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; margin-bottom: 0.4rem; }
-  .field-input { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border-color); color: var(--text-main); padding: 0.55rem 0; font-size: 1rem; outline: none; margin-bottom: 1.4rem; font-family: inherit; transition: border-color 0.2s; }
-  .field-input:focus { border-bottom-color: var(--accent-gold); }
-  .btn-add { width: 100%; padding: 0.9rem; background: var(--accent-gold); border: none; color: #fff; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
-  .btn-add:hover { opacity: 0.88; }
+    /* ── Sub-Header Bar (KimiPoS POS Layout) ──────────────────── */
+    .pos-subbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 1rem 1.5rem 0.5rem;
+        background: var(--bg-color);
+        max-width: 1160px;
+        margin: 0 auto;
+    }
+    .pos-subbar-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        letter-spacing: -0.4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .pos-breadcrumbs {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .pos-breadcrumbs a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.15s;
+    }
+    .pos-breadcrumbs a:hover {
+        color: var(--pos-red);
+    }
+    .pos-breadcrumbs .separator {
+        font-size: 0.65rem;
+        opacity: 0.6;
+    }
+    .pos-breadcrumbs .current {
+        color: var(--pos-red);
+        font-weight: 700;
+    }
 
-  /* Agent status pill */
-  .agent-row { display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 0.9rem; border: 1px solid var(--border-color); margin-bottom: 1.25rem; font-size: 0.72rem; color: var(--text-muted); gap: 0.75rem; flex-wrap: wrap; }
-  .agent-pill { display: inline-flex; align-items: center; gap: 0.4rem; }
+    /* Subbar Pill Buttons */
+    .btn-subbar-pill {
+        background: var(--panel-bg);
+        color: var(--text-main) !important;
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        padding: 7px 16px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-decoration: none !important;
+    }
+    .btn-subbar-pill:hover {
+        border-color: var(--pos-red-border);
+        background: var(--pos-red-soft);
+        color: var(--pos-red) !important;
+        transform: translateY(-1px);
+    }
 
-  /* Print mode */
-  .print-mode-box { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 1.1rem; margin-bottom: 1.25rem; }
-  .print-mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
-  .print-mode-opt {
-    background: transparent; border: 1.5px solid var(--border-color);
-    padding: 0.8rem 0.75rem; cursor: pointer; text-align: left;
-    display: flex; flex-direction: column; gap: 2px;
-    transition: border-color 0.15s, background 0.15s; font-family: inherit;
-  }
-  .print-mode-opt:hover  { border-color: var(--accent-gold); }
-  .print-mode-opt.active { border-color: var(--accent-gold); background: rgba(236, 39, 52,0.07); }
-  .pm-icon  { font-size: 1.2rem; margin-bottom: 0.2rem; }
-  .pm-title { font-size: 0.78rem; font-weight: 700; color: var(--text-main); }
-  .pm-desc  { font-size: 0.65rem; color: var(--text-muted); line-height: 1.4; }
-  @media(max-width:500px) { .print-mode-grid { grid-template-columns: 1fr; } }
-  #printModeHint { margin-top: 0.75rem; font-size: 0.72rem; color: var(--text-muted); line-height: 1.6; }
+    .stations-wrap {
+        max-width: 1160px;
+        margin: 0 auto;
+        padding: 0.5rem 1.5rem 5rem;
+    }
 
-  /* Station cards */
-  .station-card { background: var(--panel-bg); border: 1px solid var(--border-color); margin-bottom: 0.75rem; transition: border-color 0.2s; }
-  .station-card.is-default { border-color: var(--accent-gold); }
-  .station-header { padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
-  .station-name { font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 0.6rem; }
-  .badge-default { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-gold); border: 1px solid var(--accent-gold); padding: 2px 8px; }
-  .btn-ghost { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1.5px; padding: 4px 10px; cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.2s; }
-  .btn-ghost:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
-  .chevron { transition: transform 0.2s; font-size: 0.8rem; }
-  .chevron.open { transform: rotate(180deg); }
+    /* ── Hero Overview KPI Cards ─────────────────────────────── */
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    @media (max-width: 900px) {
+        .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 500px) {
+        .kpi-grid { grid-template-columns: 1fr; }
+    }
 
-  /* Printer config panel */
-  .printer-panel { border-top: 1px solid var(--border-color); padding: 1.25rem; display: none; }
-  .printer-panel.open { display: block; }
-  .printer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.5rem; }
-  @media(max-width:500px) { .printer-grid { grid-template-columns: 1fr; } }
-  .field-select { width: 100%; background: var(--panel-bg); border: none; border-bottom: 1px solid var(--border-color); color: var(--text-main); padding: 0.55rem 0; font-size: 0.9rem; outline: none; margin-bottom: 1.4rem; font-family: inherit; cursor: pointer; appearance: none; }
-  .field-select:focus { border-bottom-color: var(--accent-gold); }
+    .kpi-card {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 1.15rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    }
+    .kpi-icon-badge {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        flex-shrink: 0;
+    }
+    .kpi-icon-red {
+        background: var(--pos-red-soft);
+        color: var(--pos-red);
+        border: 1px solid var(--pos-red-border);
+    }
+    .kpi-icon-amber {
+        background: var(--pos-amber-soft);
+        color: var(--pos-amber);
+        border: 1px solid var(--pos-amber-border);
+    }
+    .kpi-icon-blue {
+        background: var(--pos-blue-soft);
+        color: var(--pos-blue);
+        border: 1px solid var(--pos-blue-border);
+    }
+    .kpi-icon-green {
+        background: var(--pos-green-soft);
+        color: var(--pos-green);
+        border: 1px solid var(--pos-green-border);
+    }
+    .kpi-info {
+        min-width: 0;
+        flex: 1;
+    }
+    .kpi-label {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 2px;
+    }
+    .kpi-value {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--text-main);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .kpi-sub {
+        font-size: 0.68rem;
+        color: var(--text-muted);
+        margin-top: 1px;
+    }
 
-  /* Advanced toggle */
-  .advanced-toggle { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); cursor: pointer; background: none; border: none; padding: 0; font-family: inherit; display: flex; align-items: center; gap: 0.3rem; margin-bottom: 1rem; }
-  .advanced-toggle:hover { color: var(--text-main); }
-  .advanced-panel { display: none; }
-  .advanced-panel.open { display: block; }
+    /* ── Main Two-Column Layout ──────────────────────────────── */
+    .stations-main-layout {
+        display: grid;
+        grid-template-columns: 360px 1fr;
+        gap: 24px;
+        align-items: start;
+    }
+    @media (max-width: 960px) {
+        .stations-main-layout { grid-template-columns: 1fr; }
+    }
 
-  .hint { font-size: 0.68rem; color: var(--text-muted); margin-bottom: 1.2rem; line-height: 1.5; }
+    /* Luxury Card Container */
+    .lux-card {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 22px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+        position: relative;
+        margin-bottom: 24px;
+    }
+    .lux-card-title {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: var(--text-main);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 0.4rem;
+    }
+    .lux-card-desc {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+        margin-bottom: 1.25rem;
+    }
 
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-color); display: inline-block; }
-  .dot.green  { background: #10b981; }
-  .dot.red    { background: #ef4444; }
-  .dot.orange { background: #f59e0b; }
+    /* Form Controls */
+    .form-group-lux {
+        margin-bottom: 1.2rem;
+    }
+    .lux-label {
+        display: block;
+        font-size: 0.73rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: var(--text-muted);
+        margin-bottom: 0.45rem;
+    }
+    .lux-input {
+        width: 100%;
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 0.65rem 0.9rem;
+        font-size: 0.9rem;
+        color: var(--text-main);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        outline: none;
+        transition: all 0.2s ease;
+    }
+    .lux-input:focus {
+        border-color: var(--pos-red);
+        box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.12);
+        background: var(--panel-bg);
+    }
+    .lux-select {
+        width: 100%;
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 0.65rem 0.9rem;
+        font-size: 0.88rem;
+        color: var(--text-main);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        outline: none;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    .lux-select:focus {
+        border-color: var(--pos-red);
+        box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.12);
+        background: var(--panel-bg);
+    }
 
-  .printer-status { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; color: var(--text-muted); }
+    /* Luxury Buttons */
+    .btn-lux-primary {
+        width: 100%;
+        background: var(--pos-red);
+        color: #ffffff !important;
+        border: none;
+        border-radius: 999px;
+        padding: 0.8rem 1.4rem;
+        font-size: 0.88rem;
+        font-weight: 700;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 14px rgba(236, 39, 52, 0.32);
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-decoration: none !important;
+    }
+    .btn-lux-primary:hover {
+        background: var(--pos-red-hover);
+        transform: translateY(-1.5px);
+        box-shadow: 0 6px 18px rgba(236, 39, 52, 0.44);
+    }
+    .btn-lux-primary:active {
+        transform: translateY(0);
+    }
 
-  .btn-row  { display: flex; gap: 0.75rem; margin-top: 0.5rem; flex-wrap: wrap; }
-  .btn-save { padding: 0.6rem 1.4rem; background: var(--accent-gold); border: none; color: #fff; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; cursor: pointer; }
-  .btn-test { padding: 0.6rem 1.4rem; background: transparent; border: 1px solid var(--border-color); color: var(--text-main); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: all 0.2s; }
-  .btn-test:hover     { border-color: var(--text-main); }
-  .btn-test:disabled  { opacity: 0.4; cursor: not-allowed; }
-  .btn-delete-station { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1.5px; padding: 0.4rem 0.9rem; cursor: pointer; transition: all 0.2s; font-family: inherit; }
-  .btn-delete-station:hover { border-color: #ef4444; color: #ef4444; }
+    .btn-lux-outline {
+        background: var(--panel-bg);
+        color: var(--text-main) !important;
+        border: 1.5px solid var(--border-color);
+        border-radius: 999px;
+        padding: 0.65rem 1.25rem;
+        font-size: 0.82rem;
+        font-weight: 700;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-decoration: none !important;
+    }
+    .btn-lux-outline:hover:not(:disabled) {
+        border-color: var(--pos-red);
+        color: var(--pos-red) !important;
+        background: var(--pos-red-soft);
+        transform: translateY(-1px);
+    }
+    .btn-lux-outline:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
 
-  .empty-state { color: var(--text-muted); font-size: 0.8rem; font-style: italic; padding: 1.5rem 0; }
+    .btn-lux-danger-outline {
+        background: transparent;
+        color: #ef4444 !important;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 999px;
+        padding: 0.5rem 1.1rem;
+        font-size: 0.76rem;
+        font-weight: 600;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    .btn-lux-danger-outline:hover {
+        background: rgba(239, 68, 68, 0.08);
+        border-color: #ef4444;
+    }
 
-  /* Print strip */
-  .strip-block { border: 1px solid var(--border-color); background: var(--panel-bg); padding: 0.5rem 0.9rem; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; text-align: center; line-height: 1.3; min-width: 70px; }
-  .strip-bill  { border-color: var(--accent-gold); color: var(--accent-gold); }
-  .strip-kot   { border-color: var(--text-muted); color: var(--text-main); }
-  .strip-cut   { display: flex; align-items: center; padding: 0 0.4rem; font-size: 0.6rem; letter-spacing: 1px; font-weight: 600; white-space: nowrap; }
-  .strip-part  { color: var(--text-muted); }
-  .strip-full  { color: var(--accent-gold); font-size: 0.65rem; }
-  @media(max-width:600px) {
-    .strip-block { min-width: 56px; padding: 0.4rem 0.5rem; font-size: 0.65rem; }
-    .strip-cut   { padding: 0 0.25rem; font-size: 0.55rem; }
-  }
+    /* Print Mode Selector Box */
+    .print-mode-card {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 22px;
+        padding: 1.4rem;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+    }
+    .print-mode-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 1rem;
+    }
+    @media (max-width: 600px) {
+        .print-mode-grid { grid-template-columns: 1fr; }
+    }
+    .print-mode-opt {
+        background: var(--bg-color);
+        border: 1.5px solid var(--border-color);
+        border-radius: 16px;
+        padding: 1.1rem 1rem;
+        cursor: pointer;
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        transition: all 0.2s ease;
+        font-family: inherit;
+        position: relative;
+    }
+    .print-mode-opt:hover {
+        border-color: var(--pos-red-border);
+        background: var(--pos-red-soft);
+        transform: translateY(-1.5px);
+    }
+    .print-mode-opt.active {
+        border-color: var(--pos-red);
+        background: var(--pos-red-soft);
+        box-shadow: 0 4px 14px rgba(236, 39, 52, 0.12);
+    }
+    .print-mode-opt.active::after {
+        content: '\F272';
+        font-family: 'bootstrap-icons';
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        color: var(--pos-red);
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+    .pm-icon-wrap {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        margin-bottom: 4px;
+    }
+    .print-mode-opt.active .pm-icon-wrap {
+        border-color: var(--pos-red-border);
+        color: var(--pos-red);
+    }
+    .pm-title {
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+    .pm-desc {
+        font-size: 0.74rem;
+        color: var(--text-muted);
+        line-height: 1.45;
+    }
+    #printModeHint {
+        margin-top: 0.9rem;
+        font-size: 0.76rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+        padding: 0.6rem 0.9rem;
+        background: var(--bg-color);
+        border-radius: 10px;
+        border-left: 3px solid var(--pos-red);
+    }
+
+    /* ── Station Accordion Cards ─────────────────────────────── */
+    .station-card {
+        background: var(--panel-bg);
+        border: 1.5px solid var(--border-color);
+        border-radius: 20px;
+        margin-bottom: 12px;
+        overflow: hidden;
+        transition: all 0.25s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+    .station-card.is-default {
+        border-color: rgba(236, 39, 52, 0.4);
+    }
+    .station-card:hover {
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+    }
+    .station-header {
+        padding: 1.15rem 1.35rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        user-select: none;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .station-name-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+    }
+    .station-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        flex-shrink: 0;
+    }
+    .station-card.is-default .station-icon {
+        background: var(--pos-red-soft);
+        color: var(--pos-red);
+        border-color: var(--pos-red-border);
+    }
+    .station-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text-main);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .badge-default-station {
+        background: var(--pos-red);
+        color: #ffffff;
+        font-size: 0.62rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 2px 8px;
+        border-radius: 999px;
+    }
+    .station-actions-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .printer-status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        background: var(--bg-color);
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border-color);
+        font-family: monospace;
+    }
+    .btn-set-default {
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-set-default:hover {
+        border-color: var(--pos-red);
+        color: var(--pos-red);
+        background: var(--pos-red-soft);
+    }
+    .chevron-icon {
+        transition: transform 0.2s ease;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+    .chevron-icon.open {
+        transform: rotate(180deg);
+        color: var(--pos-red);
+    }
+
+    /* Accordion Drawer */
+    .printer-panel {
+        border-top: 1px solid var(--border-color);
+        padding: 1.35rem 1.4rem 1.5rem;
+        background: var(--bg-color);
+        display: none;
+    }
+    .printer-panel.open {
+        display: block;
+    }
+    .printer-grid {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 16px;
+    }
+    @media (max-width: 600px) {
+        .printer-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Advanced Settings Drawer */
+    .advanced-toggle-btn {
+        background: none;
+        border: none;
+        padding: 0;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--text-muted);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin: 1rem 0 0.8rem;
+        font-family: inherit;
+        transition: color 0.15s;
+    }
+    .advanced-toggle-btn:hover {
+        color: var(--text-main);
+    }
+    .advanced-panel {
+        display: none;
+        padding: 1rem;
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        margin-bottom: 1rem;
+    }
+    .advanced-panel.open {
+        display: block;
+    }
+
+    /* Action Buttons Row */
+    .station-btn-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 1.25rem;
+        flex-wrap: wrap;
+    }
+
+    /* Status Dots */
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+    .status-dot.green  { background: #10b981; box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2); }
+    .status-dot.red    { background: #ef4444; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2); }
+    .status-dot.orange { background: #f59e0b; box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2); }
+    .status-dot.gray   { background: var(--border-color); }
+
+    /* ── Print Strip Preview ─────────────────────────────────── */
+    .preview-card {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 22px;
+        padding: 1.5rem;
+        margin-top: 24px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+    }
+    .strip-flex {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+        row-gap: 8px;
+        margin: 1rem 0;
+    }
+    .strip-block {
+        border: 1.5px solid var(--border-color);
+        background: var(--bg-color);
+        border-radius: 8px;
+        padding: 0.6rem 1rem;
+        font-size: 0.76rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        text-align: center;
+        line-height: 1.3;
+        min-width: 80px;
+    }
+    .strip-bill {
+        border-color: var(--pos-red);
+        color: var(--pos-red);
+        background: var(--pos-red-soft);
+    }
+    .strip-kot {
+        border-color: var(--border-color);
+        color: var(--text-main);
+        background: var(--panel-bg);
+    }
+    .strip-cut {
+        display: flex;
+        align-items: center;
+        padding: 0 0.5rem;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.8px;
+        white-space: nowrap;
+    }
+    .strip-cut.cut-full {
+        color: var(--pos-red);
+        font-size: 0.72rem;
+    }
+    .strip-cut.cut-part {
+        color: var(--text-muted);
+    }
 </style>
 {% endblock %}
 
-{% block header_left %}
-<a href="/setup/" style="text-decoration:none;color:inherit;font-family:'DM Serif Display',serif;font-size:1.1rem;">
-  <i class="bi bi-asterisk me-2" style="color:var(--accent-gold)"></i>Setup
-</a>
-{% endblock %}
-
-{% block header_right %}
-<a href="/setup/" class="btn-luxury d-none d-sm-inline-flex">
-  <i class="bi bi-arrow-left me-1"></i> Setup Home
-</a>
-{% endblock %}
-
 {% block content %}
-<div class="page-body">
+<!-- ── Sub-Header Bar (KimiPoS POS Layout) ── -->
+<div class="pos-subbar">
+    <div>
+        <h1 class="pos-subbar-title">
+            <i class="bi bi-fire text-danger"></i> Kitchen Stations
+        </h1>
+        <div class="pos-breadcrumbs">
+            <a href="/dashboard/"><i class="bi bi-house-door"></i> Dashboard</a>
+            <span class="separator">/</span>
+            <a href="/setup/">Setup</a>
+            <span class="separator">/</span>
+            <span class="current">Kitchen Stations</span>
+        </div>
+    </div>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <a href="/setup/" class="btn-subbar-pill">
+            <i class="bi bi-gear"></i> Setup Hub
+        </a>
+        <a href="{% url 'printer_setup' %}" class="btn-subbar-pill">
+            <i class="bi bi-printer"></i> Printer Setup
+        </a>
+        <a href="/kitchen/" class="btn-subbar-pill">
+            <i class="bi bi-egg-fried"></i> Kitchen (KDS)
+        </a>
+    </div>
+</div>
 
-  <!-- LEFT: ADD NEW STATION -->
-  <div>
-    <p class="page-eyebrow">Configuration</p>
-    <h1 class="page-title">Kitchen Stations</h1>
-    <div class="divider"></div>
-    <p class="page-sub">
-      Each station (Hot Kitchen, Bar, Bakery…) routes KOTs to its own printer.
-      Enter the printer IP per station, then send a test print to confirm.
-    </p>
+<div class="stations-wrap">
 
+    <!-- Django Messages Banner -->
     {% if messages %}
-      {% for msg in messages %}
-        <div style="background:rgba(236, 39, 52,0.07);border-left:3px solid var(--accent-gold);padding:0.9rem 1.1rem;font-size:0.75rem;line-height:1.6;color:var(--text-main);margin-bottom:1.5rem;">{{ msg }}</div>
-      {% endfor %}
+        {% for msg in messages %}
+        <div class="alert alert-{% if msg.tags == 'error' %}danger{% else %}{{ msg.tags }}{% endif %} alert-dismissible fade show rounded-4 mb-4" role="alert" style="font-size:0.85rem;">
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
     {% endif %}
 
-    <form method="post">
-      {% csrf_token %}
-      <label class="field-label">Station Name</label>
-      <input type="text" name="station_name" class="field-input" placeholder="e.g. Hot Kitchen, Bar" required autocomplete="off">
-      <button type="submit" class="btn-add"><i class="bi bi-plus-lg me-2"></i>Add Station</button>
-    </form>
-  </div>
+    <!-- ── 4 Hero Overview KPI Cards ── -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-icon-badge kpi-icon-red">
+                <i class="bi bi-fire"></i>
+            </div>
+            <div class="kpi-info">
+                <div class="kpi-label">Active Stations</div>
+                <div class="kpi-value">{{ stations|length }}</div>
+                <div class="kpi-sub">Total routing endpoints</div>
+            </div>
+        </div>
 
-  <!-- RIGHT: EXISTING STATIONS -->
-  <div>
+        <div class="kpi-card">
+            <div class="kpi-icon-badge kpi-icon-amber">
+                <i class="bi bi-star-fill"></i>
+            </div>
+            <div class="kpi-info">
+                <div class="kpi-label">Default Station</div>
+                <div class="kpi-value">{{ default_station.name|default:"None" }}</div>
+                <div class="kpi-sub">Primary cashier strip target</div>
+            </div>
+        </div>
 
-    <!-- Agent status — single row -->
-    <div class="agent-row">
-      <span class="agent-pill">
-        <span class="dot" id="agentDot"></span>
-        <span id="agentStatusText" style="color:var(--text-muted);">Checking EasyBillBro Agent…</span>
-      </span>
-      <a href="{% url 'printer_setup' %}" style="font-size:0.7rem;color:var(--accent-gold);text-decoration:none;letter-spacing:1px;text-transform:uppercase;">
-        Printer Settings <i class="bi bi-arrow-right ms-1"></i>
-      </a>
+        <div class="kpi-card">
+            <div class="kpi-icon-badge kpi-icon-blue">
+                <i class="bi bi-diagram-3"></i>
+            </div>
+            <div class="kpi-info">
+                <div class="kpi-label">Routing Mode</div>
+                <div class="kpi-value" style="font-size:1.05rem;">
+                    {% if any_station_has_printer %}Per-Station{% else %}Cashier Strip{% endif %}
+                </div>
+                <div class="kpi-sub">{% if any_station_has_printer %}Dedicated KOT printers{% else %}Single continuous roll{% endif %}</div>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon-badge kpi-icon-green" id="kpiAgentBadge">
+                <i class="bi bi-cpu"></i>
+            </div>
+            <div class="kpi-info">
+                <div class="kpi-label">EasyBillBro Agent</div>
+                <div class="kpi-value d-flex align-items-center gap-2" style="font-size:1.05rem;" id="kpiAgentText">
+                    <span class="status-dot gray" id="agentDot"></span> Checking…
+                </div>
+                <div class="kpi-sub" id="agentSubText">Port 8765 WebSocket</div>
+            </div>
+        </div>
     </div>
 
-    <!-- Print mode selector -->
-    <div class="print-mode-box">
-      <p class="section-label" style="margin-bottom:0.75rem;">How Are Printers Set Up?</p>
-      <div class="print-mode-grid">
-        <button class="print-mode-opt {% if not any_station_has_printer %}active{% endif %}"
-                id="modeCashier" onclick="setPrintMode('cashier')">
-          <span class="pm-icon">🖨</span>
-          <span class="pm-title">One Printer at Counter</span>
-          <span class="pm-desc">Bill + all KOTs print as one strip. Only the default station needs a printer IP.</span>
-        </button>
-        <button class="print-mode-opt {% if any_station_has_printer %}active{% endif %}"
-                id="modeStation" onclick="setPrintMode('station')">
-          <span class="pm-icon">🖨🖨</span>
-          <span class="pm-title">Printer per Station</span>
-          <span class="pm-desc">Each kitchen station has its own printer. KOTs print directly at the station.</span>
-        </button>
-      </div>
-      <div id="printModeHint"></div>
+    <!-- ── Main Two-Column Layout ── -->
+    <div class="stations-main-layout">
+
+        <!-- LEFT COLUMN: ADD STATION & AGENT HELP -->
+        <div>
+            <!-- Add Station Card -->
+            <div class="lux-card">
+                <div class="lux-card-title">
+                    <i class="bi bi-plus-circle text-danger"></i> Add Kitchen Station
+                </div>
+                <div class="lux-card-desc">
+                    Create preparation areas (e.g. Hot Kitchen, Bar, Bakery, Grill) to route food orders to their destination printers.
+                </div>
+
+                <form method="post" action="">
+                    {% csrf_token %}
+                    <div class="form-group-lux">
+                        <label class="lux-label" for="stationNameInput">Station Name</label>
+                        <input type="text"
+                               name="station_name"
+                               id="stationNameInput"
+                               class="lux-input"
+                               placeholder="e.g. Hot Kitchen, Bar, Bakery"
+                               required
+                               autocomplete="off">
+                    </div>
+                    <button type="submit" class="btn-lux-primary">
+                        <i class="bi bi-plus-lg"></i> Add Station
+                    </button>
+                </form>
+            </div>
+
+            <!-- EasyBillBro Agent Status Box -->
+            <div class="lux-card" style="background:var(--bg-color);">
+                <div class="lux-card-title" style="font-size:0.95rem;">
+                    <i class="bi bi-hdd-network text-danger"></i> Print Agent Status
+                </div>
+                <div class="d-flex align-items-center justify-content-between p-3 rounded-3 mb-3" style="background:var(--panel-bg);border:1px solid var(--border-color);">
+                    <div class="d-flex align-items-center gap-2" style="font-size:0.8rem;font-weight:600;">
+                        <span class="status-dot gray" id="agentDotSide"></span>
+                        <span id="agentStatusText" style="color:var(--text-muted);">Checking Agent…</span>
+                    </div>
+                    <a href="{% url 'printer_setup' %}" class="btn-lux-outline" style="padding:4px 10px;font-size:0.75rem;">
+                        Settings
+                    </a>
+                </div>
+                <p class="mb-0 text-muted" style="font-size:0.75rem;line-height:1.5;">
+                    The EasyBillBro Agent runs on your local network machine to deliver ESC/POS print jobs directly to thermal receipt printers.
+                </p>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: ROUTING MODE & STATION ACCORDIONS -->
+        <div>
+            <!-- Print Routing Mode Selector Box -->
+            <div class="print-mode-card">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div>
+                        <div class="lux-card-title mb-0">
+                            <i class="bi bi-signpost-split text-danger"></i> How Are Printers Set Up?
+                        </div>
+                        <div class="lux-card-desc mb-0">Choose how bills and KOTs route across your restaurant stations.</div>
+                    </div>
+                </div>
+
+                <div class="print-mode-grid">
+                    <button type="button"
+                            class="print-mode-opt {% if not any_station_has_printer %}active{% endif %}"
+                            id="modeCashier"
+                            onclick="setPrintMode('cashier')">
+                        <div class="pm-icon-wrap">🖨️</div>
+                        <div class="pm-title">One Printer at Counter</div>
+                        <div class="pm-desc">Bill + all station KOTs print together as one continuous perforated strip at the cashier.</div>
+                    </button>
+
+                    <button type="button"
+                            class="print-mode-opt {% if any_station_has_printer %}active{% endif %}"
+                            id="modeStation"
+                            onclick="setPrintMode('station')">
+                        <div class="pm-icon-wrap">🖨️🖨️</div>
+                        <div class="pm-title">Printer per Station</div>
+                        <div class="pm-desc">Each kitchen station has its own dedicated thermal printer. KOTs print immediately at the station.</div>
+                    </button>
+                </div>
+
+                <div id="printModeHint"></div>
+            </div>
+
+            <!-- Active Stations List Header -->
+            <div class="d-flex align-items-center justify-content-between mb-3 px-1">
+                <div style="font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);">
+                    Configured Stations ({{ stations|length }})
+                </div>
+            </div>
+
+            <!-- Stations List -->
+            {% for station in stations %}
+            <div class="station-card {% if station.is_default %}is-default{% endif %}" id="card-{{ station.id }}">
+
+                <!-- Station Header (Accordion Trigger) -->
+                <div class="station-header" onclick="togglePanel({{ station.id }})">
+                    <div class="station-name-wrap">
+                        <div class="station-icon">
+                            <i class="bi bi-fire"></i>
+                        </div>
+                        <div>
+                            <div class="station-title">
+                                {{ station.name }}
+                                {% if station.is_default %}
+                                <span class="badge-default-station">Default</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="station-actions-wrap">
+                        {% if station.printer_ip %}
+                        <span class="printer-status-pill">
+                            <span class="status-dot orange"></span> {{ station.printer_ip }}
+                        </span>
+                        {% else %}
+                        <span class="printer-status-pill">
+                            <span class="status-dot gray"></span> No printer IP
+                        </span>
+                        {% endif %}
+
+                        {% if not station.is_default %}
+                        <form method="post" action="/setup/set-default-station/{{ station.id }}/" onclick="event.stopPropagation()" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-set-default" title="Set as default station">
+                                Set Default
+                            </button>
+                        </form>
+                        {% endif %}
+
+                        <i class="bi bi-chevron-down chevron-icon" id="chevron-{{ station.id }}"></i>
+                    </div>
+                </div>
+
+                <!-- Station Printer Config Drawer -->
+                <div class="printer-panel" id="panel-{{ station.id }}">
+
+                    {% if station.is_default and not any_station_has_printer %}
+                    <div class="p-3 rounded-3 mb-3 d-flex align-items-center gap-2" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);color:var(--text-main);font-size:0.8rem;">
+                        <i class="bi bi-info-circle-fill text-success" style="font-size:1.1rem;"></i>
+                        <div>
+                            <strong class="text-success">Counter Cashier Printer.</strong> Bill and all kitchen KOTs print here as one combined strip. Other stations do not require an IP.
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="printer-grid">
+                        <div>
+                            <label class="lux-label" for="ip-{{ station.id }}">Printer IP Address</label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="text"
+                                       class="lux-input"
+                                       id="ip-{{ station.id }}"
+                                       value="{{ station.printer_ip|default:'' }}"
+                                       placeholder="e.g. 192.168.1.100"
+                                       style="font-family:monospace;">
+                                <button type="button"
+                                        class="btn-lux-outline"
+                                        id="discover-btn-{{ station.id }}"
+                                        onclick="discoverPrinterIp({{ station.id }})"
+                                        title="Auto-scan network for thermal printers"
+                                        style="white-space:nowrap;padding:0.65rem 0.9rem;">
+                                    <i class="bi bi-search"></i> Auto Scan
+                                </button>
+                            </div>
+                            <div id="discover-result-{{ station.id }}" style="font-size:0.75rem;color:var(--text-muted);margin-top:0.4rem;min-height:1rem;"></div>
+                        </div>
+
+                        <div>
+                            <label class="lux-label" for="paper-{{ station.id }}">Paper Roll Width</label>
+                            <select class="lux-select" id="paper-{{ station.id }}">
+                                <option value="80" {% if station.paper_width_mm == 80 %}selected{% endif %}>80mm — Standard 3-inch roll (48 chars)</option>
+                                <option value="58" {% if station.paper_width_mm == 58 %}selected{% endif %}>58mm — Narrow 2-inch roll (32 chars)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Collapsible Advanced Settings -->
+                    <button type="button" class="advanced-toggle-btn" onclick="toggleAdvanced({{ station.id }})">
+                        <i class="bi bi-chevron-right" id="adv-icon-{{ station.id }}" style="font-size:0.65rem;"></i>
+                        Advanced Hardware Settings
+                    </button>
+
+                    <div class="advanced-panel" id="adv-{{ station.id }}">
+                        <div class="printer-grid">
+                            <div class="form-group-lux mb-2">
+                                <label class="lux-label" for="port-{{ station.id }}">Raw Port</label>
+                                <input type="number"
+                                       class="lux-input"
+                                       id="port-{{ station.id }}"
+                                       value="{{ station.printer_port|default:9100 }}"
+                                       min="1" max="65535"
+                                       style="font-family:monospace;">
+                                <div class="text-muted mt-1" style="font-size:0.7rem;">Default raw socket port is 9100.</div>
+                            </div>
+                            <div class="form-group-lux mb-2">
+                                <label class="lux-label" for="cut-{{ station.id }}">Paper Cut Behavior</label>
+                                <select class="lux-select" id="cut-{{ station.id }}">
+                                    <option value="full"    {% if station.cut_type == 'full'    %}selected{% endif %}>Full Automatic Cut</option>
+                                    <option value="partial" {% if station.cut_type == 'partial' %}selected{% endif %}>Partial Cut (Perforated)</option>
+                                    <option value="none"    {% if station.cut_type == 'none'    %}selected{% endif %}>No Cut (Tear manually)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group-lux mb-0 mt-2">
+                            <label class="lux-label" for="enc-{{ station.id }}">ESC/POS Code Page</label>
+                            <select class="lux-select" id="enc-{{ station.id }}" style="max-width:360px;">
+                                <option value="cp437" {% if station.printer_encoding == 'cp437' %}selected{% endif %}>CP437 — Standard (Recommended for EPSON & Xprinter)</option>
+                                <option value="cp850" {% if station.printer_encoding == 'cp850' %}selected{% endif %}>CP850 — Western Europe</option>
+                                <option value="utf-8" {% if station.printer_encoding == 'utf-8' %}selected{% endif %}>UTF-8 — Modern smart printers only</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Station Action Buttons -->
+                    <div class="station-btn-row">
+                        <button type="button" class="btn-lux-primary" onclick="saveConfig({{ station.id }})" style="width:auto;padding:0.6rem 1.4rem;">
+                            <i class="bi bi-floppy"></i> Save Config
+                        </button>
+                        <button type="button"
+                                class="btn-lux-outline"
+                                id="test-btn-{{ station.id }}"
+                                {% if not station.printer_ip %}disabled title="Save a printer IP first"{% endif %}
+                                onclick="testPrint({{ station.id }})">
+                            <i class="bi bi-printer"></i> Send Test Print
+                        </button>
+                        <span class="d-inline-flex align-items-center gap-2 ms-2" id="status-{{ station.id }}" style="font-size:0.8rem;"></span>
+
+                        {% if stations|length > 1 %}
+                        <div class="ms-auto">
+                            <button type="button"
+                                    class="btn-lux-danger-outline"
+                                    onclick="deleteStation({{ station.id }}, '{{ station.name|escapejs }}', {{ station.is_default|lower }})">
+                                <i class="bi bi-trash"></i> Remove Station
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+            {% empty %}
+            <div class="lux-card text-center py-5">
+                <i class="bi bi-fire text-muted" style="font-size:2.5rem;display:block;margin-bottom:1rem;"></i>
+                <div class="fw-bold mb-1">No Kitchen Stations Configured</div>
+                <div class="text-muted" style="font-size:0.85rem;">Add your first station using the form on the left to start routing KOTs.</div>
+            </div>
+            {% endfor %}
+
+            <!-- ── Print Strip Preview Section ── -->
+            {% if stations %}
+            <div class="preview-card">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="lux-card-title mb-0" style="font-size:0.98rem;">
+                        <i class="bi bi-receipt text-danger"></i> How Will Receipts & KOTs Print?
+                    </div>
+                </div>
+
+                {% if any_station_has_printer %}
+                <!-- Multi-Printer Mode Preview -->
+                <div class="p-3 rounded-3" style="background:var(--bg-color);border:1px solid var(--border-color);">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;font-weight:700;">MULTI-PRINTER MODE</span>
+                        <span style="font-size:0.75rem;color:var(--text-muted);">Each station prints its own KOT when an order is sent to the kitchen.</span>
+                    </div>
+
+                    <div class="strip-flex">
+                        <div class="strip-block strip-bill">BILL</div>
+                        <div class="strip-cut cut-full">✂ FULL CUT</div>
+                        <span class="text-muted" style="font-size:0.75rem;">→ Cashier Printer{% if cashier_ip %} ({{ cashier_ip }}){% endif %}</span>
+                    </div>
+
+                    {% for station in stations %}
+                    {% if station.printer_ip and not station.is_default %}
+                    <div class="strip-flex">
+                        <div class="strip-block strip-kot">KOT: {{ station.name }}</div>
+                        <div class="strip-cut cut-full">✂ FULL CUT</div>
+                        <span class="text-muted" style="font-size:0.75rem;">→ {{ station.printer_ip }}</span>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+
+                    <div class="mt-2 pt-2 border-top text-muted" style="font-size:0.74rem;">
+                        KOTs print immediately at each station. Customer bill prints at payment.
+                    </div>
+                </div>
+
+                {% else %}
+                <!-- Cashier Strip Mode Preview -->
+                <div class="p-3 rounded-3" style="background:var(--bg-color);border:1px solid var(--border-color);">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge" style="background:rgba(236,39,52,0.12);color:var(--pos-red);font-weight:700;">CASHIER STRIP MODE</span>
+                        <span style="font-size:0.75rem;color:var(--text-muted);">Bill + all station KOTs print as one connected strip at the counter printer.</span>
+                    </div>
+
+                    <div class="strip-flex">
+                        <div class="strip-block strip-bill">BILL</div>
+                        <div class="strip-cut cut-part">— partial</div>
+                        {% for station in stations %}
+                        <div class="strip-block strip-kot">
+                            KOT<br><span style="font-size:0.65rem;opacity:0.8;">{{ station.name }}</span>
+                        </div>
+                        {% if not forloop.last %}
+                        <div class="strip-cut cut-part">— partial</div>
+                        {% else %}
+                        <div class="strip-cut cut-full">✂ FULL CUT</div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="mt-2 pt-2 border-top text-muted" style="font-size:0.74rem;">
+                        Cashier tears off the full strip after checkout. Staff hand each section to the kitchen stations.
+                        {% if not cashier_ip %}
+                        <span class="text-warning fw-bold d-block mt-1">
+                            <i class="bi bi-exclamation-triangle"></i> No counter printer IP configured. Enter your printer IP in the default station above.
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+        </div>
     </div>
-
-    <p class="section-label" style="margin-top:1.5rem;">Active Stations</p>
-
-    {% for station in stations %}
-    <div class="station-card {% if station.is_default %}is-default{% endif %}" id="card-{{ station.id }}">
-
-      <div class="station-header" onclick="togglePanel({{ station.id }})">
-        <div class="station-name">
-          <i class="bi bi-fire" style="color:{% if station.is_default %}var(--accent-gold){% else %}var(--text-muted){% endif %}"></i>
-          {{ station.name }}
-          {% if station.is_default %}
-            <span class="badge-default">Default</span>
-          {% endif %}
-        </div>
-        <div style="display:flex;align-items:center;gap:0.6rem;">
-          {% if station.printer_ip %}
-            <span class="printer-status"><span class="dot orange"></span>{{ station.printer_ip }}</span>
-          {% else %}
-            <span class="printer-status"><span class="dot"></span>No printer</span>
-          {% endif %}
-          {% if not station.is_default %}
-            <form method="post" action="/setup/set-default-station/{{ station.id }}/" onclick="event.stopPropagation()" style="display:inline;">
-              {% csrf_token %}
-              <button type="submit" class="btn-ghost">Set Default</button>
-            </form>
-          {% endif %}
-          <i class="bi bi-chevron-down chevron" id="chevron-{{ station.id }}"></i>
-        </div>
-      </div>
-
-      <div class="printer-panel" id="panel-{{ station.id }}">
-
-        {% if station.is_default and not any_station_has_printer %}
-        <div style="background:rgba(16,185,129,0.07);border-left:3px solid #10b981;padding:0.7rem 0.9rem;margin-bottom:1rem;font-size:0.72rem;line-height:1.6;">
-          <strong style="color:#10b981;">Cashier printer.</strong>
-          Bill + all KOTs print here as one strip. Leave other stations with no IP.
-        </div>
-        {% endif %}
-
-        <div class="printer-grid">
-          <div>
-            <label class="field-label">Printer IP Address</label>
-            <div style="display:flex;align-items:center;gap:0.5rem;">
-              <input type="text" class="field-input" id="ip-{{ station.id }}"
-                value="{{ station.printer_ip|default:'' }}"
-                placeholder="e.g. 192.168.1.100"
-                style="margin-bottom:0;flex:1;">
-              <button class="btn-ghost" id="discover-btn-{{ station.id }}"
-                onclick="discoverPrinterIp({{ station.id }})"
-                title="Auto-scan network for printers"
-                style="white-space:nowrap;padding:4px 10px;height:2.1rem;">
-                <i class="bi bi-search"></i>
-              </button>
-            </div>
-            <div id="discover-result-{{ station.id }}" style="font-size:0.68rem;color:var(--text-muted);margin-top:0.3rem;margin-bottom:1.4rem;min-height:1rem;"></div>
-          </div>
-          <div>
-            <label class="field-label">Paper Width</label>
-            <select class="field-select" id="paper-{{ station.id }}">
-              <option value="80" {% if station.paper_width_mm == 80 %}selected{% endif %}>80mm — standard</option>
-              <option value="58" {% if station.paper_width_mm == 58 %}selected{% endif %}>58mm — narrow</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Advanced fields — collapsed by default -->
-        <button class="advanced-toggle" onclick="toggleAdvanced({{ station.id }})">
-          <i class="bi bi-chevron-right" id="adv-icon-{{ station.id }}" style="font-size:0.6rem;"></i>
-          Advanced
-        </button>
-        <div class="advanced-panel" id="adv-{{ station.id }}">
-          <div class="printer-grid">
-            <div>
-              <label class="field-label">Port</label>
-              <input type="number" class="field-input" id="port-{{ station.id }}"
-                value="{{ station.printer_port }}" min="1" max="65535">
-            </div>
-            <div>
-              <label class="field-label">Cut Type</label>
-              <select class="field-select" id="cut-{{ station.id }}">
-                <option value="full"    {% if station.cut_type == 'full'    %}selected{% endif %}>Full cut</option>
-                <option value="partial" {% if station.cut_type == 'partial' %}selected{% endif %}>Partial cut</option>
-                <option value="none"    {% if station.cut_type == 'none'    %}selected{% endif %}>No cut (tear)</option>
-              </select>
-            </div>
-          </div>
-          <label class="field-label">Encoding</label>
-          <select class="field-select" id="enc-{{ station.id }}" style="max-width:320px;">
-            <option value="cp437" {% if station.printer_encoding == 'cp437' %}selected{% endif %}>CP437 — standard (most printers)</option>
-            <option value="cp850" {% if station.printer_encoding == 'cp850' %}selected{% endif %}>CP850 — western Europe</option>
-            <option value="utf-8" {% if station.printer_encoding == 'utf-8' %}selected{% endif %}>UTF-8 — modern printers only</option>
-          </select>
-          <p class="hint">Leave CP437 unless your printer explicitly supports UTF-8.</p>
-        </div>
-
-        <div class="btn-row">
-          <button class="btn-save" onclick="saveConfig({{ station.id }})">
-            <i class="bi bi-floppy me-1"></i> Save
-          </button>
-          <button class="btn-test" id="test-btn-{{ station.id }}"
-            {% if not station.printer_ip %}disabled title="Save a printer IP first"{% endif %}
-            onclick="testPrint({{ station.id }})">
-            <i class="bi bi-printer me-1"></i> Test Print
-          </button>
-          <span class="printer-status" id="status-{{ station.id }}"></span>
-        </div>
-
-        {% if stations|length > 1 %}
-        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border-color);">
-          <button class="btn-delete-station" onclick="deleteStation({{ station.id }}, '{{ station.name|escapejs }}', {{ station.is_default|lower }})">
-            <i class="bi bi-trash me-1"></i> Remove Station
-          </button>
-        </div>
-        {% endif %}
-
-      </div>
-    </div>
-    {% empty %}
-    <p class="empty-state">No stations yet. Add one on the left — at least one is needed for KOT routing.</p>
-    {% endfor %}
-
-  </div>
 </div>
-
-<!-- PRINT STRIP PREVIEW -->
-{% if stations %}
-<div style="max-width:960px;margin:0 auto 4rem;padding:0 1.5rem;">
-  <p class="section-label" style="margin-bottom:1rem;">How Will It Print?</p>
-
-  {% if any_station_has_printer %}
-  <div style="background:var(--panel-bg);border:1px solid var(--border-color);padding:1.5rem;">
-    <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;">
-      <span style="font-size:0.65rem;text-transform:uppercase;letter-spacing:2px;font-weight:700;color:#10b981;background:rgba(16,185,129,.1);padding:3px 10px;">Multi-Printer Mode</span>
-      <span style="font-size:0.75rem;color:var(--text-muted);">Each station prints its own KOT when an order is sent</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.75rem;flex-wrap:wrap;">
-      <div class="strip-block strip-bill">BILL</div>
-      <div class="strip-cut strip-full">✂ FULL CUT</div>
-      <span style="font-size:0.68rem;color:var(--text-muted);margin-left:0.5rem;">→ Cashier printer{% if cashier_ip %} ({{ cashier_ip }}){% endif %}</span>
-    </div>
-    {% for station in stations %}
-    {% if station.printer_ip and not station.is_default %}
-    <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.5rem;flex-wrap:wrap;">
-      <div class="strip-block strip-kot">KOT: {{ station.name }}</div>
-      <div class="strip-cut strip-full">✂ FULL CUT</div>
-      <span style="font-size:0.68rem;color:var(--text-muted);margin-left:0.5rem;">→ {{ station.printer_ip }}</span>
-    </div>
-    {% endif %}
-    {% endfor %}
-    <p style="font-size:0.72rem;color:var(--text-muted);margin-top:1rem;margin-bottom:0;border-top:1px solid var(--border-color);padding-top:0.75rem;">
-      KOTs print at each station when the order is sent to kitchen. Bill prints at payment.
-    </p>
-  </div>
-
-  {% else %}
-  <div style="background:var(--panel-bg);border:1px solid var(--border-color);padding:1.5rem;">
-    <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1.25rem;">
-      <span style="font-size:0.65rem;text-transform:uppercase;letter-spacing:2px;font-weight:700;color:var(--accent-gold);background:rgba(236, 39, 52,.1);padding:3px 10px;">Cashier Strip Mode</span>
-      <span style="font-size:0.75rem;color:var(--text-muted);">Bill + all KOTs print as one connected strip at payment</span>
-    </div>
-    <div style="display:flex;align-items:stretch;gap:0;flex-wrap:wrap;row-gap:0.5rem;">
-      <div class="strip-block strip-bill">BILL</div>
-      <div class="strip-cut strip-part">— partial</div>
-      {% for station in stations %}
-      <div class="strip-block strip-kot">KOT<br><span style="font-size:0.6rem;opacity:0.8;">{{ station.name }}</span></div>
-      {% if not forloop.last %}
-      <div class="strip-cut strip-part">— partial</div>
-      {% else %}
-      <div class="strip-cut strip-full">✂ FULL CUT</div>
-      {% endif %}
-      {% endfor %}
-    </div>
-    <p style="font-size:0.72rem;color:var(--text-muted);margin-top:1rem;margin-bottom:0;border-top:1px solid var(--border-color);padding-top:0.75rem;">
-      Cashier tears off the full strip after payment. Staff deliver each section to the station.
-      {% if not cashier_ip %}<br><strong style="color:#f59e0b;">No printer IP set</strong> — open the default station above and enter its IP.{% endif %}
-    </p>
-  </div>
-  {% endif %}
-
-</div>
-{% endif %}
-
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// Android phones run the agent on-device; desktops use the configured host
+// Android devices run the print agent locally on device; desktops use configured host
 const AGENT_WS = 'ws://' + ((typeof lexnoraxPlatform !== 'undefined' && lexnoraxPlatform.android)
     ? 'localhost'
     : '{{ request.user.outlet.agent_host|default:"localhost" }}') + ':8765';
@@ -374,28 +1135,47 @@ async function connectAgent(timeout = 2000) {
 }
 
 async function checkAgentStatus() {
-  const dot  = document.getElementById('agentDot');
-  const text = document.getElementById('agentStatusText');
+  const dotTop     = document.getElementById('agentDot');
+  const dotSide    = document.getElementById('agentDotSide');
+  const textTop    = document.getElementById('kpiAgentText');
+  const textSide   = document.getElementById('agentStatusText');
+  const badgeTop   = document.getElementById('kpiAgentBadge');
+
   try {
     const ws = await connectAgent(2000);
     ws.send(JSON.stringify({ type: 'ping' }));
-    dot.className  = 'dot green';
-    text.textContent = 'EasyBillBro Agent running';
-    text.style.color = '#10b981';
+
+    if (dotTop) dotTop.className = 'status-dot green';
+    if (dotSide) dotSide.className = 'status-dot green';
+    if (textTop) textTop.innerHTML = '<span class="status-dot green"></span> Connected';
+    if (textSide) {
+      textSide.textContent = 'Agent Connected';
+      textSide.style.color = '#10b981';
+    }
+    if (badgeTop) {
+      badgeTop.className = 'kpi-icon-badge kpi-icon-green';
+    }
   } catch {
-    dot.className  = 'dot red';
-    text.innerHTML = 'Agent not running — <a href="{% static "agent/lexnorax_agent_installer.bat" %}" download style="color:var(--accent-gold);">Download installer</a>';
-    text.style.color = 'var(--text-muted)';
+    if (dotTop) dotTop.className = 'status-dot red';
+    if (dotSide) dotSide.className = 'status-dot red';
+    if (textTop) textTop.innerHTML = '<span class="status-dot red"></span> Offline';
+    if (textSide) {
+      textSide.innerHTML = 'Not running — <a href="{% static "agent/lexnorax_agent_installer.bat" %}" download style="color:var(--pos-red);font-weight:700;">Download Installer</a>';
+      textSide.style.color = 'var(--text-muted)';
+    }
+    if (badgeTop) {
+      badgeTop.className = 'kpi-icon-badge kpi-icon-red';
+    }
   }
 }
 
 async function setPrintMode(mode) {
   const hint = document.getElementById('printModeHint');
   if (mode === 'cashier') {
-    if (!confirm(
-      'Switch to One Printer mode?\n\n' +
-      'This will clear the printer IP from all stations except the default station.\n\n' +
-      'The default station keeps its IP — bill + KOTs print there as one strip.'
+    if (!await ui.confirm(
+      'Switch to One Printer Mode?',
+      'This will clear the printer IP from all stations except the default station.\n\nThe default station keeps its IP — bill + KOTs print there as one strip.',
+      'Switch Mode'
     )) return;
     try {
       await apiClient.post('/setup/kitchen-stations/set-mode/cashier/', {});
@@ -403,10 +1183,10 @@ async function setPrintMode(mode) {
       hint.style.color = '#10b981';
       document.getElementById('modeCashier').classList.add('active');
       document.getElementById('modeStation').classList.remove('active');
-      setTimeout(() => window.location.reload(), 800);
+      setTimeout(() => window.location.reload(), 600);
     } catch(e) {}
   } else {
-    hint.textContent = 'Enter a printer IP for each station below.';
+    hint.textContent = 'Enter a printer IP for each station below to enable direct station printing.';
     hint.style.color = 'var(--text-muted)';
     document.getElementById('modeStation').classList.add('active');
     document.getElementById('modeCashier').classList.remove('active');
@@ -416,35 +1196,41 @@ async function setPrintMode(mode) {
 document.addEventListener('DOMContentLoaded', () => {
   checkAgentStatus();
   const hint = document.getElementById('printModeHint');
-  {% if any_station_has_printer %}
-  hint.textContent = 'Each station has its own printer. KOTs print at the station when the order is sent.';
-  {% else %}
-  hint.innerHTML = '✓ One Printer mode — enter the IP on the <strong>{% if default_station %}{{ default_station.name }}{% else %}default{% endif %}</strong> station only.';
-  hint.style.color = '#10b981';
-  {% endif %}
+  if (hint) {
+    {% if any_station_has_printer %}
+    hint.textContent = '✓ Multi-Printer Mode active — each station prints KOTs directly upon order confirmation.';
+    {% else %}
+    hint.innerHTML = '✓ One Printer Mode active — enter the printer IP on the <strong>{% if default_station %}{{ default_station.name }}{% else %}default{% endif %}</strong> station only.';
+    {% endif %}
+  }
 });
 
 function togglePanel(id) {
   const panel   = document.getElementById(`panel-${id}`);
   const chevron = document.getElementById(`chevron-${id}`);
+  if (!panel) return;
   const isOpen  = panel.classList.contains('open');
   panel.classList.toggle('open', !isOpen);
-  chevron.classList.toggle('open', !isOpen);
+  if (chevron) chevron.classList.toggle('open', !isOpen);
 }
 
 function toggleAdvanced(id) {
   const panel = document.getElementById(`adv-${id}`);
   const icon  = document.getElementById(`adv-icon-${id}`);
+  if (!panel) return;
   const isOpen = panel.classList.contains('open');
   panel.classList.toggle('open', !isOpen);
-  icon.className = isOpen ? 'bi bi-chevron-right' : 'bi bi-chevron-down';
-  icon.style.fontSize = '0.6rem';
+  if (icon) {
+    icon.className = isOpen ? 'bi bi-chevron-right' : 'bi bi-chevron-down';
+    icon.style.fontSize = '0.65rem';
+  }
 }
 
 function setStatus(id, type, msg) {
   const el = document.getElementById(`status-${id}`);
+  if (!el) return;
   const colors = { ok: '#10b981', err: '#ef4444', busy: 'var(--text-muted)' };
-  el.innerHTML = `<span class="dot" style="background:${colors[type]}"></span> ${msg}`;
+  el.innerHTML = `<span class="status-dot" style="background:${colors[type]}"></span> ${msg}`;
 }
 
 async function saveConfig(id) {
@@ -460,12 +1246,14 @@ async function saveConfig(id) {
       paper_width_mm: paper, cut_type: cut, printer_encoding: enc,
     });
     setStatus(id, 'ok', data.message || 'Saved');
+    ui.toast('Printer configuration saved', 'success');
     const testBtn = document.getElementById(`test-btn-${id}`);
-    if (ip) { testBtn.disabled = false; testBtn.title = ''; }
-    const dots = document.getElementById(`card-${id}`).querySelectorAll('.dot');
+    if (ip && testBtn) { testBtn.disabled = false; testBtn.title = ''; }
+    const dots = document.getElementById(`card-${id}`).querySelectorAll('.status-dot');
     if (dots.length) dots[0].style.background = ip ? '#f59e0b' : 'var(--border-color)';
   } catch {
     setStatus(id, 'err', 'Save failed');
+    ui.toast('Failed to save printer settings', 'error');
   }
 }
 
@@ -511,7 +1299,8 @@ async function testPrint(id) {
       ws.send(JSON.stringify({ type: 'print', job_id: jid, lines, network_host: ip, network_port: port }));
     });
     setStatus(id, 'ok', 'Printed!');
-    const dots = document.getElementById(`card-${id}`).querySelectorAll('.dot');
+    ui.toast('Test print sent successfully', 'success');
+    const dots = document.getElementById(`card-${id}`).querySelectorAll('.status-dot');
     if (dots.length) dots[0].style.background = '#10b981';
   } catch(e) {
     const msg = e.message === 'not running' ? 'EasyBillBro Agent not running' : (e.message || 'Could not reach printer');
@@ -526,7 +1315,7 @@ async function discoverPrinterIp(id) {
   const btn    = document.getElementById(`discover-btn-${id}`);
   const result = document.getElementById(`discover-result-${id}`);
   btn.disabled = true;
-  result.textContent = 'Scanning network…';
+  result.textContent = 'Scanning network for ESC/POS printers…';
   result.style.color = 'var(--text-muted)';
 
   try {
@@ -545,15 +1334,16 @@ async function discoverPrinterIp(id) {
     });
 
     if (found.length === 0) {
-      result.textContent = 'No printers found on network';
+      result.textContent = 'No printers found on local network';
       result.style.color = '#ef4444';
     } else if (found.length === 1) {
       document.getElementById(`ip-${id}`).value = found[0].ip;
       result.textContent = `✓ Found: ${found[0].ip} (${found[0].responded_ms}ms)`;
       result.style.color = '#10b981';
+      ui.toast(`Found printer at ${found[0].ip}`, 'success');
     } else {
       const links = found.map(p =>
-        `<a href="#" onclick="event.preventDefault();document.getElementById('ip-${id}').value='${p.ip}';document.getElementById('discover-result-${id}').textContent='Selected ${p.ip}';document.getElementById('discover-result-${id}').style.color='#10b981';" style="color:var(--accent-gold);">${p.ip}</a>`
+        `<a href="#" onclick="event.preventDefault();document.getElementById('ip-${id}').value='${p.ip}';document.getElementById('discover-result-${id}').textContent='Selected ${p.ip}';document.getElementById('discover-result-${id}').style.color='#10b981';" style="color:var(--pos-red);font-weight:700;">${p.ip}</a>`
       ).join(' &nbsp;·&nbsp; ');
       result.innerHTML = `Found ${found.length}: ${links}`;
       result.style.color = 'var(--text-muted)';
@@ -567,10 +1357,11 @@ async function discoverPrinterIp(id) {
 }
 
 async function deleteStation(id, name, isDefault) {
+  const title = isDefault ? 'Delete Default Station?' : 'Remove Kitchen Station?';
   const warning = isDefault
-    ? `"${name}" is the default station. Another station will become the default automatically.\n\nDelete anyway?`
-    : `Remove kitchen station "${name}"?\n\nMenu items assigned to it will move to the default station.`;
-  if (!confirm(warning)) return;
+    ? `"${name}" is the default station. Another station will become the default automatically. Delete anyway?`
+    : `Remove kitchen station "${name}"? Menu items assigned to it will move to the default station.`;
+  if (!await ui.confirm(title, warning, 'Delete Station')) return;
   try {
     const data = await apiClient.post(`/setup/kitchen-stations/${id}/delete/`, {});
     ui.toast(data.message || 'Station removed', 'success');
@@ -585,3 +1376,4 @@ async function deleteStation(id, name, isDefault) {
 }
 </script>
 {% endblock %}
+

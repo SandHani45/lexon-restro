@@ -2,13 +2,18 @@
 import logging
 from decimal import Decimal
 
+import json
+
 from django.contrib.auth.decorators import login_required
 from django.db.models import Prefetch, Sum, Q
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.urls import reverse
 from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_POST
 
 from core.decorators import tenant_required
+from core.features import has_feature
 from menu.models import MenuCategory, MenuItem
 from orders.models import Order, Table, Payment
 from tablemerge.models import TableMerge
@@ -171,3 +176,61 @@ def bill_view(request, order_id):
         })
     except Order.DoesNotExist:
         return JsonResponse({"error": "Order not found"}, status=404)
+
+
+# -------------------------------------------------
+# SEND BILL TO WHATSAPP (manual, from the bill screen)
+# -------------------------------------------------
+
+@login_required
+@tenant_required
+@require_POST
+def send_whatsapp_bill(request, order_id):
+    """
+    Cashier-triggered "Send to WhatsApp" on the bill screen. Distinct from
+    the automatic receipt fired on payment (payment_views.py) -- this lets
+    staff (re-)send on demand, to a number typed in on the spot if the
+    order has none on file yet, or to resend after the customer says they
+    never got it. Runs synchronously (unlike the payment-flow send, which
+    is deliberately async so it can't delay the "payment complete"
+    response) because a cashier who just clicked the button is already
+    waiting for a yes/no answer.
+    """
+    try:
+        order = Order.objects.get(
+            id=order_id, tenant=request.user.tenant, outlet=request.user.outlet
+        )
+    except Order.DoesNotExist:
+        return JsonResponse({"error": "Order not found"}, status=404)
+
+    if not has_feature(request.user.tenant, "whatsapp_receipts"):
+        return JsonResponse({"error": "WhatsApp receipts aren't enabled for your account."}, status=403)
+
+    from django.conf import settings
+    if not (getattr(settings, "META_WHATSAPP_TOKEN", "") or getattr(settings, "TWILIO_ACCOUNT_SID", "")):
+        return JsonResponse({"error": "WhatsApp sending isn't set up for this account yet. Contact support."}, status=503)
+
+    try:
+        body = json.loads(request.body or "{}")
+    except ValueError:
+        body = {}
+
+    from notifications.services.whatsapp_service import send_bill_receipt, normalize_phone
+    from orders.views.public_views import make_public_bill_token
+
+    phone_input = (body.get("phone") or "").strip()
+    if phone_input:
+        if not normalize_phone(phone_input):
+            return JsonResponse({"error": "That doesn't look like a valid phone number."}, status=400)
+        if phone_input != order.customer_phone:
+            order.customer_phone = phone_input
+            order.save(update_fields=["customer_phone"])
+    elif not order.customer_phone:
+        return JsonResponse({"error": "Enter a customer phone number first."}, status=400)
+
+    token = make_public_bill_token(order.id)
+    bill_url = request.build_absolute_uri(reverse("public-bill", args=[token]))
+
+    if send_bill_receipt(order, bill_url):
+        return JsonResponse({"success": True, "phone": order.customer_phone})
+    return JsonResponse({"error": "Couldn't reach WhatsApp. Check the number and try again."}, status=502)

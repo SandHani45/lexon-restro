@@ -37,6 +37,19 @@ RESERVED_SLUGS = frozenset({
 })
 
 
+def tenant_logo_path(instance, filename):
+    """
+    restaurants/<tenant-slug>/logos/<filename> -- same per-tenant folder
+    convention as menu_item_image_path (menu/models.py), so a restaurant's
+    logo and menu photos land under one shared prefix regardless of the
+    active storage backend. Falls back to the tenant's pk (or "new" for a
+    not-yet-saved tenant) since a brand-new signup can have its logo
+    assigned before Tenant.save() has lowercased/finalized the slug.
+    """
+    slug = instance.slug or f"tenant-{instance.pk or 'new'}"
+    return f"restaurants/{slug}/logos/{filename}"
+
+
 class Tenant(models.Model):
 
     name = models.CharField(
@@ -64,7 +77,7 @@ class Tenant(models.Model):
     )
 
     logo = models.ImageField(
-        upload_to="tenant_logos/",
+        upload_to=tenant_logo_path,
         null=True,
         blank=True,
         help_text="Restaurant Logo for bills",
@@ -149,7 +162,15 @@ class Tenant(models.Model):
         # validate_image_size nor Django's own ImageField content check ever
         # fire, and an SVG-with-<script> or an HTML file renamed to .jpg
         # would be stored and served as-is from the public logo URL.
-        if self.logo and hasattr(self.logo, "file") and not self.logo.name.lower().endswith(".webp"):
+        # `_committed` is False only when a fresh File/UploadedFile was just
+        # assigned (checked synchronously, no I/O); True for an existing
+        # storage path. hasattr(self.logo, "file") used to be used here
+        # instead, but that property lazily opens the file from storage on
+        # every access -- a bare OSError (not swallowed by hasattr, which
+        # only catches AttributeError) on Cloudinary crashes saves of
+        # tenants whose logo was untouched. See menu/models.py MenuItem.save
+        # for the same fix applied there first.
+        if self.logo and not self.logo._committed and not self.logo.name.lower().endswith(".webp"):
             try:
                 validate_image_size(self.logo)
                 filename, content = process_uploaded_image(self.logo)

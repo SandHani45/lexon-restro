@@ -1,246 +1,587 @@
 {% extends 'core/base.html' %}
+{% load static %}
 
 {% block title %}Kitchen Display — {{ request.user.tenant.name }}{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* Kitchen is ALWAYS dark — readable under bright/hot kitchen conditions */
+    /* ══════════════════════════════════════════════════════════════
+       KIMIPOS LUXURY KITCHEN DISPLAY SYSTEM (KDS) DESIGN SYSTEM
+       ══════════════════════════════════════════════════════════════ */
     :root {
-        --bg-color:    #0a0a0a;
-        --panel-bg:    #241a16;
-        --card-bg:     #2a1f1a;
-        --text-main:   #f7f1ec;
-        --text-muted:  #a89686;
-        --border-color: #3a2c26;
-        --c-fresh:  #FA7327;
-        --c-warn:   #f59e0b;
-        --c-urgent: #ef4444;
-    }
-    /* Staff can toggle to light if they prefer */
-    html.kitchen-light {
-        --bg-color:    #F7F7F9;
-        --panel-bg:    #ffffff;
-        --card-bg:     #ffffff;
-        --text-main:   #2C170E;
-        --text-muted:  #8a7d74;
-        --border-color: #ECE7E2;
+        --pos-red: #EC2734;
+        --pos-red-hover: #d81f2f;
+        --pos-red-soft: rgba(236, 39, 52, 0.08);
+        --pos-red-border: rgba(236, 39, 52, 0.22);
+        --pos-green: #10b981;
+        --pos-green-soft: rgba(16, 185, 129, 0.10);
+        --pos-green-hover: #059669;
+        --pos-amber: #f59e0b;
+        --pos-amber-soft: rgba(245, 158, 11, 0.10);
+        --pos-orange: #f97316;
+        --pos-orange-soft: rgba(249, 115, 22, 0.10);
+
+        /* Semantic kitchen mappings */
+        --c-fresh:  var(--pos-green);
+        --c-warn:   var(--pos-amber);
+        --c-urgent: var(--pos-red);
     }
 
-    body { overflow-x: hidden; }
+    body {
+        background: var(--bg-color) !important;
+        overflow-x: hidden;
+    }
+
+    /* ── Sub-Header Bar (KimiPoS POS Layout) ──────────────────── */
+    .pos-subbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 0.9rem 1.5rem 0.5rem;
+        background: var(--bg-color);
+    }
+    .pos-subbar-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        letter-spacing: -0.4px;
+    }
+    .pos-breadcrumbs {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .pos-breadcrumbs a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.15s;
+    }
+    .pos-breadcrumbs a:hover {
+        color: var(--pos-red);
+    }
+    .pos-breadcrumbs .separator {
+        font-size: 0.65rem;
+        opacity: 0.6;
+    }
+    .pos-breadcrumbs .current {
+        color: var(--pos-red);
+        font-weight: 700;
+    }
+
+    /* KDS Subbar Badges & Action Pills */
+    .kds-status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
+        background: var(--pos-red-soft);
+        color: var(--pos-red);
+        border: 1px solid var(--pos-red-border);
+        border-radius: 999px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .pulse-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--pos-red);
+        display: inline-block;
+        animation: pulseLive 1.8s infinite;
+    }
+    @keyframes pulseLive {
+        0%   { transform: scale(0.9); opacity: 0.6; box-shadow: 0 0 0 0 rgba(236, 39, 52, 0.4); }
+        70%  { transform: scale(1.15); opacity: 1; box-shadow: 0 0 0 6px rgba(236, 39, 52, 0); }
+        100% { transform: scale(0.9); opacity: 0.6; box-shadow: 0 0 0 0 rgba(236, 39, 52, 0); }
+    }
+
+    .kds-pill-btn {
+        background: var(--panel-bg);
+        color: var(--text-main);
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-decoration: none !important;
+    }
+    .kds-pill-btn:hover {
+        border-color: var(--pos-red-border);
+        background: var(--pos-red-soft);
+        color: var(--pos-red);
+        transform: translateY(-1px);
+    }
 
     /* ── Station tabs ─────────────────────────────────── */
+    .kds-station-container {
+        padding: 0 1.5rem;
+        margin-top: 0.25rem;
+    }
     .station-tabs {
         display: flex;
         gap: 0.6rem;
-        padding: 0.75rem 1.5rem;
+        padding: 0.65rem 0.8rem;
         background: var(--panel-bg);
-        border-bottom: 1px solid var(--border-color);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
         overflow-x: auto;
         scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
     }
     .station-tabs::-webkit-scrollbar { display: none; }
     .station-btn {
-        background: transparent;
+        background: var(--surface-2);
         border: 1px solid var(--border-color);
         color: var(--text-muted);
-        font-family: 'Outfit', sans-serif;
-        font-weight: 600;
-        font-size: 0.85rem;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        font-weight: 700;
+        font-size: 0.84rem;
         cursor: pointer;
-        transition: var(--transition-smooth);
+        transition: all 0.2s ease;
         white-space: nowrap;
-        padding: 0.55rem 1.1rem;
-        border-radius: var(--radius-pill);
-        min-height: 44px;
+        padding: 0.5rem 1.1rem;
+        border-radius: 999px;
+        min-height: 40px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
-    .station-btn:hover { color: var(--text-main); border-color: var(--text-muted); }
-    .station-btn.active { background: var(--c-fresh); border-color: var(--c-fresh); color: #fff; }
+    .station-btn:hover {
+        color: var(--text-main);
+        border-color: rgba(236, 39, 52, 0.35);
+        background: var(--pos-red-soft);
+    }
+    .station-btn.active {
+        background: var(--pos-red) !important;
+        border-color: var(--pos-red) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(236, 39, 52, 0.35);
+    }
 
     /* ── Orders grid ─────────────────────────────────── */
-    .orders-grid { padding: 1.5rem; }
+    .orders-grid {
+        padding: 1.25rem 1.5rem 2.5rem;
+    }
 
     /* ── KOT cards ───────────────────────────────────── */
     .order-card {
         background: var(--card-bg);
         border: 1px solid var(--border-color);
-        border-radius: var(--radius-md);
+        border-radius: 20px;
         display: flex;
         flex-direction: column;
         height: 100%;
-        transition: var(--transition-smooth);
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
     }
-    .order-card:hover { border-color: var(--text-muted); }
-    .card-fresh  { border-top: 4px solid var(--c-fresh); }
-    .card-warn   { border-top: 4px solid var(--c-warn); }
-    .card-urgent { border-top: 4px solid var(--c-urgent); animation: pulse-border 2s infinite; }
-
-    @keyframes pulse-border {
-        0%   { box-shadow: 0 0 0 0 rgba(239,68,68,0.25); }
-        70%  { box-shadow: 0 0 0 12px rgba(239,68,68,0); }
-        100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+    .order-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
     }
 
+    /* Top Accent Status Borders */
+    .card-fresh  { border-top: 4px solid var(--pos-green); }
+    .card-warn   { border-top: 4px solid var(--pos-amber); }
+    .card-urgent {
+        border-top: 4px solid var(--pos-red);
+        animation: kdsUrgentPulse 2s infinite ease-in-out;
+    }
+
+    @keyframes kdsUrgentPulse {
+        0%, 100% { box-shadow: 0 4px 20px rgba(236, 39, 52, 0.12); }
+        50%      { box-shadow: 0 0 25px rgba(236, 39, 52, 0.32); }
+    }
+
+    /* KOT Header */
     .order-header {
-        padding: 1.25rem 1.5rem;
+        padding: 1.15rem 1.4rem;
+        background: var(--panel-bg);
         border-bottom: 1px dashed var(--border-color);
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
+        gap: 12px;
     }
     .table-name {
-        font-family: 'DM Serif Display', serif;
-        font-size: 2rem;      /* 32px — readable at 2m */
-        font-weight: 700;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        font-size: 1.45rem;
+        font-weight: 800;
         color: var(--text-main);
-        line-height: 1;
-        margin-bottom: 0.2rem;
+        line-height: 1.15;
+        margin: 0;
+        letter-spacing: -0.5px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
     .kot-num {
-        font-size: 0.7rem;
+        font-size: 0.72rem;
+        font-weight: 700;
         color: var(--text-muted);
-        letter-spacing: 2px;
-        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background: var(--surface-2);
+        border: 1px solid var(--border-color);
+        padding: 2px 8px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
     }
     .timer {
-        font-size: 1rem;
-        font-weight: 700;
-        font-family: 'Outfit', sans-serif;
-        padding: 0.3rem 0.75rem;
-        border-radius: var(--radius-pill);
+        font-size: 0.88rem;
+        font-weight: 800;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        padding: 0.35rem 0.8rem;
+        border-radius: 999px;
         white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        line-height: 1;
     }
-
-    /* BUMP — mark entire KOT done, big enough for a knuckle tap */
-    .btn-bump {
-        width: 100%; padding: 1rem; background: transparent;
-        border: none; border-top: 1px solid var(--border-color);
-        font-size: 1rem; font-weight: 600; text-transform: uppercase;
-        letter-spacing: 1px; cursor: pointer; color: var(--c-fresh);
-        transition: background .2s;
-        min-height: 56px;
+    .card-fresh  .timer {
+        color: var(--pos-green);
+        background: var(--pos-green-soft);
+        border: 1px solid rgba(16, 185, 129, 0.25);
     }
-    .btn-bump:hover { background: rgba(250,115,39,.12); }
-    .card-fresh  .timer { color: var(--c-fresh);  background: rgba(250,115,39,.14); }
-    .card-warn   .timer { color: var(--c-warn);   background: rgba(245,158,11,.14); }
-    .card-urgent .timer { color: var(--c-urgent); background: rgba(239,68,68,.14); }
+    .card-warn   .timer {
+        color: var(--pos-amber);
+        background: var(--pos-amber-soft);
+        border: 1px solid rgba(245, 158, 11, 0.25);
+    }
+    .card-urgent .timer {
+        color: var(--pos-red);
+        background: rgba(236, 39, 52, 0.15);
+        border: 1px solid rgba(236, 39, 52, 0.35);
+    }
 
     /* ── Item rows ───────────────────────────────────── */
-    .items-container { padding: 1.25rem 1.5rem; flex-grow: 1; }
+    .items-container {
+        padding: 1.15rem 1.4rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+    }
     .item-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0.9rem 0;
+        padding-bottom: 0.85rem;
         border-bottom: 1px solid var(--border-color);
     }
-    .item-row:last-child { border-bottom: none; padding-bottom: 0; }
-    .item-qty {
-        font-family: 'DM Serif Display', serif;
-        color: var(--c-fresh);
-        font-size: 1.25rem;
+    .item-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+    .item-qty-badge {
+        min-width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        background: var(--surface-2);
+        border: 1.5px solid var(--border-color);
+        color: var(--pos-red);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        font-weight: 800;
+        font-size: 1.05rem;
         margin-right: 12px;
-        min-width: 24px;
-        text-align: right;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
     }
-    .item-name { font-size: 1rem; color: var(--text-main); font-weight: 400; }
-    .item-note { display: block; margin-top: 0.3rem; font-size: 0.75rem; color: var(--c-warn); font-style: italic; }
-    .action-cell { margin-left: 0.75rem; min-width: 100px; display: flex; justify-content: flex-end; }
-
-    /* ── Action buttons — BIG for kitchen gloves ─────── */
-    .btn-status {
-        background: transparent;
-        font-size: var(--text-xs);
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        font-weight: 600;
-        padding: 0.6rem 1.1rem;
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius-sm);
+    .item-name {
+        font-size: 0.95rem;
         color: var(--text-main);
-        transition: var(--transition-smooth);
-        width: 100%;
-        min-height: var(--min-tap-target);
-        cursor: pointer;
+        font-weight: 600;
+        line-height: 1.3;
     }
-    .btn-start:hover { border-color: var(--c-warn); color: var(--c-warn); }
-    .btn-ready:hover { border-color: var(--c-fresh); color: var(--c-fresh); }
+    .item-note {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 4px;
+        font-size: 0.76rem;
+        font-weight: 600;
+        color: #d97706;
+        background: rgba(245, 158, 11, 0.10);
+        border: 1px dashed rgba(245, 158, 11, 0.35);
+        border-radius: 6px;
+        padding: 2px 8px;
+    }
+    html.dark .item-note {
+        color: #fbbf24;
+    }
+    .action-cell {
+        margin-left: 0.75rem;
+        min-width: 110px;
+        display: flex;
+        justify-content: flex-end;
+        flex-shrink: 0;
+    }
+
+    /* ── Action buttons — BIG for kitchen gloves & knuckles ─────── */
+    .btn-status {
+        background: var(--surface-2);
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 700;
+        padding: 0.45rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        color: var(--text-main);
+        transition: all 0.2s ease;
+        width: 100%;
+        min-height: 40px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+    }
+    .btn-start {
+        border-color: rgba(245, 158, 11, 0.5);
+        color: var(--pos-amber);
+    }
+    .btn-start:hover {
+        background: var(--pos-amber);
+        border-color: var(--pos-amber);
+        color: #ffffff;
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
+        transform: translateY(-1px);
+    }
+    .btn-ready {
+        background: linear-gradient(135deg, #10b981, #059669);
+        border: none;
+        color: #ffffff;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+    .btn-ready:hover {
+        background: #059669;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.45);
+        transform: translateY(-1px);
+    }
     .badge-done {
-        color: #059669;
-        background: rgba(16,185,129,.12);
-        font-size: 0.75rem;
+        color: var(--pos-green);
+        background: var(--pos-green-soft);
+        border: 1px solid rgba(16, 185, 129, 0.22);
+        font-size: 0.76rem;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        padding: 0.6rem 1rem;
-        border: none;
-        border-radius: var(--radius-pill);
+        letter-spacing: 0.5px;
+        padding: 0.45rem 0.9rem;
+        border-radius: 999px;
         text-align: center;
         width: 100%;
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+    }
+
+    /* BUMP — mark entire KOT done, knuckle tap friendly */
+    .btn-bump {
+        width: 100%;
+        padding: 0.9rem 1rem;
+        background: linear-gradient(135deg, #10b981, #059669);
+        border: none;
+        font-size: 0.92rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        cursor: pointer;
+        color: #ffffff;
+        min-height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        border-radius: 0 0 19px 19px;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    }
+    .btn-bump:hover {
+        filter: brightness(1.08);
+        box-shadow: 0 -3px 14px rgba(16, 185, 129, 0.4);
+    }
+    .btn-bump:active {
+        transform: scale(0.99);
+    }
+
+    .btn-bump-all-done {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        background: var(--panel-bg);
+        border-top: 1px solid var(--border-color);
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--pos-green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        border-radius: 0 0 19px 19px;
     }
 
     /* ── States ──────────────────────────────────────── */
     .empty-state, .loading-state {
-        text-align: center; padding: 5rem 2rem; width: 100%; color: var(--text-muted);
+        text-align: center;
+        padding: 5rem 2rem;
+        width: 100%;
+        color: var(--text-muted);
     }
-    .empty-state i { font-size: 3rem; margin-bottom: 1rem; display: block; }
-    .empty-state h3 { font-family: 'DM Serif Display', serif; }
+    .empty-icon-wrap {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: var(--pos-green-soft);
+        color: var(--pos-green);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        margin-bottom: 1.25rem;
+        box-shadow: 0 4px 18px rgba(16, 185, 129, 0.15);
+    }
+    .empty-title {
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        font-weight: 800;
+        font-size: 1.5rem;
+        color: var(--text-main);
+        margin-bottom: 0.35rem;
+    }
+    .empty-subtitle {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        max-width: 400px;
+        margin: 0 auto;
+    }
 
     /* ── Mobile ──────────────────────────────────────── */
     @media (max-width: 576px) {
-        .orders-grid { padding: 0.75rem; }
+        .pos-subbar { padding: 0.75rem 1rem 0.25rem; }
+        .kds-station-container { padding: 0 1rem; }
+        .orders-grid { padding: 0.75rem 1rem 2rem; }
         .item-row { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
         .action-cell { margin-left: 0; width: 100%; }
-        .btn-status, .badge-done { padding: 0.9rem; font-size: 0.9rem; }
-    }
-
-    /* ── Waiter message modal dark ───────────────────── */
-    .modal-content {
-        background: var(--panel-bg) !important;
-        color: var(--text-main) !important;
-        border: 1px solid var(--border-color) !important;
-        border-radius: var(--radius-lg) !important;
+        .btn-status, .badge-done { padding: 0.8rem; font-size: 0.88rem; min-height: 44px; }
     }
 </style>
 {% endblock %}
 
 {% block header_left %}
-<div class="d-flex flex-column">
-  <a href="/dashboard/" style="text-decoration:none;color:inherit;">
-    <h1 class="brand-title mb-0" style="font-size:1.3rem;"><i class="bi bi-egg-fried me-2" style="color:var(--c-fresh);"></i>Kitchen Display</h1>
+<div class="d-flex align-items-center gap-2">
+  <a href="/dashboard/" class="d-flex align-items-center gap-2 text-decoration-none" style="color:inherit;">
+    <span class="topbar-page-title d-flex align-items-center gap-2">
+      <i class="bi bi-fire" style="color:var(--pos-red, #EC2734);"></i>
+      <span>Kitchen Display</span>
+    </span>
   </a>
-  <p class="mb-0 text-muted" style="font-size:0.75rem;letter-spacing:1px;text-transform:uppercase;">{{ request.user.outlet.name }}</p>
+  <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle ms-1 d-none d-sm-inline-flex" style="font-size:0.68rem; font-weight:700; padding:2px 8px;">KDS LIVE</span>
 </div>
 {% endblock %}
 
 {% block header_right %}
 {% if request.user.role == 'owner' or request.user.role == 'manager' %}
-<button class="btn-luxury text-decoration-none d-none d-sm-inline-flex" style="border-color:#ef4444;color:#ef4444;" onclick="clearAllKitchen()" title="Clear every ticket off this screen">Clear All</button>
-<button class="btn-icon d-sm-none" style="color:#ef4444;" onclick="clearAllKitchen()" title="Clear All"><i class="bi bi-trash3"></i></button>
+<button class="btn-subbar-pill text-danger border-danger-subtle d-none d-sm-inline-flex" onclick="clearAllKitchen()" title="Clear every ticket off this screen">
+    <i class="bi bi-trash3"></i> Clear All
+</button>
+<button class="btn-icon text-danger d-sm-none" onclick="clearAllKitchen()" title="Clear All"><i class="bi bi-trash3"></i></button>
 {% endif %}
-<button class="btn-icon" onclick="kitchenToggleTheme()" title="Toggle Light/Dark" id="kitchenThemeBtn">
-    <i class="bi bi-sun" id="themeIcon"></i>
+
+<button class="btn-icon" onclick="toggleKitchenSound()" title="Toggle Sound Alerts" id="kdsSoundBtn">
+    <i class="bi bi-volume-up-fill" id="kdsSoundIcon" style="color:var(--pos-green, #10b981);"></i>
+</button>
+
+<button class="btn-icon" onclick="posToggleFullScreen()" title="Fullscreen Mode" id="kdsFullscreenBtn">
+    <i class="bi bi-fullscreen"></i>
+</button>
+
+<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Dark / Light Mode">
+    <i class="bi bi-moon" id="themeIcon"></i>
 </button>
 {% endblock %}
 
 {% block content %}
+<!-- Sub-Header Bar (KDS Controls) -->
+<div class="pos-subbar">
+    <div class="d-flex flex-column">
+        <h1 class="pos-subbar-title d-flex align-items-center gap-2">
+            <i class="bi bi-egg-fried" style="color:var(--pos-red, #EC2734);"></i>
+            <span>Kitchen Display System</span>
+        </h1>
+        <div class="pos-breadcrumbs">
+            <a href="/dashboard/"><i class="bi bi-house-door me-1"></i>Dashboard</a>
+            <span class="separator">/</span>
+            <span class="current">Kitchen Display</span>
+            <span class="separator">•</span>
+            <span class="text-muted"><i class="bi bi-geo-alt me-1"></i>{{ request.user.outlet.name }}</span>
+        </div>
+    </div>
+
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <!-- Active Tickets Pill -->
+        <div class="kds-status-pill" id="activeTicketsBadge">
+            <span class="pulse-dot"></span>
+            <span id="activeTicketCountText">0 Active Tickets</span>
+        </div>
+
+        <!-- Sound Toggle Pill -->
+        <button class="kds-pill-btn" onclick="toggleKitchenSound()" id="kdsSoundPill">
+            <i class="bi bi-volume-up-fill text-success" id="kdsSoundPillIcon"></i>
+            <span id="kdsSoundPillText">Sound On</span>
+        </button>
+
+        <!-- Live Sync status -->
+        <button class="kds-pill-btn" onclick="loadKitchen(true)" title="Tap to refresh now">
+            <i class="bi bi-arrow-repeat" id="syncSpinner"></i>
+            <span id="syncText">Sync Now</span>
+        </button>
+    </div>
+</div>
+
 <!-- Station filter tabs -->
-<div class="station-tabs" id="stationTabs">
-    <button class="station-btn active" onclick="changeStation('', this)">All Stations</button>
-    {% for s in stations %}
-    <button class="station-btn" onclick="changeStation('{{ s.name }}', this)">{{ s.name }}</button>
-    {% endfor %}
+<div class="kds-station-container">
+    <div class="station-tabs" id="stationTabs">
+        <button class="station-btn active" onclick="changeStation('', this)">
+            <i class="bi bi-grid-fill me-1"></i> All Stations
+        </button>
+        {% for s in stations %}
+        <button class="station-btn" onclick="changeStation('{{ s.name|escapejs }}', this)">
+            <i class="bi bi-fire me-1"></i> {{ s.name }}
+        </button>
+        {% endfor %}
+    </div>
 </div>
 
 <!-- KOT grid -->
 <div class="orders-grid">
     <div class="row g-4" id="orders">
         <div class="loading-state">
-            <div class="spinner-border mb-3" style="width:2rem;height:2rem;border-width:1px;color:var(--c-fresh);" role="status"></div>
-            <p style="text-transform:uppercase;letter-spacing:2px;font-size:0.8rem;">Syncing Kitchen…</p>
+            <div class="spinner-border mb-3" style="width:2.2rem;height:2.2rem;border-width:2.5px;color:var(--pos-red, #EC2734);" role="status"></div>
+            <p style="text-transform:uppercase;letter-spacing:2px;font-size:0.8rem;font-weight:700;">Syncing Kitchen…</p>
         </div>
     </div>
 </div>
@@ -248,13 +589,7 @@
 
 {% block extra_js %}
 <script>
-    /* Kitchen always starts dark — force it regardless of global theme pref */
-    document.documentElement.classList.add('dark');
-
-    // Item names, per-item notes, and table names are staff-entered free
-    // text re-interpolated into innerHTML below -- without escaping, one
-    // staff member's item note or menu edit executes in every other staff
-    // member's browser who has the kitchen display open.
+    // Escape HTML to prevent XSS
     function escapeHtml(str) {
         const div = document.createElement('div');
         div.textContent = str == null ? '' : String(str);
@@ -263,27 +598,79 @@
 
     let loading = false;
     let currentStation = "";
-    /* Kitchen-specific light toggle (not global themeManager) */
-    let kitchenLight = localStorage.getItem('kitchen_light') === 'true';
-    function kitchenToggleTheme() {
-        kitchenLight = !kitchenLight;
-        localStorage.setItem('kitchen_light', kitchenLight);
-        document.documentElement.classList.toggle('kitchen-light', kitchenLight);
-        const icon = document.getElementById('themeIcon');
-        if (icon) icon.className = kitchenLight ? 'bi bi-moon' : 'bi bi-sun';
+    let prevKotCount = -1;
+
+    // Sound alert preferences
+    let soundEnabled = localStorage.getItem('kds_sound_enabled') !== 'false';
+
+    function updateSoundUI() {
+        const icon = document.getElementById('kdsSoundIcon');
+        const pillIcon = document.getElementById('kdsSoundPillIcon');
+        const pillText = document.getElementById('kdsSoundPillText');
+        if (soundEnabled) {
+            if (icon) { icon.className = 'bi bi-volume-up-fill'; icon.style.color = 'var(--pos-green, #10b981)'; }
+            if (pillIcon) { pillIcon.className = 'bi bi-volume-up-fill text-success'; }
+            if (pillText) { pillText.textContent = 'Sound On'; }
+        } else {
+            if (icon) { icon.className = 'bi bi-volume-mute-fill'; icon.style.color = 'var(--text-muted)'; }
+            if (pillIcon) { pillIcon.className = 'bi bi-volume-mute-fill text-muted'; }
+            if (pillText) { pillText.textContent = 'Sound Muted'; }
+        }
     }
-    /* Apply saved kitchen light pref on load */
-    document.documentElement.classList.toggle('kitchen-light', kitchenLight);
-    document.addEventListener('DOMContentLoaded', () => {
-        const icon = document.getElementById('themeIcon');
-        if (icon) icon.className = kitchenLight ? 'bi bi-moon' : 'bi bi-sun';
-    });
+
+    function toggleKitchenSound() {
+        soundEnabled = !soundEnabled;
+        localStorage.setItem('kds_sound_enabled', soundEnabled);
+        updateSoundUI();
+        if (soundEnabled) {
+            playKitchenChime();
+            if (window.ui && ui.toast) ui.toast('Kitchen sound alerts enabled', 'success');
+        } else {
+            if (window.ui && ui.toast) ui.toast('Kitchen sound alerts muted', 'info');
+        }
+    }
+
+    // High quality Web Audio API synthesized kitchen chime
+    function playKitchenChime() {
+        if (!soundEnabled) return;
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+            
+            // First note (D5 - 587.33 Hz)
+            const osc1 = ctx.createOscillator();
+            const gain1 = ctx.createGain();
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(587.33, ctx.currentTime);
+            gain1.gain.setValueAtTime(0.25, ctx.currentTime);
+            gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+            osc1.connect(gain1);
+            gain1.connect(ctx.destination);
+            osc1.start(ctx.currentTime);
+            osc1.stop(ctx.currentTime + 0.35);
+
+            // Second higher note (A5 - 880.00 Hz)
+            const osc2 = ctx.createOscillator();
+            const gain2 = ctx.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(880.00, ctx.currentTime + 0.14);
+            gain2.gain.setValueAtTime(0.3, ctx.currentTime + 0.14);
+            gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.65);
+            osc2.connect(gain2);
+            gain2.connect(ctx.destination);
+            osc2.start(ctx.currentTime + 0.14);
+            osc2.stop(ctx.currentTime + 0.65);
+        } catch (e) {
+            console.warn('Could not play audio chime:', e);
+        }
+    }
 
     function changeStation(station, el) {
         currentStation = station;
         document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
-        el.classList.add('active');
-        loadKitchen();
+        if (el) el.classList.add('active');
+        loadKitchen(true);
     }
 
     function colorClass(minutes) {
@@ -292,55 +679,91 @@
         return 'card-urgent';
     }
 
-    function loadKitchen() {
+    function loadKitchen(manual = false) {
         if (loading) return;
         loading = true;
+
+        const spinner = document.getElementById('syncSpinner');
+        if (spinner && manual) spinner.classList.add('spin-on-sync');
+
         const url = '/kitchen-data/' + (currentStation ? `?station=${encodeURIComponent(currentStation)}` : '');
         fetch(url)
             .then(r => r.json())
             .then(data => {
                 const container = document.getElementById('orders');
+                const badgeText = document.getElementById('activeTicketCountText');
+
+                if (spinner) spinner.classList.remove('spin-on-sync');
+
                 if (!data.kots || !data.kots.length) {
+                    if (badgeText) badgeText.textContent = '0 Active Tickets';
                     container.innerHTML = `
                         <div class="empty-state">
-                            <i class="bi bi-check2-all" style="color:var(--c-fresh);"></i>
-                            <h3>All Caught Up</h3>
-                            <p style="text-transform:uppercase;letter-spacing:1px;font-size:0.75rem;">No active orders.</p>
+                            <div class="empty-icon-wrap">
+                                <i class="bi bi-check2-all"></i>
+                            </div>
+                            <h3 class="empty-title">All Caught Up!</h3>
+                            <p class="empty-subtitle">No active kitchen orders. New tickets will appear here automatically.</p>
+                            <div class="d-inline-flex align-items-center gap-2 mt-3 px-3 py-1 rounded-pill" style="background:var(--pos-green-soft);color:var(--pos-green);font-size:0.78rem;font-weight:700;">
+                                <span class="pulse-dot" style="background:var(--pos-green);"></span>
+                                <span>Live Kitchen Sync Active</span>
+                            </div>
                         </div>`;
-                    loading = false; return;
+                    prevKotCount = 0;
+                    loading = false;
+                    return;
                 }
+
+                // Update active count
+                if (badgeText) badgeText.textContent = `${data.kots.length} Active Ticket${data.kots.length > 1 ? 's' : ''}`;
+
+                // Check if new tickets arrived
+                if (prevKotCount >= 0 && data.kots.length > prevKotCount) {
+                    playKitchenChime();
+                }
+                prevKotCount = data.kots.length;
+
                 container.innerHTML = data.kots.map(kot => {
                     const created = new Date(kot.created_at);
                     const minutes = isNaN(created) ? 0 : Math.max(0, Math.floor((Date.now() - created) / 60000));
                     const cc = colorClass(minutes);
                     const items = kot.items.map(i => {
                         let action = '';
-                        if (i.status === 'sent') action = `<button class="btn-status btn-start" onclick="startPreparing(${i.id})">Start Prep</button>`;
-                        else if (i.status === 'preparing') action = `<button class="btn-status btn-ready" onclick="markReady(${i.id})">Ready ✓</button>`;
-                        else action = `<span class="badge-done">Done</span>`;
+                        if (i.status === 'sent') {
+                            action = `<button class="btn-status btn-start" onclick="startPreparing(${i.id})"><i class="bi bi-fire"></i> Start</button>`;
+                        } else if (i.status === 'preparing') {
+                            action = `<button class="btn-status btn-ready" onclick="markReady(${i.id})"><i class="bi bi-check2"></i> Ready ✓</button>`;
+                        } else {
+                            action = `<span class="badge-done"><i class="bi bi-check2-circle"></i> Ready</span>`;
+                        }
+
                         return `<div class="item-row">
-                            <div class="d-flex w-100 align-items-center">
-                                <span class="item-qty">${i.quantity}</span>
-                                <div style="flex-grow:1;">
-                                    <span class="item-name">${escapeHtml(i.name)}</span>
-                                    ${i.notes ? `<span class="item-note">${escapeHtml(i.notes)}</span>` : ''}
+                            <div class="d-flex w-100 align-items-center min-w-0">
+                                <span class="item-qty-badge">${i.quantity}</span>
+                                <div style="flex-grow:1; min-width:0;">
+                                    <div class="item-name">${escapeHtml(i.name)}</div>
+                                    ${i.notes ? `<div class="item-note"><i class="bi bi-pencil-square"></i>${escapeHtml(i.notes)}</div>` : ''}
                                 </div>
                             </div>
                             <div class="action-cell">${action}</div>
                         </div>`;
                     }).join('');
+
                     const allDone = kot.items.every(i => i.status === 'ready' || i.status === 'served');
-                    const bumpBtn = allDone ? '' : `<button class="btn-bump" onclick="bumpKot(${kot.id})"><i class="bi bi-check2-all me-2"></i>BUMP — All Ready</button>`;
+                    const bumpBtn = allDone
+                        ? `<div class="btn-bump-all-done"><i class="bi bi-check2-circle me-1"></i>All Items Ready</div>`
+                        : `<button class="btn-bump" onclick="bumpKot(${kot.id})"><i class="bi bi-check2-all me-1"></i>BUMP — All Ready</button>`;
+
                     return `<div class="col-12 col-md-6 col-xl-4 col-xxl-3">
                         <div class="order-card ${cc}">
                             <div class="order-header">
-                                <div>
-                                    <div class="table-name">${escapeHtml(kot.table)}</div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="kot-num">KOT #${kot.kot_number}</span>
+                                <div style="min-width:0; flex:1;">
+                                    <div class="table-name" title="${escapeHtml(kot.table)}">${escapeHtml(kot.table)}</div>
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <span class="kot-num"><i class="bi bi-receipt me-1"></i>KOT #${kot.kot_number}</span>
                                     </div>
                                 </div>
-                                <div class="timer">${minutes}m</div>
+                                <div class="timer"><i class="bi bi-clock me-1"></i>${minutes}m</div>
                             </div>
                             <div class="items-container">${items}</div>
                             ${bumpBtn}
@@ -350,11 +773,17 @@
                 loading = false;
             })
             .catch(() => {
+                if (spinner) spinner.classList.remove('spin-on-sync');
                 document.getElementById('orders').innerHTML = `
                     <div class="empty-state">
-                        <i class="bi bi-wifi-off text-danger"></i>
-                        <h3 class="text-danger">Sync Failed</h3>
-                        <p style="text-transform:uppercase;letter-spacing:1px;font-size:0.75rem;">Retrying…</p>
+                        <div class="empty-icon-wrap" style="background:rgba(239,68,68,0.12);color:var(--pos-red);">
+                            <i class="bi bi-wifi-off"></i>
+                        </div>
+                        <h3 class="empty-title text-danger">Sync Interrupted</h3>
+                        <p class="empty-subtitle">Reconnecting to kitchen service… Will retry automatically.</p>
+                        <button class="kds-pill-btn mt-3" onclick="loadKitchen(true)">
+                            <i class="bi bi-arrow-repeat"></i> Retry Now
+                        </button>
                     </div>`;
                 loading = false;
             });
@@ -362,42 +791,59 @@
 
     function startPreparing(id) {
         fetch("{% url 'item-start' 0 %}".replace('0', id), {
-            method: 'POST', headers: { 'X-CSRFToken': apiClient.getCsrf() }
-        }).then(loadKitchen).catch(console.error);
+            method: 'POST',
+            headers: { 'X-CSRFToken': (window.apiClient ? apiClient.getCsrf() : '') }
+        }).then(() => loadKitchen(true)).catch(console.error);
     }
 
     function markReady(id) {
         fetch("{% url 'mark-ready' 0 %}".replace('0', id), {
-            method: 'POST', headers: { 'X-CSRFToken': apiClient.getCsrf() }
-        }).then(loadKitchen).catch(console.error);
+            method: 'POST',
+            headers: { 'X-CSRFToken': (window.apiClient ? apiClient.getCsrf() : '') }
+        }).then(() => loadKitchen(true)).catch(console.error);
     }
 
     function bumpKot(kotId) {
         fetch("{% url 'bump-kot' 0 %}".replace('0', kotId), {
-            method: 'POST', headers: { 'X-CSRFToken': apiClient.getCsrf() }
-        }).then(loadKitchen).catch(console.error);
+            method: 'POST',
+            headers: { 'X-CSRFToken': (window.apiClient ? apiClient.getCsrf() : '') }
+        }).then(() => loadKitchen(true)).catch(console.error);
     }
 
     function clearAllKitchen() {
-        ui.confirm(
+        const confirmFn = window.ui && ui.confirm
+            ? ui.confirm
+            : (title, text, confirmBtn) => Promise.resolve({ isConfirmed: confirm(title + '\n' + text) });
+
+        confirmFn(
             'Clear every ticket off this screen?',
             'This marks every item currently shown as served — for wiping out stale or orphaned tickets, not for real service. This cannot be undone.',
             'Yes, clear all'
         ).then(result => {
             if (!result.isConfirmed) return;
             fetch("{% url 'clear-all-kitchen' %}", {
-                method: 'POST', headers: { 'X-CSRFToken': apiClient.getCsrf() }
+                method: 'POST',
+                headers: { 'X-CSRFToken': (window.apiClient ? apiClient.getCsrf() : '') }
             })
             .then(r => r.json())
             .then(d => {
-                if (d.success) { ui.toast(`Cleared ${d.count} item(s)`, 'success'); loadKitchen(); }
-                else ui.toast(d.error || 'Could not clear', 'error');
+                if (d.success) {
+                    if (window.ui && ui.toast) ui.toast(`Cleared ${d.count} item(s)`, 'success');
+                    loadKitchen(true);
+                } else {
+                    if (window.ui && ui.toast) ui.toast(d.error || 'Could not clear', 'error');
+                }
             })
-            .catch(() => ui.toast('Network error — nothing cleared', 'error'));
+            .catch(() => {
+                if (window.ui && ui.toast) ui.toast('Network error — nothing cleared', 'error');
+            });
         });
     }
 
-    loadKitchen();
-    setInterval(loadKitchen, 5000);
+    document.addEventListener('DOMContentLoaded', () => {
+        updateSoundUI();
+        loadKitchen();
+        setInterval(() => loadKitchen(false), 4000);
+    });
 </script>
 {% endblock %}

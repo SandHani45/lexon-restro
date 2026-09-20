@@ -1,91 +1,668 @@
 {% extends 'core/base.html' %}
-
-{% block title %}CRM — Guest Loyalty | {{ request.user.tenant.name }}{% endblock %}
+{% load static %}
+{% block title %}Customers &amp; Loyalty | {{ request.user.tenant.name }}{% endblock %}
 
 {% block extra_css %}
 <style>
-    ::placeholder { color: var(--text-muted) !important; opacity: 0.7 !important; }
-    .dashboard-card { background: var(--panel-bg); border: 1px solid var(--border-color); }
-    .section-title { font-family: 'DM Serif Display', serif; font-size: 1rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 1.5rem; }
-    .search-bar { background: transparent; border: none; border-bottom: 1px solid var(--border-color); color: var(--text-main); border-radius: 0; padding: 0.6rem 0; font-size: 0.9rem; outline: none; width: 100%; max-width: 280px; }
-    .search-bar:focus { border-color: var(--accent-gold); }
-    .guest-table { width: 100%; border-collapse: collapse; }
-    .guest-table th { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); padding: 0.8rem 1rem; border-bottom: 1px solid var(--border-color); text-align: left; }
-    .guest-table td { padding: 0.9rem 1rem; border-bottom: 1px dashed var(--border-color); font-size: 0.9rem; vertical-align: middle; }
-    .guest-table tr:hover td { background: rgba(236, 39, 52,0.04); }
-    .pts-badge { background: rgba(236, 39, 52,0.12); color: var(--accent-gold); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; padding: 3px 10px; border-radius: var(--radius-pill, 999px); }
-    .stat-box { border-radius: var(--radius-lg, 20px); padding: 1.1rem 1.25rem; text-align: center; background: rgba(236, 39, 52, 0.08); }
-    .stat-box.tint-green { background: rgba(16, 185, 129, 0.08); }
-    .stat-val { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--accent-gold); }
-    .stat-box.tint-green .stat-val { color: #10b981; }
-    .stat-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-top: 0.3rem; }
+    /* ══════════════════════════════════════════════════════════════
+       KIMIPOS LUXURY CUSTOMERS (CRM) DESIGN SYSTEM
+       ══════════════════════════════════════════════════════════════ */
+    :root {
+        --pos-red: #EC2734;
+        --pos-red-hover: #d81f2f;
+        --pos-red-soft: rgba(236, 39, 52, 0.08);
+        --pos-red-border: rgba(236, 39, 52, 0.22);
+        --pos-green: #10b981;
+        --pos-green-soft: rgba(16, 185, 129, 0.10);
+        --pos-green-border: rgba(16, 185, 129, 0.25);
+        --pos-amber: #f59e0b;
+        --pos-amber-soft: rgba(245, 158, 11, 0.10);
+        --pos-amber-border: rgba(245, 158, 11, 0.25);
+        --pos-purple: #8b5cf6;
+        --pos-purple-soft: rgba(139, 92, 246, 0.10);
+        --pos-purple-border: rgba(139, 92, 246, 0.25);
+    }
+
+    body {
+        background: var(--bg-color) !important;
+    }
+
+    /* ── Sub-Header Bar (KimiPoS POS Layout) ──────────────────── */
+    .pos-subbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 1rem 1.5rem 0.5rem;
+        background: var(--bg-color);
+        max-width: 1440px;
+        margin: 0 auto;
+    }
+    .pos-subbar-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        letter-spacing: -0.4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .pos-breadcrumbs {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .pos-breadcrumbs a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.15s;
+    }
+    .pos-breadcrumbs a:hover {
+        color: var(--pos-red);
+    }
+    .pos-breadcrumbs .separator {
+        font-size: 0.65rem;
+        opacity: 0.6;
+    }
+    .pos-breadcrumbs .current {
+        color: var(--pos-red);
+        font-weight: 700;
+    }
+
+    .btn-subbar-pill {
+        background: var(--panel-bg);
+        color: var(--text-main) !important;
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        padding: 7px 16px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-decoration: none !important;
+    }
+    .btn-subbar-pill:hover {
+        border-color: var(--pos-red-border);
+        background: var(--pos-red-soft);
+        color: var(--pos-red) !important;
+        transform: translateY(-1px);
+    }
+
+    .crm-wrap {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 0.5rem 1.5rem 4rem;
+    }
+
+    /* ── Hero KPI Cards ────────────────────────────────────────── */
+    .kpi-card {
+        background: var(--card-bg, #ffffff);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 1.25rem 1.4rem;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+    .kpi-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+    }
+    .kpi-card.kpi-guests::before  { background: linear-gradient(90deg, #c2381e, #EC2734); }
+    .kpi-card.kpi-spend::before   { background: linear-gradient(90deg, #059669, #10b981); }
+    .kpi-card.kpi-points::before  { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .kpi-card.kpi-repeat::before  { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
+
+    .kpi-info { flex: 1; min-width: 0; }
+    .kpi-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: var(--text-muted);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        margin-bottom: 0.25rem;
+    }
+    .kpi-val {
+        font-size: 1.85rem;
+        font-weight: 800;
+        color: var(--text-main);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        line-height: 1.1;
+        letter-spacing: -0.5px;
+        margin-bottom: 0.25rem;
+    }
+    .kpi-sub {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+    }
+    .kpi-icon-wrap {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        flex-shrink: 0;
+    }
+    .icon-guests { background: rgba(236, 39, 52, 0.12); color: var(--pos-red); }
+    .icon-spend  { background: rgba(16, 185, 129, 0.12); color: var(--pos-green); }
+    .icon-points { background: rgba(245, 158, 11, 0.12); color: var(--pos-amber); }
+    .icon-repeat { background: rgba(139, 92, 246, 0.12); color: var(--pos-purple); }
+
+    /* ── Search & Sort Card ────────────────────────────────────── */
+    .filter-card {
+        background: var(--card-bg, #ffffff);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 1.25rem 1.4rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+    }
+    .filter-grid {
+        display: flex;
+        gap: 12px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+    .search-group {
+        flex: 1;
+        min-width: 250px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .sort-group {
+        width: 200px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .filter-label {
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        font-weight: 700;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .input-pill {
+        background: var(--panel-bg);
+        border: 1.5px solid var(--border-color);
+        color: var(--text-main);
+        padding: 0.5rem 0.85rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        outline: none;
+        transition: all 0.18s ease;
+        width: 100%;
+    }
+    .input-pill:focus {
+        border-color: var(--pos-red);
+        box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.12);
+    }
+
+    .btn-apply {
+        padding: 0.55rem 1.4rem;
+        background: var(--pos-red);
+        border: none;
+        border-radius: 999px;
+        color: #ffffff;
+        font-size: 0.82rem;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 3px 10px rgba(236, 39, 52, 0.3);
+        transition: all 0.2s ease;
+    }
+    .btn-apply:hover {
+        background: var(--pos-red-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(236, 39, 52, 0.4);
+        color: #fff;
+    }
+    .btn-clear {
+        padding: 0.55rem 1.2rem;
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        color: var(--text-muted);
+        font-size: 0.82rem;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        text-decoration: none !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+    }
+    .btn-clear:hover {
+        border-color: var(--pos-red-border);
+        color: var(--pos-red);
+        background: var(--pos-red-soft);
+    }
+
+    /* ── Table Card ────────────────────────────────────────────── */
+    .table-card {
+        background: var(--card-bg, #ffffff);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    }
+    .guest-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+    .guest-table th {
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: var(--text-muted);
+        font-weight: 700;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        padding: 1rem 1.2rem;
+        border-bottom: 1px solid var(--border-color);
+        background: rgba(0, 0, 0, 0.015);
+        text-align: left;
+        white-space: nowrap;
+    }
+    html.dark .guest-table th {
+        background: rgba(255, 255, 255, 0.02);
+    }
+    .guest-table td {
+        padding: 1rem 1.2rem;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.88rem;
+        vertical-align: middle;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        transition: background 0.15s ease;
+    }
+    .guest-table tr:last-child td {
+        border-bottom: none;
+    }
+    .guest-table tr:hover td {
+        background: var(--pos-red-soft);
+    }
+
+    .guest-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: var(--pos-red-soft);
+        border: 1px solid var(--pos-red-border);
+        color: var(--pos-red);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+    .pts-badge {
+        background: var(--pos-amber-soft);
+        color: #d97706;
+        border: 1px solid var(--pos-amber-border);
+        font-size: 0.72rem;
+        font-weight: 800;
+        padding: 3px 9px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .visits-badge {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 6px;
+    }
+
+    .btn-view-profile {
+        padding: 6px 14px;
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        color: var(--text-main);
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-decoration: none !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.18s ease;
+    }
+    .btn-view-profile:hover {
+        background: var(--pos-red);
+        border-color: var(--pos-red);
+        color: #ffffff !important;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 10px rgba(236, 39, 52, 0.3);
+    }
+
+    /* ── Pagination ─────────────────────────────────────────────── */
+    .pag {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+    .pag a, .pag span {
+        padding: 0.45rem 0.9rem;
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        text-decoration: none;
+        color: var(--text-main);
+        background: var(--panel-bg);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        transition: all 0.15s ease;
+    }
+    .pag .current {
+        background: var(--pos-red);
+        border-color: var(--pos-red);
+        color: #ffffff;
+        box-shadow: 0 2px 8px rgba(236, 39, 52, 0.3);
+    }
+    .pag a:hover {
+        border-color: var(--pos-red-border);
+        color: var(--pos-red);
+        background: var(--pos-red-soft);
+    }
+
+    @media (max-width: 768px) {
+        .pos-subbar { padding: 0.75rem 1rem; }
+        .crm-wrap { padding: 0.5rem 1rem 4rem; }
+        .guest-table th:nth-child(4),
+        .guest-table td:nth-child(4),
+        .guest-table th:nth-child(6),
+        .guest-table td:nth-child(6) { display: none; }
+    }
 </style>
 {% endblock %}
 
 {% block header_left %}
-<div>
-    <a href="/dashboard/" class="brand-title">
-        <i class="bi bi-people" style="color:var(--accent-gold);"></i>
-        <span>{{ request.user.tenant.name }}</span>
-    </a>
-    <p class="brand-subtitle">{{ request.user.outlet.name }} · Guest Relations</p>
-</div>
+<a href="{% url 'crm-dashboard' %}" class="d-flex align-items-center gap-2 text-decoration-none" style="color:inherit;">
+  <div style="width:34px;height:34px;border-radius:10px;background:rgba(236,39,52,0.12);border:1px solid rgba(236,39,52,0.3);display:flex;align-items:center;justify-content:center;color:var(--pos-red);flex-shrink:0;">
+    <i class="bi bi-people-fill" style="font-size:1.05rem;"></i>
+  </div>
+  <div>
+    <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.3px;color:var(--text-main);font-family:var(--font-main, 'Outfit', sans-serif);">Customers &amp; Loyalty</h1>
+    <div class="text-muted" style="font-size:0.72rem;letter-spacing:0.3px;font-family:var(--font-main, 'Outfit', sans-serif);">{{ request.user.outlet.name|default:request.user.tenant.name }}</div>
+  </div>
+</a>
 {% endblock %}
 
 {% block header_right %}
-<form method="GET" class="m-0">
-    <input type="search" name="q" value="{{ query }}" placeholder="Search guests…" class="search-bar" onchange="this.form.submit()">
-</form>
-<a href="/dashboard/" class="btn-luxury d-none d-sm-inline-flex">Dashboard</a>
-{{ block.super }}
+<a href="{% url 'reviews-list' %}" class="btn-subbar-pill no-print">
+  <i class="bi bi-star-fill text-warning me-1"></i>Reviews
+</a>
+<a href="{% url 'reservation-list' %}" class="btn-subbar-pill no-print">
+  <i class="bi bi-calendar-check me-1"></i>Reservations
+</a>
+{% endblock %}
+
+{% block header_notifications %}
+{% include "core/_notif_badges_luxury.html" %}
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid mx-auto" style="max-width:1200px; padding:1.5rem;">
+<!-- Sub-Header Bar (KimiPoS POS Style) -->
+<div class="pos-subbar">
+  <div>
+    <h1 class="pos-subbar-title">
+      <i class="bi bi-people-fill" style="color:var(--pos-red);"></i>
+      Customer Relations &amp; Loyalty
+    </h1>
+    <div class="pos-breadcrumbs">
+      <a href="/dashboard/"><i class="bi bi-house-door me-1"></i>Dashboard</a>
+      <i class="bi bi-chevron-right separator"></i>
+      <a href="{% url 'crm-dashboard' %}">CRM</a>
+      <i class="bi bi-chevron-right separator"></i>
+      <span class="current">Guests Directory</span>
+    </div>
+  </div>
+  <div class="d-flex align-items-center gap-2 flex-wrap">
+    <a href="{% url 'reviews-list' %}" class="btn-subbar-pill no-print">
+      <i class="bi bi-star-fill text-warning"></i> Guest Reviews
+    </a>
+    <a href="{% url 'reservation-list' %}" class="btn-subbar-pill no-print">
+      <i class="bi bi-calendar2-week"></i> Table Bookings
+    </a>
+    <a href="/billing/" class="btn-subbar-pill no-print" style="background:var(--pos-red);color:#fff !important;border:none;">
+      <i class="bi bi-plus-circle-fill"></i> New Order
+    </a>
+  </div>
+</div>
 
-    <div class="row g-3 mb-4">
-        <div class="col-6 col-md-3">
-            <div class="stat-box">
-                <div class="stat-val">{{ guests|length }}</div>
-                <div class="stat-label">Total Guests</div>
-            </div>
+<div class="crm-wrap">
+
+  <!-- 4 Hero KPI Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-guests">
+        <div class="kpi-info">
+          <div class="kpi-label">Registered Guests</div>
+          <div class="kpi-val">{{ total_guests }}</div>
+          <div class="kpi-sub">Total unique customer profiles</div>
         </div>
-        <div class="col-6 col-md-3">
-            <div class="stat-box tint-green">
-                <div class="stat-val">{{ guests|length }}</div>
-                <div class="stat-label">Registered</div>
-            </div>
+        <div class="kpi-icon-wrap icon-guests">
+          <i class="bi bi-people-fill"></i>
         </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-spend">
+        <div class="kpi-info">
+          <div class="kpi-label">Lifetime Guest Spend</div>
+          <div class="kpi-val">₹{{ total_spent|floatformat:0 }}</div>
+          <div class="kpi-sub">Total revenue from registered guests</div>
+        </div>
+        <div class="kpi-icon-wrap icon-spend">
+          <i class="bi bi-currency-rupee"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-points">
+        <div class="kpi-info">
+          <div class="kpi-label">Reward Points Balance</div>
+          <div class="kpi-val">{{ total_points }}</div>
+          <div class="kpi-sub">Outstanding loyalty points</div>
+        </div>
+        <div class="kpi-icon-wrap icon-points">
+          <i class="bi bi-stars"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-repeat">
+        <div class="kpi-info">
+          <div class="kpi-label">Repeat Guest Rate</div>
+          <div class="kpi-val">{{ repeat_rate }}%</div>
+          <div class="kpi-sub">{{ repeat_guests }} repeat dining customers</div>
+        </div>
+        <div class="kpi-icon-wrap icon-repeat">
+          <i class="bi bi-arrow-repeat"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search & Sorting Card -->
+  <div class="filter-card no-print">
+    <form method="get" class="filter-grid">
+      <div class="search-group">
+        <label class="filter-label">Search Guests</label>
+        <input type="search" name="q" value="{{ query }}" placeholder="Search by name, mobile number or email..." class="input-pill">
+      </div>
+      <div class="sort-group">
+        <label class="filter-label">Sort Order</label>
+        <select name="sort" class="input-pill">
+          <option value="recent" {% if sort_by == "recent" %}selected{% endif %}>Most Recent</option>
+          <option value="spend"  {% if sort_by == "spend"  %}selected{% endif %}>Highest Spend</option>
+          <option value="visits" {% if sort_by == "visits" %}selected{% endif %}>Most Visits</option>
+          <option value="points" {% if sort_by == "points" %}selected{% endif %}>Most Loyalty Points</option>
+          <option value="name"   {% if sort_by == "name"   %}selected{% endif %}>Name (A–Z)</option>
+        </select>
+      </div>
+      <div class="d-flex align-items-center gap-2" style="margin-bottom:1px;">
+        <button type="submit" class="btn-apply">
+          <i class="bi bi-search"></i> Search
+        </button>
+        {% if query or sort_by != "recent" %}
+        <a href="{% url 'crm-dashboard' %}" class="btn-clear">
+          <i class="bi bi-x-circle"></i> Clear
+        </a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+  <!-- Guests Table Card -->
+  <div class="table-card">
+    {% if guests %}
+    <div class="table-responsive">
+      <table class="guest-table">
+        <thead>
+          <tr>
+            <th>Guest Name</th>
+            <th>Contact Phone</th>
+            <th>Visits</th>
+            <th>Lifetime Spend</th>
+            <th>Reward Points</th>
+            <th>Member Since</th>
+            <th style="text-align:right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for g in guests %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-3">
+                <div class="guest-avatar">
+                  {{ g.name|default:g.phone|slice:":1"|upper }}
+                </div>
+                <div>
+                  <div style="font-weight:800;color:var(--text-main);font-size:0.92rem;">
+                    {{ g.name|default:"Unnamed Guest" }}
+                  </div>
+                  {% if g.email %}
+                  <div style="font-size:0.75rem;color:var(--text-muted);"><i class="bi bi-envelope me-1"></i>{{ g.email }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+            <td>
+              <span style="font-family:'Space Mono', monospace;font-weight:600;font-size:0.85rem;color:var(--text-main);">
+                <i class="bi bi-telephone text-muted me-1"></i>{{ g.phone }}
+              </span>
+            </td>
+            <td>
+              <span class="visits-badge">
+                <i class="bi bi-cup-hot text-muted me-1"></i>{{ g.visit_count }} visit{{ g.visit_count|pluralize }}
+              </span>
+            </td>
+            <td style="font-weight:800;font-size:0.95rem;color:var(--text-main);">
+              ₹{{ g.total_spent|floatformat:0 }}
+            </td>
+            <td>
+              <span class="pts-badge">
+                <i class="bi bi-star-fill"></i>{{ g.total_points }} pts
+              </span>
+            </td>
+            <td style="color:var(--text-muted);font-size:0.82rem;">
+              <i class="bi bi-calendar3 me-1"></i>{{ g.created_at|date:"d M Y" }}
+            </td>
+            <td style="text-align:right;">
+              <a href="{% url 'guest-profile' g.id %}" class="btn-view-profile">
+                View Profile <i class="bi bi-arrow-right"></i>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
 
-    <div class="dashboard-card p-0 mb-5">
-        <div class="table-responsive">
-            <table class="guest-table">
-                <thead>
-                    <tr>
-                        <th>Name</th><th>Phone</th><th>Visits</th><th>Total Spent</th>
-                        <th>Points</th><th>Joined</th><th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for g in guests %}
-                    <tr>
-                        <td><strong>{{ g.name|default:"—" }}</strong></td>
-                        <td>{{ g.phone }}</td>
-                        <td>{{ g.visit_count }}</td>
-                        <td>₹{{ g.total_spent|floatformat:0 }}</td>
-                        <td><span class="pts-badge">{{ g.total_points }} pts</span></td>
-                        <td style="color:var(--text-muted); font-size:0.8rem;">{{ g.created_at|date:"M d, Y" }}</td>
-                        <td>
-                            <a href="/crm/guest/{{ g.id }}/" class="btn-luxury" style="padding:0.35rem 0.8rem; font-size:0.65rem;">View</a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="7" style="text-align:center; padding:3rem; color:var(--text-muted);">No guests yet. Link a guest during checkout to get started.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <!-- Pagination -->
+    {% if page %}
+    <div class="pag no-print p-3 border-top" style="border-color:var(--border-color) !important;">
+      <div class="me-auto" style="font-size:0.8rem;color:var(--text-muted);">
+        Showing page <strong>{{ page.number }}</strong> of <strong>{{ page.paginator.num_pages }}</strong> ({{ page.paginator.count }} guests total)
+      </div>
+      {% if page.has_previous %}
+      <a href="?page={{ page.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">
+        <i class="bi bi-chevron-left me-1"></i>Previous
+      </a>
+      {% endif %}
+      <span class="current">{{ page.number }}</span>
+      {% if page.has_next %}
+      <a href="?page={{ page.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">
+        Next<i class="bi bi-chevron-right ms-1"></i>
+      </a>
+      {% endif %}
     </div>
+    {% endif %}
+
+    {% else %}
+    <div style="text-align:center;padding:5rem 2rem;color:var(--text-muted);">
+      <div style="width:72px;height:72px;border-radius:20px;background:var(--pos-red-soft);border:1px solid var(--pos-red-border);display:inline-flex;align-items:center;justify-content:center;color:var(--pos-red);font-size:2rem;margin-bottom:1.25rem;">
+        <i class="bi bi-people"></i>
+      </div>
+      <h4 style="font-weight:800;color:var(--text-main);margin-bottom:0.5rem;font-family:var(--font-main, 'Outfit', sans-serif);">No Guests Found</h4>
+      <p style="font-size:0.85rem;max-width:440px;margin:0 auto 1.5rem;">
+        {% if query %}
+          No registered guests match your search "{{ query }}".
+        {% else %}
+          No customer records yet. Guests are automatically registered when linked to orders during POS billing or table checkout.
+        {% endif %}
+      </p>
+      {% if query %}
+      <a href="{% url 'crm-dashboard' %}" class="btn-subbar-pill">
+        <i class="bi bi-arrow-clockwise me-1"></i>Reset Search
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+
 </div>
 {% endblock %}

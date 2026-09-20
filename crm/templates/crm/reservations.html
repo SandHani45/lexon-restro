@@ -1,96 +1,452 @@
 {% extends 'core/base.html' %}
+{% load static %}
 
 {% block title %}Reservations | {{ request.user.tenant.name }}{% endblock %}
 
 {% block extra_css %}
 <style>
-    .dashboard-card { background: var(--panel-bg); border: 1px solid var(--border-color); }
-    .section-title { font-family: 'DM Serif Display', serif; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 1.5rem; }
-    .booking-table { width: 100%; border-collapse: collapse; }
-    .booking-table th { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); padding: 0.8rem 1rem; border-bottom: 1px solid var(--border-color); text-align: left; }
-    .booking-table td { padding: 0.9rem 1rem; border-bottom: 1px dashed var(--border-color); font-size: 0.9rem; vertical-align: middle; }
-    .booking-table tr:hover td { background: rgba(236, 39, 52,0.04); }
-    .status-badge { display: inline-flex; align-items: center; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 10px; border-radius: var(--radius-pill, 999px); font-weight: 700; }
-    .status-pending   { background: rgba(245, 158, 11, 0.12); color: #b45309; }
-    .status-confirmed { background: rgba(16, 185, 129, 0.12); color: #10b981; }
-    .status-seated    { background: rgba(59, 130, 246, 0.12); color: #2563eb; }
-    .status-cancelled { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
-    .status-no_show   { background: rgba(100, 116, 139, 0.12); color: #64748b; }
-    .res-count-tile { border-radius: var(--radius-lg, 20px); padding: 1.1rem 1.25rem; text-align: center; background: rgba(236, 39, 52, 0.08); }
-    .res-count-val { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--accent-gold); }
-    .res-count-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-top: 0.3rem; }
-    .modal-content { border-radius: var(--radius-lg, 20px); border: 1px solid var(--border-color); background: var(--panel-bg); color: var(--text-main); }
-    .form-control { border-radius: var(--radius-sm, 10px); border: 1px solid var(--border-color); background: transparent; color: var(--text-main); }
-    .form-control:focus { border-color: var(--accent-gold); box-shadow: none; background: transparent; color: var(--text-main); }
-    html.dark .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+    /* ══════════════════════════════════════════════════════════════
+       KIMIPOS LUXURY RESERVATIONS DESIGN SYSTEM
+       ══════════════════════════════════════════════════════════════ */
+    :root {
+        --pos-red: #EC2734;
+        --pos-red-hover: #d81f2f;
+        --pos-red-soft: rgba(236, 39, 52, 0.08);
+        --pos-red-border: rgba(236, 39, 52, 0.22);
+        --pos-green: #10b981;
+        --pos-green-soft: rgba(16, 185, 129, 0.10);
+        --pos-amber: #f59e0b;
+        --pos-amber-soft: rgba(245, 158, 11, 0.10);
+        --pos-blue: #3b82f6;
+        --pos-blue-soft: rgba(59, 130, 246, 0.10);
+    }
+
+    body {
+        background: var(--bg-color) !important;
+    }
+
+    /* ── Sub-Header Bar (KimiPoS POS Layout) ──────────────────── */
+    .pos-subbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 0.9rem 1.5rem 0.5rem;
+        background: var(--bg-color);
+    }
+    .pos-subbar-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        letter-spacing: -0.4px;
+    }
+    .pos-breadcrumbs {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .pos-breadcrumbs a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.15s;
+    }
+    .pos-breadcrumbs a:hover {
+        color: var(--pos-red);
+    }
+    .pos-breadcrumbs .separator {
+        font-size: 0.65rem;
+        opacity: 0.6;
+    }
+    .pos-breadcrumbs .current {
+        color: var(--pos-red);
+        font-weight: 700;
+    }
+
+    /* Action Buttons */
+    .btn-subbar-new {
+        background: var(--pos-red);
+        color: #ffffff !important;
+        border: none;
+        border-radius: 999px;
+        padding: 7px 18px;
+        font-size: 0.84rem;
+        font-weight: 700;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 3px 12px rgba(236, 39, 52, 0.3);
+        transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        cursor: pointer;
+        text-decoration: none !important;
+    }
+    .btn-subbar-new:hover {
+        background: var(--pos-red-hover);
+        transform: translateY(-1.5px);
+        box-shadow: 0 6px 18px rgba(236, 39, 52, 0.42);
+        color: #ffffff !important;
+    }
+
+    .btn-subbar-pill {
+        background: var(--panel-bg);
+        color: var(--text-main) !important;
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-decoration: none !important;
+    }
+    .btn-subbar-pill:hover {
+        border-color: var(--pos-red-border);
+        background: var(--pos-red-soft);
+        color: var(--pos-red) !important;
+        transform: translateY(-1px);
+    }
+
+    /* ── KPI Summary Cards ────────────────────────────────────── */
+    .res-kpi-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 18px;
+        padding: 1.15rem 1.35rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        transition: transform 0.2s ease;
+    }
+    .res-kpi-card:hover {
+        transform: translateY(-2px);
+    }
+    .res-kpi-val {
+        font-size: 1.85rem;
+        font-weight: 800;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        line-height: 1;
+        margin-bottom: 0.2rem;
+    }
+    .res-kpi-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+    }
+    .res-kpi-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+
+    /* ── Table Card ───────────────────────────────────────────── */
+    .res-table-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    }
+    .booking-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+    .booking-table th {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-muted);
+        padding: 1rem 1.25rem;
+        background: var(--panel-bg);
+        border-bottom: 1px solid var(--border-color);
+        text-align: left;
+    }
+    .booking-table td {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.9rem;
+        vertical-align: middle;
+        color: var(--text-main);
+    }
+    .booking-table tr:last-child td {
+        border-bottom: none;
+    }
+    .booking-table tr:hover td {
+        background: var(--pos-red-soft);
+    }
+
+    /* Status Badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-weight: 700;
+    }
+    .status-pending {
+        background: var(--pos-amber-soft);
+        color: var(--pos-amber);
+        border: 1px solid rgba(245, 158, 11, 0.25);
+    }
+    .status-confirmed {
+        background: var(--pos-green-soft);
+        color: var(--pos-green);
+        border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+    .status-seated {
+        background: var(--pos-blue-soft);
+        color: var(--pos-blue);
+        border: 1px solid rgba(59, 130, 246, 0.25);
+    }
+    .status-cancelled {
+        background: rgba(239, 68, 68, 0.12);
+        color: var(--pos-red);
+        border: 1px solid rgba(236, 39, 52, 0.25);
+    }
+    .status-no_show {
+        background: rgba(100, 116, 139, 0.12);
+        color: #64748b;
+        border: 1px solid rgba(100, 116, 139, 0.25);
+    }
+
+    /* Modal Styling */
+    .modal-content {
+        border-radius: 20px;
+        border: 1px solid var(--border-color);
+        background: var(--panel-bg);
+        color: var(--text-main);
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
+    }
+    .form-control, .form-select {
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        background: var(--surface-2);
+        color: var(--text-main);
+        padding: 0.55rem 0.85rem;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: var(--pos-red);
+        box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.15);
+        background: var(--surface-2);
+        color: var(--text-main);
+    }
 </style>
 {% endblock %}
 
 {% block header_left %}
-<div>
-    <a href="/dashboard/" class="brand-title">
-        <i class="bi bi-calendar-check" style="color:var(--accent-gold);"></i>
-        <span>Reservations</span>
-    </a>
-    <p class="brand-subtitle">{{ request.user.outlet.name }}</p>
+<div class="d-flex align-items-center gap-2">
+  <a href="/dashboard/" class="d-flex align-items-center gap-2 text-decoration-none" style="color:inherit;">
+    <span class="topbar-page-title d-flex align-items-center gap-2">
+      <i class="bi bi-calendar-check" style="color:var(--pos-red, #EC2734);"></i>
+      <span>Table Reservations</span>
+    </span>
+  </a>
+  <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle ms-1 d-none d-sm-inline-flex" style="font-size:0.68rem; font-weight:700; padding:2px 8px;">CRM</span>
 </div>
 {% endblock %}
 
 {% block header_right %}
-<input type="date" value="{{ view_date|date:'Y-m-d' }}" class="form-control d-none d-sm-block" style="width:160px; background:transparent; border-color:var(--border-color); color:var(--text-main);" onchange="window.location.href='?date='+encodeURIComponent(this.value)">
-<button class="btn-luxury" data-bs-toggle="modal" data-bs-target="#newBookingModal">New Booking</button>
-<a href="/dashboard/" class="btn-luxury d-none d-sm-inline-flex">Exit</a>
-{{ block.super }}
+<input type="date" value="{{ view_date|date:'Y-m-d' }}" class="form-control d-none d-sm-block" style="width:150px; font-size:0.8rem; font-weight:600;" onchange="window.location.href='?date='+encodeURIComponent(this.value)">
+<button class="btn-subbar-new" data-bs-toggle="modal" data-bs-target="#newBookingModal">
+    <i class="bi bi-plus-lg"></i> New Booking
+</button>
+<a href="/dashboard/" class="btn-subbar-pill d-none d-sm-inline-flex">
+    <i class="bi bi-arrow-left"></i> Dashboard
+</a>
 {% endblock %}
 
 {% block content %}
-<div class="container mx-auto" style="max-width:1100px; padding:1.5rem;">
+<!-- Subbar -->
+<div class="pos-subbar">
+    <div class="d-flex flex-column">
+        <h1 class="pos-subbar-title d-flex align-items-center gap-2">
+            <i class="bi bi-calendar-event" style="color:var(--pos-red, #EC2734);"></i>
+            <span>Table Reservations</span>
+        </h1>
+        <div class="pos-breadcrumbs">
+            <a href="/dashboard/"><i class="bi bi-house-door me-1"></i>Dashboard</a>
+            <span class="separator">/</span>
+            <span class="current">Reservations</span>
+            <span class="separator">•</span>
+            <span class="text-muted"><i class="bi bi-geo-alt me-1"></i>{{ request.user.outlet.name }}</span>
+        </div>
+    </div>
 
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <!-- Date indicator -->
+        <div class="btn-subbar-pill" style="cursor:default;">
+            <i class="bi bi-calendar3" style="color:var(--pos-red);"></i>
+            <span>{{ view_date|date:"D, M j, Y" }}</span>
+        </div>
+
+        <button class="btn-subbar-new" data-bs-toggle="modal" data-bs-target="#newBookingModal">
+            <i class="bi bi-plus-circle-fill"></i> New Booking
+        </button>
+    </div>
+</div>
+
+<div class="container-fluid px-4 py-3" style="max-width:1400px;">
     <!-- Mobile date picker -->
     <div class="d-sm-none mb-3">
+        <label class="form-label text-muted small text-uppercase fw-bold">Select Date</label>
         <input type="date" value="{{ view_date|date:'Y-m-d' }}" class="form-control w-100" onchange="window.location.href='?date='+encodeURIComponent(this.value)">
     </div>
 
-    <!-- Quick count tile -->
-    <div class="row g-3 mb-3">
-        <div class="col-6 col-md-3">
-            <div class="res-count-tile">
-                <div class="res-count-val">{{ reservations|length }}</div>
-                <div class="res-count-label">Bookings Today</div>
+    <!-- 3 Summary KPI Tiles -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-4">
+            <div class="res-kpi-card">
+                <div>
+                    <div class="res-kpi-val" style="color:var(--pos-red);">{{ reservations|length }}</div>
+                    <div class="res-kpi-label">Total Bookings</div>
+                </div>
+                <div class="res-kpi-icon" style="background:var(--pos-red-soft); color:var(--pos-red);">
+                    <i class="bi bi-calendar2-check-fill"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-4">
+            <div class="res-kpi-card">
+                <div>
+                    <div class="res-kpi-val" style="color:var(--pos-green);">
+                        {% with confirmed=0 %}
+                            {% for r in reservations %}{% if r.status == 'confirmed' or r.status == 'seated' %}{% if forloop.first %}{{ reservations|length }}{% endif %}{% endif %}{% empty %}0{% endfor %}
+                        {% endwith %}
+                    </div>
+                    <div class="res-kpi-label">Confirmed / Seated</div>
+                </div>
+                <div class="res-kpi-icon" style="background:var(--pos-green-soft); color:var(--pos-green);">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-4">
+            <div class="res-kpi-card">
+                <div>
+                    <div class="res-kpi-val" style="color:var(--pos-amber);">{{ tables|length }}</div>
+                    <div class="res-kpi-label">Dining Tables Available</div>
+                </div>
+                <div class="res-kpi-icon" style="background:var(--pos-amber-soft); color:var(--pos-amber);">
+                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="dashboard-card p-0">
+    <!-- Reservations Table -->
+    <div class="res-table-card">
         <div class="table-responsive">
             <table class="booking-table">
                 <thead>
                     <tr>
-                        <th>Time</th><th>Guest</th><th>Phone</th><th>Table</th><th>Guests</th><th>Status</th><th>Actions</th>
+                        <th>Time</th>
+                        <th>Guest Name</th>
+                        <th>Phone</th>
+                        <th>Table</th>
+                        <th>Covers</th>
+                        <th>Status</th>
+                        <th style="text-align:right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for res in reservations %}
                     <tr>
-                        <td style="font-family:'Space Mono',monospace; font-size:0.85rem;">{{ res.reservation_time|date:"H:i" }}</td>
-                        <td><strong>{{ res.guest.name|default:"—" }}</strong></td>
-                        <td>{{ res.guest.phone }}</td>
-                        <td>{{ res.table.name|default:"TBD" }}</td>
-                        <td>{{ res.number_of_guests }} pax</td>
-                        <td><span class="status-badge status-{{ res.status }}">{{ res.status }}</span></td>
                         <td>
-                            {% if res.status == "pending" %}
-                            <button class="btn-icon" title="Confirm" onclick="updateReservationStatus('{{ res.id }}', 'confirmed')"><i class="bi bi-check-lg"></i></button>
-                            <button class="btn-icon" title="Cancel" onclick="updateReservationStatus('{{ res.id }}', 'cancelled')"><i class="bi bi-x-lg"></i></button>
-                            {% elif res.status == "confirmed" %}
-                            <button class="btn-icon" title="Seat Guest" onclick="seatGuest('{{ res.id }}')"><i class="bi bi-box-arrow-in-right"></i></button>
-                            <button class="btn-icon" title="No Show" onclick="updateReservationStatus('{{ res.id }}', 'no_show')"><i class="bi bi-person-dash"></i></button>
-                            <button class="btn-icon" title="Cancel" onclick="updateReservationStatus('{{ res.id }}', 'cancelled')"><i class="bi bi-x-lg"></i></button>
-                            {% endif %}
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-clock text-muted"></i>
+                                <span style="font-weight:700; font-size:0.92rem;">{{ res.reservation_time|date:"h:i A" }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="fw-bold" style="color:var(--text-main);">{{ res.guest.name|default:"Guest" }}</div>
+                        </td>
+                        <td>
+                            <a href="tel:{{ res.guest.phone }}" class="text-decoration-none text-muted" style="font-size:0.85rem;">
+                                <i class="bi bi-telephone me-1"></i>{{ res.guest.phone }}
+                            </a>
+                        </td>
+                        <td>
+                            <span class="badge rounded-pill" style="background:var(--surface-2); border:1px solid var(--border-color); color:var(--text-main); font-size:0.75rem; font-weight:700; padding:4px 10px;">
+                                <i class="bi bi-layout-text-sidebar me-1"></i>{{ res.table.name|default:"TBD" }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="fw-bold">{{ res.number_of_guests }}</span> <span class="text-muted small">guests</span>
+                        </td>
+                        <td>
+                            <span class="status-badge status-{{ res.status }}">
+                                {% if res.status == 'confirmed' %}<i class="bi bi-check2"></i>
+                                {% elif res.status == 'seated' %}<i class="bi bi-person-check"></i>
+                                {% elif res.status == 'pending' %}<i class="bi bi-hourglass-split"></i>
+                                {% elif res.status == 'cancelled' %}<i class="bi bi-x-circle"></i>
+                                {% else %}<i class="bi bi-dash-circle"></i>{% endif %}
+                                {{ res.status|title }}
+                            </span>
+                        </td>
+                        <td style="text-align:right;">
+                            <div class="d-inline-flex align-items-center gap-1">
+                                {% if res.status == "pending" %}
+                                <button class="btn btn-sm btn-outline-success rounded-pill px-2 py-1" title="Confirm" onclick="updateReservationStatus('{{ res.id }}', 'confirmed')">
+                                    <i class="bi bi-check-lg"></i> Confirm
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1" title="Cancel" onclick="updateReservationStatus('{{ res.id }}', 'cancelled')">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                                {% elif res.status == "confirmed" %}
+                                <button class="btn btn-sm btn-outline-primary rounded-pill px-2 py-1" title="Seat Guest" onclick="seatGuest('{{ res.id }}')">
+                                    <i class="bi bi-box-arrow-in-right"></i> Seat
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-1" title="No Show" onclick="updateReservationStatus('{{ res.id }}', 'no_show')">
+                                    <i class="bi bi-person-dash"></i> No Show
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1" title="Cancel" onclick="updateReservationStatus('{{ res.id }}', 'cancelled')">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                                {% else %}
+                                <span class="text-muted small">—</span>
+                                {% endif %}
+                            </div>
                         </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="7" style="text-align:center; padding:5rem; color:var(--text-muted);">No bookings for this date.</td></tr>
+                    <tr>
+                        <td colspan="7" style="text-align:center; padding:5rem 2rem; color:var(--text-muted);">
+                            <div style="width:64px; height:64px; border-radius:50%; background:var(--surface-2); display:inline-flex; align-items:center; justify-content:center; font-size:1.8rem; margin-bottom:1rem;">
+                                <i class="bi bi-calendar-x"></i>
+                            </div>
+                            <h4 style="font-weight:800; font-size:1.25rem; color:var(--text-main); margin-bottom:0.35rem;">No Bookings Found</h4>
+                            <p style="font-size:0.85rem; max-width:400px; margin:0 auto 1.5rem;">There are no table reservations scheduled for this date.</p>
+                            <button class="btn-subbar-new" data-bs-toggle="modal" data-bs-target="#newBookingModal">
+                                <i class="bi bi-plus-lg"></i> Add New Reservation
+                            </button>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -99,44 +455,53 @@
 </div>
 
 <!-- New Booking Modal -->
-<div class="modal fade" id="newBookingModal" tabindex="-1">
-    <div class="modal-dialog">
+<div class="modal fade" id="newBookingModal" tabindex="-1" aria-labelledby="newBookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header border-0 pb-0">
-                <h5 class="section-title">New Reservation</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="d-flex align-items-center gap-2">
+                    <div style="width:36px; height:36px; border-radius:10px; background:var(--pos-red-soft); color:var(--pos-red); display:flex; align-items:center; justify-content:center; font-size:1.1rem;">
+                        <i class="bi bi-calendar-plus"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold" id="newBookingModalLabel" style="font-size:1.15rem; color:var(--text-main);">New Table Reservation</h5>
+                        <p class="text-muted mb-0 small">Add guest booking details</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body pt-3">
                 <div class="mb-3">
-                    <label class="form-label text-muted small text-uppercase fw-bold">Phone Number*</label>
-                    <input type="text" id="node-phone" class="form-control" placeholder="Phone">
+                    <label class="form-label text-muted small text-uppercase fw-bold">Phone Number *</label>
+                    <input type="tel" id="node-phone" class="form-control" placeholder="10-digit mobile number" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label text-muted small text-uppercase fw-bold">Guest Name</label>
-                    <input type="text" id="node-name" class="form-control" placeholder="Name">
+                    <input type="text" id="node-name" class="form-control" placeholder="Guest Full Name">
                 </div>
-                <div class="row">
-                    <div class="col-6 mb-3">
-                        <label class="form-label text-muted small text-uppercase fw-bold">Time*</label>
-                        <input type="datetime-local" id="node-time" class="form-control">
+                <div class="row g-2 mb-3">
+                    <div class="col-7">
+                        <label class="form-label text-muted small text-uppercase fw-bold">Date & Time *</label>
+                        <input type="datetime-local" id="node-time" class="form-control" required>
                     </div>
-                    <div class="col-6 mb-3">
-                        <label class="form-label text-muted small text-uppercase fw-bold">Table</label>
-                        <select id="node-table" class="form-control">
-                            <option value="">Any Free Table</option>
-                            {% for t in tables %}
-                            <option value="{{ t.id }}">{{ t.name }}</option>
-                            {% endfor %}
-                        </select>
+                    <div class="col-5">
+                        <label class="form-label text-muted small text-uppercase fw-bold">Covers (Guests)</label>
+                        <input type="number" id="node-pax" class="form-control" value="2" min="1" max="50">
                     </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label text-muted small text-uppercase fw-bold">Covers (Guests)</label>
-                    <input type="number" id="node-pax" class="form-control" value="2">
+                <div class="mb-2">
+                    <label class="form-label text-muted small text-uppercase fw-bold">Assigned Table</label>
+                    <select id="node-table" class="form-select">
+                        <option value="">Any Available Table</option>
+                        {% for t in tables %}
+                        <option value="{{ t.id }}">Table {{ t.name }} ({{ t.capacity|default:4 }} pax)</option>
+                        {% endfor %}
+                    </select>
                 </div>
             </div>
-            <div class="modal-footer border-0">
-                <button class="btn-luxury" onclick="saveBooking()">Confirm Booking</button>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn-subbar-pill" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn-subbar-new" onclick="saveBooking()">Confirm Booking</button>
             </div>
         </div>
     </div>
@@ -145,33 +510,83 @@
 
 {% block extra_js %}
 <script>
+// Set default datetime in modal to current date + next rounded hour
+document.addEventListener('DOMContentLoaded', () => {
+    const timeInput = document.getElementById('node-time');
+    if (timeInput && !timeInput.value) {
+        const now = new Date();
+        now.setHours(now.getHours() + 1, 0, 0, 0);
+        const pad = (n) => String(n).padStart(2, '0');
+        const formatted = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+        timeInput.value = formatted;
+    }
+});
+
 async function saveBooking() {
+    const phone = document.getElementById('node-phone').value.trim();
+    const name = document.getElementById('node-name').value.trim();
+    const time = document.getElementById('node-time').value;
+    const tableId = document.getElementById('node-table').value;
+    const guests = document.getElementById('node-pax').value;
+
+    if (!phone || !time) {
+        if (window.ui && ui.toast) ui.toast('Please provide guest phone number and reservation time.', 'warning');
+        else alert('Please provide phone number and reservation time.');
+        return;
+    }
+
     const data = {
-        phone: document.getElementById('node-phone').value,
-        name: document.getElementById('node-name').value,
-        reservation_time: document.getElementById('node-time').value,
-        table_id: document.getElementById('node-table').value,
-        guests: document.getElementById('node-pax').value
+        phone: phone,
+        name: name,
+        reservation_time: time,
+        table_id: tableId || null,
+        guests: parseInt(guests) || 2
     };
-    const res = await fetch('/crm/reservations/create/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
-        body: JSON.stringify(data)
-    });
-    if (res.ok) { window.location.reload(); }
-    else { alert('Error saving booking'); }
+
+    try {
+        const res = await fetch('/crm/reservations/create/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': (window.apiClient ? apiClient.getCsrf() : '{{ csrf_token }}')
+            },
+            body: JSON.stringify(data)
+        });
+        const result = await res.json().catch(() => ({}));
+        if (res.ok) {
+            if (window.ui && ui.toast) ui.toast('Reservation booked successfully!', 'success');
+            setTimeout(() => window.location.reload(), 600);
+        } else {
+            if (window.ui && ui.toast) ui.toast(result.error || 'Error saving booking', 'error');
+            else alert(result.error || 'Error saving booking');
+        }
+    } catch (e) {
+        if (window.ui && ui.toast) ui.toast('Network error saving booking', 'error');
+        else alert('Network error saving booking');
+    }
 }
 
 async function updateReservationStatus(reservationId, newStatus) {
-    const res = await fetch(`/crm/reservations/${reservationId}/status/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
-        body: JSON.stringify({ status: newStatus })
-    });
-    if (res.ok) { window.location.reload(); }
-    else {
-        const data = await res.json().catch(() => ({}));
-        alert(data.error || 'Could not update reservation.');
+    try {
+        const res = await fetch(`/crm/reservations/${reservationId}/status/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': (window.apiClient ? apiClient.getCsrf() : '{{ csrf_token }}')
+            },
+            body: JSON.stringify({ status: newStatus })
+        });
+        if (res.ok) {
+            if (window.ui && ui.toast) ui.toast(`Reservation updated to ${newStatus}`, 'success');
+            setTimeout(() => window.location.reload(), 500);
+        } else {
+            const data = await res.json().catch(() => ({}));
+            if (window.ui && ui.toast) ui.toast(data.error || 'Could not update reservation.', 'error');
+            else alert(data.error || 'Could not update reservation.');
+        }
+    } catch (e) {
+        if (window.ui && ui.toast) ui.toast('Network error updating reservation', 'error');
+        else alert('Network error updating reservation');
     }
 }
 

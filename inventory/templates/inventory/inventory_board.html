@@ -1,114 +1,759 @@
 {% extends 'core/base.html' %}
+{% load static %}
 
-{% block title %}Inventory | {{ request.user.tenant.name }}{% endblock %}
+{% block title %}Inventory & Stock Control | {{ request.user.tenant.name }}{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* HEADER */
-    .pos-header { position: sticky; top: 0; z-index: 1000; }
+    /* ══════════════════════════════════════════════════════════════
+       KIMIPOS LUXURY DESIGN SYSTEM & INVENTORY THEME
+       ══════════════════════════════════════════════════════════════ */
+    :root {
+        --pos-red: #EC2734;
+        --pos-red-hover: #d81f2f;
+        --pos-red-soft: rgba(236, 39, 52, 0.08);
+        --pos-red-border: rgba(236, 39, 52, 0.22);
+        --pos-green: #10b981;
+        --pos-green-soft: rgba(16, 185, 129, 0.10);
+        --pos-green-border: rgba(16, 185, 129, 0.25);
+        --pos-amber: #f59e0b;
+        --pos-amber-soft: rgba(245, 158, 11, 0.10);
+        --pos-amber-border: rgba(245, 158, 11, 0.25);
+        --pos-blue: #3b82f6;
+        --pos-blue-soft: rgba(59, 130, 246, 0.10);
+        --pos-blue-border: rgba(59, 130, 246, 0.25);
+        --pos-purple: #8b5cf6;
+        --pos-purple-soft: rgba(139, 92, 246, 0.10);
+        --pos-purple-border: rgba(139, 92, 246, 0.25);
+    }
 
-    /* TABLE */
-    .inventory-card {
+    body {
+        background: var(--bg-color) !important;
+    }
+
+    /* ── Sub-Header Bar (KimiPoS POS Layout) ──────────────────── */
+    .pos-subbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 1.1rem 1.5rem 0.5rem;
+        background: var(--bg-color);
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+    .pos-subbar-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        letter-spacing: -0.4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .pos-breadcrumbs {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .pos-breadcrumbs a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.15s;
+    }
+    .pos-breadcrumbs a:hover {
+        color: var(--pos-red);
+    }
+    .pos-breadcrumbs .separator {
+        font-size: 0.65rem;
+        opacity: 0.6;
+    }
+    .pos-breadcrumbs .current {
+        color: var(--pos-red);
+        font-weight: 700;
+    }
+
+    /* Subbar Action Buttons */
+    .btn-subbar-primary {
+        background: var(--pos-red);
+        color: #ffffff !important;
+        border: none;
+        padding: 0.45rem 1.15rem;
+        border-radius: 999px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        box-shadow: 0 2px 8px rgba(236, 39, 52, 0.28);
+        transition: all 0.18s ease;
+        cursor: pointer;
+    }
+    .btn-subbar-primary:hover {
+        background: var(--pos-red-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(236, 39, 52, 0.38);
+    }
+
+    .btn-subbar-pill {
         background: var(--panel-bg);
         border: 1px solid var(--border-color);
-        border-radius: 12px;
-        box-shadow: var(--shadow-soft);
+        color: var(--text-muted);
+        padding: 0.45rem 1rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: all 0.15s ease;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+    }
+    .btn-subbar-pill:hover {
+        border-color: var(--pos-red);
+        color: var(--pos-red);
+        background: var(--pos-red-soft);
+        transform: translateY(-1px);
+    }
+
+    /* Main Container */
+    .inventory-wrap {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0.75rem 1.5rem 4rem;
+    }
+
+    /* KPI Cards */
+    .kpi-card {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 1.15rem 1.35rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    }
+    .kpi-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+    .kpi-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--text-muted);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .kpi-value {
+        font-size: 1.45rem;
+        font-weight: 900;
+        color: var(--text-main);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        line-height: 1.2;
+    }
+    .kpi-sub {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        white-space: nowrap;
         overflow: hidden;
-        margin-top: 2rem;
+        text-overflow: ellipsis;
     }
-    .table { margin-bottom: 0; color: var(--text-main); }
-    .table th {
-        background: rgba(0,0,0,0.02);
+    .kpi-badge-icon {
+        width: 46px;
+        height: 46px;
+        min-width: 46px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        flex-shrink: 0;
+    }
+
+    /* Alert Banner */
+    .inventory-alert-banner {
+        background: var(--pos-red-soft);
+        border: 1px solid var(--pos-red-border);
+        border-radius: 20px;
+        padding: 1.1rem 1.4rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .alert-icon-wrap {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: rgba(236, 39, 52, 0.16);
+        color: var(--pos-red);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+    .btn-inventory-primary {
+        background: var(--pos-red);
+        color: #ffffff;
+        border: none;
+        padding: 0.55rem 1.25rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        box-shadow: 0 2px 8px rgba(236, 39, 52, 0.28);
+    }
+    .btn-inventory-primary:hover {
+        background: var(--pos-red-hover);
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(236, 39, 52, 0.38);
+    }
+
+    /* Search & Filter Toolbar */
+    .inventory-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-bottom: 1.25rem;
+    }
+    .inventory-search-wrap {
+        position: relative;
+        flex: 1;
+        max-width: 380px;
+        min-width: 240px;
+    }
+    .inventory-search-wrap i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 0.95rem;
+    }
+    .inventory-search-input {
+        width: 100%;
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        padding: 0.6rem 1rem 0.6rem 2.45rem;
+        font-size: 0.88rem;
+        color: var(--text-main);
+        outline: none;
+        transition: all 0.15s ease;
+    }
+    .inventory-search-input:focus {
+        border-color: var(--pos-red);
+        box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.15);
+    }
+
+    /* Category Pill Strip */
+    .category-strip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        scrollbar-width: thin;
+        flex: 1;
+        min-width: 280px;
+    }
+    .category-strip::-webkit-scrollbar {
+        height: 4px;
+    }
+    .category-strip::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.1);
+        border-radius: 4px;
+    }
+    .category-pill {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        padding: 0.42rem 1rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        user-select: none;
+    }
+    .category-pill:hover {
+        border-color: var(--pos-red);
+        color: var(--pos-red);
+    }
+    .category-pill.active {
+        background: var(--pos-red);
+        border-color: var(--pos-red);
+        color: #ffffff;
+        box-shadow: 0 2px 8px rgba(236, 39, 52, 0.28);
+    }
+
+    /* Squircle Card Container & Table */
+    .squircle-card {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        overflow: hidden;
+    }
+    .table-modern {
+        width: 100%;
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+        color: var(--text-main);
+    }
+    .table-modern th {
+        background: rgba(0, 0, 0, 0.02);
         border-bottom: 1px solid var(--border-color);
-        text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;
-        color: var(--text-muted); padding: 1.2rem 1.5rem; font-weight: 600;
+        color: var(--text-muted);
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        padding: 1rem 1.25rem;
+        white-space: nowrap;
+        font-family: var(--font-main, 'Outfit', sans-serif);
     }
-    html.dark .table th { background: rgba(255,255,255,0.02); }
-    .table td {
-        background: var(--panel-bg); border-bottom: 1px solid var(--border-color);
-        padding: 1.2rem 1.5rem; vertical-align: middle; color: var(--text-main);
+    html.dark .table-modern th {
+        background: rgba(255, 255, 255, 0.02);
     }
-    .table-hover tbody tr:hover td { background: rgba(236, 39, 52,0.05); }
-    .stock-val { font-family: 'Space Mono', monospace; font-weight: 600; font-size: 1.1rem; }
-
-    /* STATUS BADGES */
-    .status-badge { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; padding: 5px 10px; border-radius: 4px; display: inline-block; }
-    .badge-ok  { background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid #10b981; }
-    .badge-low { background: rgba(239,68,68,0.1);  color: #ef4444; border: 1px solid #ef4444; }
-
-    /* INPUTS */
-    .input-luxury {
-        background: transparent; border: 1px solid var(--border-color); color: var(--text-main);
-        padding: 0.4rem 0.8rem; font-size: 0.9rem; border-radius: 4px; width: 100px;
-        font-family: 'Space Mono', monospace; transition: var(--transition-smooth);
+    .table-modern td {
+        padding: 1rem 1.25rem;
+        vertical-align: middle;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-main);
+        font-size: 0.88rem;
     }
-    .input-luxury:focus { outline: none; border-color: var(--accent-gold); box-shadow: 0 0 0 2px rgba(236, 39, 52,0.2); }
-    .input-luxury::placeholder { font-family: 'Outfit', sans-serif; color: var(--text-muted); }
+    .table-modern tbody tr:last-child td {
+        border-bottom: none;
+    }
+    .table-modern tbody tr:hover td {
+        background: var(--pos-red-soft);
+    }
 
-    /* MODALS */
-    .modal-content { background: var(--panel-bg); border-radius: 8px; border: 1px solid var(--border-color); box-shadow: var(--shadow-hover); }
-    .modal-header { border-bottom: 1px solid var(--border-color); padding: 1.5rem; }
-    .modal-footer { border-top: 1px solid var(--border-color); padding: 1.5rem; }
-    .modal-title { font-family: 'DM Serif Display', serif; font-weight: 700; color: var(--text-main); }
-    .modal-body { padding: 1.5rem; }
+    /* Status Badges */
+    .badge-status {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+    }
+    .badge-status.badge-ok {
+        background: var(--pos-green-soft);
+        color: var(--pos-green);
+        border: 1px solid var(--pos-green-border);
+    }
+    .badge-status.badge-low {
+        background: var(--pos-red-soft);
+        color: var(--pos-red);
+        border: 1px solid var(--pos-red-border);
+    }
+
+    /* Stock value & mono numbers */
+    .mono-num {
+        font-family: 'Space Mono', monospace;
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+
+    /* Table Action Stepper / Inputs */
+    .qty-input {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-main);
+        font-family: 'Space Mono', monospace;
+        font-size: 0.85rem;
+        padding: 0.35rem 0.55rem;
+        width: 78px;
+        outline: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .qty-input:focus {
+        border-color: var(--pos-red);
+        box-shadow: 0 0 0 2px rgba(236, 39, 52, 0.18);
+    }
+
+    .btn-table-action {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+        padding: 0.35rem 0.75rem;
+        border-radius: 8px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        white-space: nowrap;
+    }
+    .btn-table-action:hover {
+        transform: translateY(-1px);
+    }
+    .btn-table-action.btn-action-add:hover {
+        border-color: var(--pos-green);
+        background: var(--pos-green-soft);
+        color: var(--pos-green);
+    }
+    .btn-table-action.btn-action-waste:hover {
+        border-color: var(--pos-red);
+        background: var(--pos-red-soft);
+        color: var(--pos-red);
+    }
+    .btn-table-action.btn-action-adjust:hover {
+        border-color: var(--pos-amber);
+        background: var(--pos-amber-soft);
+        color: var(--pos-amber);
+    }
+
+    .btn-action-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    .btn-action-icon:hover {
+        border-color: var(--pos-red);
+        color: var(--pos-red);
+        background: var(--pos-red-soft);
+        transform: translateY(-1px);
+    }
+
+    /* Modals */
+    .modal-content {
+        background: var(--panel-bg) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 24px !important;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25) !important;
+        overflow: hidden;
+    }
+    .modal-header {
+        border-bottom: 1px solid var(--border-color) !important;
+        padding: 1.25rem 1.6rem !important;
+    }
+    .modal-title {
+        font-family: var(--font-main, 'Outfit', sans-serif) !important;
+        font-weight: 800 !important;
+        font-size: 1.2rem !important;
+        color: var(--text-main) !important;
+        letter-spacing: -0.3px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .modal-body {
+        padding: 1.5rem 1.6rem !important;
+    }
+    .modal-footer {
+        border-top: 1px solid var(--border-color) !important;
+        padding: 1.1rem 1.6rem !important;
+    }
+    .modal .form-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--text-muted);
+        margin-bottom: 0.35rem;
+    }
     .modal .form-control, .modal .form-select {
-        background: transparent; border: 1px solid var(--border-color); color: var(--text-main);
-        padding: 0.8rem; border-radius: 4px;
+        background: var(--panel-bg) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 12px !important;
+        color: var(--text-main) !important;
+        padding: 0.65rem 0.9rem !important;
+        font-size: 0.88rem !important;
+        transition: border-color 0.15s, box-shadow 0.15s;
     }
     .modal .form-control:focus, .modal .form-select:focus {
-        border-color: var(--accent-gold); box-shadow: 0 0 0 2px rgba(236, 39, 52,0.2); background: transparent; color: var(--text-main);
+        border-color: var(--pos-red) !important;
+        box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.18) !important;
     }
-    html.dark .modal .form-select option { background: var(--panel-bg); color: var(--text-main); }
-    html.dark .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+    html.dark .modal .form-select option {
+        background: var(--panel-bg);
+        color: var(--text-main);
+    }
+    html.dark .btn-close {
+        filter: invert(1) grayscale(100%) brightness(200%);
+    }
 
-    @media (max-width: 767px) {
-        .table th, .table td { padding: 0.75rem 1rem; }
-        .input-luxury { width: 70px; }
+    .btn-modal-submit {
+        background: var(--pos-red);
+        color: #ffffff;
+        border: none;
+        border-radius: 999px;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        width: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 2px 8px rgba(236, 39, 52, 0.28);
+        transition: all 0.18s ease;
+        cursor: pointer;
+    }
+    .btn-modal-submit:hover {
+        background: var(--pos-red-hover);
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(236, 39, 52, 0.38);
+    }
+
+    .btn-modal-waste {
+        background: rgba(236, 39, 52, 0.12);
+        color: var(--pos-red);
+        border: 1px solid var(--pos-red-border);
+        border-radius: 999px;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        width: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.18s ease;
+        cursor: pointer;
+    }
+    .btn-modal-waste:hover {
+        background: var(--pos-red);
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    .btn-modal-adjust {
+        background: var(--pos-amber-soft);
+        color: var(--pos-amber);
+        border: 1px solid var(--pos-amber-border);
+        border-radius: 999px;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        width: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.18s ease;
+        cursor: pointer;
+    }
+    .btn-modal-adjust:hover {
+        background: var(--pos-amber);
+        color: #ffffff;
+        transform: translateY(-1px);
     }
 </style>
 {% endblock %}
 
-{% block header_left %}
-<div>
-    <a href="/dashboard/" class="brand-title">
-        <i class="bi bi-box-seam" style="color:var(--accent-gold);"></i>
-        <span>{{ request.user.tenant.name }}</span>
-    </a>
-    <p class="brand-subtitle">{{ request.user.outlet.name }} · Inventory Management</p>
-</div>
-{% endblock %}
-
-{% block header_right %}
-<button class="btn-luxury btn-luxury-primary" onclick="openAddInventoryModal()"><i class="bi bi-plus-lg me-1"></i> Add Ingredient</button>
-<a href="{% url 'inventory_consumption' %}" class="btn-luxury text-decoration-none d-none d-sm-inline-flex"><i class="bi bi-graph-up me-1"></i> Consumption</a>
-<a href="{% url 'inventory_variance' %}" class="btn-luxury text-decoration-none d-none d-sm-inline-flex"><i class="bi bi-droplet-half me-1"></i> Variance</a>
-{% if 'purchase_orders' in tenant_features %}
-<a href="{% url 'purchase_order_list' %}" class="btn-luxury text-decoration-none d-none d-sm-inline-flex"><i class="bi bi-receipt me-1"></i> Purchase Orders</a>
-<a href="{% url 'supplier_list' %}" class="btn-luxury text-decoration-none d-none d-sm-inline-flex"><i class="bi bi-truck me-1"></i> Suppliers</a>
-{% endif %}
-{% if 'central_kitchen' in tenant_features %}
-<a href="/inventory/requisitions/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex"><i class="bi bi-arrow-up-right-circle me-1"></i> Requisitions</a>
-<a href="/inventory/central-kitchen/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex"><i class="bi bi-building me-1"></i> Central Kitchen</a>
-{% endif %}
-{{ block.super }}
-{% endblock %}
-
 {% block content %}
-<div class="container-fluid mx-auto py-4" style="max-width:1200px; padding:1rem 2rem;">
-
-    <!-- Mobile: Add button -->
-    <div class="d-sm-none mb-3">
-        <button class="btn-luxury btn-luxury-primary w-100 justify-content-center" onclick="openAddInventoryModal()">
-            <i class="bi bi-plus-lg me-1"></i> Add Ingredient
+<!-- ══════════════════════════════════════════════════════════════
+     SUBBAR (BREADCRUMBS & TOP QUICK ACTIONS)
+     ══════════════════════════════════════════════════════════════ -->
+<div class="pos-subbar">
+    <div>
+        <h1 class="pos-subbar-title">
+            <i class="bi bi-box-seam text-danger"></i>
+            Stock &amp; Inventory Control
+        </h1>
+        <nav class="pos-breadcrumbs">
+            <a href="/dashboard/">Dashboard</a>
+            <span class="separator">/</span>
+            <span class="current">Inventory Board</span>
+        </nav>
+    </div>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <button type="button" class="btn-subbar-primary" onclick="openAddInventoryModal()">
+            <i class="bi bi-plus-lg"></i> Add Ingredient
         </button>
+        <a href="{% url 'inventory_consumption' %}" class="btn-subbar-pill">
+            <i class="bi bi-graph-up"></i> Consumption
+        </a>
+        <a href="{% url 'inventory_variance' %}" class="btn-subbar-pill">
+            <i class="bi bi-droplet-half"></i> Variance
+        </a>
+        {% if 'purchase_orders' in tenant_features %}
+        <a href="{% url 'purchase_order_list' %}" class="btn-subbar-pill">
+            <i class="bi bi-receipt"></i> Purchase Orders
+        </a>
+        <a href="{% url 'supplier_list' %}" class="btn-subbar-pill">
+            <i class="bi bi-truck"></i> Suppliers
+        </a>
+        {% endif %}
+        {% if 'central_kitchen' in tenant_features %}
+        <a href="/inventory/requisitions/" class="btn-subbar-pill">
+            <i class="bi bi-arrow-up-right-circle"></i> Requisitions
+        </a>
+        <a href="/inventory/central-kitchen/" class="btn-subbar-pill">
+            <i class="bi bi-building"></i> Central Kitchen
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="inventory-wrap">
+
+    <!-- ══════════════════════════════════════════════════════════
+         4 HERO KPI OVERVIEW CARDS
+         ══════════════════════════════════════════════════════════ -->
+    <div class="row g-3 mb-4">
+        <!-- 1. Total Ingredients -->
+        <div class="col-6 col-md-3">
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <span class="kpi-label">Tracked Items</span>
+                    <span class="kpi-value">{{ items|length }}</span>
+                    <span class="kpi-sub"><i class="bi bi-box-seam text-primary"></i> Active pantry items</span>
+                </div>
+                <div class="kpi-badge-icon" style="background:var(--pos-blue-soft); color:var(--pos-blue);">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Low Stock Alerts -->
+        <div class="col-6 col-md-3">
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <span class="kpi-label">Low Stock</span>
+                    <span class="kpi-value" style="color:{% if low_stock_count > 0 %}var(--pos-red){% else %}var(--pos-green){% endif %};">
+                        {{ low_stock_count }}
+                    </span>
+                    <span class="kpi-sub">
+                        {% if low_stock_count > 0 %}
+                            <i class="bi bi-exclamation-triangle-fill text-danger"></i> Needs reordering
+                        {% else %}
+                            <i class="bi bi-check-circle-fill text-success"></i> All items optimal
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="kpi-badge-icon" style="background:{% if low_stock_count > 0 %}var(--pos-red-soft); color:var(--pos-red);{% else %}var(--pos-green-soft); color:var(--pos-green);{% endif %}">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Categories Tracked -->
+        <div class="col-6 col-md-3">
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <span class="kpi-label">Categories</span>
+                    <span class="kpi-value">{{ categories|length }}</span>
+                    <span class="kpi-sub"><i class="bi bi-tag text-warning"></i> Recipe groupings</span>
+                </div>
+                <div class="kpi-badge-icon" style="background:var(--pos-amber-soft); color:var(--pos-amber);">
+                    <i class="bi bi-tags"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Active Suppliers -->
+        <div class="col-6 col-md-3">
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <span class="kpi-label">Suppliers</span>
+                    <span class="kpi-value">{{ suppliers|length }}</span>
+                    <span class="kpi-sub"><i class="bi bi-truck text-purple"></i> Verified vendors</span>
+                </div>
+                <div class="kpi-badge-icon" style="background:var(--pos-purple-soft); color:var(--pos-purple);">
+                    <i class="bi bi-truck"></i>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Search bar -->
-    <div style="margin-bottom:1rem;">
-        <input type="text" id="inventorySearch" class="input-luxury"
-               style="width:100%;max-width:400px;"
-               placeholder="Search ingredients…"
-               oninput="filterInventory(this.value)">
+    <!-- ══════════════════════════════════════════════════════════
+         LOW STOCK REORDER WARNING BANNER
+         ══════════════════════════════════════════════════════════ -->
+    {% if 'purchase_orders' in tenant_features and low_stock_count > 0 %}
+    <div id="lowStockBar" class="inventory-alert-banner">
+        <div class="d-flex align-items-center gap-3">
+            <div class="alert-icon-wrap">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+            <div>
+                <div class="fw-bold" id="lowStockBarText" style="color:var(--text-main); font-size:0.92rem;">
+                    {{ low_stock_count }} item{{ low_stock_count|pluralize }} low on stock
+                </div>
+                <div class="text-muted" style="font-size:0.78rem;">
+                    Current quantity is below minimum buffer threshold. Generate draft purchase orders for your preferred suppliers.
+                </div>
+            </div>
+        </div>
+        <button class="btn-inventory-primary" onclick="generatePurchaseOrders()" id="genPoBtn">
+            <i class="bi bi-receipt me-1"></i> Generate Purchase Orders
+        </button>
+    </div>
+    {% endif %}
+
+    <!-- ══════════════════════════════════════════════════════════
+         TOOLBAR: SEARCH & CATEGORY PILLS
+         ══════════════════════════════════════════════════════════ -->
+    <div class="inventory-toolbar">
+        <div class="inventory-search-wrap">
+            <i class="bi bi-search"></i>
+            <input type="text" id="inventorySearch" class="inventory-search-input"
+                   placeholder="Search ingredients, categories…"
+                   oninput="filterInventory(this.value)">
+        </div>
+
+        <div class="category-strip">
+            <button class="category-pill active" data-category="" onclick="selectCategoryFilter(this, '')">
+                All Items ({{ items|length }})
+            </button>
+            {% for c in categories %}
+            <button class="category-pill" data-category="{{ c|lower }}" onclick="selectCategoryFilter(this, '{{ c|escapejs }}')">
+                {{ c }}
+            </button>
+            {% endfor %}
+        </div>
     </div>
 
     <datalist id="categoryOptions">
@@ -117,22 +762,12 @@
         {% endfor %}
     </datalist>
 
-    {% if 'purchase_orders' in tenant_features and low_stock_count > 0 %}
-    <div id="lowStockBar" class="d-flex align-items-center justify-content-between flex-wrap gap-2"
-         style="border:1px solid var(--accent-gold); background:color-mix(in srgb, var(--accent-gold) 8%, transparent); padding:0.7rem 1rem; margin-bottom:1rem; border-radius:2px;">
-        <span id="lowStockBarText" style="font-size:0.85rem; color:var(--text-main);">
-            <i class="bi bi-exclamation-triangle-fill me-1" style="color:var(--accent-gold);"></i>
-            {{ low_stock_count }} item{{ low_stock_count|pluralize }} low on stock
-        </span>
-        <button class="btn-luxury btn-luxury-primary" onclick="generatePurchaseOrders()" id="genPoBtn">
-            <i class="bi bi-receipt me-1"></i> Generate Purchase Orders
-        </button>
-    </div>
-    {% endif %}
-
-    <div class="inventory-card">
+    <!-- ══════════════════════════════════════════════════════════
+         INVENTORY ITEMS SQUIRCLE TABLE
+         ══════════════════════════════════════════════════════════ -->
+    <div class="squircle-card">
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table-modern">
                 <thead>
                     <tr>
                         <th>Ingredient</th>
@@ -140,75 +775,121 @@
                         <th>Cost / Unit</th>
                         <th>Current Stock</th>
                         <th>Unit</th>
-                        <th>Value</th>
+                        <th>Est. Value</th>
                         <th>Status</th>
                         <th>Update Stock</th>
-                        <th>Actions</th>
+                        <th class="text-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for item in items %}
-                    <tr>
-                        <td class="fw-semibold">{{ item.name }}</td>
-                        <td class="text-muted" style="font-size:0.85rem;">{{ item.category|default:"—" }}</td>
-                        <td class="stock-val text-muted">₹{{ item.cost_price }}</td>
-                        <td id="stock{{ item.id }}" class="stock-val">{{ item.stock }}</td>
-                        <td class="text-muted text-uppercase" style="font-size:0.85rem; letter-spacing:1px;">{{ item.unit }}</td>
-                        <td class="stock-val" style="color:var(--accent-gold);">
-                            {% widthratio item.cost_price 1 item.stock %}
+                    <tr data-item-row="true" data-name="{{ item.name|lower }}" data-category="{{ item.category|default:''|lower }}">
+                        <td>
+                            <div class="fw-bold" style="color:var(--text-main);">{{ item.name }}</div>
+                            {% if item.preferred_supplier %}
+                            <div class="text-muted" style="font-size:0.75rem;">
+                                <i class="bi bi-truck me-1"></i>{{ item.preferred_supplier.name }}
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.category %}
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill px-2 py-1" style="font-size:0.75rem;">
+                                {{ item.category }}
+                            </span>
+                            {% else %}
+                            <span class="text-muted" style="font-size:0.82rem;">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="mono-num text-muted">₹{{ item.cost_price }}</td>
+                        <td id="stock{{ item.id }}" class="mono-num fw-bold" style="color:var(--text-main);">
+                            {{ item.stock }}
+                        </td>
+                        <td>
+                            <span class="text-muted text-uppercase fw-semibold" style="font-size:0.75rem; letter-spacing:0.8px;">
+                                {{ item.unit }}
+                            </span>
+                        </td>
+                        <td class="mono-num" style="color:var(--pos-red);">
+                            ₹{% widthratio item.cost_price 1 item.stock %}
                         </td>
                         <td>
                             {% if item.is_low_stock %}
-                            <span class="status-badge badge-low"><i class="bi bi-exclamation-triangle me-1"></i> Low Stock</span>
+                            <span class="badge-status badge-low">
+                                <i class="bi bi-exclamation-triangle-fill"></i> Low Stock
+                            </span>
                             {% else %}
-                            <span class="status-badge badge-ok"><i class="bi bi-check-circle me-1"></i> Optimal</span>
+                            <span class="badge-status badge-ok">
+                                <i class="bi bi-check-circle-fill"></i> Optimal
+                            </span>
                             {% endif %}
                         </td>
                         <td>
                             <div class="d-flex align-items-center gap-2">
-                                <input type="number" min="0" step="0.01" id="add{{ item.id }}" class="input-luxury" placeholder="Qty">
-                                <button class="btn-luxury px-3" onclick="restock('{{ item.id }}')" title="Add received stock"><i class="bi bi-plus-lg me-1"></i>Add</button>
-                                <button class="btn-luxury px-3" style="border-color:#c9503a;color:#c9503a;" onclick="openWastageModal('{{ item.id }}', '{{ item.name|escapejs }}', '{{ item.unit }}')" title="Log wastage / spillage — reduces stock and records it as a loss"><i class="bi bi-droplet-half me-1"></i>Waste</button>
-                                <button class="btn-luxury px-3" style="border-color:var(--accent-gold);color:var(--accent-gold);" onclick="openAdjustModal('{{ item.id }}', '{{ item.name|escapejs }}', '{{ item.unit }}', '{{ item.stock }}')" title="Correct stock after a physical count — not a loss, just fixes the number"><i class="bi bi-sliders me-1"></i>Adjust</button>
+                                <input type="number" min="0" step="0.01" id="add{{ item.id }}" class="qty-input" placeholder="Qty">
+                                <button type="button" class="btn-table-action btn-action-add" onclick="restock('{{ item.id }}')" title="Add received stock">
+                                    <i class="bi bi-plus-lg"></i> Add
+                                </button>
+                                <button type="button" class="btn-table-action btn-action-waste" onclick="openWastageModal('{{ item.id }}', '{{ item.name|escapejs }}', '{{ item.unit }}')" title="Log wastage or spillage">
+                                    <i class="bi bi-droplet-half"></i> Waste
+                                </button>
+                                <button type="button" class="btn-table-action btn-action-adjust" onclick="openAdjustModal('{{ item.id }}', '{{ item.name|escapejs }}', '{{ item.unit }}', '{{ item.stock }}')" title="Correct stock after physical count">
+                                    <i class="bi bi-sliders"></i> Adjust
+                                </button>
                             </div>
                         </td>
-                        <td>
-                            <button class="btn-icon" onclick="openEditModal('{{ item.id }}', '{{ item.name|escapejs }}', '{{ item.category|escapejs }}', '{{ item.cost_price }}', '{{ item.low_stock_threshold }}', '{{ item.reorder_quantity }}', '{{ item.preferred_supplier.id|default:"" }}')" title="Edit ingredient details" aria-label="Edit ingredient details">
-                                <i class="bi bi-pencil" style="font-size:1.1rem; color:var(--text-muted);"></i>
+                        <td class="text-end">
+                            <button type="button" class="btn-action-icon" onclick="openEditModal('{{ item.id }}', '{{ item.name|escapejs }}', '{{ item.category|escapejs }}', '{{ item.cost_price }}', '{{ item.low_stock_threshold }}', '{{ item.reorder_quantity }}', '{{ item.preferred_supplier.id|default:"" }}')" title="Edit ingredient details" aria-label="Edit ingredient details">
+                                <i class="bi bi-pencil"></i>
                             </button>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="9" class="text-center py-5 text-muted">No inventory items found. Add ingredients to track stock.</td>
+                        <td colspan="9" class="text-center py-5 text-muted">
+                            <div class="py-4">
+                                <i class="bi bi-inboxes display-5 d-block mb-3 text-muted opacity-50"></i>
+                                <div class="fw-bold fs-6 mb-1">No Inventory Items Found</div>
+                                <div class="small text-muted mb-3">Add raw materials and recipe ingredients to track live pantry stock.</div>
+                                <button type="button" class="btn-subbar-primary" onclick="openAddInventoryModal()">
+                                    <i class="bi bi-plus-lg me-1"></i> Add First Ingredient
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+
 </div>
 
-<!-- Add Ingredient Modal -->
+<!-- ══════════════════════════════════════════════════════════════
+     MODAL 1: ADD INGREDIENT
+     ══════════════════════════════════════════════════════════════ -->
 <div class="modal fade" id="inventoryModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title m-0">Add Ingredient</h5>
+                <h5 class="modal-title m-0">
+                    <i class="bi bi-plus-circle text-danger"></i>
+                    Add Ingredient
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label class="form-label text-muted text-uppercase" style="font-size:0.75rem; font-weight:600; letter-spacing:1px;">Ingredient Name</label>
+                    <label class="form-label" for="invName">Ingredient Name</label>
                     <input id="invName" class="form-control" placeholder="e.g. Flour, Tomatoes, Olive Oil">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label text-muted text-uppercase" style="font-size:0.75rem; font-weight:600; letter-spacing:1px;">Category (optional)</label>
+                    <label class="form-label" for="invCategory">Category (optional)</label>
                     <input id="invCategory" class="form-control" list="categoryOptions" placeholder="e.g. Vegetables, Dairy, Spices">
                 </div>
                 <div class="row">
                     <div class="col-6 mb-3">
-                        <label class="form-label text-muted text-uppercase" style="font-size:0.75rem; font-weight:600; letter-spacing:1px;">Measurement Unit</label>
+                        <label class="form-label" for="invUnit">Measurement Unit</label>
                         <select id="invUnit" class="form-select">
                             <option value="pcs">Pieces (pcs)</option>
                             <option value="g">Grams (g)</option>
@@ -218,63 +899,70 @@
                         </select>
                     </div>
                     <div class="col-6 mb-3">
-                        <label class="form-label text-muted text-uppercase" style="font-size:0.75rem; font-weight:600; letter-spacing:1px;">Cost Price / Unit</label>
+                        <label class="form-label" for="invCostPrice">Cost Price / Unit</label>
                         <input id="invCostPrice" type="number" step="0.01" class="form-control" placeholder="0.00">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-6 mb-3">
-                        <label class="form-label text-muted text-uppercase" style="font-size:0.75rem; font-weight:600; letter-spacing:1px;">Initial Stock</label>
+                        <label class="form-label" for="invStock">Initial Stock</label>
                         <input id="invStock" type="number" step="0.01" class="form-control" placeholder="0.00">
                     </div>
                     <div class="col-6 mb-3">
-                        <label class="form-label text-muted text-uppercase" style="font-size:0.75rem; font-weight:600; letter-spacing:1px;">Low Threshold</label>
+                        <label class="form-label" for="invThreshold">Low Threshold</label>
                         <input id="invThreshold" type="number" step="0.01" class="form-control" placeholder="Alert below...">
                     </div>
                 </div>
             </div>
             <div class="modal-footer border-0 pt-0">
-                <button class="btn-luxury w-100 btn-luxury-primary justify-content-center" onclick="createInventoryItem()">Create Ingredient</button>
+                <button type="button" class="btn-modal-submit" onclick="createInventoryItem()">
+                    <i class="bi bi-check2-circle"></i> Create Ingredient
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Edit Inventory Modal -->
+<!-- ══════════════════════════════════════════════════════════════
+     MODAL 2: EDIT INGREDIENT
+     ══════════════════════════════════════════════════════════════ -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title m-0">Edit Ingredient</h5>
+                <h5 class="modal-title m-0">
+                    <i class="bi bi-pencil-square text-danger"></i>
+                    Edit Ingredient
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="editId">
                 <div class="mb-3">
-                    <label class="form-label text-muted text-uppercase" style="font-size:0.75rem; font-weight:600; letter-spacing:1px;">Ingredient Name</label>
+                    <label class="form-label" for="editName">Ingredient Name</label>
                     <input id="editName" class="form-control">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label text-muted text-uppercase" style="font-size:0.75rem; font-weight:600; letter-spacing:1px;">Category (optional)</label>
+                    <label class="form-label" for="editCategory">Category (optional)</label>
                     <input id="editCategory" class="form-control" list="categoryOptions" placeholder="e.g. Vegetables, Dairy, Spices">
                 </div>
                 <div class="row">
                     <div class="col-6 mb-3">
-                        <label class="form-label text-muted text-uppercase" style="font-size:0.75rem; font-weight:600; letter-spacing:1px;">Cost Price / Unit</label>
+                        <label class="form-label" for="editCostPrice">Cost Price / Unit</label>
                         <input id="editCostPrice" type="number" step="0.01" class="form-control">
                     </div>
                     <div class="col-6 mb-3">
-                        <label class="form-label text-muted text-uppercase" style="font-size:0.75rem; font-weight:600; letter-spacing:1px;">Low Threshold</label>
+                        <label class="form-label" for="editThreshold">Low Threshold</label>
                         <input id="editThreshold" type="number" step="0.01" class="form-control">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-6 mb-3">
-                        <label class="form-label text-muted text-uppercase" style="font-size:0.75rem; font-weight:600; letter-spacing:1px;">Auto-Reorder Qty</label>
+                        <label class="form-label" for="editReorderQty">Auto-Reorder Qty</label>
                         <input id="editReorderQty" type="number" step="0.01" class="form-control" placeholder="Qty to order">
                     </div>
                     <div class="col-6 mb-3">
-                        <label class="form-label text-muted text-uppercase" style="font-size:0.75rem; font-weight:600; letter-spacing:1px;">Preferred Supplier</label>
+                        <label class="form-label" for="editSupplier">Preferred Supplier</label>
                         <select id="editSupplier" class="form-select">
                             <option value="">-- None --</option>
                             {% for s in suppliers %}
@@ -285,30 +973,40 @@
                 </div>
             </div>
             <div class="modal-footer border-0 pt-0">
-                <button class="btn-luxury w-100 btn-luxury-primary justify-content-center" onclick="updateInventoryItem()">Save Changes</button>
+                <button type="button" class="btn-modal-submit" onclick="updateInventoryItem()">
+                    <i class="bi bi-check2-circle"></i> Save Changes
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- WASTAGE MODAL -->
+<!-- ══════════════════════════════════════════════════════════════
+     MODAL 3: LOG WASTAGE / SPILLAGE
+     ══════════════════════════════════════════════════════════════ -->
 <div class="modal fade" id="wastageModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="background:var(--panel-bg);border:1px solid var(--border-col);border-radius:8px;">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title" style="color:var(--text-main);">Log Wastage / Spillage</h5>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title m-0">
+                    <i class="bi bi-droplet-half text-danger"></i>
+                    Log Wastage / Spillage
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="wastageItemId">
-                <p class="text-muted mb-3" id="wastageItemName" style="font-size:0.9rem;"></p>
-                <div class="mb-3">
-                    <label class="form-label" style="color:var(--text-main);font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;">Quantity (<span id="wastageUnit"></span>)</label>
-                    <input type="number" id="wastageQty" min="0.001" step="0.001" class="input-luxury w-100" placeholder="e.g. 30">
+                <div class="alert alert-danger bg-opacity-10 border-0 rounded-3 mb-3 py-2 px-3">
+                    <span class="text-muted small">Item:</span>
+                    <strong class="text-danger" id="wastageItemName"></strong>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" style="color:var(--text-main);font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;">Reason</label>
-                    <select id="wastageReason" class="input-luxury w-100">
+                    <label class="form-label" for="wastageQty">Quantity (<span id="wastageUnit"></span>)</label>
+                    <input type="number" id="wastageQty" min="0.001" step="0.001" class="form-control" placeholder="e.g. 0.50">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="wastageReason">Reason</label>
+                    <select id="wastageReason" class="form-select">
                         <option value="Spillage">Spillage</option>
                         <option value="Breakage">Breakage</option>
                         <option value="Over-pour">Over-pour</option>
@@ -317,45 +1015,53 @@
                     </select>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" style="color:var(--text-main);font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;">Notes (optional)</label>
-                    <input type="text" id="wastageNotes" class="input-luxury w-100" placeholder="e.g. Bottle dropped by staff">
+                    <label class="form-label" for="wastageNotes">Notes (optional)</label>
+                    <input type="text" id="wastageNotes" class="form-control" placeholder="e.g. Container dropped during shift">
                 </div>
             </div>
             <div class="modal-footer border-0 pt-0">
-                <button class="btn-luxury w-100 justify-content-center" style="border-color:#c9503a;color:#c9503a;" onclick="submitWastage()">
-                    <i class="bi bi-droplet-half me-2"></i>Log Wastage
+                <button type="button" class="btn-modal-waste" onclick="submitWastage()">
+                    <i class="bi bi-droplet-half me-1"></i> Confirm Wastage Loss
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Manual Stock Adjustment Modal -->
+<!-- ══════════════════════════════════════════════════════════════
+     MODAL 4: MANUAL STOCK ADJUSTMENT
+     ══════════════════════════════════════════════════════════════ -->
 <div class="modal fade" id="adjustModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="background:var(--panel-bg);border:1px solid var(--border-col);border-radius:8px;">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title" style="color:var(--text-main);">Adjust Stock</h5>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title m-0">
+                    <i class="bi bi-sliders text-warning"></i>
+                    Adjust Stock
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="adjustItemId">
-                <p class="text-muted mb-3" id="adjustItemName" style="font-size:0.9rem;"></p>
-                <div class="mb-3">
-                    <label class="form-label" style="color:var(--text-main);font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;">
-                        What you actually counted (<span id="adjustUnit"></span>)
-                    </label>
-                    <input type="number" id="adjustNewCount" min="0" step="0.001" class="input-luxury w-100" placeholder="e.g. 12.5">
-                    <div class="form-text" style="font-size:0.75rem;" id="adjustCurrentStock"></div>
+                <div class="alert alert-warning bg-opacity-10 border-0 rounded-3 mb-3 py-2 px-3">
+                    <span class="text-muted small">Item:</span>
+                    <strong class="text-warning" id="adjustItemName"></strong>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" style="color:var(--text-main);font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;">Reason (required)</label>
-                    <input type="text" id="adjustReason" class="input-luxury w-100" placeholder="e.g. Monthly physical count, miscounted last delivery">
+                    <label class="form-label" for="adjustNewCount">
+                        What you actually counted (<span id="adjustUnit"></span>)
+                    </label>
+                    <input type="number" id="adjustNewCount" min="0" step="0.001" class="form-control" placeholder="e.g. 12.5">
+                    <div class="form-text text-muted mt-1" style="font-size:0.75rem;" id="adjustCurrentStock"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="adjustReason">Reason (required)</label>
+                    <input type="text" id="adjustReason" class="form-control" placeholder="e.g. Physical inventory count discrepancy">
                 </div>
             </div>
             <div class="modal-footer border-0 pt-0">
-                <button class="btn-luxury w-100 justify-content-center" style="border-color:var(--accent-gold);color:var(--accent-gold);" onclick="submitAdjust()">
-                    <i class="bi bi-sliders me-2"></i>Apply Adjustment
+                <button type="button" class="btn-modal-adjust" onclick="submitAdjust()">
+                    <i class="bi bi-check-circle me-1"></i> Apply Adjustment
                 </button>
             </div>
         </div>
@@ -378,29 +1084,61 @@ function getCookie(name) {
     return cookieValue;
 }
 
+function getCsrfToken() {
+    return getCookie('csrftoken2') || getCookie('csrftoken') || '';
+}
+
+let currentCategoryFilter = '';
+let currentSearchQuery = '';
+
+function selectCategoryFilter(btn, category) {
+    document.querySelectorAll('.category-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentCategoryFilter = category.toLowerCase().trim();
+    applyFilters();
+}
+
 function filterInventory(q) {
-    const term = q.toLowerCase();
-    document.querySelectorAll('tbody tr').forEach(row => {
-        const name = row.querySelector('td:first-child')?.textContent.toLowerCase() || '';
-        row.style.display = name.includes(term) ? '' : 'none';
+    currentSearchQuery = q.toLowerCase().trim();
+    applyFilters();
+}
+
+function applyFilters() {
+    document.querySelectorAll('tbody tr[data-item-row]').forEach(row => {
+        const name = row.getAttribute('data-name') || '';
+        const cat = row.getAttribute('data-category') || '';
+        const matchesSearch = !currentSearchQuery || name.includes(currentSearchQuery) || cat.includes(currentSearchQuery);
+        const matchesCategory = !currentCategoryFilter || cat === currentCategoryFilter;
+        row.style.display = (matchesSearch && matchesCategory) ? '' : 'none';
     });
 }
 
 function restock(id) {
-    const qty = document.getElementById('add' + id).value;
-    if (!qty || qty <= 0) { alert('Please enter a valid quantity.'); return; }
+    const qtyInput = document.getElementById('add' + id);
+    const qty = qtyInput ? qtyInput.value : '';
+    if (!qty || parseFloat(qty) <= 0) {
+        if (window.ui && ui.toast) {
+            ui.toast('Please enter a valid quantity.', 'warning');
+        } else {
+            alert('Please enter a valid quantity.');
+        }
+        return;
+    }
     fetch(`/inventory/restock/${id}/`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken2') },
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
         body: JSON.stringify({ quantity: qty })
     })
     .then(r => r.json())
     .then(data => {
         if (data.success) {
-            document.getElementById('stock' + id).innerText = data.new_stock;
-            document.getElementById('add' + id).value = '';
+            const stockEl = document.getElementById('stock' + id);
+            if (stockEl) stockEl.innerText = data.new_stock;
+            if (qtyInput) qtyInput.value = '';
             location.reload();
-        } else { alert('Restock failed'); }
+        } else {
+            alert('Restock failed');
+        }
     });
 }
 
@@ -408,36 +1146,45 @@ function generatePurchaseOrders() {
     const btn = document.getElementById('genPoBtn');
     const text = document.getElementById('lowStockBarText');
     const poListUrl = "{% url 'purchase_order_list' %}";
-    btn.disabled = true;
+    if (btn) btn.disabled = true;
     fetch('/inventory/generate-purchase-orders/', {
         method: 'POST',
-        headers: { 'X-CSRFToken': getCookie('csrftoken2') },
+        headers: { 'X-CSRFToken': getCsrfToken() },
     })
     .then(r => r.json())
     .then(data => {
-        if (!data.success) { alert('Could not generate purchase orders.'); btn.disabled = false; return; }
+        if (!data.success) {
+            alert('Could not generate purchase orders.');
+            if (btn) btn.disabled = false;
+            return;
+        }
 
         if (!data.has_suppliers && data.processed_count === 0) {
-            text.innerHTML = `You haven't added any suppliers yet — add one to start generating purchase orders. ` +
-                `<a href="{% url 'supplier_list' %}" style="color:var(--accent-gold);">Add a Supplier</a>`;
-            btn.remove();
+            if (text) {
+                text.innerHTML = `You haven't added any suppliers yet — add one to start generating purchase orders. ` +
+                    `<a href="{% url 'supplier_list' %}" style="color:var(--pos-red);">Add a Supplier</a>`;
+            }
+            if (btn) btn.remove();
             return;
         }
 
         let html = `${data.processed_count} item${data.processed_count === 1 ? '' : 's'} added to ${data.purchase_orders.length} draft PO${data.purchase_orders.length === 1 ? '' : 's'}`;
         if (data.purchase_orders.length) {
             html += ': ' + data.purchase_orders.map(po =>
-                `<a href="${poListUrl}#po-row-${po.id}" style="color:var(--accent-gold);">${po.supplier}</a>`
+                `<a href="${poListUrl}#po-row-${po.id}" style="color:var(--pos-red);">${po.supplier}</a>`
             ).join(', ');
         }
         if (data.skipped.length) {
             html += `<br><span style="color:var(--text-muted); font-size:0.78rem;">Skipped: ` +
                 data.skipped.map(s => `${s.name} (${s.reason})`).join(', ') + `</span>`;
         }
-        text.innerHTML = html;
-        btn.remove();
+        if (text) text.innerHTML = html;
+        if (btn) btn.remove();
     })
-    .catch(() => { alert('Could not generate purchase orders.'); btn.disabled = false; });
+    .catch(() => {
+        alert('Could not generate purchase orders.');
+        if (btn) btn.disabled = false;
+    });
 }
 
 function openAddInventoryModal() {
@@ -445,20 +1192,36 @@ function openAddInventoryModal() {
 }
 
 function createInventoryItem() {
-    const name = document.getElementById('invName').value;
-    const category = document.getElementById('invCategory').value;
+    const name = document.getElementById('invName').value.trim();
+    const category = document.getElementById('invCategory').value.trim();
     const unit = document.getElementById('invUnit').value;
     const stock = document.getElementById('invStock').value;
     const threshold = document.getElementById('invThreshold').value;
     const costPrice = document.getElementById('invCostPrice').value;
-    if (!name) { alert('Please enter an ingredient name.'); return; }
+    if (!name) {
+        alert('Please enter an ingredient name.');
+        return;
+    }
     fetch('/inventory/create/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken2') },
-        body: JSON.stringify({ name, category, unit, stock: parseFloat(stock) || 0, threshold: parseFloat(threshold) || 0, cost_price: parseFloat(costPrice) || 0 })
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
+        body: JSON.stringify({
+            name,
+            category,
+            unit,
+            stock: parseFloat(stock) || 0,
+            threshold: parseFloat(threshold) || 0,
+            cost_price: parseFloat(costPrice) || 0
+        })
     })
     .then(r => r.json())
-    .then(data => { if (data.success) { location.reload(); } else { alert(data.error || 'Failed to create ingredient.'); } });
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.error || 'Failed to create ingredient.');
+        }
+    });
 }
 
 function openEditModal(id, name, category, costPrice, threshold, reorderQty, supplierId) {
@@ -474,20 +1237,36 @@ function openEditModal(id, name, category, costPrice, threshold, reorderQty, sup
 
 function updateInventoryItem() {
     const id = document.getElementById('editId').value;
-    const name = document.getElementById('editName').value;
-    const category = document.getElementById('editCategory').value;
+    const name = document.getElementById('editName').value.trim();
+    const category = document.getElementById('editCategory').value.trim();
     const costPrice = document.getElementById('editCostPrice').value;
     const threshold = document.getElementById('editThreshold').value;
     const reorderQty = document.getElementById('editReorderQty').value;
     const supplierId = document.getElementById('editSupplier').value;
-    if (!name) { alert('Please enter an ingredient name.'); return; }
+    if (!name) {
+        alert('Please enter an ingredient name.');
+        return;
+    }
     fetch(`/inventory/update/${id}/`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken2') },
-        body: JSON.stringify({ name, category, cost_price: parseFloat(costPrice) || 0, threshold: parseFloat(threshold) || 0, reorder_quantity: parseFloat(reorderQty) || 0, supplier_id: supplierId || null })
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
+        body: JSON.stringify({
+            name,
+            category,
+            cost_price: parseFloat(costPrice) || 0,
+            threshold: parseFloat(threshold) || 0,
+            reorder_quantity: parseFloat(reorderQty) || 0,
+            supplier_id: supplierId || null
+        })
     })
     .then(r => r.json())
-    .then(data => { if (data.success) { location.reload(); } else { alert(data.error || 'Failed to update ingredient.'); } });
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.error || 'Failed to update ingredient.');
+        }
+    });
 }
 
 function openWastageModal(id, name, unit) {
@@ -505,19 +1284,25 @@ function submitWastage() {
     const qty    = document.getElementById('wastageQty').value;
     const reason = document.getElementById('wastageReason').value;
     const notes  = document.getElementById('wastageNotes').value;
-    if (!qty || parseFloat(qty) <= 0) { alert('Enter a valid quantity.'); return; }
+    if (!qty || parseFloat(qty) <= 0) {
+        alert('Enter a valid quantity.');
+        return;
+    }
     fetch(`/inventory/wastage/${id}/`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken2') },
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
         body: JSON.stringify({ quantity: qty, reason, notes })
     })
     .then(r => r.json())
     .then(data => {
         if (data.success) {
             bootstrap.Modal.getInstance(document.getElementById('wastageModal')).hide();
-            document.getElementById('stock' + id).innerText = parseFloat(data.new_stock).toFixed(3);
+            const stockEl = document.getElementById('stock' + id);
+            if (stockEl) stockEl.innerText = parseFloat(data.new_stock).toFixed(3);
             location.reload();
-        } else { alert(data.error || 'Failed to log wastage'); }
+        } else {
+            alert(data.error || 'Failed to log wastage');
+        }
     });
 }
 
@@ -535,11 +1320,17 @@ function submitAdjust() {
     const id = document.getElementById('adjustItemId').value;
     const newCount = document.getElementById('adjustNewCount').value;
     const reason = document.getElementById('adjustReason').value.trim();
-    if (newCount === '' || parseFloat(newCount) < 0) { alert('Enter what you actually counted.'); return; }
-    if (!reason) { alert('A reason is required for a manual adjustment.'); return; }
+    if (newCount === '' || parseFloat(newCount) < 0) {
+        alert('Enter what you actually counted.');
+        return;
+    }
+    if (!reason) {
+        alert('A reason is required for a manual adjustment.');
+        return;
+    }
     fetch(`/inventory/adjust/${id}/`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken2') },
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
         body: JSON.stringify({ new_count: newCount, reason })
     })
     .then(r => r.json())
@@ -547,7 +1338,9 @@ function submitAdjust() {
         if (data.success) {
             bootstrap.Modal.getInstance(document.getElementById('adjustModal')).hide();
             location.reload();
-        } else { alert(data.error || 'Failed to apply the adjustment'); }
+        } else {
+            alert(data.error || 'Failed to apply the adjustment');
+        }
     });
 }
 </script>

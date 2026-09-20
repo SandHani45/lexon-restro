@@ -226,6 +226,7 @@ function showTransferMsg(msg, ok) {
 
 async function dispatchAll() {
   if (!confirm("Mark all pending transfers as In Transit?")) return;
+  if (!await ui.confirm("Dispatch Transfers?", "Mark all pending transfers as In Transit?", "Mark In Transit")) return;
   const btn = document.getElementById("dispatchBtn");
   if (btn) btn.disabled = true;
 

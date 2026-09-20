@@ -191,6 +191,7 @@ document.getElementById("createForm").addEventListener("submit", async function(
 
 async function applyPreset(tenantId, presetKey, label) {
   if (!confirm(`Apply preset "${label}" to this restaurant? This will override feature flags.`)) return;
+  if (!await ui.confirm("Apply Preset?", `Apply preset "${label}" to this restaurant? This will override feature flags.`, "Apply Preset")) return;
   const r = await fetch(`/superuser/tenant/${tenantId}/preset/`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded", "X-CSRFToken": apiClient.getCsrf() },
@@ -199,6 +200,8 @@ async function applyPreset(tenantId, presetKey, label) {
   const d = await r.json();
   if (d.success) { alert(`Applied: ${d.label}`); location.reload(); }
   else alert(d.error || "Failed");
+  if (d.success) { await ui.alert("Preset Applied", `Applied: ${d.label}`, "success"); location.reload(); }
+  else ui.alert("Error", d.error || "Failed", "error");
 }
 </script>
 {% endblock %}

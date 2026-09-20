@@ -264,6 +264,7 @@ async function submitRequisition() {
 
 async function autoGenerate() {
   if (!confirm("Generate a requisition for all low-stock items automatically?")) return;
+  if (!await ui.confirm("Auto-Generate Requisition?", "Generate a requisition for all low-stock items automatically?", "Auto-Generate")) return;
   const btn = document.getElementById("autoBtn");
   btn.disabled = true;
   const r = await fetch("{% url 'requisition-auto-generate' %}", {

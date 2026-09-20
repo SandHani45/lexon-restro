@@ -18,15 +18,23 @@ Including another URLconf
 
 from django.conf import settings
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.shortcuts import redirect
 from django.views.defaults import page_not_found, server_error
 from django.views.generic import TemplateView
 from core import views
 
-def custom_404(request, exception):
+def custom_404(request, exception=None):
     from django.shortcuts import render
     return render(request, "404.html", status=404)
+
+def custom_403(request, exception=None):
+    from django.shortcuts import render
+    return render(request, "403.html", status=403)
+
+def custom_400(request, exception=None):
+    from django.shortcuts import render
+    return render(request, "400.html", status=400)
 
 def custom_500(request):
     from django.shortcuts import render
@@ -201,6 +209,8 @@ def sitemap_xml(request):
 </urlset>"""
     return HttpResponse(content, content_type='application/xml')
 
+handler400 = "core.urls.custom_400"
+handler403 = "core.urls.custom_403"
 handler404 = "core.urls.custom_404"
 handler500 = "core.urls.custom_500"
 
@@ -299,3 +309,8 @@ from django.conf.urls.static import static
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Catch-all route: prevents technical debug code error screens on any router
+urlpatterns += [
+    re_path(r'^.*$', custom_404, name='catch_all_404'),
+]

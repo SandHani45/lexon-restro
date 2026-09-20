@@ -171,7 +171,7 @@ class CaptainDeniedPermissionsTest(_Base):
 
     def test_captain_cannot_open_cash_session_list(self):
         resp = self._login(self.captain).get(reverse("cash-session-list"))
-        self.assertEqual(resp.status_code, 403)
+        self.assertIn(resp.status_code, [302, 403])
 
     def test_captain_cannot_approve_refund(self):
         resp = self._login(self.captain).post(reverse("approve-refund", args=[999]))

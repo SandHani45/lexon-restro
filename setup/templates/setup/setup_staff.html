@@ -1,168 +1,1123 @@
 {% extends 'core/base.html' %}
 {% load static %}
 
-{% block title %}Staff Accounts | {{ request.user.tenant.name }}{% endblock %}
+{% block title %}Staff Management | {{ request.user.tenant.name }}{% endblock %}
 
 {% block extra_css %}
 <style>
-    .page-body { max-width: 900px; margin: 0 auto; padding: 4rem 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
-    @media(max-width: 640px) { .page-body { grid-template-columns: 1fr; } }
-
-    .page-eyebrow { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 4px; color: var(--accent-gold); margin-bottom: 0.5rem; }
-    .page-title { font-family: 'DM Serif Display', serif; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; }
-    .divider { width: 40px; height: 1px; background: var(--accent-gold); margin: 1.2rem 0; }
-    .page-sub { color: var(--text-muted); font-size: 0.8rem; line-height: 1.6; margin-bottom: 2rem; }
-
-    .form-label { display: block; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; margin-bottom: 0.5rem; }
-    .setup-input { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border-color); color: var(--text-main); padding: 0.6rem 0; font-size: 0.9rem; outline: none; margin-bottom: 1.5rem; font-family: inherit; }
-    .setup-input:focus { border-bottom-color: var(--accent-gold); }
-    .form-select { width: 100%; background: var(--panel-bg); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.6rem; font-size: 0.85rem; outline: none; margin-bottom: 1.5rem; font-family: inherit; }
-
-    .btn-create { width: 100%; padding: 0.9rem; background: var(--accent-gold); border: none; color: #fff; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 700; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; }
-    .btn-create:hover { background: var(--accent-hover); }
-
-    .alert { padding: 0.8rem 1.2rem; margin-bottom: 1.5rem; font-size: 0.8rem; border-left: 3px solid var(--accent-gold); background: rgba(236, 39, 52,0.08); }
-    .alert-warning { border-left-color: #ef4444; background: rgba(239,68,68,0.08); }
-
-    .staff-table { width: 100%; border-collapse: collapse; }
-    .staff-table th { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; padding: 0.75rem 0; border-bottom: 1px solid var(--border-color); text-align: left; }
-    .staff-table td { padding: 1rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; vertical-align: middle; }
-
-    .role-badge { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1.5px; padding: 3px 8px; border: 1px solid var(--border-color); color: var(--text-muted); }
-    .role-badge.manager, .role-badge.owner { border-color: var(--accent-gold); color: var(--accent-gold); }
-    .role-badge.chef { border-color: #f59e0b; color: #f59e0b; }
-    .role-badge.waiter { border-color: #60a5fa; color: #60a5fa; }
-
-    .btn-reset-pw {
-        background: transparent; border: 1px solid var(--border-color); color: var(--text-muted);
-        font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; padding: 4px 10px;
-        cursor: pointer; font-family: inherit; transition: all 0.2s;
+    /* ══════════════════════════════════════════════════════════════
+       KIMIPOS LUXURY STAFF MANAGEMENT DESIGN SYSTEM
+       ══════════════════════════════════════════════════════════════ */
+    :root {
+        --pos-red: #EC2734;
+        --pos-red-hover: #d81f2f;
+        --pos-red-soft: rgba(236, 39, 52, 0.08);
+        --pos-red-border: rgba(236, 39, 52, 0.22);
+        --pos-green: #10b981;
+        --pos-green-soft: rgba(16, 185, 129, 0.10);
+        --pos-green-border: rgba(16, 185, 129, 0.25);
+        --pos-amber: #f59e0b;
+        --pos-amber-soft: rgba(245, 158, 11, 0.10);
+        --pos-amber-border: rgba(245, 158, 11, 0.25);
+        --pos-blue: #3b82f6;
+        --pos-blue-soft: rgba(59, 130, 246, 0.10);
+        --pos-blue-border: rgba(59, 130, 246, 0.25);
+        --pos-purple: #8b5cf6;
+        --pos-purple-soft: rgba(139, 92, 246, 0.10);
+        --pos-purple-border: rgba(139, 92, 246, 0.25);
     }
-    .btn-reset-pw:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
 
-    .staff-table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    body {
+        background: var(--bg-color) !important;
+    }
 
-    @media (max-width: 640px) {
-        .page-body { padding: 2rem 1.1rem; gap: 2.5rem; }
-        .btn-reset-pw { padding: 10px 12px; min-height: 44px; }
-        .staff-table { min-width: 480px; }
+    /* ── Sub-Header Bar (KimiPoS POS Layout) ──────────────────── */
+    .pos-subbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 1.1rem 1.5rem 0.5rem;
+        background: var(--bg-color);
+        max-width: 1320px;
+        margin: 0 auto;
+    }
+    .pos-subbar-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        letter-spacing: -0.4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .pos-breadcrumbs {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .pos-breadcrumbs a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.15s;
+    }
+    .pos-breadcrumbs a:hover {
+        color: var(--pos-red);
+    }
+    .pos-breadcrumbs .separator {
+        font-size: 0.65rem;
+        opacity: 0.6;
+    }
+    .pos-breadcrumbs .current {
+        color: var(--pos-red);
+        font-weight: 700;
+    }
+
+    /* Subbar Pill Buttons */
+    .btn-subbar-pill {
+        background: var(--panel-bg);
+        color: var(--text-main) !important;
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        padding: 7px 16px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-decoration: none !important;
+    }
+    .btn-subbar-pill:hover {
+        border-color: var(--pos-red-border);
+        background: var(--pos-red-soft);
+        color: var(--pos-red) !important;
+        transform: translateY(-1px);
+    }
+
+    .btn-subbar-action {
+        background: var(--pos-red);
+        color: #ffffff !important;
+        border: none;
+        border-radius: 999px;
+        padding: 7px 18px;
+        font-size: 0.84rem;
+        font-weight: 700;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 3px 12px rgba(236, 39, 52, 0.3);
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-decoration: none !important;
+    }
+    .btn-subbar-action:hover {
+        background: var(--pos-red-hover);
+        transform: translateY(-1.5px);
+        box-shadow: 0 6px 18px rgba(236, 39, 52, 0.42);
+        color: #ffffff !important;
+    }
+
+    .staff-wrap {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 0.5rem 1.5rem 5rem;
+    }
+
+    /* ── Hero Status Cards ─────────────────────────────────────── */
+    .kpi-card {
+        background: var(--card-bg, #ffffff);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 1.15rem 1.35rem;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+    .kpi-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+    .kpi-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--text-muted);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .kpi-value {
+        font-size: 1.6rem;
+        font-weight: 900;
+        color: var(--text-main);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        line-height: 1.15;
+        margin-top: 2px;
+    }
+    .kpi-sub {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .kpi-badge-icon {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        flex-shrink: 0;
+    }
+
+    /* ── Squircle Settings & Form Cards ────────────────────────── */
+    .squircle-card {
+        background: var(--card-bg, #ffffff);
+        border: 1px solid var(--border-color);
+        border-radius: 24px;
+        padding: 1.5rem 1.65rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    .squircle-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding-bottom: 1.1rem;
+        margin-bottom: 1.25rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .squircle-title-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .squircle-icon-badge {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+    .squircle-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        letter-spacing: -0.2px;
+    }
+    .squircle-sub {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin: 2px 0 0 0;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+
+    /* ── Form Inputs & Floating Labels ─────────────────────────── */
+    .pos-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: var(--text-muted);
+        margin-bottom: 0.45rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .pos-input, .pos-select {
+        width: 100%;
+        background: var(--input-bg, #fbfbfb);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 0.75rem 1rem;
+        font-size: 0.88rem;
+        color: var(--text-main);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        transition: all 0.2s ease;
+        outline: none;
+    }
+    .pos-input:focus, .pos-select:focus {
+        border-color: var(--pos-red);
+        background: var(--card-bg, #ffffff);
+        box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.12);
+    }
+    .input-icon-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    .input-icon-group i.input-icon-lead {
+        position: absolute;
+        left: 14px;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        pointer-events: none;
+    }
+    .input-icon-group .pos-input {
+        padding-left: 2.6rem;
+    }
+    .btn-eye-toggle {
+        position: absolute;
+        right: 10px;
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        font-size: 1rem;
+        cursor: pointer;
+        padding: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.15s;
+    }
+    .btn-eye-toggle:hover {
+        color: var(--pos-red);
+    }
+
+    .pos-btn-submit {
+        background: var(--pos-red);
+        color: #ffffff;
+        border: none;
+        border-radius: 999px;
+        padding: 0.85rem 1.6rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 16px rgba(236, 39, 52, 0.32);
+        transition: all 0.2s ease;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+    .pos-btn-submit:hover {
+        background: var(--pos-red-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(236, 39, 52, 0.44);
+        color: #ffffff;
+    }
+
+    /* ── Flash Messages Alert ──────────────────────────────────── */
+    .pos-alert {
+        padding: 0.85rem 1.15rem;
+        border-radius: 14px;
+        font-size: 0.82rem;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 1.25rem;
+        border: 1px solid transparent;
+    }
+    .pos-alert-success {
+        background: var(--pos-green-soft);
+        border-color: var(--pos-green-border);
+        color: var(--pos-green);
+    }
+    .pos-alert-error, .pos-alert-danger {
+        background: var(--pos-red-soft);
+        border-color: var(--pos-red-border);
+        color: var(--pos-red);
+    }
+    .pos-alert-warning {
+        background: var(--pos-amber-soft);
+        border-color: var(--pos-amber-border);
+        color: var(--pos-amber);
+    }
+    .pos-alert-info {
+        background: var(--pos-blue-soft);
+        border-color: var(--pos-blue-border);
+        color: var(--pos-blue);
+    }
+
+    /* ── Directory Search & Filter Controls ────────────────────── */
+    .directory-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 1.25rem;
+    }
+    .search-input-wrap {
+        position: relative;
+        flex: 1;
+        min-width: 220px;
+    }
+    .search-input-wrap i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+    .search-input {
+        width: 100%;
+        padding: 0.65rem 1rem 0.65rem 2.4rem;
+        border-radius: 999px;
+        border: 1px solid var(--border-color);
+        background: var(--input-bg, #fbfbfb);
+        color: var(--text-main);
+        font-size: 0.82rem;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        outline: none;
+        transition: all 0.2s;
+    }
+    .search-input:focus {
+        border-color: var(--pos-red);
+        background: var(--card-bg, #ffffff);
+        box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.1);
+    }
+
+    /* Switch toggle pill */
+    .switch-pill-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        cursor: pointer;
+        user-select: none;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        padding: 5px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--border-color);
+        background: var(--panel-bg);
+        transition: all 0.2s;
+    }
+    .switch-pill-label:hover {
+        border-color: var(--pos-red-border);
+        color: var(--text-main);
+    }
+    .switch-pill-label input[type="checkbox"] {
+        accent-color: var(--pos-red);
+        cursor: pointer;
+        width: 14px;
+        height: 14px;
+        margin: 0;
+    }
+
+    /* ── Staff Table & Row Styling ─────────────────────────────── */
+    .staff-table-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+    }
+    .pos-modern-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .pos-modern-table thead th {
+        background: var(--table-header-bg, rgba(0, 0, 0, 0.02));
+        color: var(--text-muted);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        padding: 0.85rem 1.15rem;
+        border-bottom: 1px solid var(--border-color);
+        white-space: nowrap;
+    }
+    .pos-modern-table tbody td {
+        padding: 0.95rem 1.15rem;
+        border-bottom: 1px solid var(--border-color);
+        vertical-align: middle;
+        font-size: 0.85rem;
+        color: var(--text-main);
+        background: var(--card-bg, #ffffff);
+        transition: background 0.15s;
+    }
+    .pos-modern-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    .pos-modern-table tbody tr:hover td {
+        background: var(--pos-red-soft);
+    }
+    .pos-modern-table tbody tr.inactive-row td {
+        opacity: 0.65;
+        background: rgba(0, 0, 0, 0.02);
+    }
+
+    /* Staff Member Profile Chip */
+    .staff-profile-chip {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .staff-avatar {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.88rem;
+        font-weight: 800;
+        color: #ffffff;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        flex-shrink: 0;
+    }
+    .staff-name-wrap {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+    .staff-username {
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--text-main);
+        line-height: 1.2;
+    }
+    .staff-status-sub {
+        font-size: 0.7rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 2px;
+    }
+    .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    .status-dot.active {
+        background: var(--pos-green);
+        box-shadow: 0 0 0 2px var(--pos-green-soft);
+    }
+    .status-dot.inactive {
+        background: #ef4444;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+    }
+
+    /* Role Pill Badges */
+    .role-badge-pill {
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+        text-transform: capitalize;
+        border: 1px solid transparent;
+    }
+    .role-badge-pill.manager, .role-badge-pill.owner {
+        background: var(--pos-red-soft);
+        border-color: var(--pos-red-border);
+        color: var(--pos-red);
+    }
+    .role-badge-pill.cashier {
+        background: var(--pos-blue-soft);
+        border-color: var(--pos-blue-border);
+        color: var(--pos-blue);
+    }
+    .role-badge-pill.captain {
+        background: var(--pos-purple-soft);
+        border-color: var(--pos-purple-border);
+        color: var(--pos-purple);
+    }
+    .role-badge-pill.chef {
+        background: var(--pos-amber-soft);
+        border-color: var(--pos-amber-border);
+        color: var(--pos-amber);
+    }
+    .role-badge-pill.waiter {
+        background: var(--pos-green-soft);
+        border-color: var(--pos-green-border);
+        color: var(--pos-green);
+    }
+
+    /* Outlet Badge */
+    .outlet-badge-pill {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        padding: 3px 10px;
+        border-radius: 999px;
+    }
+
+    /* Action Buttons in Table */
+    .table-actions-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 5px;
+        flex-wrap: nowrap;
+    }
+    .btn-table-action {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        border-radius: 10px;
+        padding: 5px 9px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.15s ease;
+        white-space: nowrap;
+        text-decoration: none;
+    }
+    .btn-table-action:hover {
+        border-color: var(--pos-red-border);
+        background: var(--pos-red-soft);
+        color: var(--pos-red);
+        transform: translateY(-1px);
+    }
+    .btn-table-action.action-toggle-active {
+        color: #ef4444;
+    }
+    .btn-table-action.action-toggle-active:hover {
+        background: rgba(239, 68, 68, 0.1);
+        border-color: rgba(239, 68, 68, 0.3);
+        color: #ef4444;
+    }
+    .btn-table-action.action-toggle-reactivate {
+        color: var(--pos-green);
+    }
+    .btn-table-action.action-toggle-reactivate:hover {
+        background: var(--pos-green-soft);
+        border-color: var(--pos-green-border);
+        color: var(--pos-green);
+    }
+
+    /* ── Empty State ───────────────────────────────────────────── */
+    .empty-staff-state {
+        text-align: center;
+        padding: 3rem 1.5rem;
+    }
+    .empty-staff-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--pos-red-soft);
+        color: var(--pos-red);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+    }
+
+    /* ── Responsive Refinements ────────────────────────────────── */
+    @media (max-width: 991px) {
+        .pos-subbar { padding: 1rem 1rem 0.5rem; }
+        .staff-wrap { padding: 0.5rem 1rem 5rem; }
+    }
+    @media (max-width: 768px) {
+        .pos-modern-table thead { display: none; }
+        .pos-modern-table, .pos-modern-table tbody, .pos-modern-table tr, .pos-modern-table td {
+            display: block;
+            width: 100%;
+        }
+        .pos-modern-table tbody tr {
+            margin-bottom: 1rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            background: var(--card-bg, #ffffff);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+        .pos-modern-table tbody td {
+            padding: 0.4rem 0;
+            border-bottom: none;
+        }
+        .table-actions-wrap {
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border-color);
+        }
+        .btn-table-action {
+            padding: 8px 12px;
+            font-size: 0.78rem;
+        }
     }
 </style>
 {% endblock %}
 
-{% block header_left %}
-<div>
-    <a href="/dashboard/" style="text-decoration:none;color:inherit;">
-        <h1 class="brand-title mb-0">
-            <i class="bi bi-diamond-half" style="color:var(--accent-gold);"></i>
-            {{ request.user.tenant.name }}
-        </h1>
-    </a>
-    <p class="brand-subtitle">Setup — {{ request.user.outlet.name }}</p>
-</div>
-{% endblock %}
-
-{% block header_right %}
-<a href="/setup/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Setup Area</a>
-<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme">
-    <i class="bi bi-moon" id="themeIcon"></i>
-</button>
-{% endblock %}
-
 {% block content %}
-<div class="page-body">
-
-    <!-- LEFT: CREATE FORM -->
+<!-- ══════════════════════════════════════════════════════════════
+     SUBBAR (BREADCRUMBS & TOP QUICK ACTIONS)
+     ══════════════════════════════════════════════════════════════ -->
+<div class="pos-subbar">
     <div>
-        <p class="page-eyebrow">Management</p>
-        <h1 class="page-title">Add Staff</h1>
-        <div class="divider"></div>
-        <p class="page-sub">Create login credentials for your team. Each account is scoped to this outlet only.</p>
+        <h1 class="pos-subbar-title">
+            <i class="bi bi-people-fill text-danger"></i>
+            Staff & Team Management
+        </h1>
+        <nav class="pos-breadcrumbs">
+            <a href="/dashboard/">Dashboard</a>
+            <span class="separator">/</span>
+            <a href="/setup/">Setup</a>
+            <span class="separator">/</span>
+            <span class="current">Staff Accounts</span>
+        </nav>
+    </div>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <a href="/setup/" class="btn-subbar-pill">
+            <i class="bi bi-sliders2"></i> Setup Hub
+        </a>
+        <a href="/setup/outlet/" class="btn-subbar-pill">
+            <i class="bi bi-shop"></i> Outlet Settings
+        </a>
+        <a href="/setup/printers/" class="btn-subbar-pill">
+            <i class="bi bi-printer"></i> Printers
+        </a>
+        <a href="#create-staff-card" class="btn-subbar-action d-none d-md-inline-flex" onclick="document.getElementById('id_username').focus();">
+            <i class="bi bi-person-plus-fill"></i> + Add Member
+        </a>
+    </div>
+</div>
 
-        {% if messages %}
-        {% for msg in messages %}
-        <div class="alert">{{ msg }}</div>
-        {% endfor %}
-        {% endif %}
+<div class="staff-wrap">
+    <!-- ══════════════════════════════════════════════════════════
+         4 HERO KPI METRIC CARDS
+         ══════════════════════════════════════════════════════════ -->
+    <div class="row g-3 mb-4">
+        <!-- 1. Total Staff Accounts -->
+        <div class="col-6 col-md-3">
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <span class="kpi-label">Total Staff</span>
+                    <span class="kpi-value" id="kpi-total-staff">{{ staff|length }}</span>
+                    <span class="kpi-sub"><i class="bi bi-person-badge text-danger"></i> Configured accounts</span>
+                </div>
+                <div class="kpi-badge-icon" style="background: var(--pos-red-soft); color: var(--pos-red);">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+            </div>
+        </div>
 
-        <form method="post">
-            {% csrf_token %}
-            <label class="form-label">Username</label>
-            <input type="text" name="username" class="setup-input" placeholder="e.g. john_waiter" required>
+        <!-- 2. Active Accounts -->
+        <div class="col-6 col-md-3">
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <span class="kpi-label">Active Team</span>
+                    <span class="kpi-value" id="kpi-active-staff">
+                        {% with active_count=0 %}
+                            {% for m in staff %}{% if m.is_active %}{% with active_count=active_count|add:1 %}{% endwith %}{% endif %}{% endfor %}
+                            <span id="active-members-count">Active</span>
+                        {% endwith %}
+                    </span>
+                    <span class="kpi-sub text-success"><i class="bi bi-check-circle-fill"></i> Ready on floor</span>
+                </div>
+                <div class="kpi-badge-icon" style="background: var(--pos-green-soft); color: var(--pos-green);">
+                    <i class="bi bi-person-check-fill"></i>
+                </div>
+            </div>
+        </div>
 
-            <label class="form-label">Password</label>
-            <input type="password" name="password" class="setup-input" placeholder="Min 8 characters" required>
+        <!-- 3. Branch Outlets -->
+        <div class="col-6 col-md-3">
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <span class="kpi-label">Outlets</span>
+                    <span class="kpi-value">{{ outlets|length }}</span>
+                    <span class="kpi-sub"><i class="bi bi-building text-primary"></i> Operating locations</span>
+                </div>
+                <div class="kpi-badge-icon" style="background: var(--pos-blue-soft); color: var(--pos-blue);">
+                    <i class="bi bi-shop-window"></i>
+                </div>
+            </div>
+        </div>
 
-            <label class="form-label">Role</label>
-            <select name="role" class="form-select">
-                <option value="manager">Manager</option>
-                <option value="cashier">Cashier</option>
-                <option value="captain">Captain</option>
-                <option value="waiter">Waiter</option>
-                <option value="chef">Chef</option>
-            </select>
-
-            <label class="form-label">Outlet</label>
-            <select name="outlet" class="form-select" required>
-                {% for o in outlets %}
-                <option value="{{ o.id }}">{{ o.name }}</option>
-                {% endfor %}
-            </select>
-
-            <button type="submit" class="btn-create">Create Account</button>
-        </form>
+        <!-- 4. Multi-Role Scoping -->
+        <div class="col-6 col-md-3">
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <span class="kpi-label">Access Control</span>
+                    <span class="kpi-value" style="font-size: 1.15rem; margin-top: 5px;">Role-Scoped</span>
+                    <span class="kpi-sub"><i class="bi bi-shield-check text-warning"></i> Granular hierarchy</span>
+                </div>
+                <div class="kpi-badge-icon" style="background: var(--pos-amber-soft); color: var(--pos-amber);">
+                    <i class="bi bi-shield-lock-fill"></i>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- RIGHT: CURRENT STAFF -->
-    <div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
-            <p class="page-eyebrow" style="opacity:0;margin-bottom:0;">—</p>
-            <label style="display:flex;align-items:center;gap:6px;font-size:0.72rem;color:var(--text-muted);cursor:pointer;user-select:none;">
-                <input type="checkbox" id="showInactiveToggle" onchange="toggleInactiveVisibility()">
-                Show inactive
-            </label>
-        </div>
-        <h2 class="page-title" style="font-size:1.2rem;">Current Team</h2>
-        <div class="divider"></div>
+    <!-- ══════════════════════════════════════════════════════════
+         MAIN CONTENT: CREATE FORM + DIRECTORY TABLE
+         ══════════════════════════════════════════════════════════ -->
+    <div class="row g-4">
+        <!-- ── LEFT COLUMN: ADD NEW STAFF ACCOUNT ────────────── -->
+        <div class="col-lg-4">
+            <div class="squircle-card" id="create-staff-card">
+                <div class="squircle-card-header">
+                    <div class="squircle-title-wrap">
+                        <div class="squircle-icon-badge" style="background: var(--pos-red-soft); color: var(--pos-red);">
+                            <i class="bi bi-person-plus-fill"></i>
+                        </div>
+                        <div>
+                            <h2 class="squircle-title">Add Team Member</h2>
+                            <p class="squircle-sub">Create login credentials for this branch</p>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="staff-table-scroll">
-        <table class="staff-table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Role</th>
-                    <th>Outlet</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for member in staff %}
-                <tr id="staff-row-{{ member.id }}" class="{% if not member.is_active %}inactive-row{% endif %}" style="{% if not member.is_active %}display:none;opacity:0.5;{% endif %}">
-                    <td>{{ member.username }}{% if not member.is_active %} <span style="font-size:0.62rem;text-transform:uppercase;letter-spacing:1px;color:#ef4444;">Inactive</span>{% endif %}</td>
-                    <td><span class="role-badge {{ member.role }}">{{ member.get_role_display }}</span></td>
-                    <td style="color:var(--text-muted);font-size:0.75rem;">{{ member.outlet.name|default:"-" }}</td>
-                    <td style="display:flex;gap:6px;">
-                        <button class="btn-reset-pw" onclick="editRole({{ member.id }}, '{{ member.username|escapejs }}', '{{ member.role }}')">Edit Role</button>
-                        <button class="btn-reset-pw" onclick="editOutlet({{ member.id }}, '{{ member.username|escapejs }}', '{{ member.outlet_id|default_if_none:"" }}')">Edit Location</button>
-                        <button class="btn-reset-pw" onclick="editPayRate({{ member.id }}, '{{ member.username|escapejs }}')">Edit Pay Rate</button>
-                        <button class="btn-reset-pw" onclick="resetPassword({{ member.id }}, '{{ member.username|escapejs }}')">Reset Password</button>
-                        <button class="btn-reset-pw" id="toggle-btn-{{ member.id }}" onclick="toggleActive({{ member.id }}, '{{ member.username|escapejs }}', {{ member.is_active|yesno:"true,false" }})">{% if member.is_active %}Deactivate{% else %}Reactivate{% endif %}</button>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4" style="color:var(--text-muted);font-size:0.8rem;padding-top:1.5rem;">No staff accounts yet.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                <!-- Django Messages Flash -->
+                {% if messages %}
+                    {% for msg in messages %}
+                        <div class="pos-alert {% if msg.tags == 'error' %}pos-alert-error{% elif msg.tags == 'warning' %}pos-alert-warning{% elif msg.tags == 'info' %}pos-alert-info{% else %}pos-alert-success{% endif %}">
+                            <i class="bi {% if msg.tags == 'error' %}bi-exclamation-triangle-fill{% elif msg.tags == 'warning' %}bi-exclamation-circle-fill{% elif msg.tags == 'info' %}bi-info-circle-fill{% else %}bi-check-circle-fill{% endif %}"></i>
+                            <div>{{ msg }}</div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post" id="createStaffForm">
+                    {% csrf_token %}
+
+                    <!-- Username -->
+                    <div class="mb-3">
+                        <label class="pos-label" for="id_username">
+                            <i class="bi bi-at"></i> Username
+                        </label>
+                        <div class="input-icon-group">
+                            <i class="bi bi-person input-icon-lead"></i>
+                            <input type="text"
+                                   id="id_username"
+                                   name="username"
+                                   class="pos-input"
+                                   placeholder="e.g. rahul_cashier"
+                                   autocomplete="off"
+                                   required>
+                        </div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-3">
+                        <label class="pos-label" for="id_password">
+                            <i class="bi bi-key"></i> Initial Password
+                        </label>
+                        <div class="input-icon-group">
+                            <i class="bi bi-lock input-icon-lead"></i>
+                            <input type="password"
+                                   id="id_password"
+                                   name="password"
+                                   class="pos-input"
+                                   placeholder="Min 8 characters"
+                                   minlength="8"
+                                   autocomplete="new-password"
+                                   required>
+                            <button type="button" class="btn-eye-toggle" onclick="togglePasswordVisibility('id_password', this)" title="Show / Hide password">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        <small class="text-muted" style="font-size: 0.72rem; margin-top: 4px; display: block;">
+                            Must be at least 8 characters. Staff can reset later.
+                        </small>
+                    </div>
+
+                    <!-- Role -->
+                    <div class="mb-3">
+                        <label class="pos-label" for="id_role">
+                            <i class="bi bi-award"></i> Staff Role
+                        </label>
+                        <select name="role" id="id_role" class="pos-select" required>
+                            <option value="manager">Manager (Full POS & Operational Control)</option>
+                            <option value="cashier" selected>Cashier (Billing & Cash Drawer)</option>
+                            <option value="captain">Captain (Table Orders & Floor)</option>
+                            <option value="waiter">Waiter (Order Taking & Service)</option>
+                            <option value="chef">Chef (Kitchen Display System)</option>
+                        </select>
+                    </div>
+
+                    <!-- Outlet -->
+                    <div class="mb-4">
+                        <label class="pos-label" for="id_outlet">
+                            <i class="bi bi-shop"></i> Assigned Outlet
+                        </label>
+                        <select name="outlet" id="id_outlet" class="pos-select" required>
+                            {% for o in outlets %}
+                            <option value="{{ o.id }}" {% if o.id == request.user.outlet_id %}selected{% endif %}>
+                                {{ o.name }}{% if o.id == request.user.outlet_id %} (Current Outlet){% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="pos-btn-submit" id="btn-create-submit">
+                        <i class="bi bi-person-plus-fill"></i>
+                        <span>Create Staff Account</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Quick Roles Guide -->
+            <div class="squircle-card p-3 d-none d-lg-block" style="background: rgba(0,0,0,0.015);">
+                <span class="pos-label mb-2"><i class="bi bi-shield-check text-danger"></i> Role Permissions Guide</span>
+                <ul class="list-unstyled mb-0" style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.6;">
+                    <li><strong class="text-danger">Manager:</strong> Void bills, discounts, day-end reports & staff settings.</li>
+                    <li><strong class="text-primary">Cashier:</strong> Generate bills, collect payments, print receipts.</li>
+                    <li><strong class="text-purple" style="color:var(--pos-purple);">Captain:</strong> Table assignments, reservations & floor management.</li>
+                    <li><strong class="text-success">Waiter:</strong> Punch table orders & send KOTs to kitchen.</li>
+                    <li><strong class="text-warning">Chef:</strong> View KOT queue & mark station dishes prepared.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ── RIGHT COLUMN: CURRENT TEAM DIRECTORY ──────────── -->
+        <div class="col-lg-8">
+            <div class="squircle-card">
+                <!-- Card Header -->
+                <div class="squircle-card-header">
+                    <div class="squircle-title-wrap">
+                        <div class="squircle-icon-badge" style="background: var(--pos-blue-soft); color: var(--pos-blue);">
+                            <i class="bi bi-person-badge-fill"></i>
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                <h2 class="squircle-title">Current Team Directory</h2>
+                                <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-2 py-1" style="font-size: 0.72rem;">
+                                    <span id="filtered-staff-count">{{ staff|length }}</span> Members
+                                </span>
+                            </div>
+                            <p class="squircle-sub">Active login credentials and operational permissions</p>
+                        </div>
+                    </div>
+
+                    <!-- Inactive Toggle -->
+                    <div>
+                        <label class="switch-pill-label" title="Toggle visibility of deactivated staff members">
+                            <input type="checkbox" id="showInactiveToggle" onchange="toggleInactiveVisibility()">
+                            <span>Show Inactive</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Directory Search & Fast Filter Toolbar -->
+                <div class="directory-toolbar">
+                    <div class="search-input-wrap">
+                        <i class="bi bi-search"></i>
+                        <input type="text"
+                               id="staffSearchInput"
+                               class="search-input"
+                               placeholder="Search staff by username, role, or outlet..."
+                               onkeyup="filterStaffTable()">
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <select id="roleFilterSelect" class="pos-select py-1 px-3" style="width: auto; border-radius: 999px; font-size: 0.8rem;" onchange="filterStaffTable()">
+                            <option value="">All Roles</option>
+                            <option value="manager">Manager</option>
+                            <option value="cashier">Cashier</option>
+                            <option value="captain">Captain</option>
+                            <option value="waiter">Waiter</option>
+                            <option value="chef">Chef</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Staff Table -->
+                <div class="staff-table-scroll">
+                    <table class="pos-modern-table" id="staffTable">
+                        <thead>
+                            <tr>
+                                <th>Staff Member</th>
+                                <th>Role</th>
+                                <th>Assigned Outlet</th>
+                                <th class="text-end">Management Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in staff %}
+                            <tr id="staff-row-{{ member.id }}"
+                                class="staff-data-row {% if not member.is_active %}inactive-row{% endif %}"
+                                data-username="{{ member.username|lower }}"
+                                data-role="{{ member.role|lower }}"
+                                data-outlet="{{ member.outlet.name|default:''|lower }}"
+                                data-active="{{ member.is_active|yesno:'true,false' }}"
+                                style="{% if not member.is_active %}display:none;{% endif %}">
+                                <!-- Col 1: Member Name & Avatar -->
+                                <td>
+                                    <div class="staff-profile-chip">
+                                        <div class="staff-avatar" style="background: {% if member.role == 'manager' %}linear-gradient(135deg, #EC2734, #b91c1c){% elif member.role == 'cashier' %}linear-gradient(135deg, #3b82f6, #1d4ed8){% elif member.role == 'captain' %}linear-gradient(135deg, #8b5cf6, #6d28d9){% elif member.role == 'chef' %}linear-gradient(135deg, #f59e0b, #b45309){% else %}linear-gradient(135deg, #10b981, #047857){% endif %};">
+                                            {{ member.username|slice:":2"|upper }}
+                                        </div>
+                                        <div class="staff-name-wrap">
+                                            <span class="staff-username">{{ member.username }}</span>
+                                            <div class="staff-status-sub">
+                                                {% if member.is_active %}
+                                                    <span class="status-dot active"></span>
+                                                    <span class="text-success" style="font-weight: 600;">Active Account</span>
+                                                {% else %}
+                                                    <span class="status-dot inactive"></span>
+                                                    <span class="text-danger" style="font-weight: 600;">Deactivated</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Col 2: Role Badge -->
+                                <td>
+                                    <span class="role-badge-pill {{ member.role }}">
+                                        {% if member.role == 'manager' %}<i class="bi bi-shield-shaded"></i>
+                                        {% elif member.role == 'cashier' %}<i class="bi bi-cash-stack"></i>
+                                        {% elif member.role == 'captain' %}<i class="bi bi-diagram-3-fill"></i>
+                                        {% elif member.role == 'chef' %}<i class="bi bi-fire"></i>
+                                        {% else %}<i class="bi bi-cup-hot-fill"></i>{% endif %}
+                                        {{ member.get_role_display }}
+                                    </span>
+                                </td>
+
+                                <!-- Col 3: Outlet Location -->
+                                <td>
+                                    <span class="outlet-badge-pill">
+                                        <i class="bi bi-geo-alt-fill text-danger"></i>
+                                        <span id="outlet-label-{{ member.id }}">{{ member.outlet.name|default:"-" }}</span>
+                                    </span>
+                                </td>
+
+                                <!-- Col 4: Action Buttons -->
+                                <td>
+                                    <div class="table-actions-wrap">
+                                        <!-- Edit Role -->
+                                        <button type="button"
+                                                class="btn-table-action"
+                                                title="Change operational role"
+                                                onclick="editRole({{ member.id }}, '{{ member.username|escapejs }}', '{{ member.role }}')">
+                                            <i class="bi bi-person-gear"></i> Role
+                                        </button>
+
+                                        <!-- Edit Outlet -->
+                                        <button type="button"
+                                                class="btn-table-action"
+                                                title="Transfer to another branch outlet"
+                                                onclick="editOutlet({{ member.id }}, '{{ member.username|escapejs }}', '{{ member.outlet_id|default_if_none:'' }}')">
+                                            <i class="bi bi-geo-alt"></i> Outlet
+                                        </button>
+
+                                        <!-- Edit Pay Rate -->
+                                        <button type="button"
+                                                class="btn-table-action"
+                                                title="Configure monthly salary or hourly rate"
+                                                onclick="editPayRate({{ member.id }}, '{{ member.username|escapejs }}')">
+                                            <i class="bi bi-currency-rupee"></i> Pay
+                                        </button>
+
+                                        <!-- Reset Password -->
+                                        <button type="button"
+                                                class="btn-table-action"
+                                                title="Direct password reset & unlock account"
+                                                onclick="resetPassword({{ member.id }}, '{{ member.username|escapejs }}')">
+                                            <i class="bi bi-key"></i> Reset
+                                        </button>
+
+                                        <!-- Toggle Active State -->
+                                        <button type="button"
+                                                class="btn-table-action {% if member.is_active %}action-toggle-active{% else %}action-toggle-reactivate{% endif %}"
+                                                id="toggle-btn-{{ member.id }}"
+                                                title="{% if member.is_active %}Deactivate login without deleting history{% else %}Reactivate account{% endif %}"
+                                                onclick="toggleActive({{ member.id }}, '{{ member.username|escapejs }}', {{ member.is_active|yesno:'true,false' }})">
+                                            {% if member.is_active %}
+                                                <i class="bi bi-slash-circle"></i> Deactivate
+                                            {% else %}
+                                                <i class="bi bi-check-circle"></i> Reactivate
+                                            {% endif %}
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr id="empty-staff-row">
+                                <td colspan="4">
+                                    <div class="empty-staff-state">
+                                        <div class="empty-staff-icon">
+                                            <i class="bi bi-person-x"></i>
+                                        </div>
+                                        <h4 style="font-weight: 700; margin-bottom: 4px;">No Staff Accounts Found</h4>
+                                        <p class="text-muted" style="font-size: 0.82rem; margin-bottom: 1.25rem;">
+                                            Use the form on the left to add your first cashier, waiter, or manager.
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            <tr id="no-filter-match-row" style="display: none;">
+                                <td colspan="4">
+                                    <div class="empty-staff-state py-4">
+                                        <div class="empty-staff-icon mb-2" style="width: 48px; height: 48px; font-size: 1.3rem;">
+                                            <i class="bi bi-search"></i>
+                                        </div>
+                                        <h5 style="font-weight: 700; margin-bottom: 2px;">No matching staff found</h5>
+                                        <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 0;">
+                                            Try clearing your search query or selecting "All Roles".
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
-
 </div>
 {% endblock %}
 
 {% block extra_js %}
+<!-- JSON Choices for Interactive Modals -->
 <script id="role-choices-data" type="application/json">
 {
     {% for value, label in role_choices %}"{{ value }}": "{{ label|escapejs }}"{% if not forloop.last %},{% endif %}
@@ -175,57 +1130,158 @@
     {% endfor %}
 }
 </script>
-<script>
-const ROLE_CHOICES = JSON.parse(document.getElementById('role-choices-data').textContent);
-const OUTLET_CHOICES = JSON.parse(document.getElementById('outlet-choices-data').textContent);
 
+<script>
+/* ══════════════════════════════════════════════════════════════
+   STAFF MANAGEMENT CLIENT CONTROLLER
+   ══════════════════════════════════════════════════════════════ */
+const ROLE_CHOICES = JSON.parse(document.getElementById('role-choices-data').textContent || '{}');
+const OUTLET_CHOICES = JSON.parse(document.getElementById('outlet-choices-data').textContent || '{}');
+
+// Password Reveal Helper
+function togglePasswordVisibility(inputId, btnEl) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const isPw = input.type === 'password';
+    input.type = isPw ? 'text' : 'password';
+    btnEl.innerHTML = isPw ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+}
+
+// Inactive Staff Visibility Toggle
+function toggleInactiveVisibility() {
+    filterStaffTable();
+}
+
+// Live Search & Role Filter
+function filterStaffTable() {
+    const showInactive = document.getElementById('showInactiveToggle').checked;
+    const query = (document.getElementById('staffSearchInput').value || '').trim().toLowerCase();
+    const selectedRole = (document.getElementById('roleFilterSelect').value || '').trim().toLowerCase();
+
+    const rows = document.querySelectorAll('.staff-data-row');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+        const isActive = row.getAttribute('data-active') === 'true';
+        const username = row.getAttribute('data-username') || '';
+        const role = row.getAttribute('data-role') || '';
+        const outlet = row.getAttribute('data-outlet') || '';
+
+        // Check active condition
+        if (!isActive && !showInactive) {
+            row.style.display = 'none';
+            return;
+        }
+
+        // Check role filter
+        if (selectedRole && role !== selectedRole) {
+            row.style.display = 'none';
+            return;
+        }
+
+        // Check search query
+        if (query) {
+            const matches = username.includes(query) || role.includes(query) || outlet.includes(query);
+            if (!matches) {
+                row.style.display = 'none';
+                return;
+            }
+        }
+
+        row.style.display = '';
+        visibleCount++;
+    });
+
+    const countEl = document.getElementById('filtered-staff-count');
+    if (countEl) countEl.textContent = visibleCount;
+
+    const noMatchRow = document.getElementById('no-filter-match-row');
+    if (noMatchRow) {
+        noMatchRow.style.display = (visibleCount === 0 && rows.length > 0) ? '' : 'none';
+    }
+}
+
+// Update Active KPI Count
+function updateActiveKpi() {
+    const rows = document.querySelectorAll('.staff-data-row');
+    let active = 0;
+    rows.forEach(r => {
+        if (r.getAttribute('data-active') === 'true') active++;
+    });
+    const el = document.getElementById('active-members-count');
+    if (el) el.textContent = active;
+}
+
+// 1. Edit Outlet
 async function editOutlet(userId, username, currentOutletId) {
+    const isDark = typeof themeManager !== 'undefined' && themeManager.isDark();
     const { value: newOutletId } = await Swal.fire({
-        title: `Move ${username} to a different location`,
+        title: `Transfer ${username}`,
+        text: 'Select the destination branch outlet for this staff member.',
         input: 'select',
         inputOptions: OUTLET_CHOICES,
         inputValue: currentOutletId,
         showCancelButton: true,
         confirmButtonText: 'Save Location',
-        confirmButtonColor: 'var(--accent-gold)',
-        cancelButtonColor: 'var(--text-muted)',
-        background: themeManager.isDark() ? 'var(--panel-bg)' : '#ffffff',
-        color: 'var(--text-main)',
-        customClass: { popup: 'rounded-0', confirmButton: 'rounded-0 btn btn-accent', cancelButton: 'rounded-0 btn btn-luxury' },
+        confirmButtonColor: '#EC2734',
+        cancelButtonColor: '#6c757d',
+        background: isDark ? '#1a1a24' : '#ffffff',
+        color: isDark ? '#f4f4f5' : '#18181b',
+        customClass: {
+            popup: 'rounded-4 shadow-lg border',
+            confirmButton: 'btn btn-danger rounded-pill px-4',
+            cancelButton: 'btn btn-secondary rounded-pill px-4'
+        },
     });
 
     if (!newOutletId || newOutletId === currentOutletId) return;
 
     try {
         const data = await apiClient.post(`/setup/staff/${userId}/edit-outlet/`, { outlet_id: newOutletId });
-        ui.toast(data.message || 'Location updated.', 'success');
-        setTimeout(() => location.reload(), 700);
+        if (typeof ui !== 'undefined' && ui.toast) {
+            ui.toast(data.message || 'Location updated successfully.', 'success');
+        }
+        setTimeout(() => location.reload(), 600);
     } catch (err) {
-        // apiClient already shows a toast on failure
+        // apiClient displays toast automatically
     }
 }
 
+// 2. Edit Pay Rate
 async function editPayRate(userId, username) {
+    const isDark = typeof themeManager !== 'undefined' && themeManager.isDark();
     const { value: formValues } = await Swal.fire({
-        title: `Set pay rate for ${username}`,
-        html:
-            `<select id="swal-pay-type" class="swal2-select" style="display:block;width:100%;margin-bottom:10px;">
-                <option value="monthly">Monthly Salary</option>
-                <option value="hourly">Hourly Rate</option>
-            </select>
-            <input id="swal-pay-amount" type="number" min="0.01" step="0.01" class="swal2-input" placeholder="Amount (₹)" style="margin:0;">`,
+        title: `Configure Pay Rate`,
+        html: `
+            <p style="font-size:0.85rem; color: #71717a; margin-bottom: 1rem;">Set compensation schedule for <strong>${username}</strong>.</p>
+            <div style="text-align:left; margin-bottom: 12px;">
+                <label style="font-size:0.75rem; font-weight:700; text-transform:uppercase; color:#71717a; margin-bottom:4px; display:block;">Compensation Schedule</label>
+                <select id="swal-pay-type" class="pos-select swal2-select" style="display:block;width:100%;border-radius:12px;padding:8px 12px;">
+                    <option value="monthly">Monthly Salary (₹)</option>
+                    <option value="hourly">Hourly Rate (₹)</option>
+                </select>
+            </div>
+            <div style="text-align:left;">
+                <label style="font-size:0.75rem; font-weight:700; text-transform:uppercase; color:#71717a; margin-bottom:4px; display:block;">Amount (₹)</label>
+                <input id="swal-pay-amount" type="number" min="0.01" step="0.01" class="pos-input swal2-input" placeholder="e.g. 18000" style="margin:0;width:100%;border-radius:12px;padding:8px 12px;">
+            </div>
+        `,
         showCancelButton: true,
         confirmButtonText: 'Save Pay Rate',
-        confirmButtonColor: 'var(--accent-gold)',
-        cancelButtonColor: 'var(--text-muted)',
-        background: themeManager.isDark() ? 'var(--panel-bg)' : '#ffffff',
-        color: 'var(--text-main)',
-        customClass: { popup: 'rounded-0', confirmButton: 'rounded-0 btn btn-accent', cancelButton: 'rounded-0 btn btn-luxury' },
+        confirmButtonColor: '#EC2734',
+        cancelButtonColor: '#6c757d',
+        background: isDark ? '#1a1a24' : '#ffffff',
+        color: isDark ? '#f4f4f5' : '#18181b',
+        customClass: {
+            popup: 'rounded-4 shadow-lg border',
+            confirmButton: 'btn btn-danger rounded-pill px-4',
+            cancelButton: 'btn btn-secondary rounded-pill px-4'
+        },
         preConfirm: () => {
             const payType = document.getElementById('swal-pay-type').value;
             const amount = document.getElementById('swal-pay-amount').value;
             if (!amount || parseFloat(amount) <= 0) {
-                Swal.showValidationMessage('Enter an amount greater than 0');
+                Swal.showValidationMessage('Please enter a valid amount greater than 0');
                 return false;
             }
             return { pay_type: payType, amount: amount };
@@ -236,60 +1292,70 @@ async function editPayRate(userId, username) {
 
     try {
         const data = await apiClient.post(`/setup/staff/${userId}/edit-pay-rate/`, formValues);
-        ui.toast(data.message || 'Pay rate updated.', 'success');
+        if (typeof ui !== 'undefined' && ui.toast) {
+            ui.toast(data.message || 'Pay rate updated.', 'success');
+        }
     } catch (err) {
-        // apiClient already shows a toast on failure
+        // apiClient handles notification
     }
 }
 
+// 3. Edit Role
 async function editRole(userId, username, currentRole) {
+    const isDark = typeof themeManager !== 'undefined' && themeManager.isDark();
     const { value: newRole } = await Swal.fire({
-        title: `Change role for ${username}`,
+        title: `Change Role for ${username}`,
+        text: 'Select the operational role to assign immediate permissions.',
         input: 'select',
         inputOptions: ROLE_CHOICES,
         inputValue: currentRole,
         showCancelButton: true,
         confirmButtonText: 'Save Role',
-        confirmButtonColor: 'var(--accent-gold)',
-        cancelButtonColor: 'var(--text-muted)',
-        background: themeManager.isDark() ? 'var(--panel-bg)' : '#ffffff',
-        color: 'var(--text-main)',
-        customClass: { popup: 'rounded-0', confirmButton: 'rounded-0 btn btn-accent', cancelButton: 'rounded-0 btn btn-luxury' },
+        confirmButtonColor: '#EC2734',
+        cancelButtonColor: '#6c757d',
+        background: isDark ? '#1a1a24' : '#ffffff',
+        color: isDark ? '#f4f4f5' : '#18181b',
+        customClass: {
+            popup: 'rounded-4 shadow-lg border',
+            confirmButton: 'btn btn-danger rounded-pill px-4',
+            cancelButton: 'btn btn-secondary rounded-pill px-4'
+        },
     });
 
     if (!newRole || newRole === currentRole) return;
 
     try {
         const data = await apiClient.post(`/setup/staff/${userId}/edit-role/`, { role: newRole });
-        ui.toast(data.message || 'Role updated.', 'success');
-        setTimeout(() => location.reload(), 700);
+        if (typeof ui !== 'undefined' && ui.toast) {
+            ui.toast(data.message || 'Role updated successfully.', 'success');
+        }
+        setTimeout(() => location.reload(), 600);
     } catch (err) {
-        // apiClient already shows a toast on failure
+        // apiClient handles notification
     }
 }
 
-function toggleInactiveVisibility() {
-    const show = document.getElementById('showInactiveToggle').checked;
-    document.querySelectorAll('.inactive-row').forEach(row => {
-        row.style.display = show ? '' : 'none';
-    });
-}
-
+// 4. Reset Password
 async function resetPassword(userId, username) {
+    const isDark = typeof themeManager !== 'undefined' && themeManager.isDark();
     const { value: password } = await Swal.fire({
-        title: `Reset password for ${username}`,
+        title: `Reset Password`,
+        html: `<p style="font-size:0.85rem; color: #71717a; margin-bottom: 0.5rem;">Enter a new password for <strong>${username}</strong>. This also clears any failed attempt lockouts.</p>`,
         input: 'password',
-        inputLabel: 'New password (min 8 characters)',
-        inputPlaceholder: 'Enter a new password',
+        inputPlaceholder: 'Enter new password (min 8 characters)',
         showCancelButton: true,
-        confirmButtonText: 'Reset Password',
-        confirmButtonColor: 'var(--accent-gold)',
-        cancelButtonColor: 'var(--text-muted)',
-        background: themeManager.isDark() ? 'var(--panel-bg)' : '#ffffff',
-        color: 'var(--text-main)',
-        customClass: { popup: 'rounded-0', confirmButton: 'rounded-0 btn btn-accent', cancelButton: 'rounded-0 btn btn-luxury' },
+        confirmButtonText: 'Update Password',
+        confirmButtonColor: '#EC2734',
+        cancelButtonColor: '#6c757d',
+        background: isDark ? '#1a1a24' : '#ffffff',
+        color: isDark ? '#f4f4f5' : '#18181b',
+        customClass: {
+            popup: 'rounded-4 shadow-lg border',
+            confirmButton: 'btn btn-danger rounded-pill px-4',
+            cancelButton: 'btn btn-secondary rounded-pill px-4'
+        },
         inputValidator: (value) => {
-            if (!value || value.length < 8) return 'Password must be at least 8 characters.';
+            if (!value || value.length < 8) return 'Password must be at least 8 characters long.';
         }
     });
 
@@ -297,30 +1363,66 @@ async function resetPassword(userId, username) {
 
     try {
         const data = await apiClient.post(`/setup/staff/${userId}/reset-password/`, { password });
-        ui.toast(data.message || 'Password reset.', 'success');
+        if (typeof ui !== 'undefined' && ui.toast) {
+            ui.toast(data.message || 'Password reset successfully.', 'success');
+        }
     } catch (err) {
-        // apiClient already shows a toast on failure
+        // apiClient handles notification
     }
 }
 
+// 5. Toggle Active / Deactivate
 async function toggleActive(userId, username, isCurrentlyActive) {
     const action = isCurrentlyActive ? 'Deactivate' : 'Reactivate';
-    const result = await ui.confirm(
-        `${action} ${username}?`,
-        isCurrentlyActive
-            ? `${username} will no longer be able to log in. Their orders, shifts, and history stay exactly as they are, and this can be undone any time.`
-            : `${username} will be able to log in again.`,
-        `Yes, ${action.toLowerCase()}`
-    );
-    if (!result.isConfirmed) return;
+    const isDark = typeof themeManager !== 'undefined' && themeManager.isDark();
+
+    const { isConfirmed } = await Swal.fire({
+        title: `${action} ${username}?`,
+        html: isCurrentlyActive
+            ? `<span style="font-size:0.85rem; color:#71717a;">${username} will no longer be able to log in. Their historical orders, cash sessions, and shift data are strictly preserved and this can be reversed anytime.</span>`
+            : `<span style="font-size:0.85rem; color:#71717a;">${username}'s login access will be restored immediately.</span>`,
+        icon: isCurrentlyActive ? 'warning' : 'question',
+        showCancelButton: true,
+        confirmButtonText: `Yes, ${action}`,
+        confirmButtonColor: isCurrentlyActive ? '#ef4444' : '#10b981',
+        cancelButtonColor: '#6c757d',
+        background: isDark ? '#1a1a24' : '#ffffff',
+        color: isDark ? '#f4f4f5' : '#18181b',
+        customClass: {
+            popup: 'rounded-4 shadow-lg border',
+            confirmButton: 'btn rounded-pill px-4',
+            cancelButton: 'btn btn-secondary rounded-pill px-4'
+        },
+    });
+
+    if (!isConfirmed) return;
 
     try {
         const data = await apiClient.post(`/setup/staff/${userId}/toggle-active/`, {});
-        ui.toast(data.message || 'Updated.', 'success');
-        setTimeout(() => location.reload(), 700);
+        if (typeof ui !== 'undefined' && ui.toast) {
+            ui.toast(data.message || 'Status updated.', 'success');
+        }
+        setTimeout(() => location.reload(), 600);
     } catch (err) {
-        // apiClient already shows a toast on failure
+        // apiClient handles notification
     }
 }
+
+// Initialize on Load
+document.addEventListener('DOMContentLoaded', () => {
+    updateActiveKpi();
+
+    // Form submit loading state
+    const form = document.getElementById('createStaffForm');
+    if (form) {
+        form.addEventListener('submit', () => {
+            const btn = document.getElementById('btn-create-submit');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Creating Account...';
+            }
+        });
+    }
+});
 </script>
 {% endblock %}

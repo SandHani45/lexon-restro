@@ -60,6 +60,13 @@ def login_view(request):
 
         if user is not None:
             login(request, user)
+            # A real login always wins over the DEBUG-only /demo/ tenant
+            # switcher's leftover session flag -- otherwise a staff member
+            # who previously previewed a different tenant via /demo/ stays
+            # cross-tenant-locked out of their own account (TenantMiddleware
+            # keeps resolving request.tenant to the stale demo pick, and
+            # tenant_required then 403s them for "Cross-tenant access").
+            request.session.pop("dev_tenant_slug", None)
             path = _role_path(user)
             url  = _subdomain_redirect(user, path)
             return redirect(url or path)

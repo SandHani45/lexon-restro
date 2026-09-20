@@ -154,6 +154,7 @@ async function lookupBarcode() {
 
 async function confirmReceive(transferId, batchNum) {
   if (!confirm(`Receive all items from batch ${batchNum}?\nStock will be added to your inventory automatically.`)) return;
+  if (!await ui.confirm("Receive Transfers?", `Receive all items from batch ${batchNum}?\nStock will be added to your inventory automatically.`, "Receive Transfer")) return;
 
   const r = await fetch(`/inventory/central-kitchen/receive/${transferId}/confirm/`, {
     method: "POST", headers: { "X-CSRFToken": CSRF },

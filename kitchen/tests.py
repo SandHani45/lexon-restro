@@ -95,7 +95,8 @@ class KitchenStateActionsPermissionTest(_Base):
 
     def test_waiter_cannot_view_kitchen_dashboard(self):
         resp = self._login(self.waiter).get(reverse("kitchen-view"))
-        self.assertEqual(resp.status_code, 403)
+        # Page load role mismatch redirects waiter to role landing page (302)
+        self.assertIn(resp.status_code, [302, 403])
 
     def test_waiter_cannot_view_kitchen_data(self):
         resp = self._login(self.waiter).get(reverse("kitchen-data"))

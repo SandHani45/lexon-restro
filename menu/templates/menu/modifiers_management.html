@@ -268,8 +268,8 @@ function createGroup() {
     }).then(() => location.reload());
 }
 
-function deleteGroup(id) {
-    if (!confirm('Erase this group and all its modifiers?')) return;
+async function deleteGroup(id) {
+    if (!await ui.confirm('Delete Modifier Group?', 'Erase this group and all its modifiers? This cannot be undone.', 'Delete Group')) return;
     fetch("{% url 'delete_modifier_group' 0 %}".replace('0', id), {
         method: 'POST', headers: { 'X-CSRFToken': getCookie('csrftoken2') }
     }).then(() => location.reload());
@@ -285,7 +285,8 @@ function addModifier(groupId) {
     }).then(() => location.reload());
 }
 
-function deleteModifier(id) {
+async function deleteModifier(id) {
+    if (!await ui.confirm('Delete Modifier?', 'Remove this modifier option?', 'Delete')) return;
     fetch("{% url 'delete_modifier' 0 %}".replace('0', id), {
         method: 'POST', headers: { 'X-CSRFToken': getCookie('csrftoken2') }
     }).then(() => location.reload());

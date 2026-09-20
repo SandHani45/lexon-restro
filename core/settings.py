@@ -103,7 +103,12 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    # cloudinary_storage must load before django.contrib.staticfiles per
+    # django-cloudinary-storage's own docs (only matters if a Cloudinary
+    # static-files backend is ever wired in below; harmless otherwise).
+    'cloudinary_storage',
     'django.contrib.staticfiles',
+    'cloudinary',
     'django_extensions',
     # Third-party
     'axes',
@@ -262,19 +267,51 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # -------------------------------------------------------
-# MEDIA STORAGE — S3 via django-storages
-# Set AWS_STORAGE_BUCKET_NAME in env to enable S3 storage.
-# Falls back to local disk for development.
+# MEDIA STORAGE — Cloudinary, then S3, then local disk
+# Set CLOUDINARY_CLOUD_NAME (+ KEY/SECRET) to store all uploads (menu photos,
+# tenant logos) on Cloudinary, each restaurant under its own
+# restaurants/<tenant-slug>/... folder (see menu_item_image_path /
+# tenant_logo_path in menu/models.py and tenants/models.py) -- Cloudinary
+# resolves that upload_to path into its own folder structure automatically,
+# no extra config needed here for the per-tenant split itself.
+# Else set AWS_STORAGE_BUCKET_NAME to use S3 (or an S3-compatible store like
+# Cloudflare R2). Falls back to local disk if neither is set (dev default).
 # -------------------------------------------------------
 _is_test_run = len(__import__('sys').argv) > 1 and __import__('sys').argv[1] == 'test'
 _static_backend = (
-    "django.contrib.staticfiles.storage.StaticFilesStorage"  # no manifest needed in tests
-    if _is_test_run
+    "django.contrib.staticfiles.storage.StaticFilesStorage"  # no manifest needed in tests or local dev
+    if (_is_test_run or DEBUG)
     else "whitenoise.storage.CompressedManifestStaticFilesStorage"
 )
+WHITENOISE_MANIFEST_STRICT = False
 
-_AWS_BUCKET = os.getenv("AWS_STORAGE_BUCKET_NAME", "")
-if _AWS_BUCKET:
+_CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME", "")
+_AWS_BUCKET            = os.getenv("AWS_STORAGE_BUCKET_NAME", "")
+
+if _CLOUDINARY_CLOUD_NAME:
+    STORAGES = {
+        "default": {
+            # Our own thin subclass (core/storage.py) -- disables Cloudinary's
+            # unique_filename suffix, which otherwise breaks long filenames
+            # (see that file's docstring for the exact failure it caused).
+            "BACKEND": "core.storage.RestaurantMediaCloudinaryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": _static_backend,
+        },
+    }
+    CLOUDINARY_STORAGE = {
+        "CLOUD_NAME": _CLOUDINARY_CLOUD_NAME,
+        "API_KEY":    os.getenv("CLOUDINARY_API_KEY", ""),
+        "API_SECRET": os.getenv("CLOUDINARY_API_SECRET", ""),
+        # Every upload keeps its full upload_to path (restaurants/<slug>/...)
+        # as its Cloudinary public_id, instead of Cloudinary flattening
+        # everything into folders named after the field ("image/", "logo/").
+        "PREFIX": "",
+    }
+    # Cloudinary serves media from its own CDN domain, not this app's /media/.
+    MEDIA_URL = f"https://res.cloudinary.com/{_CLOUDINARY_CLOUD_NAME}/"
+elif _AWS_BUCKET:
     STORAGES = {
         "default": {
             "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",

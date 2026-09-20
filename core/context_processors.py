@@ -5,7 +5,7 @@ def base_url(request):
     return {'BASE_URL': settings.BASE_URL}
 
 def tenant_features(request):
-    if not request.user.is_authenticated:
+    if not hasattr(request, 'user') or not request.user.is_authenticated:
         return {'tenant_features': [], 'tenant_type': 'fine_dining'}
 
     tenant = getattr(request.user, 'tenant', None)

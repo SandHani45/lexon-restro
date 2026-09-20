@@ -228,12 +228,12 @@
     });
   }
 
-  function discardImport() {
-    if (!confirm("Discard this import? No recipe changes will be made.")) return;
+  async function discardImport() {
+    if (!await ui.confirm("Discard Import?", "Discard this import? No recipe changes will be made.", "Discard")) return;
     fetch(`/inventory/recipe-import/${JOB_ID}/discard/`, {
       method: "POST", headers: csrfHeaders(),
     }).then(r => r.json()).then(d => {
-      if (d.error) { alert(d.error); return; }
+      if (d.error) { ui.alert("Error", d.error, "error"); return; }
       window.location.href = "{% url 'menu_management' %}";
     });
   }

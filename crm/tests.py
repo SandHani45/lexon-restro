@@ -18,7 +18,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from accounts.models import User
-from crm.models import Guest, Reservation
+from crm.models import Guest, Reservation, GuestFeedback
 from orders.models import Table
 from tenants.models import Outlet, Tenant, TenantFeatureOverride
 
@@ -74,6 +74,59 @@ class CRMAccessControlTests(TestCase):
         resp = c.get(reverse("reservation-list"))
         self.assertEqual(resp.status_code, 200)
 
+    def test_reviews_loads_for_owner(self):
+        GuestFeedback.objects.create(
+            tenant=self.tenant, outlet=self.outlet,
+            guest_name="Happy Guest", rating=5, comment="Wonderful food"
+        )
+        c = Client()
+        c.force_login(self.owner)
+        resp = c.get(reverse("reviews-list"))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Happy Guest")
+        self.assertContains(resp, "Wonderful food")
+
+    def test_reviews_forbidden_for_waiter(self):
+        c = Client()
+        c.force_login(self.waiter)
+        resp = c.get(reverse("reviews-list"))
+        self.assertEqual(resp.status_code, 403)
+
+    def test_reviews_redirects_anonymous(self):
+        resp = Client().get(reverse("reviews-list"))
+        self.assertEqual(resp.status_code, 302)
+        self.assertIn("/login", resp["Location"])
+
+    def test_reviews_filters_by_rating_and_search(self):
+        GuestFeedback.objects.create(
+            tenant=self.tenant, outlet=self.outlet,
+            guest_name="Reviewer A", rating=5, comment="Great pizza"
+        )
+        GuestFeedback.objects.create(
+            tenant=self.tenant, outlet=self.outlet,
+            guest_name="Reviewer B", rating=1, comment="Cold soup"
+        )
+        c = Client()
+        c.force_login(self.owner)
+
+        # Filter rating=5
+        resp_5 = c.get(reverse("reviews-list") + "?rating=5")
+        self.assertEqual(resp_5.status_code, 200)
+        self.assertContains(resp_5, "Reviewer A")
+        self.assertNotContains(resp_5, "Reviewer B")
+
+        # Filter rating=1
+        resp_1 = c.get(reverse("reviews-list") + "?rating=1")
+        self.assertEqual(resp_1.status_code, 200)
+        self.assertContains(resp_1, "Reviewer B")
+        self.assertNotContains(resp_1, "Reviewer A")
+
+        # Search q=pizza
+        resp_search = c.get(reverse("reviews-list") + "?q=pizza")
+        self.assertEqual(resp_search.status_code, 200)
+        self.assertContains(resp_search, "Reviewer A")
+        self.assertNotContains(resp_search, "Reviewer B")
+
 
 class CRMTenantIsolationTests(TestCase):
 
@@ -87,8 +140,9 @@ class CRMTenantIsolationTests(TestCase):
             username="crm_owner_a", password="pass",
             tenant=self.t_a, outlet=self.o_a, role="owner",
         )
-        # A guest that belongs to tenant B only
+        # A guest and feedback that belong to tenant B only
         Guest.objects.create(tenant=self.t_b, name="Bob B", phone="9000000001")
+        GuestFeedback.objects.create(tenant=self.t_b, outlet=self.o_b, guest_name="Secret Guest B", rating=5)
 
     def test_owner_cannot_see_other_tenants_guests(self):
         c = Client()
@@ -96,6 +150,14 @@ class CRMTenantIsolationTests(TestCase):
         resp = c.get(reverse("crm-dashboard"))
         self.assertEqual(resp.status_code, 200)
         self.assertNotContains(resp, "Bob B")
+
+    def test_owner_cannot_see_other_tenants_reviews(self):
+        c = Client()
+        c.force_login(self.owner_a)
+        resp = c.get(reverse("reviews-list"))
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotContains(resp, "Secret Guest B")
+
 
 
 class ReservationStatusTransitionTests(TestCase):

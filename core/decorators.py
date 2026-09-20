@@ -36,9 +36,14 @@ def role_required(*roles):
                 # have the fetch silently follow to an HTML page instead of
                 # the error it's checking for, which is worse than today's
                 # plain 403. Only redirect the actual page loads.
+                is_data_endpoint = (
+                    request.path.startswith("/api/")
+                    or request.path.rstrip("/").endswith("-data")
+                    or request.path.rstrip("/").endswith("/data")
+                )
                 is_page_load = (
                     request.method == "GET"
-                    and not request.path.startswith("/api/")
+                    and not is_data_endpoint
                     and "application/json" not in request.META.get("HTTP_ACCEPT", "")
                 )
                 if not is_page_load:

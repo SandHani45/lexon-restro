@@ -2,24 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Error 400 | Bad Request</title>
+    <title>Request Not Understood | EasyBillBro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         :root {
-            --bg-color: #F7F7F9;
-            --text-main: #2C170E;
-            --text-muted: #8a7d74;
-            --accent-gold: #EC2734;
+            --bg-color: #FFF8F8;
+            --card-bg: #ffffff;
+            --text-main: #1e1e24;
+            --text-muted: #71717a;
+            --pos-red: #EC2734;
+            --pos-red-hover: #d81f2f;
+            --pos-red-soft: rgba(236, 39, 52, 0.08);
+            --pos-red-border: rgba(236, 39, 52, 0.22);
+            --border-color: #f1e4e4;
         }
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg-color: #0a0a0a;
-                --text-main: #f7f1ec;
-                --text-muted: #a89a90;
-                --accent-gold: #EC2734;
+                --bg-color: #121217;
+                --card-bg: #18181f;
+                --text-main: #f4f4f5;
+                --text-muted: #a1a1aa;
+                --pos-red: #EC2734;
+                --pos-red-hover: #d81f2f;
+                --pos-red-soft: rgba(236, 39, 52, 0.12);
+                --pos-red-border: rgba(236, 39, 52, 0.35);
+                --border-color: rgba(255, 255, 255, 0.08);
             }
         }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
@@ -28,57 +40,120 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0;
+            padding: 1.5rem;
         }
-        .error-container {
+        .error-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 28px;
             text-align: center;
-            padding: 3rem;
-            max-width: 600px;
+            padding: 3.5rem 2.5rem;
+            max-width: 540px;
+            width: 100%;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.04);
+            animation: fadeIn 0.3s ease-out;
         }
-        .error-code {
-            font-family: 'DM Serif Display', serif;
-            font-size: 8rem;
-            line-height: 1;
-            color: var(--accent-gold);
-            margin-bottom: 1rem;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .error-title {
-            font-family: 'DM Serif Display', serif;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            font-weight: normal;
+        .access-icon-badge {
+            width: 84px;
+            height: 84px;
+            border-radius: 24px;
+            background: var(--pos-red-soft);
+            border: 1.5px solid var(--pos-red-border);
+            color: var(--pos-red);
+            font-size: 2.4rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.75rem;
         }
-        .error-message {
+        .access-title {
+            font-size: 1.85rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.4px;
+        }
+        .access-message {
             color: var(--text-muted);
-            font-size: 1.1rem;
-            margin-bottom: 2.5rem;
-            line-height: 1.5;
+            font-size: 0.96rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            max-width: 440px;
+            margin-left: auto;
+            margin-right: auto;
         }
-        .btn-luxury {
-            border: 1px solid var(--text-main);
+        .access-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .btn-luxury-primary {
+            background: var(--pos-red);
+            color: #ffffff !important;
+            border: none;
+            border-radius: 999px;
+            padding: 12px 26px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            box-shadow: 0 4px 14px rgba(236, 39, 52, 0.32);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .btn-luxury-primary:hover {
+            background: var(--pos-red-hover);
+            transform: translateY(-1.5px);
+            box-shadow: 0 6px 20px rgba(236, 39, 52, 0.45);
+        }
+        .btn-luxury-ghost {
             background: transparent;
             color: var(--text-main);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 0.8rem 2rem;
-            font-size: 0.9rem;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            display: inline-block;
+            border: 1.5px solid var(--border-color);
             border-radius: 999px;
+            padding: 11px 22px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
-        .btn-luxury:hover {
-            background: var(--text-main);
-            color: var(--bg-color);
+        .btn-luxury-ghost:hover {
+            border-color: var(--pos-red-border);
+            color: var(--pos-red);
+            background: var(--pos-red-soft);
         }
     </style>
 </head>
 <body>
-    <div class="error-container">
-        <div class="error-code">400</div>
-        <h1 class="error-title">Bad Request</h1>
-        <p class="error-message">The server could not understand your request. Please double-check your inputs or go back and try again.</p>
-        <a href="/" class="btn-luxury">Return to Dashboard</a>
+    <div class="error-card">
+        <div class="access-icon-badge">
+            <i class="bi bi-exclamation-circle-fill"></i>
+        </div>
+        <h1 class="access-title">Request Not Understood</h1>
+        <p class="access-message">
+            We couldn't process this request with the parameters provided. Please return to your dashboard or go back to retry.
+        </p>
+        <div class="access-actions">
+            <a href="/dashboard/" class="btn-luxury-primary">
+                <i class="bi bi-house-door-fill"></i> Return to Dashboard
+            </a>
+            <button onclick="window.history.length > 1 ? window.history.back() : window.location.href='/dashboard/'" class="btn-luxury-ghost">
+                <i class="bi bi-arrow-left"></i> Go Back
+            </button>
+        </div>
     </div>
 </body>
 </html>

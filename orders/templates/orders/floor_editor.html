@@ -712,9 +712,9 @@
   };
 
   // ── Switch Section ─────────────────────────────────────────────────────────
-  window.switchSection = function(secName) {
+  window.switchSection = async function(secName) {
     if (isDirty) {
-      if (!confirm('You have unsaved changes. Switch floor anyway?')) {
+      if (!await ui.confirm('Unsaved Changes', 'You have unsaved changes. Switch floor anyway?', 'Switch Floor')) {
         floorSelector.value = currentSection;
         return;
       }
@@ -965,13 +965,13 @@
     }
   };
 
-  window.deleteSelectedTable = function() {
+  window.deleteSelectedTable = async function() {
     if (!selectedTableId) return;
     const idx = allTables.findIndex(x => x.id === selectedTableId);
     if (idx === -1) return;
 
     const t = allTables[idx];
-    if (confirm(`Remove table "${t.name}" from layout?`)) {
+    if (await ui.confirm('Remove Table?', `Remove table "${t.name}" from layout?`, 'Remove Table')) {
       if (!String(t.id).startsWith('temp_')) {
         deletedIds.push(t.id);
       }

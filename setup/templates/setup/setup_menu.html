@@ -1,88 +1,286 @@
 {% extends 'core/base.html' %}
 {% load static %}
 
-{% block title %}Menu Setup | {{ request.user.tenant.name }}{% endblock %}
+{% block title %}Menu Categories Setup | {{ request.user.tenant.name }}{% endblock %}
 
 {% block extra_css %}
 <style>
-    .page-body { max-width: 900px; margin: 0 auto; padding: 4rem 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
-    @media(max-width: 640px) { .page-body { grid-template-columns: 1fr; } }
-
-    .page-eyebrow { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 4px; color: var(--accent-gold); margin-bottom: 0.5rem; }
-    .page-title { font-family: 'DM Serif Display', serif; font-size: 1.8rem; font-weight: 700; }
-    .divider { width: 40px; height: 1px; background: var(--accent-gold); margin: 1.2rem 0; }
-    .page-sub { color: var(--text-muted); font-size: 0.8rem; line-height: 1.6; margin-bottom: 2rem; }
-
-    .form-label { display: block; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; margin-bottom: 0.5rem; }
-    .setup-input { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border-color); color: var(--text-main); padding: 0.6rem 0; font-size: 0.9rem; outline: none; margin-bottom: 1.5rem; font-family: inherit; }
-    .setup-input:focus { border-bottom-color: var(--accent-gold); }
-
-    .btn-add { width: 100%; padding: 0.9rem; background: var(--accent-gold); border: none; color: #fff; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
-    .btn-add:hover { background: var(--accent-hover); }
-
-    .alert { padding: 0.8rem 1.2rem; margin-bottom: 1.5rem; font-size: 0.8rem; border-left: 3px solid var(--accent-gold); background: rgba(236, 39, 52,0.08); }
-
-    .section-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; margin-bottom: 1rem; display: block; }
-    .category-card { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 1.2rem 1.5rem; margin-bottom: 0.75rem; display: flex; align-items: center; }
-    .category-icon { color: var(--accent-gold); margin-right: 0.75rem; }
-    .category-name { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; }
-    .empty-state { color: var(--text-muted); font-size: 0.8rem; font-style: italic; padding: 1.5rem 0; }
+    :root {
+        --pos-red: #EC2734;
+        --pos-red-hover: #d81f2f;
+        --pos-red-soft: rgba(236, 39, 52, 0.08);
+        --pos-red-border: rgba(236, 39, 52, 0.22);
+    }
+    body {
+        background: var(--bg-color) !important;
+    }
+    .pos-subbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 1.1rem 1.5rem 0.5rem;
+        background: var(--bg-color);
+        max-width: 1120px;
+        margin: 0 auto;
+    }
+    .pos-subbar-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        letter-spacing: -0.4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .pos-breadcrumbs {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .pos-breadcrumbs a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.15s;
+    }
+    .pos-breadcrumbs a:hover {
+        color: var(--pos-red);
+    }
+    .pos-breadcrumbs .separator {
+        font-size: 0.65rem;
+        opacity: 0.6;
+    }
+    .pos-breadcrumbs .current {
+        color: var(--pos-red);
+        font-weight: 700;
+    }
+    .btn-subbar-pill {
+        background: var(--panel-bg);
+        color: var(--text-main) !important;
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        padding: 7px 16px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-decoration: none !important;
+    }
+    .btn-subbar-pill:hover {
+        border-color: var(--pos-red-border);
+        background: var(--pos-red-soft);
+        color: var(--pos-red) !important;
+        transform: translateY(-1px);
+    }
+    .setup-menu-wrap {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0.5rem 1.5rem 5rem;
+    }
+    .squircle-card {
+        background: var(--card-bg, #ffffff);
+        border: 1px solid var(--border-color);
+        border-radius: 24px;
+        padding: 1.5rem 1.65rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        margin-bottom: 1.5rem;
+    }
+    .squircle-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 1.1rem;
+        margin-bottom: 1.25rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .squircle-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .pos-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: var(--text-muted);
+        margin-bottom: 0.45rem;
+        display: block;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .pos-input {
+        width: 100%;
+        background: var(--input-bg, #fbfbfb);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        color: var(--text-main);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        outline: none;
+        transition: all 0.2s;
+    }
+    .pos-input:focus {
+        border-color: var(--pos-red);
+        background: var(--card-bg, #ffffff);
+        box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.12);
+    }
+    .pos-btn-submit {
+        background: var(--pos-red);
+        color: #ffffff;
+        border: none;
+        border-radius: 999px;
+        padding: 0.85rem 1.6rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 16px rgba(236, 39, 52, 0.32);
+        transition: all 0.2s ease;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 1rem;
+    }
+    .pos-btn-submit:hover {
+        background: var(--pos-red-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(236, 39, 52, 0.44);
+        color: #ffffff;
+    }
+    .category-pill-item {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 0.85rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.65rem;
+        transition: all 0.15s ease;
+    }
+    .category-pill-item:hover {
+        border-color: var(--pos-red-border);
+        background: var(--pos-red-soft);
+    }
 </style>
 {% endblock %}
 
-{% block header_left %}
-<div>
-    <a href="/dashboard/" style="text-decoration:none;color:inherit;">
-        <h1 class="brand-title mb-0">
-            <i class="bi bi-diamond-half" style="color:var(--accent-gold);"></i>
-            {{ request.user.tenant.name }}
-        </h1>
-    </a>
-    <p class="brand-subtitle">Setup — {{ request.user.outlet.name }}</p>
-</div>
-{% endblock %}
-
-{% block header_right %}
-<a href="/setup/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Setup Area</a>
-<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme">
-    <i class="bi bi-moon" id="themeIcon"></i>
-</button>
-{% endblock %}
-
 {% block content %}
-<div class="page-body">
-    <!-- LEFT: ADD CATEGORY -->
+<div class="pos-subbar">
     <div>
-        <p class="page-eyebrow">Configuration</p>
-        <h1 class="page-title">Categories</h1>
-        <div class="divider"></div>
-        <p class="page-sub">Establish the hierarchy of your menu. You can add items to these categories in the main Menu Management section.</p>
-
-        {% if messages %}
-        {% for msg in messages %}
-        <div class="alert">{{ msg }}</div>
-        {% endfor %}
-        {% endif %}
-
-        <form method="post">
-            {% csrf_token %}
-            <label class="form-label">Category Name</label>
-            <input type="text" name="category_name" class="setup-input" placeholder="e.g. Starters, Main Course, Drinks" required>
-            <button type="submit" class="btn-add"><i class="bi bi-plus-lg me-2"></i>Create Category</button>
-        </form>
+        <h1 class="pos-subbar-title">
+            <i class="bi bi-tags-fill text-danger"></i>
+            Menu Categories Setup
+        </h1>
+        <nav class="pos-breadcrumbs">
+            <a href="/dashboard/">Dashboard</a>
+            <span class="separator">/</span>
+            <a href="/setup/">Setup</a>
+            <span class="separator">/</span>
+            <span class="current">Menu Categories</span>
+        </nav>
     </div>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <a href="/setup/" class="btn-subbar-pill">
+            <i class="bi bi-sliders2"></i> Setup Hub
+        </a>
+        <a href="/menu/" class="btn-subbar-pill">
+            <i class="bi bi-journal-text text-danger"></i> Full Menu Directory
+        </a>
+    </div>
+</div>
 
-    <!-- RIGHT: EXISTING CATEGORIES -->
-    <div>
-        <span class="section-label">Defined Categories</span>
-        {% for category in categories %}
-        <div class="category-card">
-            <i class="bi bi-tag category-icon"></i>
-            <div class="category-name">{{ category.name }}</div>
+<div class="setup-menu-wrap">
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="squircle-card">
+                <div class="squircle-card-header">
+                    <h2 class="squircle-title">
+                        <i class="bi bi-folder-plus text-danger me-2"></i>Create Category
+                    </h2>
+                </div>
+                <p class="text-muted" style="font-size: 0.8rem; line-height: 1.5; margin-bottom: 1.25rem;">
+                    Establish your restaurant's menu hierarchy. You can add items, prices, and recipes to these categories in the main Menu Management screen.
+                </p>
+
+                {% if messages %}
+                {% for msg in messages %}
+                <div class="alert alert-{{ msg.tags|default:'info' }} rounded-4 py-2 px-3 small mb-3">
+                    {{ msg }}
+                </div>
+                {% endfor %}
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    <label class="pos-label" for="id_category_name">Category Name</label>
+                    <input type="text"
+                           id="id_category_name"
+                           name="category_name"
+                           class="pos-input"
+                           placeholder="e.g. Appetizers, Main Course, Drinks"
+                           required>
+                    <button type="submit" class="pos-btn-submit">
+                        <i class="bi bi-plus-circle-fill"></i> Create Category
+                    </button>
+                </form>
+            </div>
         </div>
-        {% empty %}
-        <p class="empty-state">No categories defined yet. Start by defining your high-level menu sections.</p>
-        {% endfor %}
+
+        <div class="col-lg-7">
+            <div class="squircle-card">
+                <div class="squircle-card-header">
+                    <div class="d-flex align-items-center gap-2">
+                        <h2 class="squircle-title">
+                            <i class="bi bi-collection-fill text-primary me-2"></i>Defined Categories
+                        </h2>
+                        <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-2 py-1" style="font-size: 0.72rem;">
+                            {{ categories|length }} Categories
+                        </span>
+                    </div>
+                </div>
+
+                <div>
+                    {% for category in categories %}
+                    <div class="category-pill-item">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="rounded-circle bg-danger-subtle text-danger d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.85rem;">
+                                <i class="bi bi-tag-fill"></i>
+                            </div>
+                            <span style="font-weight: 700; font-family: var(--font-main, 'Outfit', sans-serif);">
+                                {{ category.name }}
+                            </span>
+                        </div>
+                        <a href="/menu/#cat-{{ category.id }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3" style="font-size: 0.75rem;">
+                            View Dishes →
+                        </a>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4 text-muted" style="font-size: 0.85rem;">
+                        <i class="bi bi-folder-x fs-3 d-block mb-2 text-danger"></i>
+                        No categories defined yet. Use the form on the left to get started.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

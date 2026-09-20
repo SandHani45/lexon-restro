@@ -443,6 +443,7 @@ async function submitPO() {
 
 async function markOrdered(poId) {
     if (!confirm('Mark this PO as sent to supplier?')) return;
+    if (!await ui.confirm('Mark Ordered?', 'Mark this PO as sent to supplier?', 'Mark Sent')) return;
     const res = await fetch(`/inventory/purchase-orders/${poId}/order/`, { method:'POST', headers:{'X-CSRFToken':CSRF} });
     const data = await res.json();
     if (data.success) { toast('PO marked as ordered.'); setTimeout(() => location.reload(), 600); }
@@ -526,6 +527,7 @@ async function submitReceive() {
 
 async function cancelPO(poId) {
     if (!confirm('Cancel this purchase order?')) return;
+    if (!await ui.confirm('Cancel Purchase Order?', 'Are you sure you want to cancel this purchase order? This cannot be undone.', 'Cancel PO')) return;
     const res = await fetch(`/inventory/purchase-orders/${poId}/cancel/`, { method:'POST', headers:{'X-CSRFToken':CSRF} });
     const data = await res.json();
     if (data.success) { toast('PO cancelled.'); setTimeout(() => location.reload(), 600); }

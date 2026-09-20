@@ -1,448 +1,1253 @@
 {% extends 'core/base.html' %}
-{% block title %}Order History | {{ request.user.outlet.name }}{% endblock %}
+{% load static %}
+{% block title %}Order History | {{ request.user.outlet.name|default:"Restaurant POS" }}{% endblock %}
 
 {% block extra_css %}
 <style>
-  .hist-wrap { max-width: 1300px; margin: 0 auto; padding: 1.5rem 1.5rem 5rem; }
+  /* ══════════════════════════════════════════════════════════════
+     KIMIPOS LUXURY ORDER HISTORY DESIGN SYSTEM
+     ══════════════════════════════════════════════════════════════ */
+  :root {
+    --pos-red: #EC2734;
+    --pos-red-hover: #d81f2f;
+    --pos-red-soft: rgba(236, 39, 52, 0.08);
+    --pos-red-border: rgba(236, 39, 52, 0.22);
+    --pos-green: #10b981;
+    --pos-green-soft: rgba(16, 185, 129, 0.10);
+    --pos-green-border: rgba(16, 185, 129, 0.25);
+    --pos-amber: #f59e0b;
+    --pos-amber-soft: rgba(245, 158, 11, 0.10);
+    --pos-amber-border: rgba(245, 158, 11, 0.25);
+    --pos-blue: #06b6d4;
+    --pos-blue-soft: rgba(6, 182, 212, 0.10);
+    --pos-blue-border: rgba(6, 182, 212, 0.25);
+    --pos-purple: #8b5cf6;
+    --pos-purple-soft: rgba(139, 92, 246, 0.10);
+    --pos-purple-border: rgba(139, 92, 246, 0.25);
+  }
 
-  /* ── Filter bar ─────────────────────────────────────────────── */
-  .filter-bar {
-    background: var(--panel-bg); border: 1px solid var(--border-color);
-    padding: 1rem 1.25rem; margin-bottom: 1.5rem;
-    display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: flex-end;
+  body {
+    background: var(--bg-color) !important;
   }
-  .filter-bar .f-group { display: flex; flex-direction: column; gap: 3px; min-width: 130px; }
-  .filter-bar label { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; }
-  .filter-bar input, .filter-bar select {
-    background: transparent; border: 1px solid var(--border-color);
-    color: var(--text-main); padding: 0.38rem 0.6rem;
-    font-size: 0.82rem; font-family: inherit; outline: none;
-  }
-  .filter-bar input:focus, .filter-bar select:focus { border-color: var(--accent-gold); }
-  .filter-bar select option { background: var(--panel-bg); }
-  .btn-filter { padding: 0.4rem 1rem; background: var(--accent-gold); border: none; color: #fff; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; font-family: inherit; }
-  .btn-filter:hover { background: #d81f2f; }
-  .btn-clear  { padding: 0.4rem 0.8rem; background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.78rem; cursor: pointer; font-family: inherit; }
 
-  /* ── Summary strip ──────────────────────────────────────────── */
-  .summary-strip {
-    display: flex; gap: 1rem; flex-wrap: wrap;
-    margin-bottom: 1.25rem; align-items: center;
+  .hist-wrap {
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 0.5rem 1.5rem 4rem;
   }
-  .sum-chip {
-    background: var(--panel-bg); border: 1px solid var(--border-color);
-    padding: 0.5rem 1rem; font-size: 0.78rem;
-  }
-  .sum-chip strong { font-size: 1rem; font-family: 'DM Serif Display', serif; color: var(--text-main); display: block; }
-  .sum-chip span   { color: var(--text-muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; }
-  .pay-bar { display: flex; gap: 6px; align-items: center; font-size: 0.75rem; }
-  .pay-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 
-  /* ── Table ─────────────────────────────────────────────────── */
-  .hist-table { width: 100%; border-collapse: collapse; }
+  /* ── Sub-Header Bar (KimiPoS POS Layout) ──────────────────── */
+  .pos-subbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 1.1rem 1.5rem 0.5rem;
+    background: var(--bg-color);
+    max-width: 1360px;
+    margin: 0 auto;
+  }
+  .pos-subbar-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin: 0;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    letter-spacing: -0.4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pos-breadcrumbs {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+  }
+  .pos-breadcrumbs a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .pos-breadcrumbs a:hover {
+    color: var(--pos-red);
+  }
+  .pos-breadcrumbs .separator {
+    font-size: 0.65rem;
+    opacity: 0.6;
+  }
+  .pos-breadcrumbs .current {
+    color: var(--pos-red);
+    font-weight: 700;
+  }
+
+  /* Action Buttons */
+  .btn-subbar-new {
+    background: var(--pos-red);
+    color: #ffffff !important;
+    border: none;
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 3px 12px rgba(236, 39, 52, 0.3);
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    cursor: pointer;
+    text-decoration: none !important;
+  }
+  .btn-subbar-new:hover {
+    background: var(--pos-red-hover);
+    transform: translateY(-1.5px);
+    box-shadow: 0 6px 18px rgba(236, 39, 52, 0.42);
+    color: #ffffff !important;
+  }
+
+  .btn-subbar-pill {
+    background: var(--panel-bg);
+    color: var(--text-main) !important;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    padding: 7px 16px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-decoration: none !important;
+  }
+  .btn-subbar-pill:hover {
+    border-color: var(--pos-red-border);
+    background: var(--pos-red-soft);
+    color: var(--pos-red) !important;
+    transform: translateY(-1px);
+  }
+
+  /* ── 4 Hero Metric Cards ──────────────────────────────────── */
+  .kpi-row {
+    margin-bottom: 1.5rem;
+  }
+  .kpi-card {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color);
+    border-radius: 22px;
+    padding: 1.25rem 1.4rem;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.06);
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .kpi-card.kpi-orders::before  { background: linear-gradient(90deg, #c2381e, #EC2734); }
+  .kpi-card.kpi-revenue::before { background: linear-gradient(90deg, #059669, #10b981); }
+  .kpi-card.kpi-aov::before     { background: linear-gradient(90deg, #ea580c, #fb923c); }
+  .kpi-card.kpi-payment::before { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
+
+  .kpi-info { flex: 1; min-width: 0; }
+  .kpi-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    margin-bottom: 0.25rem;
+  }
+  .kpi-val {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: var(--text-main);
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+    margin-bottom: 0.25rem;
+  }
+  .kpi-sub {
+    font-size: 0.74rem;
+    color: var(--text-muted);
+  }
+  .kpi-icon-wrap {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.45rem;
+    flex-shrink: 0;
+  }
+  .icon-orders  { background: rgba(236, 39, 52, 0.12); color: var(--pos-red); }
+  .icon-revenue { background: rgba(16, 185, 129, 0.12); color: var(--pos-green); }
+  .icon-aov     { background: rgba(245, 158, 11, 0.12); color: var(--pos-amber); }
+  .icon-payment { background: rgba(139, 92, 246, 0.12); color: var(--pos-purple); }
+
+  .dot-badge {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  /* ── Filter Bar ─────────────────────────────────────────────── */
+  .filter-card {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color);
+    border-radius: 22px;
+    padding: 1.25rem 1.4rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+  }
+  .filter-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-end;
+  }
+  .f-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 130px;
+    flex: 1;
+  }
+  .f-group label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    font-weight: 700;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+  }
+  .f-group input, .f-group select {
+    background: var(--panel-bg);
+    border: 1.5px solid var(--border-color);
+    color: var(--text-main);
+    padding: 0.52rem 0.85rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    outline: none;
+    transition: all 0.18s ease;
+  }
+  .f-group input:focus, .f-group select:focus {
+    border-color: var(--pos-red);
+    box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.12);
+  }
+  .f-group select option {
+    background: var(--panel-bg);
+    color: var(--text-main);
+  }
+
+  .btn-filter-apply {
+    padding: 0.58rem 1.4rem;
+    background: var(--pos-red);
+    border: none;
+    border-radius: 999px;
+    color: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 3px 10px rgba(236, 39, 52, 0.3);
+    transition: all 0.2s ease;
+  }
+  .btn-filter-apply:hover {
+    background: var(--pos-red-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(236, 39, 52, 0.4);
+    color: #fff;
+  }
+  .btn-filter-clear {
+    padding: 0.58rem 1.2rem;
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    text-decoration: none !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  .btn-filter-clear:hover {
+    border-color: var(--pos-red-border);
+    color: var(--pos-red);
+    background: var(--pos-red-soft);
+  }
+
+  .restricted-notice {
+    font-size: 0.75rem;
+    color: var(--pos-amber);
+    background: var(--pos-amber-soft);
+    border: 1px solid var(--pos-amber-border);
+    border-radius: 999px;
+    padding: 6px 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+  }
+
+  /* ── Orders Table Card ──────────────────────────────────────── */
+  .table-card {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  }
+  .hist-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+  }
   .hist-table th {
-    font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px;
-    color: var(--text-muted); font-weight: 600;
-    padding: 0.7rem 0.75rem; border-bottom: 1px solid var(--border-color); text-align: left;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+    font-weight: 700;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+    background: rgba(0, 0, 0, 0.015);
+    text-align: left;
+    white-space: nowrap;
+  }
+  html.dark .hist-table th {
+    background: rgba(255, 255, 255, 0.02);
   }
   .hist-table td {
-    padding: 0.75rem; border-bottom: 1px solid var(--border-color);
-    font-size: 0.85rem; vertical-align: middle;
+    padding: 1.05rem 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.88rem;
+    vertical-align: middle;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    transition: background 0.15s ease;
   }
-  .hist-table tr:hover td { background: var(--panel-bg); cursor: pointer; }
-  .hist-table tr.cancelled td { color: var(--text-muted); text-decoration: line-through; text-decoration-color: rgba(100,100,100,0.3); }
+  .hist-table tr:last-child td {
+    border-bottom: none;
+  }
+  .hist-table tr:hover td {
+    background: var(--pos-red-soft);
+    cursor: pointer;
+  }
+  .hist-table tr.cancelled td {
+    color: var(--text-muted);
+  }
+  .hist-table tr.cancelled .order-num {
+    text-decoration: line-through;
+    opacity: 0.65;
+  }
 
-  .order-num { font-family: 'Space Mono', monospace; font-size: 0.78rem; color: var(--accent-gold); }
+  .order-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--pos-red);
+    background: var(--pos-red-soft);
+    padding: 3px 8px;
+    border-radius: 8px;
+    border: 1px solid var(--pos-red-border);
+    display: inline-block;
+  }
+
+  /* Status Pills */
   .status-pill {
-    display: inline-block; padding: 2px 8px; border-radius: 12px;
-    font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 800;
+    white-space: nowrap;
   }
-  .pill-closed    { background: rgba(16,185,129,.12); color: #10b981; }
-  .pill-cancelled { background: rgba(239,68,68,.1);   color: #ef4444; }
-  .pill-open      { background: rgba(234,179,8,.12);  color: #ca8a04; }
-  .pill-billing   { background: rgba(6,182,212,.12);  color: #06b6d4; }
+  .pill-closed {
+    background: var(--pos-green-soft);
+    color: #059669;
+    border: 1px solid var(--pos-green-border);
+  }
+  .pill-cancelled {
+    background: var(--pos-red-soft);
+    color: #dc2626;
+    border: 1px solid var(--pos-red-border);
+  }
+  .pill-open {
+    background: var(--pos-amber-soft);
+    color: #d97706;
+    border: 1px solid var(--pos-amber-border);
+  }
+  .pill-billing {
+    background: var(--pos-blue-soft);
+    color: #0891b2;
+    border: 1px solid var(--pos-blue-border);
+  }
 
-  .method-tag { font-size: 0.65rem; padding: 1px 6px; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 3px; margin-right: 3px; }
+  .method-tag {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border: 1px solid var(--border-color);
+    background: var(--panel-bg);
+    color: var(--text-main);
+    border-radius: 6px;
+    margin-right: 4px;
+    display: inline-block;
+  }
+
+  .location-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--text-main);
+  }
 
   /* ── Pagination ─────────────────────────────────────────────── */
-  .pag { display: flex; gap: 0.4rem; align-items: center; margin-top: 1.5rem; flex-wrap: wrap; }
+  .pag {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
   .pag a, .pag span {
-    padding: 0.35rem 0.75rem; border: 1px solid var(--border-color);
-    font-size: 0.78rem; text-decoration: none; color: var(--text-main);
+    padding: 0.45rem 0.95rem;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--text-main);
+    background: var(--panel-bg);
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    transition: all 0.15s ease;
   }
-  .pag .current { background: var(--accent-gold); border-color: var(--accent-gold); color: #fff; }
-  .pag a:hover  { border-color: var(--accent-gold); color: var(--accent-gold); }
+  .pag .current {
+    background: var(--pos-red);
+    border-color: var(--pos-red);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(236, 39, 52, 0.3);
+  }
+  .pag a:hover {
+    border-color: var(--pos-red-border);
+    color: var(--pos-red);
+    background: var(--pos-red-soft);
+  }
 
-  /* ── Detail panel (slide-in) ─────────────────────────────────── */
+  /* ── Detail Panel (Slide-in) ─────────────────────────────────── */
   .detail-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.45); z-index: 1050;
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(12px) saturate(160%);
+    -webkit-backdrop-filter: blur(12px) saturate(160%);
+    z-index: 1050;
+    opacity: 0;
+    transition: opacity 0.25s ease;
   }
-  .detail-overlay.open { display: block; }
+  .detail-overlay.open {
+    display: block;
+    opacity: 1;
+  }
   .detail-panel {
-    position: fixed; top: 0; right: -520px; width: 500px; max-width: 100vw;
-    height: 100vh; background: var(--panel-bg); border-left: 1px solid var(--border-color);
-    overflow-y: auto; z-index: 1060; transition: right 0.28s ease;
-    display: flex; flex-direction: column;
+    position: fixed;
+    top: 0;
+    right: -580px;
+    width: 540px;
+    max-width: 100vw;
+    height: 100vh;
+    background: var(--panel-bg);
+    border-left: 1px solid var(--border-color);
+    border-radius: 28px 0 0 28px;
+    overflow-y: auto;
+    z-index: 1060;
+    transition: right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: -12px 0 40px rgba(0, 0, 0, 0.25);
   }
-  .detail-panel.open { right: 0; }
+  .detail-panel.open {
+    right: 0;
+  }
   .detail-panel-head {
-    padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color);
-    display: flex; justify-content: space-between; align-items: flex-start;
-    position: sticky; top: 0; background: var(--panel-bg); z-index: 2;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background: var(--panel-bg);
+    z-index: 2;
+    backdrop-filter: blur(8px);
   }
-  .detail-panel-body { padding: 1.25rem 1.5rem; flex: 1; }
-  .detail-section { margin-bottom: 1.5rem; }
+  .detail-panel-head::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #EC2734, transparent);
+  }
+  .detail-panel-body {
+    padding: 1.25rem 1.5rem;
+    flex: 1;
+  }
+  .detail-section {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color);
+    border-radius: 18px;
+    padding: 1.15rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  }
   .detail-section-title {
-    font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px;
-    color: var(--accent-gold); font-weight: 700; margin-bottom: 0.6rem;
-    padding-bottom: 0.4rem; border-bottom: 1px solid var(--border-color);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--pos-red);
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.45rem;
+    border-bottom: 1px solid var(--border-color);
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
-  .detail-row { display: flex; justify-content: space-between; padding: 0.35rem 0; font-size: 0.85rem; border-bottom: 1px dashed var(--border-color); }
-  .detail-row:last-child { border-bottom: none; }
-  .detail-row .name { color: var(--text-main); flex: 1; }
-  .detail-row .amt  { white-space: nowrap; padding-left: 1rem; color: var(--text-muted); }
-  .detail-row.voided .name { text-decoration: line-through; color: var(--text-muted); }
-  .detail-row.voided .amt  { color: #ef4444; }
-  .detail-row.comp   .name { color: #10b981; }
-  .void-reason { font-size: 0.72rem; color: #ef4444; display: block; }
-  .total-row { font-weight: 700; font-size: 0.95rem; border-top: 2px solid var(--border-color); margin-top: 0.5rem; padding-top: 0.5rem; }
-  .refund-row { color: #ef4444; }
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.48rem 0;
+    font-size: 0.85rem;
+    border-bottom: 1px dashed var(--border-color);
+    font-family: var(--font-main, 'Outfit', sans-serif);
+  }
+  .detail-row:last-child {
+    border-bottom: none;
+  }
+  .detail-row .name {
+    color: var(--text-main);
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .detail-row .amt {
+    white-space: nowrap;
+    padding-left: 1rem;
+    font-weight: 600;
+    color: var(--text-main);
+  }
+  .detail-row.voided .name {
+    text-decoration: line-through;
+    color: var(--text-muted);
+  }
+  .detail-row.voided .amt {
+    color: #ef4444;
+  }
+  .detail-row.comp .name {
+    color: #10b981;
+  }
+  .void-reason {
+    font-size: 0.72rem;
+    color: #ef4444;
+    display: block;
+  }
+  .total-row {
+    font-weight: 800;
+    font-size: 1.05rem;
+    border-top: 2px solid var(--border-color);
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    color: var(--pos-red);
+  }
+  .total-row .amt {
+    color: var(--pos-red);
+    font-size: 1.2rem;
+  }
+  .refund-row {
+    color: #ef4444;
+  }
 
-  /* ── Refund UI ──────────────────────────────────────────────── */
+  /* Refund & Audit */
   .btn-refund {
-    font-size: 0.65rem; padding: 2px 8px; border: 1px solid #ef4444;
-    color: #ef4444; background: transparent; cursor: pointer;
-    font-family: inherit; letter-spacing: 1px; text-transform: uppercase;
-    margin-left: 8px; transition: all 0.2s;
+    font-size: 0.68rem;
+    padding: 3px 10px;
+    border: 1px solid var(--pos-red-border);
+    color: var(--pos-red);
+    background: var(--pos-red-soft);
+    cursor: pointer;
+    border-radius: 999px;
+    font-weight: 700;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    margin-left: 8px;
+    transition: all 0.2s;
   }
-  .btn-refund:hover { background: #ef4444; color: #fff; }
+  .btn-refund:hover {
+    background: var(--pos-red);
+    color: #ffffff;
+  }
   .refund-entry {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 0.3rem 0.5rem; margin-top: 4px; font-size: 0.78rem;
-    background: rgba(239,68,68,0.06); border-left: 2px solid #ef4444;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.7rem;
+    margin-top: 6px;
+    font-size: 0.8rem;
+    background: var(--pos-red-soft);
+    border-radius: 10px;
+    border-left: 3px solid var(--pos-red);
   }
   .refund-entry .refund-status {
-    font-size: 0.6rem; padding: 1px 6px; border-radius: 10px;
-    font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    font-size: 0.62rem;
+    padding: 2px 7px;
+    border-radius: 999px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
-  .status-pending  { background: rgba(234,179,8,.15);  color: #ca8a04; }
-  .status-approved { background: rgba(16,185,129,.12); color: #10b981; }
-  .status-rejected { background: rgba(100,100,100,.12);color: #6b6b6b; }
-  .btn-approve { font-size:0.65rem;padding:2px 8px;border:1px solid #10b981;color:#10b981;background:transparent;cursor:pointer;font-family:inherit;letter-spacing:1px;text-transform:uppercase;transition:all .2s; }
-  .btn-approve:hover { background:#10b981;color:#fff; }
-  .btn-reject  { font-size:0.65rem;padding:2px 8px;border:1px solid var(--border-color);color:var(--text-muted);background:transparent;cursor:pointer;font-family:inherit;letter-spacing:1px;text-transform:uppercase;margin-left:4px;transition:all .2s; }
-  .btn-reject:hover  { border-color:#ef4444;color:#ef4444; }
+  .status-pending  { background: var(--pos-amber-soft);  color: #d97706; border: 1px solid var(--pos-amber-border); }
+  .status-approved { background: var(--pos-green-soft); color: #059669; border: 1px solid var(--pos-green-border); }
+  .status-rejected { background: rgba(100,100,100,.12); color: #6b6b6b; border: 1px solid rgba(100,100,100,.2); }
 
-  /* ── Refund modal ────────────────────────────────────────────── */
+  .btn-approve {
+    font-size: 0.68rem;
+    padding: 3px 9px;
+    border: 1px solid var(--pos-green);
+    color: var(--pos-green);
+    background: var(--pos-green-soft);
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    font-weight: 700;
+    transition: all .2s;
+  }
+  .btn-approve:hover { background: var(--pos-green); color: #fff; }
+  .btn-reject {
+    font-size: 0.68rem;
+    padding: 3px 9px;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    background: transparent;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    font-weight: 700;
+    margin-left: 4px;
+    transition: all .2s;
+  }
+  .btn-reject:hover { border-color: var(--pos-red); color: var(--pos-red); background: var(--pos-red-soft); }
+
+  .audit-event {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    font-size: 0.8rem;
+    border-bottom: 1px dashed var(--border-color);
+  }
+  .audit-event:last-child { border-bottom: none; }
+  .audit-time { color: var(--text-muted); white-space: nowrap; min-width: 50px; font-weight: 600; }
+  .audit-by   { color: var(--pos-red); white-space: nowrap; font-weight: 700; }
+
+  .close-circle-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .close-circle-btn:hover {
+    color: var(--pos-red);
+    border-color: var(--pos-red-border);
+    background: var(--pos-red-soft);
+    transform: scale(1.05);
+  }
+
+  .loading-detail {
+    text-align: center;
+    padding: 3.5rem 1rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+  }
+
+  /* ── Luxury Refund Modal ─────────────────────────────────────── */
   .refund-modal-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.6); z-index: 2000;
-    align-items: center; justify-content: center;
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(14px) saturate(170%);
+    -webkit-backdrop-filter: blur(14px) saturate(170%);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
   }
   .refund-modal-overlay.open { display: flex; }
   .refund-modal {
-    background: var(--panel-bg); border: 1px solid var(--border-color);
-    padding: 1.5rem; width: 360px; max-width: 95vw;
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color);
+    border-radius: 28px;
+    padding: 2rem;
+    width: 440px;
+    max-width: 94vw;
+    box-shadow: 0 32px 84px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+    font-family: var(--font-main, 'Outfit', sans-serif);
   }
-  .refund-modal h4 { font-family:'DM Serif Display',serif;font-size:1.1rem;font-weight:400;margin:0 0 1rem; }
-  .refund-modal label { font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);display:block;margin-bottom:3px;margin-top:0.75rem; }
+  .refund-modal::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #EC2734, transparent);
+  }
+  .refund-modal-icon-badge {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    background: var(--pos-red-soft);
+    border: 1px solid var(--pos-red-border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--pos-red);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .refund-modal h4 {
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem;
+    color: var(--text-main);
+  }
+  .refund-modal label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 4px;
+    margin-top: 0.9rem;
+    font-weight: 700;
+  }
   .refund-modal input, .refund-modal textarea {
-    width:100%;background:transparent;border:1px solid var(--border-color);
-    color:var(--text-main);padding:0.4rem 0.6rem;font-size:0.85rem;font-family:inherit;outline:none;
+    width: 100%;
+    background: var(--panel-bg);
+    border: 1.5px solid var(--border-color);
+    color: var(--text-main);
+    padding: 0.55rem 0.85rem;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.18s ease;
   }
-  .refund-modal input:focus, .refund-modal textarea:focus { border-color:var(--accent-gold); }
-  .refund-modal-actions { display:flex;gap:0.5rem;margin-top:1.25rem; }
-  .btn-refund-submit { flex:1;padding:0.6rem;background:#ef4444;border:none;color:#fff;font-size:0.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:inherit; }
-  .btn-refund-submit:hover { background:#dc2626; }
-  .btn-refund-cancel { padding:0.6rem 1rem;background:transparent;border:1px solid var(--border-color);color:var(--text-muted);font-size:0.8rem;cursor:pointer;font-family:inherit; }
+  .refund-modal input:focus, .refund-modal textarea:focus {
+    border-color: var(--pos-red);
+    box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.12);
+  }
+  .refund-modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+  .btn-refund-submit {
+    flex: 1;
+    padding: 0.7rem 1.3rem;
+    background: var(--pos-red);
+    border: none;
+    border-radius: 999px;
+    color: #fff;
+    font-size: 0.84rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 4px 14px rgba(236, 39, 52, 0.35);
+    transition: all 0.2s ease;
+  }
+  .btn-refund-submit:hover {
+    background: var(--pos-red-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(236, 39, 52, 0.45);
+  }
+  .btn-refund-cancel {
+    padding: 0.7rem 1.3rem;
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    color: var(--text-muted);
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s ease;
+  }
+  .btn-refund-cancel:hover {
+    border-color: var(--text-muted);
+    color: var(--text-main);
+  }
 
-  .audit-event { display: flex; gap: 0.75rem; padding: 0.5rem 0; font-size: 0.8rem; border-bottom: 1px dashed var(--border-color); }
-  .audit-event:last-child { border-bottom: none; }
-  .audit-time { color: var(--text-muted); white-space: nowrap; min-width: 48px; }
-  .audit-by   { color: var(--accent-gold); white-space: nowrap; }
-
-  .close-btn { background: none; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; line-height: 1; }
-  .close-btn:hover { color: var(--text-main); }
-
-  .loading-detail { text-align: center; padding: 3rem; color: var(--text-muted); font-size: 0.85rem; }
-
-  @media (max-width: 768px) {
-    .hist-table th:nth-child(3),
-    .hist-table td:nth-child(3),
+  @media (max-width: 992px) {
+    .hist-table th:nth-child(4),
+    .hist-table td:nth-child(4),
     .hist-table th:nth-child(5),
     .hist-table td:nth-child(5) { display: none; }
-    .filter-bar .f-group { min-width: 100px; }
-    .detail-panel { width: 100vw; }
+  }
+
+  @media (max-width: 768px) {
+    .hist-wrap { padding: 0.5rem 1rem 4rem; }
+    .pos-subbar { padding: 0.85rem 1rem; }
+    .hist-table th:nth-child(3),
+    .hist-table td:nth-child(3) { display: none; }
+    .f-group { min-width: 100%; }
+    .detail-panel { width: 100vw; border-radius: 0; }
   }
 </style>
 {% endblock %}
 
-{% block header_left %}
-<div>
-  <p style="font-size:0.6rem;text-transform:uppercase;letter-spacing:3px;color:var(--accent-gold);margin:0;">{{ request.user.outlet.name }}</p>
-  <a href="/dashboard/" style="text-decoration:none;color:inherit;">
-    <h1 class="brand-title mb-0"><i class="bi bi-clock-history me-2" style="color:var(--accent-gold);"></i>Order History</h1>
-  </a>
-</div>
-{% endblock %}
-
-{% block header_right %}
-{% if not is_restricted %}
-<a href="{% url 'pending-refunds' %}" class="btn-luxury no-print" style="margin-right:0.5rem;">
-  <i class="bi bi-arrow-counterclockwise me-1"></i>Pending Refunds
-</a>
-<a href="{% url 'export-orders-csv' %}?{{ request.GET.urlencode }}" class="btn-luxury no-print">
-  <i class="bi bi-download me-1"></i>Export CSV
-</a>
-{% endif %}
+{% block header_notifications %}
+{% include "core/_notif_badges_luxury.html" %}
 {% endblock %}
 
 {% block content %}
+<!-- Sub-Header Bar (KimiPoS POS Style) -->
+<div class="pos-subbar">
+  <div>
+    <h1 class="pos-subbar-title">
+      <i class="bi bi-clock-history text-danger"></i>
+      Order History
+    </h1>
+    <div class="pos-breadcrumbs">
+      <a href="/dashboard/"><i class="bi bi-house-door me-1"></i>Dashboard</a>
+      <i class="bi bi-chevron-right separator"></i>
+      <a href="{% url 'orders-dashboard' %}">Orders</a>
+      <i class="bi bi-chevron-right separator"></i>
+      <span class="current">Order History</span>
+    </div>
+  </div>
+  <div class="d-flex align-items-center gap-2 flex-wrap">
+    {% if not is_restricted %}
+    <a href="{% url 'pending-refunds' %}" class="btn-subbar-pill no-print">
+      <i class="bi bi-arrow-counterclockwise"></i> Pending Refunds
+    </a>
+    <a href="{% url 'export-orders-csv' %}?{{ request.GET.urlencode }}" class="btn-subbar-pill no-print">
+      <i class="bi bi-download"></i> Export CSV
+    </a>
+    {% endif %}
+    <a href="{% url 'orders-dashboard' %}" class="btn-subbar-pill no-print">
+      <i class="bi bi-list-check"></i> Orders Board
+    </a>
+    <a href="/billing/" class="btn-subbar-new no-print">
+      <i class="bi bi-plus-circle-fill"></i> New POS Bill
+    </a>
+  </div>
+</div>
+
 <div class="hist-wrap">
 
-  <!-- Filter bar -->
-  <form method="get" class="filter-bar no-print">
-    <div class="f-group">
-      <label>From</label>
-      <input type="date" name="date_from" value="{{ f_date_from }}" {% if is_restricted %}readonly{% endif %}>
+  <!-- 4 Hero Metric Cards -->
+  <div class="row g-3 kpi-row">
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-orders">
+        <div class="kpi-info">
+          <div class="kpi-label">Total Orders</div>
+          <div class="kpi-val">{{ total_orders }}</div>
+          <div class="kpi-sub">Across filtered range</div>
+        </div>
+        <div class="kpi-icon-wrap icon-orders">
+          <i class="bi bi-receipt"></i>
+        </div>
+      </div>
     </div>
-    <div class="f-group">
-      <label>To</label>
-      <input type="date" name="date_to" value="{{ f_date_to }}" {% if is_restricted %}readonly{% endif %}>
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-revenue">
+        <div class="kpi-info">
+          <div class="kpi-label">Total Revenue</div>
+          <div class="kpi-val">₹{{ total_revenue|floatformat:0 }}</div>
+          <div class="kpi-sub">Net revenue collected</div>
+        </div>
+        <div class="kpi-icon-wrap icon-revenue">
+          <i class="bi bi-currency-rupee"></i>
+        </div>
+      </div>
     </div>
-    <div class="f-group">
-      <label>Status</label>
-      <select name="status">
-        <option value="">All (excl. open)</option>
-        <option value="all" {% if f_status == "all" %}selected{% endif %}>Everything incl. open</option>
-        <option value="closed"    {% if f_status == "closed"    %}selected{% endif %}>Closed / Paid</option>
-        <option value="cancelled" {% if f_status == "cancelled" %}selected{% endif %}>Cancelled</option>
-        <option value="billing"   {% if f_status == "billing"   %}selected{% endif %}>Billing</option>
-      </select>
-    </div>
-    <div class="f-group">
-      <label>Payment</label>
-      <select name="method">
-        <option value="">All</option>
-        <option value="cash"          {% if f_method == "cash"          %}selected{% endif %}>Cash</option>
-        <option value="upi"           {% if f_method == "upi"           %}selected{% endif %}>UPI</option>
-        <option value="card"          {% if f_method == "card"          %}selected{% endif %}>Card</option>
-        <option value="complimentary" {% if f_method == "complimentary" %}selected{% endif %}>Complimentary</option>
-      </select>
-    </div>
-    <div class="f-group">
-      <label>Source</label>
-      <select name="source">
-        <option value="">All</option>
-        <option value="dine_in"  {% if f_source == "dine_in"  %}selected{% endif %}>Dine-in</option>
-        <option value="takeaway" {% if f_source == "takeaway" %}selected{% endif %}>Takeaway</option>
-        <option value="zomato"   {% if f_source == "zomato"   %}selected{% endif %}>Zomato</option>
-        <option value="swiggy"   {% if f_source == "swiggy"   %}selected{% endif %}>Swiggy</option>
-        <option value="qr_menu"  {% if f_source == "qr_menu"  %}selected{% endif %}>QR Menu</option>
-      </select>
-    </div>
-    {% if not is_restricted and staff_list %}
-    <div class="f-group">
-      <label>Staff</label>
-      <select name="staff_id">
-        <option value="">All Staff</option>
-        {% for s in staff_list %}
-        <option value="{{ s.id }}" {% if f_staff_id == s.id|stringformat:"s" %}selected{% endif %}>
-          {{ s.first_name|default:s.username }} ({{ s.role }})
-        </option>
-        {% endfor %}
-      </select>
-    </div>
-    {% endif %}
-    <div class="f-group" style="min-width:180px;">
-      <label>Search order # / phone</label>
-      <input type="text" name="q" value="{{ f_q }}" placeholder="INV-1-... or 98765...">
-    </div>
-    <div style="display:flex;gap:0.4rem;align-items:flex-end;">
-      <button type="submit" class="btn-filter">Search</button>
-      <a href="{% url 'order-history' %}" class="btn-clear">Clear</a>
-    </div>
-    {% if is_restricted %}
-    <div style="font-size:0.7rem;color:var(--text-muted);align-self:flex-end;">
-      <i class="bi bi-lock me-1"></i>{% if request.user.role == "waiter" %}Today's orders only{% else %}Last 30 days{% endif %}
-    </div>
-    {% endif %}
-  </form>
-
-  <!-- Summary strip -->
-  <div class="summary-strip">
-    <div class="sum-chip">
-      <strong>{{ total_orders }}</strong>
-      <span>Orders</span>
-    </div>
-    <div class="sum-chip">
-      <strong>Rs.{{ total_revenue|floatformat:0 }}</strong>
-      <span>Revenue</span>
-    </div>
-    {% if total_orders > 0 %}
-    <div class="sum-chip">
-      <strong>Rs.{{ total_revenue|floatformat:0 }}</strong>
-      <span>Avg: Rs.{% widthratio total_revenue total_orders 1 %}</span>
-    </div>
-    {% endif %}
-    {% if pay_map %}
-    <div class="sum-chip pay-bar">
-      {% if pay_map.cash  %}<span class="pay-dot" style="background:#10b981;"></span> Cash Rs.{{ pay_map.cash|floatformat:0 }}&nbsp;&nbsp;{% endif %}
-      {% if pay_map.upi   %}<span class="pay-dot" style="background:#3b82f6;"></span> UPI Rs.{{ pay_map.upi|floatformat:0 }}&nbsp;&nbsp;{% endif %}
-      {% if pay_map.card  %}<span class="pay-dot" style="background:#a855f7;"></span> Card Rs.{{ pay_map.card|floatformat:0 }}{% endif %}
-      <span style="color:var(--text-muted);font-size:0.65rem;">Payment breakdown</span>
-    </div>
-    {% endif %}
-  </div>
-
-  <!-- Table -->
-  {% if page.object_list %}
-  <table class="hist-table">
-    <thead>
-      <tr>
-        <th>Order #</th>
-        <th>Date / Time</th>
-        <th>Location</th>
-        <th>Source</th>
-        <th>Staff</th>
-        <th>Items</th>
-        <th style="text-align:right;">Total</th>
-        <th>Paid via</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for order in page.object_list %}
-      <tr onclick="openDetail({{ order.id }})"
-          class="{% if order.status == 'cancelled' %}cancelled{% endif %}">
-        <td><span class="order-num">{{ order.order_number|default:order.id }}</span></td>
-        <td>
-          <div style="font-size:0.85rem;">{{ order.created_at|date:"d M y" }}</div>
-          <div style="font-size:0.72rem;color:var(--text-muted);">{{ order.created_at|date:"H:i" }}</div>
-        </td>
-        <td>
-          {% if order.table %}
-            <i class="bi bi-grid-3x3-gap" style="color:var(--text-muted);font-size:0.75rem;"></i>
-            {{ order.table.name }}
-          {% else %}
-            <i class="bi bi-123" style="color:var(--text-muted);font-size:0.75rem;"></i>
-            Walk-in
-          {% endif %}
-        </td>
-        <td style="font-size:0.75rem;color:var(--text-muted);">
-          {% if order.source == "zomato" %}<i class="bi bi-bag" style="color:#e23744;"></i> Zomato
-          {% elif order.source == "swiggy" %}<i class="bi bi-bag" style="color:#fc8019;"></i> Swiggy
-          {% elif order.source == "qr_menu" %}<i class="bi bi-qr-code"></i> QR
-          {% else %}{{ order.source|title|cut:"_" }}{% endif %}
-        </td>
-        <td style="font-size:0.78rem;">
-          {% if order.created_by %}
-            {{ order.created_by.first_name|default:order.created_by.username }}
-          {% else %}
-            <span style="color:var(--text-muted);">—</span>
-          {% endif %}
-        </td>
-        <td style="font-size:0.82rem;">{{ order.items.count }}</td>
-        <td style="text-align:right;font-weight:600;">Rs.{{ order.grand_total|floatformat:0 }}</td>
-        <td>
-          {% for p in order.payments.all %}
-            {% if p.method != "refund" %}
-            <span class="method-tag">{{ p.method|upper }}</span>
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-aov">
+        <div class="kpi-info">
+          <div class="kpi-label">Avg Ticket Size</div>
+          <div class="kpi-val">
+            {% if total_orders > 0 %}
+              ₹{% widthratio total_revenue total_orders 1 %}
+            {% else %}
+              ₹0
             {% endif %}
-          {% empty %}
-            {% if order.grand_total == 0 %}<span class="method-tag">COMP</span>{% endif %}
+          </div>
+          <div class="kpi-sub">Average value per bill</div>
+        </div>
+        <div class="kpi-icon-wrap icon-aov">
+          <i class="bi bi-graph-up-arrow"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-payment">
+        <div class="kpi-info w-100">
+          <div class="kpi-label mb-2">Payment Breakdown</div>
+          <div class="d-flex flex-column gap-1">
+            <div class="d-flex justify-content-between align-items-center" style="font-size:0.75rem;">
+              <span class="d-flex align-items-center gap-1.5"><span class="dot-badge" style="background:#10b981;"></span> Cash</span>
+              <strong>₹{{ pay_map.cash|default:0|floatformat:0 }}</strong>
+            </div>
+            <div class="d-flex justify-content-between align-items-center" style="font-size:0.75rem;">
+              <span class="d-flex align-items-center gap-1.5"><span class="dot-badge" style="background:#3b82f6;"></span> UPI</span>
+              <strong>₹{{ pay_map.upi|default:0|floatformat:0 }}</strong>
+            </div>
+            <div class="d-flex justify-content-between align-items-center" style="font-size:0.75rem;">
+              <span class="d-flex align-items-center gap-1.5"><span class="dot-badge" style="background:#a855f7;"></span> Card</span>
+              <strong>₹{{ pay_map.card|default:0|floatformat:0 }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Bar Card -->
+  <div class="filter-card no-print">
+    <form method="get" class="filter-grid">
+      <div class="f-group">
+        <label>From Date</label>
+        <input type="date" name="date_from" value="{{ f_date_from }}" {% if is_restricted %}readonly{% endif %}>
+      </div>
+      <div class="f-group">
+        <label>To Date</label>
+        <input type="date" name="date_to" value="{{ f_date_to }}" {% if is_restricted %}readonly{% endif %}>
+      </div>
+      <div class="f-group">
+        <label>Status</label>
+        <select name="status">
+          <option value="">All (excl. open)</option>
+          <option value="all" {% if f_status == "all" %}selected{% endif %}>Everything incl. open</option>
+          <option value="closed"    {% if f_status == "closed"    %}selected{% endif %}>Closed / Paid</option>
+          <option value="cancelled" {% if f_status == "cancelled" %}selected{% endif %}>Cancelled</option>
+          <option value="billing"   {% if f_status == "billing"   %}selected{% endif %}>Billing</option>
+        </select>
+      </div>
+      <div class="f-group">
+        <label>Payment Mode</label>
+        <select name="method">
+          <option value="">All Methods</option>
+          <option value="cash"          {% if f_method == "cash"          %}selected{% endif %}>Cash</option>
+          <option value="upi"           {% if f_method == "upi"           %}selected{% endif %}>UPI</option>
+          <option value="card"          {% if f_method == "card"          %}selected{% endif %}>Card</option>
+          <option value="complimentary" {% if f_method == "complimentary" %}selected{% endif %}>Complimentary</option>
+        </select>
+      </div>
+      <div class="f-group">
+        <label>Channel / Source</label>
+        <select name="source">
+          <option value="">All Channels</option>
+          <option value="dine_in"  {% if f_source == "dine_in"  %}selected{% endif %}>Dine-in</option>
+          <option value="takeaway" {% if f_source == "takeaway" %}selected{% endif %}>Takeaway</option>
+          <option value="zomato"   {% if f_source == "zomato"   %}selected{% endif %}>Zomato</option>
+          <option value="swiggy"   {% if f_source == "swiggy"   %}selected{% endif %}>Swiggy</option>
+          <option value="qr_menu"  {% if f_source == "qr_menu"  %}selected{% endif %}>QR Menu</option>
+        </select>
+      </div>
+      {% if not is_restricted and staff_list %}
+      <div class="f-group">
+        <label>Staff Member</label>
+        <select name="staff_id">
+          <option value="">All Staff</option>
+          {% for s in staff_list %}
+          <option value="{{ s.id }}" {% if f_staff_id == s.id|stringformat:"s" %}selected{% endif %}>
+            {{ s.first_name|default:s.username }} ({{ s.role }})
+          </option>
           {% endfor %}
-        </td>
-        <td>
-          <span class="status-pill
-            {% if order.status == 'closed' %}pill-closed
-            {% elif order.status == 'cancelled' %}pill-cancelled
-            {% elif order.status == 'billing' %}pill-billing
-            {% else %}pill-open{% endif %}">
-            {{ order.status }}
-          </span>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
-  <!-- Pagination -->
-  <div class="pag no-print">
-    {% if page.has_previous %}
-    <a href="?{% querystring page=page.previous_page_number %}">&#8249; Prev</a>
-    {% endif %}
-    <span class="current">{{ page.number }} / {{ page.paginator.num_pages }}</span>
-    {% if page.has_next %}
-    <a href="?{% querystring page=page.next_page_number %}">Next &#8250;</a>
-    {% endif %}
-    <span style="font-size:0.72rem;color:var(--text-muted);margin-left:0.5rem;">
-      {{ page.paginator.count }} total
-    </span>
+        </select>
+      </div>
+      {% endif %}
+      <div class="f-group" style="min-width:190px;">
+        <label>Search Order # / Phone</label>
+        <input type="text" name="q" value="{{ f_q }}" placeholder="INV-1-... or 98765...">
+      </div>
+      <div class="d-flex align-items-center gap-2" style="margin-bottom:1px;">
+        <button type="submit" class="btn-filter-apply">
+          <i class="bi bi-funnel-fill"></i> Apply
+        </button>
+        <a href="{% url 'order-history' %}" class="btn-filter-clear">
+          <i class="bi bi-x-circle"></i> Clear
+        </a>
+      </div>
+      {% if is_restricted %}
+      <div class="w-100 mt-1">
+        <span class="restricted-notice">
+          <i class="bi bi-shield-lock-fill"></i>
+          {% if request.user.role == "waiter" %}Showing your own orders from today only.{% else %}Restricted to allowed timeframe.{% endif %}
+        </span>
+      </div>
+      {% endif %}
+    </form>
   </div>
 
-  {% else %}
-  <div style="text-align:center;padding:4rem;color:var(--text-muted);">
-    <i class="bi bi-inbox" style="font-size:2.5rem;display:block;margin-bottom:1rem;"></i>
-    No orders found for the current filters.
+  <!-- Orders Table Card -->
+  <div class="table-card">
+    {% if page.object_list %}
+    <div class="table-responsive">
+      <table class="hist-table">
+        <thead>
+          <tr>
+            <th>Order #</th>
+            <th>Date &amp; Time</th>
+            <th>Dining / Table</th>
+            <th>Channel</th>
+            <th>Staff</th>
+            <th>Items</th>
+            <th style="text-align:right;">Grand Total</th>
+            <th>Payment</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in page.object_list %}
+          <tr onclick="openDetail({{ order.id }})"
+              class="{% if order.status == 'cancelled' %}cancelled{% endif %}">
+            <td>
+              <span class="order-num">{{ order.order_number|default:order.id }}</span>
+            </td>
+            <td>
+              <div style="font-weight:700;color:var(--text-main);">{{ order.created_at|date:"d M Y" }}</div>
+              <div style="font-size:0.75rem;color:var(--text-muted);"><i class="bi bi-clock me-1"></i>{{ order.created_at|date:"H:i" }}</div>
+            </td>
+            <td>
+              <div class="location-badge">
+                {% if order.table %}
+                  <i class="bi bi-grid-3x3-gap text-danger"></i>
+                  <span>{{ order.table.name }}</span>
+                {% else %}
+                  <i class="bi bi-person-walking" style="color:var(--text-muted);"></i>
+                  <span>Walk-in</span>
+                {% endif %}
+              </div>
+            </td>
+            <td>
+              {% if order.source == "zomato" %}
+                <span style="color:#e23744;font-weight:700;font-size:0.78rem;"><i class="bi bi-bag me-1"></i>Zomato</span>
+              {% elif order.source == "swiggy" %}
+                <span style="color:#fc8019;font-weight:700;font-size:0.78rem;"><i class="bi bi-bag me-1"></i>Swiggy</span>
+              {% elif order.source == "qr_menu" %}
+                <span style="color:var(--pos-purple);font-weight:700;font-size:0.78rem;"><i class="bi bi-qr-code me-1"></i>QR Menu</span>
+              {% elif order.source == "dine_in" %}
+                <span style="color:var(--pos-green);font-weight:700;font-size:0.78rem;"><i class="bi bi-cup-hot me-1"></i>Dine-in</span>
+              {% elif order.source == "takeaway" %}
+                <span style="color:#0284c7;font-weight:700;font-size:0.78rem;"><i class="bi bi-box-seam me-1"></i>Takeaway</span>
+              {% else %}
+                <span style="font-weight:600;font-size:0.78rem;color:var(--text-muted);">{{ order.source|title|cut:"_" }}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if order.created_by %}
+                <span style="font-weight:600;color:var(--text-main);">{{ order.created_by.first_name|default:order.created_by.username }}</span>
+              {% else %}
+                <span style="color:var(--text-muted);">—</span>
+              {% endif %}
+            </td>
+            <td>
+              <span style="font-weight:700;font-size:0.82rem;background:var(--panel-bg);padding:3px 8px;border-radius:6px;border:1px solid var(--border-color);">
+                {{ order.items.count }} item{{ order.items.count|pluralize }}
+              </span>
+            </td>
+            <td style="text-align:right;font-weight:800;font-size:0.95rem;color:var(--text-main);">
+              ₹{{ order.grand_total|floatformat:0 }}
+            </td>
+            <td>
+              {% for p in order.payments.all %}
+                {% if p.method != "refund" %}
+                  <span class="method-tag">{{ p.method|upper }}</span>
+                {% endif %}
+              {% empty %}
+                {% if order.grand_total == 0 %}<span class="method-tag" style="background:var(--pos-green-soft);color:#059669;border-color:var(--pos-green-border);">COMP</span>{% endif %}
+              {% endfor %}
+            </td>
+            <td>
+              <span class="status-pill
+                {% if order.status == 'closed' %}pill-closed
+                {% elif order.status == 'cancelled' %}pill-cancelled
+                {% elif order.status == 'billing' %}pill-billing
+                {% else %}pill-open{% endif %}">
+                <span class="dot-badge" style="
+                  {% if order.status == 'closed' %}background:#10b981;
+                  {% elif order.status == 'cancelled' %}background:#ef4444;
+                  {% elif order.status == 'billing' %}background:#06b6d4;
+                  {% else %}background:#f59e0b;{% endif %}
+                "></span>
+                {{ order.status }}
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Strip -->
+    <div class="pag no-print p-3 border-top" style="border-color:var(--border-color) !important;">
+      <div class="me-auto" style="font-size:0.8rem;color:var(--text-muted);">
+        Showing page <strong>{{ page.number }}</strong> of <strong>{{ page.paginator.num_pages }}</strong> ({{ page.paginator.count }} total orders)
+      </div>
+      {% if page.has_previous %}
+      <a href="?{% querystring page=page.previous_page_number %}"><i class="bi bi-chevron-left me-1"></i>Previous</a>
+      {% endif %}
+      <span class="current">{{ page.number }}</span>
+      {% if page.has_next %}
+      <a href="?{% querystring page=page.next_page_number %}">Next<i class="bi bi-chevron-right ms-1"></i></a>
+      {% endif %}
+    </div>
+
+    {% else %}
+    <div style="text-align:center;padding:5rem 2rem;color:var(--text-muted);">
+      <div style="width:76px;height:76px;border-radius:22px;background:var(--pos-red-soft);border:1px solid var(--pos-red-border);display:inline-flex;align-items:center;justify-content:center;color:var(--pos-red);font-size:2.2rem;margin-bottom:1.25rem;">
+        <i class="bi bi-receipt-cutoff"></i>
+      </div>
+      <h4 style="font-weight:800;color:var(--text-main);margin-bottom:0.5rem;font-family:var(--font-main, 'Outfit', sans-serif);">No Orders Found</h4>
+      <p style="font-size:0.85rem;max-width:420px;margin:0 auto 1.5rem;">No orders match the selected filter criteria or date range.</p>
+      <a href="{% url 'order-history' %}" class="btn-subbar-pill">
+        <i class="bi bi-arrow-clockwise me-1"></i>Reset All Filters
+      </a>
+    </div>
+    {% endif %}
   </div>
-  {% endif %}
 
 </div>
 
-<!-- Refund request modal -->
+<!-- Refund Request Modal -->
 <div class="refund-modal-overlay" id="refundModalOverlay">
   <div class="refund-modal">
-    <h4>Request Refund</h4>
-    <label>Max Refundable</label>
-    <div id="refundMaxAmt" style="font-size:0.95rem;font-weight:700;color:var(--accent-gold);margin-bottom:0.75rem;"></div>
-    <label>Amount (₹)</label>
-    <input type="number" id="refundAmount" min="1" step="0.01" placeholder="Enter amount">
-    <label style="margin-top:0.75rem;">Customer Complaint <span style="color:var(--text-muted);font-weight:400;font-size:0.75rem;">(optional — what the customer said)</span></label>
-    <textarea id="refundCustomerComplaint" rows="2" placeholder="e.g. Food arrived cold, Wrong order delivered..."></textarea>
-    <label style="margin-top:0.75rem;">Manager Note <span style="color:#e74c3c;">*</span> <span style="color:var(--text-muted);font-weight:400;font-size:0.75rem;">(internal reason for approval)</span></label>
-    <textarea id="refundReason" rows="2" placeholder="e.g. Verified complaint, approving refund..."></textarea>
+    <div class="text-center">
+      <div class="refund-modal-icon-badge">
+        <i class="bi bi-arrow-counterclockwise"></i>
+      </div>
+      <h4>Request Refund</h4>
+      <p class="text-muted" style="font-size:0.82rem;margin-bottom:1.25rem;">Submit an authorized refund request for this customer order payment.</p>
+    </div>
+
+    <label>Max Refundable Amount</label>
+    <div id="refundMaxAmt" style="font-size:1.2rem;font-weight:800;color:var(--pos-red);margin-bottom:0.75rem;"></div>
+    
+    <label>Refund Amount (₹)</label>
+    <input type="number" id="refundAmount" min="1" step="0.01" placeholder="Enter amount to refund">
+    
+    <label>Customer Complaint <span style="color:var(--text-muted);font-weight:400;font-size:0.75rem;">(optional)</span></label>
+    <textarea id="refundCustomerComplaint" rows="2" placeholder="e.g. Food arrived cold, order delayed..."></textarea>
+    
+    <label>Manager Approval Note <span style="color:var(--pos-red);">*</span></label>
+    <textarea id="refundReason" rows="2" placeholder="e.g. Verified and approved partial refund..."></textarea>
+    
     <div class="refund-modal-actions">
-      <button class="btn-refund-cancel" onclick="closeRefundModal()">Cancel</button>
-      <button class="btn-refund-submit" onclick="submitRefund()">Request Refund</button>
+      <button type="button" class="btn-refund-cancel" onclick="closeRefundModal()">Cancel</button>
+      <button type="button" class="btn-refund-submit" onclick="submitRefund()">Confirm Refund Request</button>
     </div>
   </div>
 </div>
 
-<!-- Detail overlay + panel -->
+<!-- Detail Slide-in Drawer -->
 <div class="detail-overlay" id="detailOverlay" onclick="closeDetail()"></div>
 <div class="detail-panel" id="detailPanel">
   <div class="detail-panel-head">
     <div>
-      <p style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--accent-gold);margin:0;">Order Detail</p>
-      <h3 id="detailOrderNum" style="font-family:'DM Serif Display',serif;font-size:1.2rem;font-weight:400;margin:0;"></h3>
+      <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;color:var(--pos-red);font-weight:800;">Order Details</div>
+      <h3 id="detailOrderNum" style="font-size:1.25rem;font-weight:800;margin:0;font-family:var(--font-main, 'Outfit', sans-serif);color:var(--text-main);"></h3>
     </div>
-    <button class="close-btn" onclick="closeDetail()">×</button>
+    <button class="close-circle-btn" onclick="closeDetail()" title="Close details"><i class="bi bi-x-lg"></i></button>
   </div>
   <div class="detail-panel-body" id="detailBody">
-    <div class="loading-detail"><i class="bi bi-hourglass-split"></i> Loading…</div>
+    <div class="loading-detail"><i class="bi bi-hourglass-split me-2"></i>Loading order details…</div>
   </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
+function getCookie(name) {
+  const v = document.cookie.match("(^|;) ?" + name + "=([^;]*)(;|$)");
+  return v ? v[2] : null;
+}
+function getCsrfToken() {
+  return getCookie("csrftoken2") || getCookie("csrftoken") || "";
+}
+
 function openDetail(orderId) {
   document.getElementById("detailOverlay").classList.add("open");
   document.getElementById("detailPanel").classList.add("open");
   document.getElementById("detailBody").innerHTML =
-    '<div class="loading-detail"><i class="bi bi-hourglass-split"></i> Loading…</div>';
+    '<div class="loading-detail"><i class="bi bi-hourglass-split me-2"></i>Loading order details…</div>';
   document.getElementById("detailOrderNum").textContent = "#" + orderId;
 
   fetch(`/history/${orderId}/detail/`, { headers: { "X-Requested-With": "XMLHttpRequest" } })
     .then(r => r.json())
     .then(d => {
-      if (d.error) { document.getElementById("detailBody").innerHTML = `<p style="color:#ef4444;">${d.error}</p>`; return; }
+      if (d.error) {
+        document.getElementById("detailBody").innerHTML = `<div class="p-3 text-center" style="color:var(--pos-red);">${d.error}</div>`;
+        return;
+      }
       renderDetail(d);
     })
     .catch(() => {
-      document.getElementById("detailBody").innerHTML = '<p style="color:#ef4444;">Failed to load order detail.</p>';
+      document.getElementById("detailBody").innerHTML = '<div class="p-3 text-center" style="color:var(--pos-red);">Failed to load order detail.</div>';
     });
 }
 
@@ -450,44 +1255,47 @@ function closeDetail() {
   document.getElementById("detailOverlay").classList.remove("open");
   document.getElementById("detailPanel").classList.remove("open");
 }
-document.addEventListener("keydown", e => { if (e.key === "Escape") closeDetail(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") { closeDetail(); closeRefundModal(); } });
 
 function renderDetail(o) {
   document.getElementById("detailOrderNum").textContent = o.order_number;
 
-  const statusColor = { closed: "#10b981", cancelled: "#ef4444", billing: "#06b6d4", open: "#ca8a04" };
+  const statusColor = { closed: "#10b981", cancelled: "#ef4444", billing: "#06b6d4", open: "#f59e0b" };
   const col = statusColor[o.status] || "#888";
 
   let html = `
   <div class="detail-section">
-    <div class="detail-section-title">Order Info</div>
-    <div class="detail-row"><span class="name">Date</span><span class="amt">${o.created_at}</span></div>
+    <div class="detail-section-title"><i class="bi bi-info-circle me-1"></i>Order Overview</div>
+    <div class="detail-row"><span class="name">Date & Time</span><span class="amt">${o.created_at}</span></div>
     <div class="detail-row"><span class="name">Location</span><span class="amt">${o.location}</span></div>
-    <div class="detail-row"><span class="name">Source</span><span class="amt">${o.source.replace("_"," ")}</span></div>
-    <div class="detail-row"><span class="name">Waiter / Staff</span><span class="amt">${o.waiter || "—"}</span></div>
+    <div class="detail-row"><span class="name">Ordering Channel</span><span class="amt">${o.source.replace("_"," ").toUpperCase()}</span></div>
+    <div class="detail-row"><span class="name">Staff / Server</span><span class="amt">${o.waiter || "—"}</span></div>
     ${o.customer_name  ? `<div class="detail-row"><span class="name">Customer</span><span class="amt">${o.customer_name}</span></div>` : ""}
-    ${o.customer_phone ? `<div class="detail-row"><span class="name">Phone</span><span class="amt">${o.customer_phone}</span></div>` : ""}
-    ${o.duration_mins !== null ? `<div class="detail-row"><span class="name">Duration</span><span class="amt">${o.duration_mins} min</span></div>` : ""}
-    <div class="detail-row"><span class="name">Status</span><span class="amt" style="color:${col};font-weight:700;text-transform:uppercase;">${o.status}</span></div>
+    ${o.customer_phone ? `<div class="detail-row"><span class="name">Contact Phone</span><span class="amt">${o.customer_phone}</span></div>` : ""}
+    ${o.duration_mins !== null ? `<div class="detail-row"><span class="name">Dining Duration</span><span class="amt">${o.duration_mins} min</span></div>` : ""}
+    <div class="detail-row"><span class="name">Order Status</span><span class="amt" style="color:${col};font-weight:800;text-transform:uppercase;">${o.status}</span></div>
   </div>`;
 
   // Items
-  html += `<div class="detail-section"><div class="detail-section-title">Items (${o.items.length})</div>`;
+  html += `<div class="detail-section"><div class="detail-section-title"><i class="bi bi-cart3 me-1"></i>Items Ordered (${o.items.length})</div>`;
   if (!o.items.length) {
-    html += `<p style="color:var(--text-muted);font-size:0.82rem;">No items recorded.</p>`;
+    html += `<p style="color:var(--text-muted);font-size:0.82rem;margin:0;">No items recorded.</p>`;
   } else {
     o.items.forEach(item => {
       const cls = item.status === "voided" ? "voided" : item.is_complimentary ? "comp" : "";
       const badge = item.status === "voided"
-        ? `<span style="font-size:0.65rem;background:rgba(239,68,68,.1);color:#ef4444;padding:1px 5px;border-radius:3px;margin-left:6px;">VOID</span>`
+        ? `<span style="font-size:0.65rem;background:rgba(239,68,68,.12);color:#ef4444;padding:2px 6px;border-radius:999px;margin-left:6px;font-weight:800;">VOID</span>`
         : item.is_complimentary
-        ? `<span style="font-size:0.65rem;background:rgba(16,185,129,.1);color:#10b981;padding:1px 5px;border-radius:3px;margin-left:6px;">COMP</span>`
+        ? `<span style="font-size:0.65rem;background:rgba(16,185,129,.12);color:#10b981;padding:2px 6px;border-radius:999px;margin-left:6px;font-weight:800;">COMP</span>`
         : "";
       const voidNote = item.void_reason
         ? `<span class="void-reason">Reason: ${item.void_reason}</span>` : "";
-      const price = item.is_complimentary ? "Rs.0" : `Rs.${item.total.toFixed(0)}`;
+      const price = item.is_complimentary ? "₹0" : `₹${item.total.toFixed(0)}`;
       html += `<div class="detail-row ${cls}">
-        <span class="name">${item.quantity}× ${item.name}${badge}${voidNote}</span>
+        <span class="name">
+          <span style="font-weight:700;color:var(--pos-red);background:var(--pos-red-soft);padding:1px 6px;border-radius:6px;font-size:0.75rem;">${item.quantity}×</span>
+          ${item.name}${badge}${voidNote}
+        </span>
         <span class="amt">${price}</span>
       </div>`;
     });
@@ -495,22 +1303,22 @@ function renderDetail(o) {
   html += `</div>`;
 
   // Totals
-  html += `<div class="detail-section"><div class="detail-section-title">Totals</div>
-    <div class="detail-row"><span class="name">Subtotal</span><span class="amt">Rs.${o.subtotal.toFixed(0)}</span></div>
-    <div class="detail-row"><span class="name">GST</span><span class="amt">Rs.${o.gst_total.toFixed(0)}</span></div>`;
+  html += `<div class="detail-section"><div class="detail-section-title"><i class="bi bi-calculator me-1"></i>Bill Summary</div>
+    <div class="detail-row"><span class="name">Subtotal</span><span class="amt">₹${o.subtotal.toFixed(0)}</span></div>
+    <div class="detail-row"><span class="name">GST Tax</span><span class="amt">₹${o.gst_total.toFixed(0)}</span></div>`;
   if (o.discount_total > 0) {
-    html += `<div class="detail-row"><span class="name">Discount</span><span class="amt" style="color:#10b981;">-Rs.${o.discount_total.toFixed(0)}</span></div>`;
+    html += `<div class="detail-row"><span class="name">Discount Applied</span><span class="amt" style="color:#10b981;">-₹${o.discount_total.toFixed(0)}</span></div>`;
   }
-  html += `<div class="detail-row total-row"><span class="name">Grand Total</span><span class="amt">Rs.${o.grand_total.toFixed(0)}</span></div></div>`;
+  html += `<div class="detail-row total-row"><span class="name">Grand Total</span><span class="amt">₹${o.grand_total.toFixed(0)}</span></div></div>`;
 
   // Payments + refund UI
   if (o.payments.length) {
-    html += `<div class="detail-section"><div class="detail-section-title">Payments</div>`;
+    html += `<div class="detail-section"><div class="detail-section-title"><i class="bi bi-credit-card me-1"></i>Payments &amp; Transactions</div>`;
     o.payments.forEach(p => {
       if (p.is_refund) {
         html += `<div class="detail-row refund-row">
-          <span class="name">${p.method.toUpperCase()}${p.reference ? ` · ${p.reference}` : ""}</span>
-          <span class="amt">-Rs.${Math.abs(p.amount).toFixed(0)} <span style="color:var(--text-muted);font-size:0.7rem;">${p.paid_at}</span></span>
+          <span class="name"><i class="bi bi-arrow-return-left text-danger me-1"></i>${p.method.toUpperCase()}${p.reference ? ` · ${p.reference}` : ""}</span>
+          <span class="amt">-₹${Math.abs(p.amount).toFixed(0)} <span style="color:var(--text-muted);font-size:0.72rem;font-weight:400;">(${p.paid_at})</span></span>
         </div>`;
         return;
       }
@@ -519,22 +1327,22 @@ function renderDetail(o) {
         .reduce((s, r) => s + r.amount, 0);
       const remaining = (p.amount - alreadyRefunded).toFixed(2);
       const refundBtn = (o.can_refund && parseFloat(remaining) > 0)
-        ? `<button class="btn-refund" onclick="openRefundModal(${p.id}, ${remaining})">Refund</button>`
+        ? `<button type="button" class="btn-refund" onclick="openRefundModal(${p.id}, ${remaining})">Refund</button>`
         : "";
       html += `<div class="detail-row">
         <span class="name">${p.method.toUpperCase()}${p.reference ? ` · ${p.reference}` : ""}${refundBtn}</span>
-        <span class="amt">Rs.${p.amount.toFixed(0)} <span style="color:var(--text-muted);font-size:0.7rem;">${p.paid_at}</span></span>
+        <span class="amt">₹${p.amount.toFixed(0)} <span style="color:var(--text-muted);font-size:0.72rem;font-weight:400;">(${p.paid_at})</span></span>
       </div>`;
       // Show existing refunds for this payment
       p.refunds.forEach(r => {
         const stCls = `status-${r.status}`;
         const approveReject = (o.can_approve_refund && r.status === "pending")
-          ? `<button class="btn-approve" onclick="approveRefund(${r.id})">Approve</button>
-             <button class="btn-reject"  onclick="rejectRefund(${r.id})">Reject</button>`
+          ? `<button type="button" class="btn-approve" onclick="approveRefund(${r.id})">Approve</button>
+             <button type="button" class="btn-reject"  onclick="rejectRefund(${r.id})">Reject</button>`
           : "";
         html += `<div class="refund-entry">
           <span>₹${r.amount.toFixed(0)} · ${r.reason || "No reason"} <span style="color:var(--text-muted);font-size:0.7rem;">by ${r.by}</span></span>
-          <span style="display:flex;align-items:center;gap:4px;">
+          <span style="display:flex;align-items:center;gap:6px;">
             <span class="refund-status ${stCls}">${r.status}</span>
             ${approveReject}
           </span>
@@ -544,9 +1352,9 @@ function renderDetail(o) {
     html += `</div>`;
   }
 
-  // Audit trail (owner/manager only — empty array for others)
+  // Audit trail (owner/manager only)
   if (o.events && o.events.length) {
-    html += `<div class="detail-section"><div class="detail-section-title">Audit Trail</div>`;
+    html += `<div class="detail-section"><div class="detail-section-title"><i class="bi bi-clock-history me-1"></i>Audit Timeline</div>`;
     o.events.forEach(ev => {
       html += `<div class="audit-event">
         <span class="audit-time">${ev.at}</span>
@@ -557,11 +1365,15 @@ function renderDetail(o) {
     html += `</div>`;
   }
 
-  // Reprint button
-  html += `<div style="margin-top:1rem;">
+  // Action footer (Reprint Receipt & Download PDF)
+  html += `<div class="mt-3 d-flex flex-column gap-2">
     <a href="/thermal-receipt/${o.id}/" target="_blank"
-       class="btn-luxury w-100" style="text-align:center;text-decoration:none;display:flex;justify-content:center;gap:6px;">
-      <i class="bi bi-printer"></i> Reprint Receipt
+       class="btn-subbar-new w-100" style="text-align:center;text-decoration:none;display:flex;justify-content:center;align-items:center;gap:8px;padding:12px 18px;font-size:0.9rem;">
+      <i class="bi bi-printer-fill"></i> Reprint Thermal Receipt
+    </a>
+    <a href="/download-pdf/${o.id}/" target="_blank"
+       class="btn-subbar-pill w-100" style="text-align:center;text-decoration:none;display:flex;justify-content:center;align-items:center;gap:8px;padding:10px 18px;font-size:0.86rem;">
+      <i class="bi bi-file-earmark-pdf"></i> Download PDF Bill
     </a>
   </div>`;
 
@@ -586,70 +1398,129 @@ function closeRefundModal() {
   _activePaymentId = null;
 }
 
-function submitRefund() {
+async function submitRefund() {
   const amount             = document.getElementById("refundAmount").value;
   const customer_complaint = document.getElementById("refundCustomerComplaint").value.trim();
   const reason             = document.getElementById("refundReason").value.trim();
-  if (!amount || parseFloat(amount) <= 0) { alert("Enter a valid amount."); return; }
-  if (!reason) { alert("Manager Note is required."); return; }
+  if (!amount || parseFloat(amount) <= 0) {
+    if (window.ui && window.ui.alert) {
+      await ui.alert("Please enter a valid refund amount.", "Invalid Amount", "warning");
+    } else {
+      alert("Please enter a valid refund amount.");
+    }
+    return;
+  }
+  if (!reason) {
+    if (window.ui && window.ui.alert) {
+      await ui.alert("Manager Approval Note is required for audit verification.", "Approval Note Required", "warning");
+    } else {
+      alert("Manager Approval Note is required.");
+    }
+    return;
+  }
 
   fetch(`/refund/${_activePaymentId}/`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", "X-CSRFToken": getCookie("csrftoken2") },
+    headers: { "Content-Type": "application/json", "X-CSRFToken": getCsrfToken() },
     body: JSON.stringify({ amount, customer_complaint, reason })
   })
   .then(r => r.json())
-  .then(d => {
+  .then(async d => {
     if (d.success) {
       closeRefundModal();
-      // Refresh the detail panel
+      if (window.ui && window.ui.alert) {
+        await ui.alert("Refund request submitted successfully.", "Refund Submitted", "success");
+      }
       const orderId = parseInt(document.getElementById("detailOrderNum").textContent.replace("#",""));
       if (orderId) openDetail(orderId);
     } else {
-      alert(d.error || "Refund request failed.");
+      if (window.ui && window.ui.alert) {
+        await ui.alert(d.error || "Refund request failed.", "Error", "error");
+      } else {
+        alert(d.error || "Refund request failed.");
+      }
     }
   })
-  .catch(() => alert("Network error. Please try again."));
+  .catch(async () => {
+    if (window.ui && window.ui.alert) {
+      await ui.alert("Network error. Please try again.", "Error", "error");
+    } else {
+      alert("Network error. Please try again.");
+    }
+  });
 }
 
-function approveRefund(refundId) {
-  if (!confirm("Approve this refund?")) return;
+async function approveRefund(refundId) {
+  let ok = false;
+  if (window.ui && window.ui.confirm) {
+    ok = await ui.confirm("Approve Refund?", "Are you sure you want to approve and process this refund?", "Approve Refund");
+  } else {
+    ok = confirm("Approve this refund?");
+  }
+  if (!ok) return;
+
   fetch(`/refund/approve/${refundId}/`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", "X-CSRFToken": getCookie("csrftoken2") },
+    headers: { "Content-Type": "application/json", "X-CSRFToken": getCsrfToken() },
     body: "{}"
   })
   .then(r => r.json())
-  .then(d => {
+  .then(async d => {
     if (d.success) {
       const orderId = parseInt(document.getElementById("detailOrderNum").textContent.replace("#",""));
       if (orderId) openDetail(orderId);
-    } else { alert(d.error || "Approval failed."); }
+    } else {
+      if (window.ui && window.ui.alert) {
+        await ui.alert(d.error || "Approval failed.", "Error", "error");
+      } else {
+        alert(d.error || "Approval failed.");
+      }
+    }
   })
-  .catch(() => alert("Network error."));
+  .catch(async () => {
+    if (window.ui && window.ui.alert) {
+      await ui.alert("Network error.", "Error", "error");
+    } else {
+      alert("Network error.");
+    }
+  });
 }
 
-function rejectRefund(refundId) {
-  const reason = prompt("Reason for rejection (optional):");
-  if (reason === null) return; // user cancelled
+async function rejectRefund(refundId) {
+  let reason = "";
+  if (window.ui && window.ui.prompt) {
+    reason = await ui.prompt("Reject Refund", "Enter reason for rejection (optional):", "");
+  } else {
+    reason = prompt("Reason for rejection (optional):");
+  }
+  if (reason === null) return;
+
   fetch(`/refund/reject/${refundId}/`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", "X-CSRFToken": getCookie("csrftoken2") },
-    body: JSON.stringify({ reason })
+    headers: { "Content-Type": "application/json", "X-CSRFToken": getCsrfToken() },
+    body: JSON.stringify({ reason: reason || "" })
   })
   .then(r => r.json())
-  .then(d => {
+  .then(async d => {
     if (d.success) {
       const orderId = parseInt(document.getElementById("detailOrderNum").textContent.replace("#",""));
       if (orderId) openDetail(orderId);
-    } else { alert(d.error || "Rejection failed."); }
+    } else {
+      if (window.ui && window.ui.alert) {
+        await ui.alert(d.error || "Rejection failed.", "Error", "error");
+      } else {
+        alert(d.error || "Rejection failed.");
+      }
+    }
   })
-  .catch(() => alert("Network error."));
-}
-
-function getCookie(name) {
-  const v = document.cookie.match("(^|;) ?" + name + "=([^;]*)(;|$)");
-  return v ? v[2] : null;
+  .catch(async () => {
+    if (window.ui && window.ui.alert) {
+      await ui.alert("Network error.", "Error", "error");
+    } else {
+      alert("Network error.");
+    }
+  });
 }
 </script>
 {% endblock %}
+

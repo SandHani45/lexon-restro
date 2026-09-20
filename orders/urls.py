@@ -19,6 +19,7 @@ from .views import (
     create_order,
     make_item_complimentary,
     bill_view,
+    send_whatsapp_bill,
     pay_order,
     table_dashboard,
     tables_data,
@@ -71,6 +72,7 @@ urlpatterns = [
     # waiter-dashboard/resolve-waiter moved to waiter/urls.py (Phase 4).
 
     path("bill/<int:order_id>/", bill_view, name="bill-view"),
+    path("bill/<int:order_id>/send-whatsapp/", send_whatsapp_bill, name="send-whatsapp-bill"),
     path("pay/<int:order_id>/", pay_order, name="pay-order"),
     path("print-bill/<int:order_id>/", print_bill_action, name="print-bill"),
     path("print-split-bill/<int:order_id>/", print_split_bill, name="print-split-bill"),
@@ -82,6 +84,7 @@ urlpatterns = [
 
     # Order History
     path("history/",                      order_history_view, name="order-history"),
+    path("orders/history/",               order_history_view, name="orders-history-alias"),
     path("history/<int:order_id>/detail/", order_detail_api,   name="order-detail-api"),
     path("history/export/",               export_orders_csv,  name="export-orders-csv"),
 

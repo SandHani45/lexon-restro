@@ -5,11 +5,97 @@
 
 {% block extra_css %}
 <style>
+    /* ══════════════════════════════════════════════════════════════
+       KIMIPOS LUXURY DESIGN SYSTEM & SUBBAR
+       ══════════════════════════════════════════════════════════════ */
+    :root {
+        --pos-red: #EC2734;
+        --pos-red-hover: #d81f2f;
+        --pos-red-soft: rgba(236, 39, 52, 0.08);
+        --pos-red-border: rgba(236, 39, 52, 0.22);
+    }
+
+    body {
+        background: var(--bg-color) !important;
+    }
+
+    /* ── Sub-Header Bar (KimiPoS POS Layout) ──────────────────── */
+    .pos-subbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 1.1rem 1.5rem 0.5rem;
+        background: var(--bg-color);
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .pos-subbar-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        letter-spacing: -0.4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .pos-breadcrumbs {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .pos-breadcrumbs a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.15s;
+    }
+    .pos-breadcrumbs a:hover {
+        color: var(--pos-red);
+    }
+    .pos-breadcrumbs .separator {
+        font-size: 0.65rem;
+        opacity: 0.6;
+    }
+    .pos-breadcrumbs .current {
+        color: var(--pos-red);
+        font-weight: 700;
+    }
+
+    /* Subbar Pill Buttons */
+    .btn-subbar-pill {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        padding: 0.45rem 1rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: all 0.15s ease;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+    }
+    .btn-subbar-pill:hover {
+        border-color: var(--pos-red);
+        color: var(--pos-red);
+        background: var(--pos-red-soft);
+        transform: translateY(-1px);
+    }
+
     /* ── Page Layout ── */
     .qr-gen-wrapper {
         max-width: 1200px;
         margin: 0 auto;
-        padding: 1.5rem 1.25rem 4rem;
+        padding: 0.75rem 1.25rem 4rem;
     }
     .qr-gen-header {
         display: flex;
@@ -260,14 +346,15 @@
         text-decoration: none;
     }
     .btn-qr-primary {
-        background: #eab308;
-        color: #0f1117;
-        box-shadow: 0 4px 15px rgba(234,179,8,0.25);
+        background: var(--pos-red, #EC2734);
+        color: #ffffff;
+        box-shadow: 0 4px 15px rgba(236, 39, 52, 0.3);
     }
     .btn-qr-primary:hover {
-        background: #facc15;
+        background: var(--pos-red-hover, #d81f2f);
+        color: #ffffff;
         transform: translateY(-1px);
-        box-shadow: 0 6px 20px rgba(234,179,8,0.35);
+        box-shadow: 0 6px 20px rgba(236, 39, 52, 0.45);
     }
     .btn-qr-secondary {
         background: rgba(255,255,255,0.04);
@@ -487,40 +574,38 @@
 </style>
 {% endblock %}
 
-{% block header_left %}
-<a href="/setup/qr-codes/" class="d-flex align-items-center gap-2 text-decoration-none" style="color:inherit;">
-    <div style="width:34px;height:34px;border-radius:10px;background:rgba(236, 39, 52,0.12);border:1px solid rgba(236, 39, 52,0.3);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex-shrink:0;">
-        <i class="bi bi-qr-code" style="font-size:1.15rem;"></i>
-    </div>
-    <div>
-        <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.5px;color:var(--text-main);">QR Code Generator</h1>
-        <div class="text-muted" style="font-size:0.72rem;letter-spacing:0.5px;">{{ request.user.outlet.name }}</div>
-    </div>
-</a>
-{% endblock %}
-
-{% block header_right %}
-<a href="/tables/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">
-    <i class="bi bi-arrow-left me-1"></i> Tables
-</a>
-<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Dark / Light Mode">
-    <i class="bi bi-moon" id="themeIcon"></i>
-</button>
-{% endblock %}
-
 {% block content %}
-<div class="qr-gen-wrapper">
-
-    <!-- Header navigation row -->
-    <div class="qr-gen-header">
-        <a href="/tables/" class="btn-back-circle" title="Back to Tables">
-            <i class="bi bi-arrow-left"></i>
-        </a>
-        <div>
-            <h1 class="qr-gen-title">QR Code Generator</h1>
-            <p class="qr-gen-subtitle">Generate beautiful QR codes for your tables</p>
-        </div>
+<!-- ══════════════════════════════════════════════════════════════
+     SUBBAR (BREADCRUMBS & TOP QUICK ACTIONS)
+     ══════════════════════════════════════════════════════════════ -->
+<div class="pos-subbar">
+    <div>
+        <h1 class="pos-subbar-title">
+            <i class="bi bi-qr-code text-danger"></i>
+            QR Code Generator &amp; Table Cards
+        </h1>
+        <nav class="pos-breadcrumbs">
+            <a href="/dashboard/">Dashboard</a>
+            <span class="separator">/</span>
+            <a href="/setup/">Setup</a>
+            <span class="separator">/</span>
+            <span class="current">QR Codes</span>
+        </nav>
     </div>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <a href="/tables/" class="btn-subbar-pill">
+            <i class="bi bi-grid-3x3"></i> Tables
+        </a>
+        <a href="/setup/" class="btn-subbar-pill">
+            <i class="bi bi-sliders2"></i> Setup Hub
+        </a>
+        <a href="/menu/" class="btn-subbar-pill">
+            <i class="bi bi-journal-text"></i> Digital Menu
+        </a>
+    </div>
+</div>
+
+<div class="qr-gen-wrapper">
 
     <!-- Main 2-column layout -->
     <div class="qr-gen-grid">
@@ -663,7 +748,7 @@
 
                 <!-- Footer branding -->
                 <div class="powered-by-label">Powered by</div>
-                <div class="powered-by-brand" id="cardBrandText">SERVYN</div>
+                <div class="powered-by-brand" id="cardBrandText">EasyBillBro</div>
             </div>
 
             <!-- Preview Footer Info below card -->
@@ -714,9 +799,11 @@
 
     // Helper to generate center brand SVG logo
     function createCenterLogoSvg(text, qrColor, bgColor) {
-        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="90" height="26" viewBox="0 0 90 26">
-            <rect width="90" height="26" rx="6" fill="${bgColor}"/>
-            <text x="45" y="18" font-family="'Outfit', sans-serif" font-weight="900" font-size="12" fill="${qrColor}" text-anchor="middle" letter-spacing="2">${text}</text>
+        const width = 114;
+        const height = 28;
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+            <rect width="${width}" height="${height}" rx="6" fill="${bgColor}"/>
+            <text x="${width / 2}" y="19" font-family="'Outfit', sans-serif" font-weight="900" font-size="11" fill="${qrColor}" text-anchor="middle" letter-spacing="1">${text}</text>
         </svg>`;
         return "data:image/svg+xml;base64," + btoa(svg);
     }
@@ -880,7 +967,7 @@
 
         container.innerHTML = "";
 
-        const centerLogo = createCenterLogoSvg("SERVYN", currentQrColor, currentBgColor);
+        const centerLogo = createCenterLogoSvg("EasyBillBro", currentQrColor, currentBgColor);
 
         qrCodeInstance = new QRCodeStyling({
             width: 250,
@@ -980,7 +1067,7 @@
         ctx.stroke();
 
         // Generate QR code for this specific table
-        const centerLogo = createCenterLogoSvg("SERVYN", currentQrColor, currentBgColor);
+        const centerLogo = createCenterLogoSvg("EasyBillBro", currentQrColor, currentBgColor);
         const tempQr = new QRCodeStyling({
             width: 250 * scale,
             height: 250 * scale,
@@ -1043,8 +1130,9 @@
 
         ctx.fillStyle = currentQrColor;
         ctx.font = `bold ${18 * scale}px 'Outfit', sans-serif`;
-        ctx.letterSpacing = "2px";
-        ctx.fillText("SERVYN", width / 2, currentY + (48 * scale));
+        ctx.letterSpacing = "1.5px";
+        ctx.fillText("EasyBillBro", width / 2, currentY + (48 * scale));
+        ctx.letterSpacing = "0px";
 
         return canvas;
     }

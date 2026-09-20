@@ -5,436 +5,932 @@
 
 {% block extra_css %}
 <style>
-    .page-body { max-width: 700px; margin: 3rem auto 5rem; padding: 0 1.5rem; }
-    .page-eyebrow { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 4px; color: var(--accent-gold); margin-bottom: 0.5rem; }
-    .page-title { font-family: 'DM Serif Display', serif; font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
-    .divider { width: 40px; height: 1px; background: var(--accent-gold); margin: 1.2rem 0 2rem; }
+    /* ══════════════════════════════════════════════════════════════
+       KIMIPOS LUXURY OUTLET SETTINGS DESIGN SYSTEM
+       ══════════════════════════════════════════════════════════════ */
+    :root {
+        --pos-red: #EC2734;
+        --pos-red-hover: #d81f2f;
+        --pos-red-soft: rgba(236, 39, 52, 0.08);
+        --pos-red-border: rgba(236, 39, 52, 0.22);
+        --pos-green: #10b981;
+        --pos-green-soft: rgba(16, 185, 129, 0.10);
+        --pos-green-border: rgba(16, 185, 129, 0.25);
+        --pos-amber: #f59e0b;
+        --pos-amber-soft: rgba(245, 158, 11, 0.10);
+        --pos-amber-border: rgba(245, 158, 11, 0.25);
+        --pos-blue: #3b82f6;
+        --pos-blue-soft: rgba(59, 130, 246, 0.10);
+        --pos-blue-border: rgba(59, 130, 246, 0.25);
+        --pos-purple: #8b5cf6;
+        --pos-purple-soft: rgba(139, 92, 246, 0.10);
+        --pos-purple-border: rgba(139, 92, 246, 0.25);
+    }
 
-    .alert { padding: 0.8rem 1.2rem; margin-bottom: 1.5rem; font-size: 0.8rem; border-left: 3px solid var(--accent-gold); background: rgba(236, 39, 52,0.08); }
-    .alert-success { border-left-color: #22c55e; background: rgba(34,197,94,0.07); color: #22c55e; }
-    .alert-error   { border-left-color: #ef4444; background: rgba(239,68,68,0.07);  color: #ef4444; }
+    body {
+        background: var(--bg-color) !important;
+    }
 
-    .settings-section { border: 1px solid var(--border-color); background: var(--panel-bg); margin-bottom: 1.5rem; overflow: hidden; }
-    .section-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 0.6rem; }
-    .section-icon { color: var(--accent-gold); font-size: 1rem; }
-    .section-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; }
-    .section-body { padding: 1.5rem; }
+    /* ── Sub-Header Bar (KimiPoS POS Layout) ──────────────────── */
+    .pos-subbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 1rem 1.5rem 0.5rem;
+        background: var(--bg-color);
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .pos-subbar-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        letter-spacing: -0.4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .pos-breadcrumbs {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .pos-breadcrumbs a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.15s;
+    }
+    .pos-breadcrumbs a:hover {
+        color: var(--pos-red);
+    }
+    .pos-breadcrumbs .separator {
+        font-size: 0.65rem;
+        opacity: 0.6;
+    }
+    .pos-breadcrumbs .current {
+        color: var(--pos-red);
+        font-weight: 700;
+    }
 
-    .field-row { margin-bottom: 1.6rem; }
-    .field-row:last-child { margin-bottom: 0; }
-    .field-label { display: block; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; margin-bottom: 0.4rem; }
-    .field-hint { font-size: 0.68rem; color: var(--text-muted); margin-top: 0.3rem; }
-    .field-input, .field-textarea { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border-color); color: var(--text-main); padding: 0.5rem 0; font-size: 1rem; font-weight: 500; outline: none; font-family: 'Outfit', sans-serif; transition: border-color 0.2s; }
-    .field-input:focus, .field-textarea:focus { border-bottom-color: var(--accent-gold); }
-    .field-textarea { resize: vertical; min-height: 70px; font-size: 0.9rem; }
-    .field-mono { font-family: 'Space Mono', monospace; font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase; }
+    /* Subbar Pill Buttons */
+    .btn-subbar-pill {
+        background: var(--panel-bg);
+        color: var(--text-main) !important;
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        padding: 7px 16px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-decoration: none !important;
+    }
+    .btn-subbar-pill:hover {
+        border-color: var(--pos-red-border);
+        background: var(--pos-red-soft);
+        color: var(--pos-red) !important;
+        transform: translateY(-1px);
+    }
 
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    @media (max-width: 560px) { .two-col { grid-template-columns: 1fr; gap: 0; } }
+    .btn-subbar-save {
+        background: var(--pos-red);
+        color: #ffffff !important;
+        border: none;
+        border-radius: 999px;
+        padding: 7px 18px;
+        font-size: 0.84rem;
+        font-weight: 700;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 3px 12px rgba(236, 39, 52, 0.3);
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    .btn-subbar-save:hover {
+        background: var(--pos-red-hover);
+        transform: translateY(-1.5px);
+        box-shadow: 0 6px 18px rgba(236, 39, 52, 0.42);
+    }
 
-    .logo-preview { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1rem; }
-    .logo-img { width: 72px; height: 72px; object-fit: contain; border: 1px solid var(--border-color); padding: 6px; background: var(--panel-bg); }
-    .logo-placeholder { width: 72px; height: 72px; border: 1px dashed var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 1.6rem; }
-    .logo-info { font-size: 0.75rem; color: var(--text-muted); line-height: 1.6; }
+    .outlet-wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0.5rem 1.5rem 5rem;
+    }
 
-    .compliance-note { background: rgba(236, 39, 52,0.06); border: 1px solid rgba(236, 39, 52,0.25); padding: 0.75rem 1rem; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6; }
-    .compliance-note strong { color: var(--text-main); }
+    /* ── Hero Status Cards ─────────────────────────────────────── */
+    .kpi-card {
+        background: var(--card-bg, #ffffff);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 1.2rem 1.35rem;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s ease;
+    }
+    .kpi-card:hover {
+        transform: translateY(-2px);
+    }
+    .kpi-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+    }
+    .kpi-card.kpi-branch::before  { background: linear-gradient(90deg, #c2381e, #EC2734); }
+    .kpi-card.kpi-legal::before   { background: linear-gradient(90deg, #059669, #10b981); }
+    .kpi-card.kpi-tax::before     { background: linear-gradient(90deg, #ea580c, #fb923c); }
+    .kpi-card.kpi-printer::before { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
 
-    .btn-save { width: 100%; padding: 1.1rem; background: var(--accent-gold); border: none; color: #fff; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 700; cursor: pointer; margin-top: 1.5rem; transition: background 0.2s, transform 0.1s; font-family: 'Outfit', sans-serif; }
-    .btn-save:hover { background: var(--accent-hover); }
-    .btn-save:active { transform: scale(0.99); }
+    .kpi-info { flex: 1; min-width: 0; }
+    .kpi-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        margin-bottom: 0.25rem;
+    }
+    .kpi-val {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--text-main);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        line-height: 1.2;
+        margin-bottom: 0.25rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .kpi-sub {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+    }
+    .kpi-icon-wrap {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+    .icon-branch  { background: rgba(236, 39, 52, 0.12); color: var(--pos-red); }
+    .icon-legal   { background: rgba(16, 185, 129, 0.12); color: var(--pos-green); }
+    .icon-tax     { background: rgba(245, 158, 11, 0.12); color: var(--pos-amber); }
+    .icon-printer { background: rgba(139, 92, 246, 0.12); color: var(--pos-purple); }
+
+    /* ── Settings Section Cards ────────────────────────────────── */
+    .settings-card {
+        background: var(--card-bg, #ffffff);
+        border: 1px solid var(--border-color);
+        border-radius: 24px;
+        padding: 1.75rem 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    }
+    .settings-card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .settings-card-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+    }
+    .settings-card-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--text-main);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        margin: 0;
+    }
+    .settings-card-subtitle {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 2px;
+    }
+
+    /* Form Fields */
+    .field-row {
+        margin-bottom: 1.4rem;
+    }
+    .field-row:last-child {
+        margin-bottom: 0;
+    }
+    .field-label {
+        display: block;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        font-weight: 700;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        margin-bottom: 0.45rem;
+    }
+    .field-input, .field-textarea {
+        width: 100%;
+        background: var(--panel-bg);
+        border: 1.5px solid var(--border-color);
+        color: var(--text-main);
+        padding: 0.6rem 0.95rem;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        outline: none;
+        transition: all 0.18s ease;
+    }
+    .field-input:focus, .field-textarea:focus {
+        border-color: var(--pos-red);
+        box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.12);
+    }
+    .field-textarea {
+        resize: vertical;
+        min-height: 80px;
+        line-height: 1.5;
+    }
+    .field-mono {
+        font-family: 'Space Mono', monospace !important;
+        letter-spacing: 0.5px;
+        font-size: 0.88rem;
+    }
+    .field-hint {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        margin-top: 0.35rem;
+        line-height: 1.4;
+    }
+
+    .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+    }
+    @media (max-width: 640px) {
+        .two-col { grid-template-columns: 1fr; gap: 1.25rem; }
+        .settings-card { padding: 1.25rem; }
+    }
+
+    /* Logo Uploader Card */
+    .logo-upload-wrap {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 1.25rem;
+        background: var(--panel-bg);
+        border: 1.5px dashed var(--border-color);
+        border-radius: 18px;
+        margin-bottom: 1.5rem;
+    }
+    .logo-preview-box {
+        width: 84px;
+        height: 84px;
+        border-radius: 16px;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        padding: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+    .logo-preview-img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+    .btn-upload-logo {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 16px;
+        background: var(--pos-red-soft);
+        border: 1px solid var(--pos-red-border);
+        color: var(--pos-red);
+        border-radius: 999px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        transition: all 0.18s ease;
+    }
+    .btn-upload-logo:hover {
+        background: var(--pos-red);
+        color: #ffffff;
+    }
+
+    /* Modern Choice Radio / Checkbox Cards */
+    .choice-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 1.1rem 1.25rem;
+        border-radius: 16px;
+        border: 1.5px solid var(--border-color);
+        background: var(--panel-bg);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-bottom: 0.75rem;
+    }
+    .choice-card:last-child {
+        margin-bottom: 0;
+    }
+    .choice-card:hover {
+        border-color: var(--pos-red-border);
+        background: var(--pos-red-soft);
+    }
+    .choice-card.active {
+        border-color: var(--pos-red);
+        background: var(--pos-red-soft);
+    }
+    .choice-input {
+        margin-top: 3px;
+        accent-color: var(--pos-red);
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+    }
+    .choice-title {
+        font-weight: 700;
+        font-size: 0.92rem;
+        color: var(--text-main);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .choice-desc {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-top: 3px;
+        line-height: 1.45;
+    }
+
+    /* Compliance Banner */
+    .compliance-alert {
+        background: var(--pos-amber-soft);
+        border: 1px solid var(--pos-amber-border);
+        color: var(--text-main);
+        border-radius: 14px;
+        padding: 0.9rem 1.2rem;
+        font-size: 0.82rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        line-height: 1.5;
+    }
+
+    /* Save Button Banner */
+    .btn-save-outlet {
+        width: 100%;
+        padding: 1rem 1.5rem;
+        background: var(--pos-red);
+        border: none;
+        border-radius: 999px;
+        color: #ffffff;
+        font-size: 0.95rem;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        box-shadow: 0 4px 18px rgba(236, 39, 52, 0.35);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+    }
+    .btn-save-outlet:hover {
+        background: var(--pos-red-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(236, 39, 52, 0.45);
+    }
+    .btn-save-outlet:active {
+        transform: scale(0.99);
+    }
+
+    /* Flash Message */
+    .flash-alert {
+        padding: 0.9rem 1.25rem;
+        border-radius: 14px;
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+    }
+    .flash-success {
+        background: var(--pos-green-soft);
+        border: 1px solid var(--pos-green-border);
+        color: #059669;
+    }
+    .flash-error {
+        background: var(--pos-red-soft);
+        border: 1px solid var(--pos-red-border);
+        color: #dc2626;
+    }
 </style>
 {% endblock %}
 
 {% block header_left %}
-<div>
-    <a href="/dashboard/" style="text-decoration:none;color:inherit;">
-        <h1 class="brand-title mb-0">
-            <i class="bi bi-diamond-half" style="color:var(--accent-gold);"></i>
-            {{ request.user.tenant.name }}
-        </h1>
-    </a>
-    <p class="brand-subtitle">Setup — {{ request.user.outlet.name }}</p>
-</div>
+<a href="{% url 'outlet_settings' %}" class="d-flex align-items-center gap-2 text-decoration-none" style="color:inherit;">
+  <div style="width:34px;height:34px;border-radius:10px;background:rgba(236,39,52,0.12);border:1px solid rgba(236,39,52,0.3);display:flex;align-items:center;justify-content:center;color:var(--pos-red);flex-shrink:0;">
+    <i class="bi bi-shop" style="font-size:1.05rem;"></i>
+  </div>
+  <div>
+    <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.3px;color:var(--text-main);font-family:var(--font-main, 'Outfit', sans-serif);">Outlet Settings</h1>
+    <div class="text-muted" style="font-size:0.72rem;letter-spacing:0.3px;font-family:var(--font-main, 'Outfit', sans-serif);">{{ outlet.name }} · {{ tenant.name }}</div>
+  </div>
+</a>
 {% endblock %}
 
 {% block header_right %}
-<a href="/setup/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Setup Area</a>
-<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme">
-    <i class="bi bi-moon" id="themeIcon"></i>
-</button>
+<a href="{% url 'setup_wizard' %}" class="btn-subbar-pill no-print">
+  <i class="bi bi-gear-wide-connected me-1"></i>Setup Hub
+</a>
+<a href="{% url 'printer_setup' %}" class="btn-subbar-pill no-print">
+  <i class="bi bi-printer me-1"></i>Printers
+</a>
+{% endblock %}
+
+{% block header_notifications %}
+{% include "core/_notif_badges_luxury.html" %}
 {% endblock %}
 
 {% block content %}
-<div class="page-body">
-    <p class="page-eyebrow">Configuration</p>
-    <h1 class="page-title">Outlet Settings</h1>
-    <div class="divider"></div>
+<!-- Sub-Header Bar (KimiPoS POS Style) -->
+<div class="pos-subbar">
+  <div>
+    <h1 class="pos-subbar-title">
+      <i class="bi bi-shop-window" style="color:var(--pos-red);"></i>
+      Outlet &amp; Branch Settings
+    </h1>
+    <div class="pos-breadcrumbs">
+      <a href="/dashboard/"><i class="bi bi-house-door me-1"></i>Dashboard</a>
+      <i class="bi bi-chevron-right separator"></i>
+      <a href="{% url 'setup_wizard' %}">Setup</a>
+      <i class="bi bi-chevron-right separator"></i>
+      <span class="current">Outlet Settings</span>
+    </div>
+  </div>
+  <div class="d-flex align-items-center gap-2 flex-wrap">
+    <a href="{% url 'setup_wizard' %}" class="btn-subbar-pill no-print">
+      <i class="bi bi-gear"></i> Setup Hub
+    </a>
+    <a href="{% url 'printer_setup' %}" class="btn-subbar-pill no-print">
+      <i class="bi bi-printer"></i> Printers
+    </a>
+    <button type="button" onclick="document.getElementById('saveBtn').click()" class="btn-subbar-save no-print">
+      <i class="bi bi-check2-circle"></i> Save Settings
+    </button>
+  </div>
+</div>
 
-    {% if messages %}
+<div class="outlet-wrap">
+
+  <!-- 4 Hero Overview Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-branch">
+        <div class="kpi-info">
+          <div class="kpi-label">Active Outlet</div>
+          <div class="kpi-val">{{ outlet.name }}</div>
+          <div class="kpi-sub">Primary operating branch</div>
+        </div>
+        <div class="kpi-icon-wrap icon-branch">
+          <i class="bi bi-building"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-legal">
+        <div class="kpi-info">
+          <div class="kpi-label">Tax Compliance</div>
+          <div class="kpi-val">
+            {% if outlet.gst_no %}{{ outlet.gst_no|slice:":7" }}…{% else %}Setup Needed{% endif %}
+          </div>
+          <div class="kpi-sub">
+            {% if outlet.gst_no %}GSTIN registered{% else %}Add GSTIN below{% endif %}
+          </div>
+        </div>
+        <div class="kpi-icon-wrap icon-legal">
+          <i class="bi bi-shield-check"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-tax">
+        <div class="kpi-info">
+          <div class="kpi-label">Pricing System</div>
+          <div class="kpi-val">
+            {% if outlet.gst_inclusive %}Inclusive{% else %}Exclusive{% endif %}
+          </div>
+          <div class="kpi-sub">Tax calculation on menu items</div>
+        </div>
+        <div class="kpi-icon-wrap icon-tax">
+          <i class="bi bi-receipt"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-printer">
+        <div class="kpi-info">
+          <div class="kpi-label">Thermal Hardware</div>
+          <div class="kpi-val">
+            {% if outlet.printer_mac %}{{ outlet.paper_width_mm }}mm Bill{% else %}No Printer{% endif %}
+          </div>
+          <div class="kpi-sub">
+            {% if outlet.printer_mac %}{{ outlet.agent_host|default:"Active" }}{% else %}Click to configure{% endif %}
+          </div>
+        </div>
+        <div class="kpi-icon-wrap icon-printer">
+          <i class="bi bi-printer"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if messages %}
     {% for message in messages %}
-    <div class="alert {% if 'success' in message.tags %}alert-success{% elif 'error' in message.tags %}alert-error{% endif %}">
-        {{ message }}
+    <div class="flash-alert {% if 'success' in message.tags %}flash-success{% else %}flash-error{% endif %}">
+      <i class="bi {% if 'success' in message.tags %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %}"></i>
+      <span>{{ message }}</span>
     </div>
     {% endfor %}
-    {% endif %}
+  {% endif %}
 
-    <form method="post" enctype="multipart/form-data" id="settingsForm">
-        {% csrf_token %}
+  <form method="post" enctype="multipart/form-data" id="settingsForm">
+    {% csrf_token %}
 
-        <!-- Identity -->
-        <div class="settings-section">
-            <div class="section-header">
-                <i class="bi bi-shop section-icon"></i>
-                <span class="section-title">Restaurant Identity</span>
-            </div>
-            <div class="section-body">
-                <div class="logo-preview">
-                    {% if tenant.logo %}
-                    <img src="{{ tenant.logo.url }}" class="logo-img" id="logoPreview" alt="Logo">
-                    {% else %}
-                    <div class="logo-placeholder" id="logoPreview"><i class="bi bi-image"></i></div>
-                    {% endif %}
-                    <div class="logo-info">
-                        <strong style="color:var(--text-main);font-size:0.8rem;">Restaurant Logo</strong><br>
-                        Appears on printed bills and digital receipts.<br>
-                        PNG or JPG, max 2 MB recommended.
-                    </div>
-                </div>
-                <div class="field-row">
-                    <label class="field-label">Upload New Logo</label>
-                    <input type="file" name="logo" accept="image/*" class="field-input" style="font-size:0.82rem;" onchange="previewLogo(this)">
-                </div>
-                <div class="two-col">
-                    <div class="field-row">
-                        <label class="field-label" for="outlet_name">Outlet / Branch Name</label>
-                        <input type="text" id="outlet_name" name="outlet_name" class="field-input" value="{{ outlet.name }}" placeholder="e.g. Main Branch">
-                    </div>
-                    <div class="field-row">
-                        <label class="field-label">Restaurant Brand Name</label>
-                        <input type="text" class="field-input" value="{{ tenant.name }}" disabled title="Change from Django admin" style="opacity:0.5;cursor:not-allowed;">
-                        <div class="field-hint">Contact support to change brand name</div>
-                    </div>
-                </div>
-                <div class="field-row">
-                    <label class="field-label" for="address">Full Address</label>
-                    <textarea id="address" name="address" class="field-textarea" placeholder="Street, Area, City, PIN">{{ outlet.address }}</textarea>
-                    <div class="field-hint">Printed on every bill. Keep it complete.</div>
-                </div>
-            </div>
+    <!-- Section 1: Restaurant Identity & Brand Logo -->
+    <div class="settings-card">
+      <div class="settings-card-header">
+        <div class="settings-card-icon" style="background:var(--pos-red-soft);color:var(--pos-red);">
+          <i class="bi bi-shop"></i>
         </div>
-
-        <!-- Contact -->
-        <div class="settings-section">
-            <div class="section-header">
-                <i class="bi bi-telephone section-icon"></i>
-                <span class="section-title">Contact Details</span>
-            </div>
-            <div class="section-body">
-                <div class="two-col">
-                    <div class="field-row">
-                        <label class="field-label" for="phone">Phone Number</label>
-                        <input type="tel" id="phone" name="phone" class="field-input" value="{{ outlet.phone|default:'' }}" placeholder="+91 98765 43210">
-                    </div>
-                    <div class="field-row">
-                        <label class="field-label" for="whatsapp_no">WhatsApp Number</label>
-                        <input type="tel" id="whatsapp_no" name="whatsapp_no" class="field-input" value="{{ outlet.whatsapp_no|default:outlet.phone|default:'' }}" placeholder="+91 98765 43210">
-                        <div class="field-hint">Used to send digital bills via WhatsApp</div>
-                    </div>
-                </div>
-                <div class="field-row">
-                    <label class="field-label" for="email">Email Address</label>
-                    <input type="email" id="email" name="email" class="field-input" value="{{ outlet.email|default:'' }}" placeholder="restaurant@example.com">
-                    <div class="field-hint">For bill emails and system notifications</div>
-                </div>
-            </div>
+        <div>
+          <h2 class="settings-card-title">Restaurant Identity &amp; Branding</h2>
+          <div class="settings-card-subtitle">Brand imagery and contact information printed on guest bills</div>
         </div>
+      </div>
 
-        <!-- Compliance -->
-        <div class="settings-section">
-            <div class="section-header">
-                <i class="bi bi-shield-check section-icon"></i>
-                <span class="section-title">Legal &amp; Compliance</span>
-            </div>
-            <div class="section-body">
-                <div class="compliance-note">
-                    <strong>Required for GST-compliant bills.</strong> These numbers are printed on every invoice.
-                    A missing GSTIN means every printed bill is technically non-compliant under Indian tax law.
-                </div>
-                <div class="two-col">
-                    <div class="field-row">
-                        <label class="field-label" for="gst_no">GSTIN</label>
-                        <input type="text" id="gst_no" name="gst_no" class="field-input field-mono" value="{{ outlet.gst_no|default:'' }}" maxlength="15" placeholder="27AABCU9603R1ZX" oninput="this.value = this.value.toUpperCase()">
-                        <div class="field-hint">15-character GST Identification Number</div>
-                    </div>
-                    <div class="field-row">
-                        <label class="field-label" for="fssai_no">FSSAI License No.</label>
-                        <input type="text" id="fssai_no" name="fssai_no" class="field-input field-mono" value="{{ outlet.fssai_no|default:'' }}" maxlength="14" placeholder="12345678901234">
-                        <div class="field-hint">14-digit FSSAI license number</div>
-                    </div>
-                    <div class="field-row">
-                        <label class="field-label" for="sac_code">SAC Code <span style="font-size:0.7rem;color:var(--accent-gold);font-weight:400;">(GST — printed on every bill)</span></label>
-                        <input type="text" id="sac_code" name="sac_code" class="field-input field-mono" value="{{ outlet.sac_code|default:'996331' }}" maxlength="8" placeholder="996331">
-                        <div class="field-hint">
-                            Services Accounting Code under GST.
-                            <strong>996331</strong> = Restaurant / café / QSR / food court (correct for most restaurants) &nbsp;·&nbsp;
-                            <strong>996332</strong> = Delivery / cloud kitchen &nbsp;·&nbsp;
-                            <strong>996334</strong> = Catering.
-                            Leave as 996331 unless your CA specifies otherwise.
-                        </div>
-                    </div>
-
-                    <div class="field-row" style="margin-top:1.25rem;">
-                        <label class="field-label">GST Pricing Mode</label>
-                        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-top:0.25rem;">
-                            <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
-                                <input type="radio" name="gst_inclusive" value="false"
-                                    {% if not outlet.gst_inclusive %}checked{% endif %}
-                                    style="margin-top:3px;accent-color:var(--accent-gold);">
-                                <div>
-                                    <div style="font-weight:600;font-size:0.88rem;">GST Exclusive <span style="font-weight:400;color:var(--text-muted);">(default)</span></div>
-                                    <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">
-                                        Menu prices are base prices. GST is added on top at billing.<br>
-                                        <em>Example: Coffee ₹23.81 + GST (5%) ₹1.19 = <strong>Total ₹25</strong></em><br>
-                                        Used by: fine dining, hotels, formal restaurants.
-                                    </div>
-                                </div>
-                            </label>
-                            <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
-                                <input type="radio" name="gst_inclusive" value="true"
-                                    {% if outlet.gst_inclusive %}checked{% endif %}
-                                    style="margin-top:3px;accent-color:var(--accent-gold);">
-                                <div>
-                                    <div style="font-weight:600;font-size:0.88rem;">GST Inclusive <span style="font-size:0.72rem;color:#10b981;background:rgba(16,185,129,.1);padding:1px 6px;border-radius:3px;">Recommended for QSR & Café</span></div>
-                                    <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">
-                                        Menu prices already include GST. Customer pays exactly the listed price.<br>
-                                        <em>Example: Coffee ₹25 (GST ₹1.19 included) = <strong>Total ₹25</strong></em><br>
-                                        Used by: QSR counters, cafés, Zomato/Swiggy restaurants.
-                                    </div>
-                                </div>
-                            </label>
-                        </div>
-                        <div class="field-hint" style="margin-top:0.75rem;">
-                            <strong>Changing this mid-operation:</strong> affects all new orders immediately.
-                            Existing closed orders are not affected. Consult your CA if changing after go-live.
-                        </div>
-                    </div>
-
-                    <!-- ── Parcel Charge (gated: parcel_charge feature) ── -->
-                    {% if 'parcel_charge' in tenant_features %}
-                    <div class="field-row" style="margin-top:1.25rem;">
-                        <label class="field-label" for="parcel_charge_amount">
-                            Parcel / Takeaway Charge
-                            <span style="font-size:0.7rem;color:var(--text-muted);font-weight:400;margin-left:6px;">optional</span>
-                        </label>
-                        <div style="display:flex;align-items:center;gap:0.6rem;margin-top:0.4rem;">
-                            <span style="font-size:1rem;font-weight:600;color:var(--text-muted);">₹</span>
-                            <input type="number" id="parcel_charge_amount" name="parcel_charge_amount"
-                                class="field-input" style="max-width:120px;"
-                                value="{{ outlet.parcel_charge_amount|default:0 }}"
-                                min="0" max="999" step="1" placeholder="0">
-                        </div>
-                        <div class="field-hint">
-                            Extra charge for parcel/takeaway orders. Set to 0 to disable.
-                            Cashier taps a button on the billing screen to add it per order.
-                            Appears as a separate line on the bill.
-                        </div>
-                    </div>
-
-                    {% endif %}{# parcel_charge #}
-
-                    <!-- ── Central Kitchen (gated: central_kitchen feature) ── -->
-                    {% if 'central_kitchen' in tenant_features %}
-                    <div class="field-row" style="margin-top:1.25rem;">
-                        <label class="field-label">Central Kitchen</label>
-                        <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-top:0.4rem;padding:0.9rem;border:1.5px solid var(--border-color);transition:border-color 0.15s;" id="ck-box">
-                            <input type="checkbox" name="is_central_kitchen" value="true"
-                                {% if outlet.is_central_kitchen %}checked{% endif %}
-                                style="margin-top:3px;accent-color:var(--accent-gold);width:16px;height:16px;flex-shrink:0;"
-                                onchange="toggleCentralKitchen(this)">
-                            <div>
-                                <div style="font-weight:600;font-size:0.88rem;">This outlet is the Central Kitchen</div>
-                                <div style="font-size:0.78rem;color:var(--text-muted);margin-top:3px;">
-                                    Other outlets' stock requisitions route here first, if this
-                                    outlet has enough stock, before falling back to a vendor.<br>
-                                    Only one outlet per tenant should have this checked.
-                                </div>
-                            </div>
-                        </label>
-                    </div>
-                    {% endif %}
-
-                    <!-- ── Vendor Email (permission gate, not a feature — every outlet gets the choice) ── -->
-                    <div class="field-row" style="margin-top:1.25rem;">
-                        <label class="field-label">Purchase Order Emails</label>
-                        <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-top:0.4rem;padding:0.9rem;border:1.5px solid var(--border-color);transition:border-color 0.15s;" id="po-email-box">
-                            <input type="checkbox" name="po_vendor_email_enabled" value="true"
-                                {% if outlet.po_vendor_email_enabled %}checked{% endif %}
-                                style="margin-top:3px;accent-color:var(--accent-gold);width:16px;height:16px;flex-shrink:0;"
-                                onchange="togglePoEmail(this)">
-                            <div>
-                                <div style="font-weight:600;font-size:0.88rem;">Email purchase orders to vendors automatically</div>
-                                <div style="font-size:0.78rem;color:var(--text-muted);margin-top:3px;">
-                                    When a manager marks a purchase order as ordered, a PDF copy is
-                                    emailed to the vendor automatically, if the vendor has an email
-                                    on file. Off by default — nothing is sent on your behalf until
-                                    you turn this on.
-                                </div>
-                            </div>
-                        </label>
-                    </div>
-
-                    <!-- ── Composition Scheme (gated: composition_scheme feature) ── -->
-                    {% if 'composition_scheme' in tenant_features %}
-                    <div class="field-row" style="margin-top:1.25rem;">
-                        <label class="field-label">GST Registration Type</label>
-                        <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-top:0.4rem;padding:0.9rem;border:1.5px solid var(--border-color);transition:border-color 0.15s;" id="comp-scheme-box">
-                            <input type="checkbox" name="is_composition_scheme" value="true"
-                                {% if outlet.is_composition_scheme %}checked{% endif %}
-                                style="margin-top:3px;accent-color:var(--accent-gold);width:16px;height:16px;flex-shrink:0;"
-                                onchange="toggleCompScheme(this)">
-                            <div>
-                                <div style="font-weight:600;font-size:0.88rem;">Composition Scheme <span style="font-size:0.7rem;color:var(--accent-gold);background:rgba(236, 39, 52,0.1);padding:1px 6px;border-radius:3px;">COT</span></div>
-                                <div style="font-size:0.78rem;color:var(--text-muted);margin-top:3px;">
-                                    Bills will show <strong>Bill of Supply</strong> instead of Tax Invoice.<br>
-                                    No CGST/SGST lines on the printed bill.<br>
-                                    Legal note included in CSV exports for your CA.
-                                </div>
-                            </div>
-                        </label>
-                    </div>
-
-                    {% endif %}{# composition_scheme #}
-
-                    <!-- ── Union Territory ── -->
-                    <div class="field-row" style="margin-top:1.25rem;">
-                        <label class="field-label">GST Jurisdiction</label>
-                        {% if outlet.uses_utgst and outlet.gst_no %}
-                        {# Auto-detected from GSTIN — show read-only badge, hide toggle #}
-                        <div style="margin-top:0.4rem;padding:0.9rem;border:1.5px solid #10b981;background:rgba(16,185,129,0.05);">
-                            <div style="display:flex;align-items:center;gap:8px;">
-                                <span style="font-size:0.75rem;background:#10b981;color:#fff;padding:2px 8px;border-radius:3px;font-weight:600;letter-spacing:1px;">AUTO</span>
-                                <span style="font-weight:600;font-size:0.88rem;">Union Territory detected</span>
-                            </div>
-                            <div style="font-size:0.78rem;color:var(--text-muted);margin-top:4px;">
-                                GSTIN prefix <strong>{{ outlet.gst_no|slice:":2" }}</strong> identifies this outlet as a Union Territory.
-                                Invoices will show <strong>UTGST</strong> automatically. No manual override needed.
-                            </div>
-                            <input type="hidden" name="is_union_territory" value="true">
-                        </div>
-                        {% else %}
-                        <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-top:0.4rem;padding:0.9rem;border:1.5px solid var(--border-color);transition:border-color 0.15s;">
-                            <input type="checkbox" name="is_union_territory" value="true"
-                                {% if outlet.is_union_territory %}checked{% endif %}
-                                style="margin-top:3px;accent-color:var(--accent-gold);width:16px;height:16px;flex-shrink:0;">
-                            <div>
-                                <div style="font-weight:600;font-size:0.88rem;">Union Territory <span style="font-size:0.7rem;color:var(--text-muted);font-weight:400;">(manual — add GSTIN above for auto-detection)</span></div>
-                                <div style="font-size:0.78rem;color:var(--text-muted);margin-top:3px;">
-                                    Enable for outlets in Delhi, J&amp;K, Chandigarh, Puducherry, Daman &amp; Diu, etc.
-                                    Invoices will show <strong>UTGST</strong> instead of SGST as required by GST law.
-                                </div>
-                            </div>
-                        </label>
-                        {% endif %}
-                    </div>
-
-                    <!-- ── Counter Billing (gated: counter_billing feature) ── -->
-                    {% if 'counter_billing' in tenant_features %}
-                    <div class="field-row" style="margin-top:1.25rem;">
-                        <label class="field-label">Billing Mode</label>
-                        <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-top:0.4rem;padding:0.9rem;border:1.5px solid var(--border-color);transition:border-color 0.15s;" id="split-bill-box">
-                            <input type="checkbox" name="split_bill_by_category" value="true"
-                                {% if outlet.split_bill_by_category %}checked{% endif %}
-                                style="margin-top:3px;accent-color:var(--accent-gold);width:16px;height:16px;flex-shrink:0;"
-                                onchange="toggleSplitBill(this)">
-                            <div>
-                                <div style="font-weight:600;font-size:0.88rem;">Counter Billing Mode <span style="font-size:0.7rem;color:#6366f1;background:rgba(99,102,241,0.1);padding:1px 6px;border-radius:3px;">Food Court</span></div>
-                                <div style="font-size:0.78rem;color:var(--text-muted);margin-top:3px;">
-                                    After payment, prints <strong>one slip per category</strong> (Breakfast, Juice, Tea…).<br>
-                                    Customer carries each slip to the relevant counter.<br>
-                                    Ideal for hotels and food courts with multiple food sections.
-                                </div>
-                            </div>
-                        </label>
-                    </div>
-                    {% endif %}{# counter_billing #}
-
-                </div>
-            </div>
+      <!-- Logo Preview & Upload -->
+      <div class="logo-upload-wrap">
+        <div class="logo-preview-box">
+          {% if tenant.logo %}
+            <img src="{{ tenant.logo.url }}" class="logo-preview-img" id="logoPreview" alt="Logo">
+          {% else %}
+            <div id="logoPreview" style="color:var(--text-muted);font-size:1.8rem;"><i class="bi bi-image"></i></div>
+          {% endif %}
         </div>
-
-        <!-- Operating Hours -->
-        <div class="settings-section">
-            <div class="section-header">
-                <i class="bi bi-clock section-icon"></i>
-                <span class="section-title">Operating Hours</span>
-            </div>
-            <div class="section-body">
-                <div class="compliance-note">
-                    <strong>Used for overtime matching.</strong> Staff shifts are compared against these hours to detect early clock-ins or late finishes. Also shown to guests on the digital menu.
-                </div>
-                <div class="two-col">
-                    <div class="field-row">
-                        <label class="field-label" for="opening_time">Opening Time</label>
-                        <input type="time" id="opening_time" name="opening_time" class="field-input" value="{{ outlet.opening_time|default:'' }}">
-                        <div class="field-hint">e.g. 11:00 AM</div>
-                    </div>
-                    <div class="field-row">
-                        <label class="field-label" for="closing_time">Closing Time</label>
-                        <input type="time" id="closing_time" name="closing_time" class="field-input" value="{{ outlet.closing_time|default:'' }}">
-                        <div class="field-hint">For late-night outlets, set past midnight (e.g. 01:00)</div>
-                    </div>
-                </div>
-            </div>
+        <div class="flex-1">
+          <div style="font-weight:800;font-size:0.92rem;color:var(--text-main);font-family:var(--font-main, 'Outfit', sans-serif);">
+            Restaurant Brand Logo
+          </div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin:2px 0 8px;">
+            Appears on thermal receipts, digital invoices, and QR menus (PNG or JPG recommended).
+          </div>
+          <label class="btn-upload-logo">
+            <i class="bi bi-cloud-arrow-up-fill"></i> Upload New Logo
+            <input type="file" name="logo" accept="image/*" style="display:none;" onchange="previewLogo(this)">
+          </label>
         </div>
+      </div>
 
-        <!-- Printer -->
-        <div class="settings-section">
-            <div class="section-header">
-                <i class="bi bi-printer section-icon"></i>
-                <span class="section-title">Thermal Printer</span>
-            </div>
-            <div class="section-body" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
-                <div>
-                    {% if outlet.printer_mac %}
-                    <div style="font-size:0.88rem;font-weight:600;color:var(--text-main);">
-                        <i class="bi bi-check-circle-fill me-2" style="color:#22c55e;"></i>Printer configured
-                    </div>
-                    <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;font-family:'Space Mono',monospace;">
-                        {{ outlet.printer_mac }} &nbsp;·&nbsp; {{ outlet.paper_width_mm }}mm &nbsp;·&nbsp; {{ outlet.agent_host }}
-                    </div>
-                    {% else %}
-                    <div style="font-size:0.88rem;color:var(--text-muted);">
-                        <i class="bi bi-exclamation-circle me-2" style="color:var(--accent-gold);"></i>No printer configured yet
-                    </div>
-                    {% endif %}
-                </div>
-                <a href="{% url 'printer_setup' %}" class="btn-luxury text-decoration-none" style="white-space:nowrap;">
-                    <i class="bi bi-printer me-2"></i>{% if outlet.printer_mac %}Edit Printer Setup{% else %}Set Up Printer{% endif %}
-                </a>
-            </div>
+      <div class="two-col">
+        <div class="field-row">
+          <label class="field-label" for="outlet_name">Outlet / Branch Name</label>
+          <input type="text" id="outlet_name" name="outlet_name" class="field-input" value="{{ outlet.name }}" placeholder="e.g. Main Dining / Downtown Branch">
+          <div class="field-hint">Differentiates this location in multi-outlet reports.</div>
         </div>
-
-        <!-- Promo Campaigns -->
-        <div class="settings-section">
-            <div class="section-header">
-                <i class="bi bi-lightning-charge section-icon"></i>
-                <span class="section-title">Promo Campaigns</span>
-            </div>
-            <div class="section-body">
-                <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:1.5rem;line-height:1.6;">
-                    Manage your discounts, usage caps, and all-outlet broadcasting from the central campaign dashboard.
-                </p>
-                <a href="{% url 'setup_promos' %}" class="btn-luxury text-decoration-none" style="background:var(--accent-gold);color:#fff;border-color:var(--accent-gold);padding:0.8rem 1.2rem;">
-                    <i class="bi bi-gear-fill me-1"></i> Go to Promo Dashboard
-                </a>
-            </div>
+        <div class="field-row">
+          <label class="field-label">Parent Restaurant Group</label>
+          <input type="text" class="field-input" value="{{ tenant.name }}" disabled style="opacity:0.6;cursor:not-allowed;">
+          <div class="field-hint">Contact administration to update the group name.</div>
         </div>
+      </div>
 
-        <button type="submit" class="btn-save" id="saveBtn">
-            <i class="bi bi-check2-circle me-2"></i>Save Outlet Details
-        </button>
-    </form>
+      <div class="field-row">
+        <label class="field-label" for="address">Full Restaurant Address</label>
+        <textarea id="address" name="address" class="field-textarea" placeholder="Door No, Street, Landmark, City, State, PIN Code">{{ outlet.address }}</textarea>
+        <div class="field-hint">Printed on all customer invoices and delivery bills.</div>
+      </div>
+    </div>
+
+    <!-- Section 2: Communication & Digital Receipts -->
+    <div class="settings-card">
+      <div class="settings-card-header">
+        <div class="settings-card-icon" style="background:var(--pos-blue-soft);color:var(--pos-blue);">
+          <i class="bi bi-telephone-fill"></i>
+        </div>
+        <div>
+          <h2 class="settings-card-title">Communication &amp; Digital Receipts</h2>
+          <div class="settings-card-subtitle">Customer service numbers and automated WhatsApp dispatching</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="field-row">
+          <label class="field-label" for="phone">Outlet Calling Phone</label>
+          <input type="tel" id="phone" name="phone" class="field-input" value="{{ outlet.phone|default:'' }}" placeholder="+91 98765 43210">
+          <div class="field-hint">Guest inquiry number printed on bill headers.</div>
+        </div>
+        <div class="field-row">
+          <label class="field-label" for="whatsapp_no">WhatsApp Receipt Number</label>
+          <input type="tel" id="whatsapp_no" name="whatsapp_no" class="field-input" value="{{ outlet.whatsapp_no|default:outlet.phone|default:'' }}" placeholder="+91 98765 43210">
+          <div class="field-hint">Used for sending digital invoices and order links.</div>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <label class="field-label" for="email">Official Email Address</label>
+        <input type="email" id="email" name="email" class="field-input" value="{{ outlet.email|default:'' }}" placeholder="billing@restaurant.com">
+        <div class="field-hint">Receives day-end sales summaries and manager notifications.</div>
+      </div>
+    </div>
+
+    <!-- Section 3: Legal, GST & Tax Compliance -->
+    <div class="settings-card">
+      <div class="settings-card-header">
+        <div class="settings-card-icon" style="background:var(--pos-green-soft);color:var(--pos-green);">
+          <i class="bi bi-shield-check"></i>
+        </div>
+        <div>
+          <h2 class="settings-card-title">Legal &amp; Tax Compliance</h2>
+          <div class="settings-card-subtitle">Statutory registration numbers and Indian GST billing rules</div>
+        </div>
+      </div>
+
+      <div class="compliance-alert">
+        <i class="bi bi-info-circle-fill text-warning mt-1" style="font-size:1.1rem;"></i>
+        <div>
+          <strong>Essential for GST Invoicing:</strong> GSTIN and FSSAI license numbers appear on every printed customer receipt. Correct details ensure full compliance under Indian restaurant tax regulations.
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="field-row">
+          <label class="field-label" for="gst_no">GST Identification Number (GSTIN)</label>
+          <input type="text" id="gst_no" name="gst_no" class="field-input field-mono" value="{{ outlet.gst_no|default:'' }}" maxlength="15" placeholder="27AABCU9603R1ZX" oninput="this.value = this.value.toUpperCase()">
+          <div class="field-hint">15-character alphanumeric GSTIN.</div>
+        </div>
+        <div class="field-row">
+          <label class="field-label" for="fssai_no">FSSAI Food License Number</label>
+          <input type="text" id="fssai_no" name="fssai_no" class="field-input field-mono" value="{{ outlet.fssai_no|default:'' }}" maxlength="14" placeholder="12345678901234">
+          <div class="field-hint">14-digit state/central food safety license.</div>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <label class="field-label" for="sac_code">Services Accounting Code (SAC)</label>
+        <input type="text" id="sac_code" name="sac_code" class="field-input field-mono" value="{{ outlet.sac_code|default:'996331' }}" maxlength="8" placeholder="996331">
+        <div class="field-hint">
+          <strong>996331</strong> (Dine-in / Café / QSR) &nbsp;·&nbsp;
+          <strong>996332</strong> (Cloud Kitchen / Delivery) &nbsp;·&nbsp;
+          <strong>996334</strong> (Catering). Keep <strong>996331</strong> unless your tax advisor advises otherwise.
+        </div>
+      </div>
+
+      <!-- GST Pricing Mode -->
+      <div class="field-row mt-4">
+        <label class="field-label">Menu Tax Pricing Mode</label>
+        
+        <label class="choice-card {% if not outlet.gst_inclusive %}active{% endif %}">
+          <input type="radio" name="gst_inclusive" value="false" class="choice-input" {% if not outlet.gst_inclusive %}checked{% endif %}>
+          <div>
+            <div class="choice-title">
+              <span>GST Exclusive (Base + Tax)</span>
+              <span class="badge bg-secondary-subtle text-secondary border ms-1" style="font-size:0.65rem;">Default</span>
+            </div>
+            <div class="choice-desc">
+              Menu item prices are base prices. CGST and SGST (or UTGST) are calculated and added on top at checkout.<br>
+              <em>Example: Item ₹100 + 5% GST (₹5) = <strong>Total ₹105</strong>. Standard for dine-in and fine dining.</em>
+            </div>
+          </div>
+        </label>
+
+        <label class="choice-card {% if outlet.gst_inclusive %}active{% endif %}">
+          <input type="radio" name="gst_inclusive" value="true" class="choice-input" {% if outlet.gst_inclusive %}checked{% endif %}>
+          <div>
+            <div class="choice-title">
+              <span>GST Inclusive (All-Inclusive)</span>
+              <span class="badge bg-success-subtle text-success border border-success-subtle ms-1" style="font-size:0.65rem;">Recommended for QSR &amp; Café</span>
+            </div>
+            <div class="choice-desc">
+              The listed menu price already includes all taxes. The guest pays the exact round figure displayed.<br>
+              <em>Example: Item ₹100 (contains ₹4.76 GST inside) = <strong>Total ₹100</strong>. Ideal for fast checkout counters.</em>
+            </div>
+          </div>
+        </label>
+      </div>
+
+      <!-- Gated Features & Advanced Checkboxes -->
+      {% if 'parcel_charge' in tenant_features %}
+      <div class="field-row mt-3">
+        <label class="field-label" for="parcel_charge_amount">Takeaway / Parcel Packaging Charge</label>
+        <div style="display:flex;align-items:center;gap:8px;max-width:180px;">
+          <span style="font-size:1.1rem;font-weight:700;color:var(--text-main);">₹</span>
+          <input type="number" id="parcel_charge_amount" name="parcel_charge_amount" class="field-input" value="{{ outlet.parcel_charge_amount|default:0 }}" min="0" max="999" step="1">
+        </div>
+        <div class="field-hint">Default packaging fee added on takeaway orders. Set to 0 to disable.</div>
+      </div>
+      {% endif %}
+
+      {% if 'central_kitchen' in tenant_features %}
+      <div class="field-row mt-3">
+        <label class="choice-card" id="ck-box">
+          <input type="checkbox" name="is_central_kitchen" value="true" class="choice-input" {% if outlet.is_central_kitchen %}checked{% endif %} onchange="toggleCentralKitchen(this)">
+          <div>
+            <div class="choice-title"><i class="bi bi-box-seam me-1 text-primary"></i>Central Production Kitchen</div>
+            <div class="choice-desc">Identifies this outlet as the central commissary hub supplying stock requisitions to other branches.</div>
+          </div>
+        </label>
+      </div>
+      {% endif %}
+
+      <!-- Purchase Orders Vendor Email -->
+      <div class="field-row mt-3">
+        <label class="choice-card" id="po-email-box">
+          <input type="checkbox" name="po_vendor_email_enabled" value="true" class="choice-input" {% if outlet.po_vendor_email_enabled %}checked{% endif %} onchange="togglePoEmail(this)">
+          <div>
+            <div class="choice-title"><i class="bi bi-envelope-check me-1 text-success"></i>Automated Vendor Purchase Orders</div>
+            <div class="choice-desc">Automatically emails a generated purchase order PDF to the supplier whenever a manager approves stock procurement.</div>
+          </div>
+        </label>
+      </div>
+
+      {% if 'composition_scheme' in tenant_features %}
+      <div class="field-row mt-3">
+        <label class="choice-card" id="comp-scheme-box">
+          <input type="checkbox" name="is_composition_scheme" value="true" class="choice-input" {% if outlet.is_composition_scheme %}checked{% endif %} onchange="toggleCompScheme(this)">
+          <div>
+            <div class="choice-title">
+              <span>GST Composition Dealer (COT)</span>
+              <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle ms-1" style="font-size:0.65rem;">Bill of Supply</span>
+            </div>
+            <div class="choice-desc">Prints "Bill of Supply" instead of Tax Invoice. Hides separate CGST/SGST tax breakups on printed guest slips.</div>
+          </div>
+        </label>
+      </div>
+      {% endif %}
+
+      <!-- Union Territory -->
+      <div class="field-row mt-3">
+        {% if outlet.uses_utgst and outlet.gst_no %}
+        <div style="padding:1rem 1.25rem;border-radius:16px;border:1.5px solid var(--pos-green-border);background:var(--pos-green-soft);display:flex;align-items:center;gap:12px;">
+          <span class="badge bg-success text-white">AUTO-DETECTED</span>
+          <div style="font-size:0.85rem;color:var(--text-main);">
+            Union Territory jurisdiction confirmed by GSTIN prefix <strong>{{ outlet.gst_no|slice:":2" }}</strong>. Invoices automatically apply <strong>UTGST</strong>.
+          </div>
+          <input type="hidden" name="is_union_territory" value="true">
+        </div>
+        {% else %}
+        <label class="choice-card">
+          <input type="checkbox" name="is_union_territory" value="true" class="choice-input" {% if outlet.is_union_territory %}checked{% endif %}>
+          <div>
+            <div class="choice-title">Union Territory (UTGST) Jurisdiction</div>
+            <div class="choice-desc">Manual override for restaurants in Delhi, Chandigarh, Puducherry, J&amp;K, and Ladakh to replace SGST with UTGST.</div>
+          </div>
+        </label>
+        {% endif %}
+      </div>
+
+      {% if 'counter_billing' in tenant_features %}
+      <div class="field-row mt-3">
+        <label class="choice-card" id="split-bill-box">
+          <input type="checkbox" name="split_bill_by_category" value="true" class="choice-input" {% if outlet.split_bill_by_category %}checked{% endif %} onchange="toggleSplitBill(this)">
+          <div>
+            <div class="choice-title">
+              <span>Food Court Multi-Counter Slip Splitting</span>
+              <span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-1" style="font-size:0.65rem;">Multi-Section</span>
+            </div>
+            <div class="choice-desc">Prints individual counter pickup tokens per category (e.g. Chaat, Beverages, Dosa) for customer redemption.</div>
+          </div>
+        </label>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <!-- Section 4: Operating Hours -->
+    <div class="settings-card">
+      <div class="settings-card-header">
+        <div class="settings-card-icon" style="background:var(--pos-amber-soft);color:var(--pos-amber);">
+          <i class="bi bi-clock-fill"></i>
+        </div>
+        <div>
+          <h2 class="settings-card-title">Business Operating Hours</h2>
+          <div class="settings-card-subtitle">Displayed on guest digital menus and used for staff overtime detection</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="field-row">
+          <label class="field-label" for="opening_time">Daily Opening Time</label>
+          <input type="time" id="opening_time" name="opening_time" class="field-input" value="{{ outlet.opening_time|default:'' }}">
+          <div class="field-hint">e.g. 11:00 AM</div>
+        </div>
+        <div class="field-row">
+          <label class="field-label" for="closing_time">Daily Closing Time</label>
+          <input type="time" id="closing_time" name="closing_time" class="field-input" value="{{ outlet.closing_time|default:'' }}">
+          <div class="field-hint">For past-midnight hours, enter late time (e.g. 01:00 AM).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 5: Hardware & Campaign Quick Links -->
+    <div class="settings-card">
+      <div class="settings-card-header">
+        <div class="settings-card-icon" style="background:var(--pos-purple-soft);color:var(--pos-purple);">
+          <i class="bi bi-cpu-fill"></i>
+        </div>
+        <div>
+          <h2 class="settings-card-title">Hardware &amp; Promotions Hub</h2>
+          <div class="settings-card-subtitle">Quick shortcuts to your receipt printers and promotional discount campaigns</div>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-12 col-md-6">
+          <div style="padding:1.25rem;border-radius:18px;border:1.5px solid var(--border-color);background:var(--panel-bg);height:100%;display:flex;flex-direction:column;justify-content:space-between;">
+            <div>
+              <div style="font-weight:800;font-size:0.95rem;color:var(--text-main);margin-bottom:0.35rem;">
+                <i class="bi bi-printer-fill text-danger me-1"></i> Thermal Receipt Printers
+              </div>
+              <div style="font-size:0.8rem;color:var(--text-muted);line-height:1.45;margin-bottom:1rem;">
+                {% if outlet.printer_mac %}
+                  Configured on {{ outlet.agent_host|default:"localhost" }} ({{ outlet.paper_width_mm }}mm width).
+                {% else %}
+                  Connect ESC/POS USB or LAN receipt printers for automated ticket dispatch.
+                {% endif %}
+              </div>
+            </div>
+            <a href="{% url 'printer_setup' %}" class="btn-subbar-pill" style="align-self:flex-start;">
+              <i class="bi bi-sliders"></i> {% if outlet.printer_mac %}Manage Printer Setup{% else %}Setup Printer{% endif %}
+            </a>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div style="padding:1.25rem;border-radius:18px;border:1.5px solid var(--border-color);background:var(--panel-bg);height:100%;display:flex;flex-direction:column;justify-content:space-between;">
+            <div>
+              <div style="font-weight:800;font-size:0.95rem;color:var(--text-main);margin-bottom:0.35rem;">
+                <i class="bi bi-tag-fill text-warning me-1"></i> Promo Discount Campaigns
+              </div>
+              <div style="font-size:0.8rem;color:var(--text-muted);line-height:1.45;margin-bottom:1rem;">
+                Create percentage coupons, seasonal offers, and order total discounts.
+              </div>
+            </div>
+            <a href="{% url 'setup_promos' %}" class="btn-subbar-pill" style="align-self:flex-start;">
+              <i class="bi bi-lightning-charge"></i> Open Promo Dashboard
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Submit Button -->
+    <div class="mt-4">
+      <button type="submit" class="btn-save-outlet" id="saveBtn">
+        <i class="bi bi-check2-circle" style="font-size:1.15rem;"></i> Save All Outlet Details
+      </button>
+    </div>
+
+  </form>
+
 </div>
 {% endblock %}
 
@@ -450,7 +946,7 @@
             } else {
                 const img = document.createElement("img");
                 img.src = e.target.result;
-                img.className = "logo-img";
+                img.className = "logo-preview-img";
                 img.id = "logoPreview";
                 img.alt = "Logo preview";
                 prev.replaceWith(img);
@@ -459,42 +955,63 @@
         reader.readAsDataURL(input.files[0]);
     }
 
-    document.getElementById("gst_no").addEventListener("blur", function() {
-        const v = this.value.trim();
-        this.style.borderBottomColor = (v && v.length !== 15) ? "#ef4444" : "";
-        this.title = (v && v.length !== 15) ? "GSTIN must be exactly 15 characters" : "";
-    });
+    // GSTIN auto uppercase and validation helper
+    const gstInput = document.getElementById("gst_no");
+    if (gstInput) {
+        gstInput.addEventListener("blur", function() {
+            const v = this.value.trim();
+            this.style.borderColor = (v && v.length !== 15) ? "#ef4444" : "";
+            this.title = (v && v.length !== 15) ? "GSTIN must be exactly 15 characters" : "";
+        });
+    }
 
-    document.getElementById("fssai_no").addEventListener("blur", function() {
-        const v = this.value.trim();
-        const invalid = v && (v.length !== 14 || !/^\d+$/.test(v));
-        this.style.borderBottomColor = invalid ? "#ef4444" : "";
-        this.title = invalid ? "FSSAI must be exactly 14 digits" : "";
-    });
+    // FSSAI license validation helper
+    const fssaiInput = document.getElementById("fssai_no");
+    if (fssaiInput) {
+        fssaiInput.addEventListener("blur", function() {
+            const v = this.value.trim();
+            const invalid = v && (v.length !== 14 || !/^\d+$/.test(v));
+            this.style.borderColor = invalid ? "#ef4444" : "";
+            this.title = invalid ? "FSSAI must be exactly 14 digits" : "";
+        });
+    }
 
+    // Settings form submit button loading state
     document.getElementById("settingsForm").addEventListener("submit", function() {
         const btn = document.getElementById("saveBtn");
         btn.disabled = true;
-        btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Saving...';
+        btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Saving Outlet Details...';
     });
 
+    // Toggle card visual states
     function toggleCentralKitchen(cb) {
-        document.getElementById('ck-box').style.borderColor =
-            cb.checked ? 'var(--accent-gold)' : 'var(--border-color)';
+        const box = document.getElementById('ck-box');
+        if (box) box.classList.toggle('active', cb.checked);
     }
     function togglePoEmail(cb) {
-        document.getElementById('po-email-box').style.borderColor =
-            cb.checked ? 'var(--accent-gold)' : 'var(--border-color)';
+        const box = document.getElementById('po-email-box');
+        if (box) box.classList.toggle('active', cb.checked);
     }
     function toggleCompScheme(cb) {
-        document.getElementById('comp-scheme-box').style.borderColor =
-            cb.checked ? 'var(--accent-gold)' : 'var(--border-color)';
+        const box = document.getElementById('comp-scheme-box');
+        if (box) box.classList.toggle('active', cb.checked);
     }
     function toggleSplitBill(cb) {
-        document.getElementById('split-bill-box').style.borderColor =
-            cb.checked ? '#6366f1' : 'var(--border-color)';
+        const box = document.getElementById('split-bill-box');
+        if (box) box.classList.toggle('active', cb.checked);
     }
-    // Set initial border state
+
+    // Sync radio card active styles
+    document.querySelectorAll('input[name="gst_inclusive"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.querySelectorAll('input[name="gst_inclusive"]').forEach(r => {
+                r.closest('.choice-card').classList.remove('active');
+            });
+            this.closest('.choice-card').classList.add('active');
+        });
+    });
+
+    // Set initial border states on DOM ready
     document.addEventListener('DOMContentLoaded', () => {
         const comp = document.querySelector('[name="is_composition_scheme"]');
         const split = document.querySelector('[name="split_bill_by_category"]');

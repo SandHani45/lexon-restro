@@ -14,10 +14,14 @@
     <style>html,body{background:#F7F7F9;height:100%;}</style>
     <title>{% block title %}{{ request.user.tenant.name|default:"EasyBillBro POS" }}{% endblock %}</title>
 
-    <!-- Favicon -->
+    <!-- Favicon & App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
     <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}">
-    <link rel="apple-touch-icon" href="{% static 'icon-512.svg' %}">
     <link rel="manifest" href="/manifest.json">
+
 
     <!-- Google Fonts — Outfit (body) · DM Serif Display (headings) · Space Mono (mono) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -251,6 +255,289 @@
         }
         @media (max-width: 480px) {
             .lux-toast.swal2-popup { min-width: 0; max-width: calc(100vw - 2rem); }
+        }
+
+        /* ===================================================
+           KIMIPOS LUXURY CONFIRMATION & ALERT POPUP SYSTEM
+           =================================================== */
+        .lux-confirm-backdrop.swal2-container {
+            backdrop-filter: blur(14px) saturate(170%) !important;
+            -webkit-backdrop-filter: blur(14px) saturate(170%) !important;
+            background: rgba(0, 0, 0, 0.75) !important;
+            z-index: 10500 !important;
+            padding: 1.25rem !important;
+        }
+
+        .lux-modal.swal2-popup {
+            background: var(--panel-bg, #161922) !important;
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12)) !important;
+            border-radius: 28px !important;
+            box-shadow: 0 32px 84px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+            padding: 2.25rem 2rem 2rem !important;
+            max-width: 440px !important;
+            width: 100% !important;
+            color: var(--text-main, #ffffff) !important;
+            font-family: var(--font-main, 'Outfit', sans-serif) !important;
+            text-align: center !important;
+            position: relative !important;
+            overflow: hidden !important;
+            animation: luxModalEnter 0.28s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+        }
+
+        @keyframes luxModalEnter {
+            0% {
+                opacity: 0;
+                transform: scale(0.92) translateY(16px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* Ambient Top Glow Line */
+        .lux-modal.swal2-popup::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 20%;
+            right: 20%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--pos-red, #EC2734), transparent);
+            border-radius: 999px;
+            opacity: 0.8;
+        }
+
+        /* Squircle Icon Badge */
+        .lux-modal .swal2-icon.lux-modal-icon {
+            width: 72px !important;
+            height: 72px !important;
+            min-width: 72px !important;
+            border-radius: 24px !important;
+            margin: 0 auto 1.25rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border: 1.5px solid transparent !important;
+            font-size: 2rem !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25) !important;
+            position: relative !important;
+        }
+
+        .lux-modal .swal2-icon.lux-icon-warning,
+        .lux-modal .swal2-icon.swal2-warning {
+            border-color: rgba(236, 39, 52, 0.35) !important;
+            background: rgba(236, 39, 52, 0.12) !important;
+            color: var(--pos-red, #EC2734) !important;
+        }
+        .lux-modal .swal2-icon.lux-icon-warning .swal2-icon-content {
+            color: var(--pos-red, #EC2734) !important;
+            font-weight: 800 !important;
+        }
+
+        .lux-modal .swal2-icon.lux-icon-error,
+        .lux-modal .swal2-icon.swal2-error {
+            border-color: rgba(239, 68, 68, 0.35) !important;
+            background: rgba(239, 68, 68, 0.14) !important;
+            color: #ef4444 !important;
+        }
+
+        .lux-modal .swal2-icon.lux-icon-success,
+        .lux-modal .swal2-icon.swal2-success {
+            border-color: rgba(16, 185, 129, 0.35) !important;
+            background: rgba(16, 185, 129, 0.14) !important;
+            color: #10b981 !important;
+        }
+
+        .lux-modal .swal2-icon.lux-icon-info,
+        .lux-modal .swal2-icon.swal2-info,
+        .lux-modal .swal2-icon.lux-icon-question,
+        .lux-modal .swal2-icon.swal2-question {
+            border-color: rgba(59, 130, 246, 0.35) !important;
+            background: rgba(59, 130, 246, 0.14) !important;
+            color: #3b82f6 !important;
+        }
+
+        /* Typography */
+        .lux-modal .lux-modal-title,
+        .lux-modal.swal2-popup .swal2-title {
+            font-family: var(--font-main, 'Outfit', sans-serif) !important;
+            font-weight: 800 !important;
+            font-size: 1.35rem !important;
+            letter-spacing: -0.4px !important;
+            color: var(--text-main, #ffffff) !important;
+            margin: 0 0 0.5rem !important;
+            padding: 0 !important;
+            line-height: 1.25 !important;
+        }
+
+        .lux-modal .lux-modal-text,
+        .lux-modal.swal2-popup .swal2-html-container {
+            font-size: 0.92rem !important;
+            color: var(--text-muted, #94a3b8) !important;
+            margin: 0.4rem 0 1.6rem !important;
+            line-height: 1.55 !important;
+            font-weight: 400 !important;
+            padding: 0 !important;
+            word-break: break-word !important;
+            white-space: pre-line !important;
+        }
+
+        /* Actions Container */
+        .lux-modal .lux-modal-actions,
+        .lux-modal.swal2-popup .swal2-actions {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 12px !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* Luxury Red / Danger Confirm Button */
+        .lux-btn-confirm-danger,
+        .lux-modal.swal2-popup .swal2-confirm {
+            background: var(--pos-red, #EC2734) !important;
+            color: #ffffff !important;
+            border: none !important;
+            border-radius: 999px !important;
+            padding: 0.8rem 1.6rem !important;
+            font-weight: 700 !important;
+            font-size: 0.9rem !important;
+            font-family: var(--font-main, 'Outfit', sans-serif) !important;
+            box-shadow: 0 4px 16px rgba(236, 39, 52, 0.35) !important;
+            transition: all 0.18s ease !important;
+            flex: 1 !important;
+            min-height: 44px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            letter-spacing: 0.2px !important;
+        }
+        .lux-btn-confirm-danger:hover,
+        .lux-modal.swal2-popup .swal2-confirm:hover {
+            background: var(--pos-red-hover, #d81f2f) !important;
+            transform: translateY(-1.5px) !important;
+            box-shadow: 0 6px 22px rgba(236, 39, 52, 0.5) !important;
+            color: #ffffff !important;
+        }
+        .lux-btn-confirm-danger:active,
+        .lux-modal.swal2-popup .swal2-confirm:active {
+            transform: translateY(0) !important;
+        }
+
+        /* Emerald Neutral Confirm Button */
+        .lux-btn-confirm-neutral {
+            background: #10b981 !important;
+            color: #ffffff !important;
+            border: none !important;
+            border-radius: 999px !important;
+            padding: 0.8rem 1.6rem !important;
+            font-weight: 700 !important;
+            font-size: 0.9rem !important;
+            font-family: var(--font-main, 'Outfit', sans-serif) !important;
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35) !important;
+            transition: all 0.18s ease !important;
+            flex: 1 !important;
+            min-height: 44px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+        }
+        .lux-btn-confirm-neutral:hover {
+            background: #059669 !important;
+            transform: translateY(-1.5px) !important;
+            box-shadow: 0 6px 22px rgba(16, 185, 129, 0.5) !important;
+            color: #ffffff !important;
+        }
+
+        /* Cancel Button */
+        .lux-btn-cancel,
+        .lux-modal.swal2-popup .swal2-cancel {
+            background: var(--panel-bg, #161922) !important;
+            color: var(--text-muted, #94a3b8) !important;
+            border: 1.5px solid var(--border-color, rgba(255, 255, 255, 0.14)) !important;
+            border-radius: 999px !important;
+            padding: 0.8rem 1.4rem !important;
+            font-weight: 600 !important;
+            font-size: 0.9rem !important;
+            font-family: var(--font-main, 'Outfit', sans-serif) !important;
+            transition: all 0.18s ease !important;
+            flex: 1 !important;
+            min-height: 44px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+        }
+        .lux-btn-cancel:hover,
+        .lux-modal.swal2-popup .swal2-cancel:hover {
+            background: rgba(255, 255, 255, 0.06) !important;
+            color: var(--text-main, #ffffff) !important;
+            border-color: var(--text-muted, #94a3b8) !important;
+            transform: translateY(-1.5px) !important;
+        }
+
+        /* Close Button in corner */
+        .lux-modal.swal2-popup .swal2-close {
+            font-size: 1.5rem !important;
+            color: var(--text-muted) !important;
+            top: 14px !important;
+            right: 14px !important;
+            transition: color 0.15s, transform 0.15s !important;
+            background: transparent !important;
+            border: none !important;
+        }
+        .lux-modal.swal2-popup .swal2-close:hover {
+            color: var(--pos-red, #EC2734) !important;
+            transform: rotate(90deg) !important;
+        }
+
+        /* Text Input for prompt */
+        .lux-modal.swal2-popup .swal2-input {
+            background: var(--panel-bg, #161922) !important;
+            border: 1.5px solid var(--border-color, rgba(255, 255, 255, 0.14)) !important;
+            border-radius: 14px !important;
+            color: var(--text-main, #ffffff) !important;
+            font-family: var(--font-main, 'Outfit', sans-serif) !important;
+            font-size: 0.95rem !important;
+            padding: 0.75rem 1.1rem !important;
+            margin: 0.5rem 0 1.25rem !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        .lux-modal.swal2-popup .swal2-input:focus {
+            border-color: var(--pos-red, #EC2734) !important;
+            box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.18) !important;
+        }
+
+        /* Responsive Mobile Breakpoint */
+        @media (max-width: 576px) {
+            .lux-modal.swal2-popup {
+                width: calc(100% - 1.5rem) !important;
+                max-width: calc(100% - 1.5rem) !important;
+                padding: 1.8rem 1.25rem 1.5rem !important;
+                border-radius: 24px !important;
+            }
+            .lux-modal .lux-modal-actions,
+            .lux-modal.swal2-popup .swal2-actions {
+                flex-direction: column-reverse !important;
+                gap: 10px !important;
+                width: 100% !important;
+            }
+            .lux-btn-confirm-danger,
+            .lux-btn-confirm-neutral,
+            .lux-btn-cancel,
+            .lux-modal.swal2-popup .swal2-confirm,
+            .lux-modal.swal2-popup .swal2-cancel {
+                width: 100% !important;
+                max-width: 100% !important;
+                flex: unset !important;
+                min-height: 48px !important;
+            }
         }
 
         /* ---- Notification Badge (WhatsApp-style) ---- */
@@ -1057,9 +1344,12 @@
             <!-- Brand header row -->
             <div class="sidebar-brand">
                 <!-- Logo squircle -->
-                <span class="sidebar-logo-icon">
-                    <i class="bi bi-cup-hot-fill"></i>
-                </span>
+                {% if request.user.tenant.logo %}
+                    <img src="{{ request.user.tenant.logo.url }}" class="sidebar-logo-icon" style="object-fit:cover; border-radius:10px;" alt="Logo">
+                {% else %}
+                    <img src="{% static 'apple-touch-icon.png' %}" class="sidebar-logo-icon" style="object-fit:contain; border-radius:10px; width:34px; height:34px;" alt="EasyBillBro">
+                {% endif %}
+
                 <!-- Brand text -->
                 <div class="sidebar-brand-info">
                     <span class="sidebar-brand-name">{{ request.user.tenant.name|default:"Restaurant POS" }}</span>
@@ -1122,12 +1412,7 @@
                 <a href="/orders/"
                    class="sidebar-item {% if '/orders' in p or '/running-order' in p %}active{% endif %}"
                    data-label="Orders">
-                    <span class="notif-wrapper">
-                        <i class="bi bi-receipt"></i>
-                        {% if 'waiter_call' in tenant_features %}
-                        <span class="notif-badge hidden" id="notif-badge-waiter"></span>
-                        {% endif %}
-                    </span>
+                    <i class="bi bi-receipt"></i>
                     <span class="sidebar-label">Orders</span>
                 </a>
                 {% endif %}
@@ -1219,7 +1504,7 @@
                 </a>
 
                 {# Reviews #}
-                <a href="/crm/reviews/"
+                <a href="{% url 'reviews-list' %}"
                    class="sidebar-item {% if '/crm/reviews' in p or '/reviews' in p %}active{% endif %}"
                    data-label="Reviews">
                     <i class="bi bi-star"></i>
@@ -1265,7 +1550,7 @@
                 <div class="sidebar-section-title">Back Office</div>
 
                 {# Analytics #}
-                <a href="/reports/analytics/"
+                <a href="/reports/dashboard/"
                    class="sidebar-item {% if '/reports/analytics' in p %}active{% endif %}"
                    data-label="Analytics">
                     <i class="bi bi-graph-up-arrow"></i>
@@ -1273,7 +1558,7 @@
                 </a>
 
                 {# Reports #}
-                <a href="/reports/"
+                <a href="/reports/dashboard/"
                    class="sidebar-item {% if '/reports' in p and '/analytics' not in p %}active{% endif %}"
                    data-label="Reports">
                     <span class="notif-wrapper">
@@ -1374,7 +1659,7 @@
                 <div class="sidebar-promo-card">
                     <div class="promo-title">📊 Today's Summary</div>
                     <div class="promo-sub">View your full revenue & performance report.</div>
-                    <a href="/reports/" class="promo-btn">
+                    <a href="/reports/dashboard/" class="promo-btn">
                         <i class="bi bi-bar-chart-fill"></i> View Report
                     </a>
                 </div>
@@ -1452,9 +1737,25 @@
                 <div style="flex:1;min-width:0;"></div>
 
                 <!-- Right-side controls -->
-                <div class="topbar-right d-flex align-items-center gap-2 flex-nowrap">
+                <div class="topbar-right d-flex align-items-center gap-2 flex-nowrap ms-auto">
+                    {% block header_right %}
+                    <!-- Default topbar-right buttons -->
+                    {% if request.user.role != "chef" and request.user.is_authenticated %}
+                    <a href="{% url 'order-history' %}" class="btn-icon" title="Order History">
+                        <i class="bi bi-clock-history"></i>
+                    </a>
+                    {% endif %}
+                    <button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Dark / Light Mode">
+                        <i class="bi bi-moon" id="themeIcon"></i>
+                    </button>
+                    {% endblock %}
+
+                    {% block header_notifications %}
+                    {% include "core/_notif_badges.html" %}
+                    {% endblock %}
+
                     {% if request.user.is_authenticated %}
-                    <!-- User Avatar + Role Badge -->
+                    <!-- User Avatar + Role Badge (Always Top Right Last) -->
                     <div class="user-role-badge" title="Logged in as {{ request.user.username }} ({{ request.user.get_role_display|default:request.user.role }})">
                         <span class="user-avatar-circle">{{ request.user.username|slice:":2"|upper }}</span>
                         <span class="user-role-tag role-{{ request.user.role }}">
@@ -1471,19 +1772,6 @@
                         <span class="user-name-text d-none d-md-inline">{{ request.user.username }}</span>
                     </div>
                     {% endif %}
-
-                    {% block header_right %}
-                    <!-- Default topbar-right buttons -->
-                    {% include "core/_notif_badges.html" %}
-                    {% if request.user.role != "chef" and request.user.is_authenticated %}
-                    <a href="{% url 'order-history' %}" class="btn-icon" title="Order History">
-                        <i class="bi bi-clock-history"></i>
-                    </a>
-                    {% endif %}
-                    <button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Dark / Light Mode">
-                        <i class="bi bi-moon" id="themeIcon"></i>
-                    </button>
-                    {% endblock %}
                 </div>
             </header><!-- /#pos-topbar -->
 
@@ -1693,6 +1981,17 @@
         });
 
         // --- 3. Global UI Helpers ---
+        // --- Prototype extension so both `if (!await ui.confirm())` and `if (!res.isConfirmed)` work seamlessly ---
+        try {
+            if (!Object.prototype.hasOwnProperty.call(Boolean.prototype, 'isConfirmed')) {
+                Object.defineProperty(Boolean.prototype, 'isConfirmed', {
+                    get() { return this.valueOf() === true; },
+                    configurable: true
+                });
+            }
+        } catch (_) {}
+
+        // --- 3. Global UI Helpers (KimiPoS Luxury Component System) ---
         const ui = {
             toast(message, icon = 'info') {
                 const Toast = Swal.mixin({
@@ -1713,25 +2012,145 @@
             },
             showLoading() { document.body.classList.add('loading'); },
             hideLoading() { document.body.classList.remove('loading'); },
-            confirm(title, text, confirmText = 'Yes, do it') {
-                return Swal.fire({
+            async confirm(arg1, arg2, arg3) {
+                let options = {};
+                if (typeof arg1 === 'object' && arg1 !== null) {
+                    options = arg1;
+                } else if (typeof arg1 === 'string') {
+                    if (arg2 === undefined) {
+                        options = { title: arg1, text: '', confirmText: 'Confirm' };
+                    } else if (typeof arg2 === 'string') {
+                        options = { title: arg1, text: arg2, confirmText: arg3 || 'Confirm' };
+                    }
+                }
+
+                const title = options.title || 'Are you sure?';
+                const text = options.text || '';
+                const isDanger = options.isDanger !== false && !/approve|save|submit|apply|open/i.test(options.confirmText || '');
+                const icon = options.icon || (isDanger ? 'warning' : 'question');
+                const confirmText = options.confirmText || (isDanger ? 'Yes, proceed' : 'Confirm');
+                const cancelText = options.cancelText || 'Cancel';
+                const isDark = typeof themeManager !== 'undefined' ? themeManager.isDark() : document.documentElement.classList.contains('dark');
+
+                const swalRes = await Swal.fire({
                     title: title,
                     text: text,
-                    icon: 'warning',
+                    icon: icon,
                     showCancelButton: true,
                     confirmButtonColor: 'var(--accent-gold)',
                     cancelButtonColor: 'var(--text-muted)',
                     confirmButtonText: confirmText,
-                    background: themeManager.isDark() ? 'var(--panel-bg)' : '#ffffff',
-                    color: 'var(--text-main)',
+                    cancelButtonText: cancelText,
+                    buttonsStyling: false,
+                    showCloseButton: true,
+                    reverseButtons: false,
+                    focusCancel: false,
+                    focusConfirm: true,
+                    background: isDark ? 'var(--panel-bg, #161922)' : '#ffffff',
+                    color: isDark ? '#ffffff' : '#0f172a',
                     customClass: {
-                        popup: 'rounded-4',
-                        confirmButton: 'btn btn-accent',
-                        cancelButton: 'btn btn-luxury'
+                        container: 'lux-confirm-backdrop',
+                        popup: 'lux-modal swal2-popup',
+                        title: 'lux-modal-title',
+                        htmlContainer: 'lux-modal-text',
+                        icon: `lux-modal-icon lux-icon-${icon}`,
+                        actions: 'lux-modal-actions',
+                        confirmButton: isDanger ? 'lux-btn-confirm-danger' : 'lux-btn-confirm-neutral',
+                        cancelButton: 'lux-btn-cancel',
+                        closeButton: 'lux-btn-close'
                     }
                 });
+
+                return Boolean(swalRes.isConfirmed);
+            },
+
+            async alert(title, text = '', icon = 'info') {
+                const isDark = typeof themeManager !== 'undefined' ? themeManager.isDark() : document.documentElement.classList.contains('dark');
+                const swalRes = await Swal.fire({
+                    title: title,
+                    text: text,
+                    icon: icon,
+                    confirmButtonText: 'OK',
+                    buttonsStyling: false,
+                    showCloseButton: true,
+                    background: isDark ? 'var(--panel-bg, #161922)' : '#ffffff',
+                    color: isDark ? '#ffffff' : '#0f172a',
+                    customClass: {
+                        container: 'lux-confirm-backdrop',
+                        popup: 'lux-modal swal2-popup',
+                        title: 'lux-modal-title',
+                        htmlContainer: 'lux-modal-text',
+                        icon: `lux-modal-icon lux-icon-${icon}`,
+                        actions: 'lux-modal-actions',
+                        confirmButton: 'lux-btn-confirm-neutral',
+                        closeButton: 'lux-btn-close'
+                    }
+                });
+                return Boolean(swalRes.isConfirmed);
+            },
+
+            async prompt(title, text = '', defaultValue = '') {
+                const isDark = typeof themeManager !== 'undefined' ? themeManager.isDark() : document.documentElement.classList.contains('dark');
+                const swalRes = await Swal.fire({
+                    title: title,
+                    text: text,
+                    input: 'text',
+                    inputValue: defaultValue,
+                    showCancelButton: true,
+                    confirmButtonText: 'Submit',
+                    cancelButtonText: 'Cancel',
+                    buttonsStyling: false,
+                    showCloseButton: true,
+                    background: isDark ? 'var(--panel-bg, #161922)' : '#ffffff',
+                    color: isDark ? '#ffffff' : '#0f172a',
+                    customClass: {
+                        container: 'lux-confirm-backdrop',
+                        popup: 'lux-modal swal2-popup',
+                        title: 'lux-modal-title',
+                        htmlContainer: 'lux-modal-text',
+                        actions: 'lux-modal-actions',
+                        input: 'swal2-input',
+                        confirmButton: 'lux-btn-confirm-danger',
+                        cancelButton: 'lux-btn-cancel',
+                        closeButton: 'lux-btn-close'
+                    }
+                });
+                return swalRes.isConfirmed ? swalRes.value : null;
             }
         };
+
+        window.ui = ui;
+        window.confirmModal = (title, text, confirmText) => ui.confirm(title, text, confirmText);
+
+        // Auto-intercept [data-confirm] buttons, links and forms
+        document.addEventListener('click', async function(e) {
+            const target = e.target.closest('[data-confirm], [data-confirm-delete]');
+            if (!target) return;
+            if (target.dataset.confirmed === 'true') {
+                target.dataset.confirmed = 'false';
+                return;
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            const msg = target.getAttribute('data-confirm') || target.getAttribute('data-confirm-delete') || 'Are you sure you want to continue?';
+            const isDelete = target.hasAttribute('data-confirm-delete') || /delete|cancel|erase|remove/i.test(msg);
+            const confirmed = await ui.confirm({
+                title: isDelete ? 'Confirm Action' : 'Are you sure?',
+                text: msg,
+                isDanger: isDelete,
+                confirmText: isDelete ? 'Yes, proceed' : 'Confirm'
+            });
+            if (confirmed) {
+                target.dataset.confirmed = 'true';
+                if (target.tagName === 'A' && target.href) {
+                    window.location.href = target.href;
+                } else if (target.type === 'submit' && target.form) {
+                    target.form.requestSubmit ? target.form.requestSubmit(target) : target.form.submit();
+                } else {
+                    target.click();
+                }
+            }
+        }, true);
 
         // --- 4. API Client Wrapper (Error Handling & CSRF) ---
         const apiClient = {
@@ -1780,6 +2199,14 @@
             put(endpoint, body) { return this.request(endpoint, { method: 'PUT', body: JSON.stringify(body) }); },
             delete(endpoint) { return this.request(endpoint, { method: 'DELETE' }); }
         };
+        // `const` doesn't attach to `window` the way a top-level `var`/function
+        // does -- kitchen.html and reservations.html both guard their CSRF
+        // header with `window.apiClient ? apiClient.getCsrf() : ''`, so without
+        // this they silently sent an EMPTY CSRF token on every POST (a bare
+        // `apiClient` reference still worked fine from other same-page scripts,
+        // which is why this went unnoticed elsewhere). Same pattern as `window.ui`
+        // above.
+        window.apiClient = apiClient;
 
         // --- 4b. Offline Queues (IndexedDB) ---
         // Real offline support for order *creation* and, as of this version,
@@ -2107,11 +2534,9 @@
         }
 
         function updateBadge(baseId, count) {
-            // Update all badge elements with matching base ID (desktop + mobile)
-            const ids = [baseId, baseId + '-mobile'];
-            ids.forEach(id => {
-                const badge = document.getElementById(id);
-                if (!badge) return;
+            // Update all badge elements with matching base ID (desktop + mobile + sidebar)
+            const badges = document.querySelectorAll(`[id="${baseId}"], [id="${baseId}-mobile"], [id="${baseId}-sidebar"]`);
+            badges.forEach(badge => {
                 if (count > 0) {
                     badge.textContent = count > 99 ? '99+' : count;
                     badge.classList.remove('hidden');

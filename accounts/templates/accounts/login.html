@@ -1,11 +1,19 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <title>{% if tenant %}{{ tenant.name }} — Staff Login{% else %}EasyBillBro POS — Login{% endif %}</title>
-  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+  <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+  <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}">
   <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0a0a0a">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,20 +26,20 @@
     :root {
       --gold:   #EC2734;
       --gold-h: #d81f2f;
-      --bg:     #F7F7F9;
+      --bg:     #F8F9FA;
       --panel:  #ffffff;
-      --text:   #2C170E;
-      --muted:  #8a7d74;
-      --border: #ECE7E2;
+      --text:   #18181b;
+      --muted:  #71717a;
+      --border: #e4e4e7;
       --err:    #ef4444;
-      --radius: 999px;
+      --radius: 12px;
     }
     html.dark {
       --bg:     #0a0a0a;
-      --panel:  #241a16;
-      --text:   #f7f1ec;
-      --muted:  #a89a90;
-      --border: #3a2c26;
+      --panel:  #121214;
+      --text:   #f4f4f6;
+      --muted:  #9ca3af;
+      --border: #27272a;
     }
 
     html, body {
@@ -54,21 +62,22 @@
 
     /* ── Left decorative panel ─────────────────── */
     .left-panel {
-      background: #2C170E;
+      background: #0a0a0a;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 3rem;
+      padding: 3.5rem;
       position: relative;
       overflow: hidden;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
     }
     .left-panel::before {
       content: '';
       position: absolute;
       inset: 0;
       background-image:
-        linear-gradient(rgba(236,39,52,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(236,39,52,0.05) 1px, transparent 1px);
+        linear-gradient(rgba(236,39,52,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(236,39,52,0.06) 1px, transparent 1px);
       background-size: 48px 48px;
     }
     .left-panel::after {
@@ -77,30 +86,19 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(236,39,52,0.12) 0%, transparent 70%);
+      width: 450px; height: 450px;
+      background: radial-gradient(circle, rgba(236,39,52,0.15) 0%, transparent 70%);
       pointer-events: none;
     }
     .left-top { position: relative; z-index: 1; }
     .left-logo {
-      display: flex; align-items: center; gap: 12px;
+      display: inline-flex; align-items: center; gap: 12px;
       text-decoration: none;
     }
-    .left-diamond {
-      width: 28px; height: 28px;
-      /* Hollow gold-diamond frame to match the official logo (static/icon-512.svg),
-         not a solid fill. Transparent centre shows the panel behind it, so it
-         works on both the dark left panel and either theme. */
-      border: 6px solid var(--gold);
-      background: transparent;
-      transform: rotate(45deg);
-      flex-shrink: 0;
-    }
-    .left-brand {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.3rem;
-      color: #fff;
-      letter-spacing: 1px;
+    .left-logo-img {
+      height: 38px;
+      width: auto;
+      object-fit: contain;
     }
 
     .left-middle {
@@ -151,6 +149,7 @@
     .theme-btn {
       position: absolute; top: 1.5rem; right: 1.5rem;
       background: transparent; border: 1px solid var(--border);
+      border-radius: 10px;
       color: var(--muted); width: 40px; height: 40px;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; transition: all 0.2s;
@@ -168,6 +167,7 @@
       width: 64px; height: 64px;
       object-fit: contain;
       border: 1px solid var(--border);
+      border-radius: 12px;
       padding: 8px;
       margin-bottom: 1rem;
     }
@@ -185,23 +185,18 @@
 
     /* EasyBillBro branding (main domain login) */
     .lexnorax-brand {
-      text-align: center; margin-bottom: 2.5rem;
+      text-align: center; margin-bottom: 2.2rem;
     }
-    .lexnorax-mark {
-      display: inline-flex; align-items: center; gap: 10px;
-      margin-bottom: 0.5rem;
+    .theme-logo {
+      display: block;
+      height: 42px;
+      width: auto;
+      object-fit: contain;
+      margin: 0 auto;
     }
-    .lexnorax-diamond {
-      width: 24px; height: 24px;
-      /* Hollow gold-diamond frame to match the official logo (static/icon-512.svg). */
-      border: 5px solid var(--gold);
-      background: transparent;
-      transform: rotate(45deg);
-    }
-    .lexnorax-name {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.8rem; color: var(--text);
-    }
+    html.dark .logo-light { display: none !important; }
+    html:not(.dark) .logo-dark { display: none !important; }
+
     .lexnorax-sub {
       font-size: 0.7rem; text-transform: uppercase;
       letter-spacing: 3px; color: var(--muted);
@@ -212,24 +207,33 @@
     .field-inner {
       display: flex; align-items: center;
       border: 1px solid var(--border);
-      transition: border-color 0.2s;
+      border-radius: 10px;
+      background: var(--panel);
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .field-inner:focus-within { border-color: var(--gold); }
+    .field-inner:focus-within {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.12);
+    }
     .field-icon {
-      width: 48px; height: 52px;
+      width: 48px; height: 50px;
       display: flex; align-items: center; justify-content: center;
-      color: var(--muted); font-size: 0.9rem;
+      color: var(--muted); font-size: 0.95rem;
       border-right: 1px solid var(--border);
+      border-top-left-radius: 9px;
+      border-bottom-left-radius: 9px;
       flex-shrink: 0;
     }
     .field-input {
-      flex: 1; height: 52px;
+      flex: 1; height: 50px;
       background: transparent;
       border: none; outline: none;
       color: var(--text);
       font-size: 0.95rem;
       padding: 0 1rem;
       font-family: 'Outfit', sans-serif;
+      border-top-right-radius: 9px;
+      border-bottom-right-radius: 9px;
     }
     .field-input::placeholder {
       color: var(--muted); font-size: 0.78rem;
@@ -237,19 +241,25 @@
     }
 
     .btn-login {
-      width: 100%; height: 52px;
-      background: var(--gold); border: none; border-radius: var(--radius);
+      width: 100%; height: 50px;
+      background: var(--gold); border: none; border-radius: 10px;
       color: #fff; font-family: 'Outfit', sans-serif;
-      font-size: 0.8rem; font-weight: 600;
+      font-size: 0.85rem; font-weight: 600;
       text-transform: uppercase; letter-spacing: 1px;
-      cursor: pointer; transition: background 0.2s;
+      cursor: pointer; transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
       margin-top: 0.5rem;
+      box-shadow: 0 4px 14px rgba(236, 39, 52, 0.3);
     }
-    .btn-login:hover { background: var(--gold-h); }
+    .btn-login:hover {
+      background: var(--gold-h);
+      box-shadow: 0 6px 20px rgba(236, 39, 52, 0.45);
+    }
     .btn-login:active { transform: scale(0.99); }
 
     .error-box {
       border: 1px dashed var(--err);
+      background: rgba(239, 68, 68, 0.06);
+      border-radius: 10px;
       color: var(--err);
       padding: 0.75rem 1rem;
       font-size: 0.78rem;
@@ -272,6 +282,7 @@
       display: inline-flex; align-items: center; gap: 6px;
       font-size: 0.65rem; color: var(--muted);
       background: var(--bg); border: 1px solid var(--border);
+      border-radius: 6px;
       padding: 3px 10px; margin-top: 0.5rem;
       font-family: 'Space Mono', monospace;
     }
@@ -289,8 +300,7 @@
   <div class="left-panel">
     <div class="left-top">
       <a href="/" class="left-logo">
-        <div class="left-diamond"></div>
-        <span class="left-brand">EasyBillBro</span>
+        <img src="{% static 'images/easybillbro_logo_horizontal_brand.png' %}" alt="EasyBillBro" class="left-logo-img">
       </a>
     </div>
 
@@ -350,10 +360,10 @@
       {% else %}
       <!-- Main domain — EasyBillBro branding -->
       <div class="lexnorax-brand">
-        <div class="lexnorax-mark">
-          <div class="lexnorax-diamond"></div>
-          <div class="lexnorax-name">EasyBillBro</div>
-        </div>
+        <a href="/" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none; margin-bottom:0.75rem;">
+          <img src="{% static 'images/easybillbro_logo_horizontal_darktext.png' %}" alt="EasyBillBro" class="theme-logo logo-light">
+          <img src="{% static 'images/easybillbro_logo_horizontal_brand.png' %}" alt="EasyBillBro" class="theme-logo logo-dark">
+        </a>
         <div class="lexnorax-sub">POS Platform · Staff Access</div>
       </div>
       {% endif %}
@@ -390,11 +400,11 @@
 
       {% if tenant %}
       <div class="footer-note">
-        Not your restaurant? <a href="/">lexnorax.net</a>
+        Not your restaurant? <a href="/">EasyBillBro Home</a>
       </div>
       {% else %}
       <div class="footer-note">
-        <a href="/">lexnorax.net</a> &nbsp;·&nbsp; Restaurant POS for India
+        <a href="/">EasyBillBro</a> &nbsp;·&nbsp; Restaurant POS for India
       </div>
       {% endif %}
 

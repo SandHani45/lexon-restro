@@ -188,6 +188,7 @@ async function approveReq() {
 
 async function convertToBatch() {
   if (!confirm("Convert this requisition to a Production Batch? You can then add more items and dispatch.")) return;
+  if (!await ui.confirm("Convert to Production Batch?", "Convert this requisition to a Production Batch? You can then add more items and dispatch.", "Convert to Batch")) return;
   const r = await fetch(`/inventory/requisitions/${REQ_ID}/to-batch/`, {
     method: "POST", headers: { "X-CSRFToken": CSRF },
   });
@@ -198,6 +199,7 @@ async function convertToBatch() {
 
 async function convertToPO() {
   if (!confirm("Create a Purchase Order to the preferred vendor for each item?")) return;
+  if (!await ui.confirm("Create Purchase Orders?", "Create a Purchase Order to the preferred vendor for each item?", "Create PO")) return;
   const r = await fetch(`/inventory/requisitions/${REQ_ID}/to-po/`, {
     method: "POST", headers: { "X-CSRFToken": CSRF },
   });
@@ -208,6 +210,7 @@ async function convertToPO() {
 
 async function cancelReq() {
   if (!confirm("Cancel this requisition?")) return;
+  if (!await ui.confirm("Cancel Requisition?", "Are you sure you want to cancel this requisition?", "Cancel Requisition")) return;
   const r = await fetch(`/inventory/requisitions/${REQ_ID}/cancel/`, {
     method: "POST", headers: { "X-CSRFToken": CSRF },
   });

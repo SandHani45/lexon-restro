@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=Space+Mono&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.8/dist/sweetalert2.all.min.js"></script>
     <style>
         :root {
             color-scheme: light;
@@ -17,6 +18,129 @@
             color-scheme: dark;
             --bg: #0a0a0a; --panel: #241a16; --text: #f7f1ec; --muted: #a89a90;
             --border: #3a2c26; --gold: #EC2734;
+        }
+        /* Luxury Confirmation Modal */
+        .lux-confirm-backdrop {
+            backdrop-filter: blur(14px) saturate(170%) !important;
+            -webkit-backdrop-filter: blur(14px) saturate(170%) !important;
+            background: rgba(0, 0, 0, 0.75) !important;
+            z-index: 10500 !important;
+            padding: 1.25rem !important;
+        }
+        .lux-modal.swal2-popup {
+            background: var(--panel) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 28px !important;
+            box-shadow: 0 32px 84px rgba(0, 0, 0, 0.6) !important;
+            padding: 2.25rem 2rem 2rem !important;
+            max-width: 440px !important;
+            width: 100% !important;
+            color: var(--text) !important;
+            font-family: 'Outfit', sans-serif !important;
+            text-align: center !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
+        .lux-modal.swal2-popup::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 20%;
+            right: 20%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #EC2734, transparent);
+            border-radius: 999px;
+            opacity: 0.8;
+        }
+        .lux-modal .swal2-icon.lux-modal-icon {
+            width: 72px !important;
+            height: 72px !important;
+            min-width: 72px !important;
+            border-radius: 24px !important;
+            margin: 0 auto 1.25rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border: 1.5px solid rgba(236, 39, 52, 0.35) !important;
+            background: rgba(236, 39, 52, 0.12) !important;
+            color: #EC2734 !important;
+            font-size: 2rem !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25) !important;
+        }
+        .lux-modal .swal2-icon.lux-modal-icon .swal2-icon-content {
+            color: #EC2734 !important;
+            font-weight: 800 !important;
+        }
+        .lux-modal.swal2-popup .swal2-title {
+            font-family: 'Outfit', sans-serif !important;
+            font-weight: 800 !important;
+            font-size: 1.35rem !important;
+            color: var(--text) !important;
+            margin: 0 0 0.5rem !important;
+            padding: 0 !important;
+        }
+        .lux-modal.swal2-popup .swal2-html-container {
+            font-size: 0.92rem !important;
+            color: var(--muted) !important;
+            margin: 0.4rem 0 1.6rem !important;
+            line-height: 1.55 !important;
+            padding: 0 !important;
+        }
+        .lux-modal.swal2-popup .swal2-actions {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 12px !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .lux-modal.swal2-popup .swal2-confirm {
+            background: #EC2734 !important;
+            color: #ffffff !important;
+            border: none !important;
+            border-radius: 999px !important;
+            padding: 0.8rem 1.6rem !important;
+            font-weight: 700 !important;
+            font-size: 0.9rem !important;
+            font-family: 'Outfit', sans-serif !important;
+            box-shadow: 0 4px 16px rgba(236, 39, 52, 0.35) !important;
+            transition: all 0.18s ease !important;
+            flex: 1 !important;
+            min-height: 44px !important;
+            cursor: pointer !important;
+        }
+        .lux-modal.swal2-popup .swal2-confirm:hover {
+            background: #d81f2f !important;
+            transform: translateY(-1.5px) !important;
+            box-shadow: 0 6px 22px rgba(236, 39, 52, 0.5) !important;
+        }
+        .lux-modal.swal2-popup .swal2-cancel {
+            background: var(--panel) !important;
+            color: var(--muted) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 999px !important;
+            padding: 0.8rem 1.4rem !important;
+            font-weight: 600 !important;
+            font-size: 0.9rem !important;
+            font-family: 'Outfit', sans-serif !important;
+            flex: 1 !important;
+            min-height: 44px !important;
+            cursor: pointer !important;
+        }
+        .lux-modal.swal2-popup .swal2-cancel:hover {
+            background: rgba(255, 255, 255, 0.05) !important;
+            color: var(--text) !important;
+        }
+        @media (max-width: 480px) {
+            .lux-modal.swal2-popup .swal2-actions {
+                flex-direction: column-reverse !important;
+            }
+            .lux-modal.swal2-popup .swal2-confirm,
+            .lux-modal.swal2-popup .swal2-cancel {
+                width: 100% !important;
+                flex: none !important;
+            }
         }
         /* Native <select> popups are browser-drawn, not styled by the rules
            above - color-scheme tells the browser which palette to use for
@@ -269,6 +393,26 @@
         // ── Cancel order ─────────────────────────────────────────────
         async function cancelOrder() {
             if (!confirm('Cancel this order completely? This cannot be undone.')) return;
+            const swalRes = await Swal.fire({
+                title: 'Cancel Order?',
+                text: 'Cancel this order completely? This cannot be undone.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Cancel Order',
+                cancelButtonText: 'Keep Order',
+                buttonsStyling: false,
+                customClass: {
+                    container: 'lux-confirm-backdrop',
+                    popup: 'lux-modal swal2-popup',
+                    title: 'lux-modal-title',
+                    htmlContainer: 'lux-modal-text',
+                    icon: 'lux-modal-icon',
+                    actions: 'lux-modal-actions',
+                    confirmButton: 'lux-btn-confirm-danger',
+                    cancelButton: 'lux-btn-cancel'
+                }
+            });
+            if (!swalRes.isConfirmed) return;
 
             showToast('Cancelling...', '');
 

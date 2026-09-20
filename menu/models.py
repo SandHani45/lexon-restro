@@ -54,6 +54,17 @@ class MenuCategory(TenantScopedModel):
         return self.name
 
 
+def menu_item_image_path(instance, filename):
+    """
+    restaurants/<tenant-slug>/menu_items/<filename> -- keeps every
+    restaurant's photos grouped under their own folder regardless of which
+    storage backend is active (local disk, S3, or Cloudinary), instead of
+    every tenant's images being dumped together into one flat menu_items/
+    folder with no per-restaurant separation.
+    """
+    slug = getattr(instance.tenant, "slug", None) if instance.tenant_id else None
+    return f"restaurants/{slug or 'unassigned'}/menu_items/{filename}"
+
 
 class MenuItem(TenantScopedModel):
 
@@ -83,7 +94,7 @@ class MenuItem(TenantScopedModel):
 
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    image = models.ImageField(upload_to="menu_items/", null=True, blank=True, validators=[validate_image_size])
+    image = models.ImageField(upload_to=menu_item_image_path, null=True, blank=True, validators=[validate_image_size])
 
     price = models.DecimalField(
         max_digits=10,
@@ -151,11 +162,16 @@ class MenuItem(TenantScopedModel):
 
     def save(self, *args, **kwargs):
         # Only compress when a genuinely new image file is being uploaded.
-        # Checking hasattr(self.image, 'file') is True only when Django has a
-        # fresh in-memory upload; it is False when the field holds an existing
-        # storage path (re-saves for price/availability changes, etc.).
-        # This prevents redundant S3/disk reads on every non-image save.
-        if self.image and hasattr(self.image, 'file') and not self.image.name.lower().endswith('.webp'):
+        # `_committed` is False only when a fresh File/UploadedFile object was
+        # just assigned to the field (set synchronously in FileDescriptor,
+        # no I/O); it's True when the field holds an existing storage path
+        # (re-saves for price/availability changes, etc.). We used to check
+        # hasattr(self.image, 'file') instead, but that property lazily opens
+        # the file from storage on every access -- harmless waste on local
+        # disk/S3, but a bare OSError (uncaught by hasattr, which only
+        # swallows AttributeError) on Cloudinary whenever the fetch failed,
+        # crashing saves of untouched existing images.
+        if self.image and not self.image._committed and not self.image.name.lower().endswith('.webp'):
             # Fail CLOSED, not open: a file that Pillow can't decode as a
             # real image (an SVG carrying a <script>, an HTML file renamed
             # to .jpg) must not be kept and stored as-is under menu_items/

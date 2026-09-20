@@ -6,7 +6,7 @@ from django.views.decorators.cache import never_cache
 
 from core.decorators import tenant_required, role_required
 from notifications.models import Notification
-from reports.services.dashboard_metrics import owner_dashboard_metrics
+from reports.services.dashboard_metrics import owner_dashboard_metrics, weekly_revenue_series
 from menu.models import MenuItem
 
 
@@ -16,6 +16,7 @@ from menu.models import MenuItem
 @role_required("owner", "manager", "cashier")
 def owner_dashboard(request):
     metrics       = owner_dashboard_metrics(request.user)
+    weekly_revenue = weekly_revenue_series(request.user)
     notifications = Notification.objects.filter(
         tenant=request.user.tenant, outlet=request.user.outlet, is_read=False
     ).order_by("-created_at")[:10]
@@ -89,6 +90,7 @@ def owner_dashboard(request):
 
     return render(request, "accounts/owner_dashboard.html", {
         "metrics":             metrics,
+        "weekly_revenue":      weekly_revenue,
         "notifications":       notifications,
         "aggregator":          aggregator_config,
         "is_qsr":              is_qsr,

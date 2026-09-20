@@ -13,9 +13,14 @@
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <link rel="canonical" href="https://lexnorax.net/">
 
-<!-- FAVICON -->
+<!-- FAVICON & APP ICONS -->
+<link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+<link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+<link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+<link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
 <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}">
-<link rel="apple-touch-icon" href="{% static 'icon-512.svg' %}">
+<meta name="theme-color" content="#0a0a0a">
+
 
 <!-- OPEN GRAPH -->
 <meta property="og:type" content="website">
@@ -169,16 +174,16 @@ nav.scrolled {
   text-decoration: none;
 }
 .nav-logo-img {
-  height: 44px;
+  height: 42px;
   width: auto;
-  max-width: 175px;
+  max-width: 240px;
   object-fit: contain;
   display: block;
   transition: transform 0.25s ease, opacity 0.25s ease;
 }
 .nav-logo:hover .nav-logo-img {
-  transform: scale(1.04);
-  opacity: 0.95;
+  transform: scale(1.03);
+  opacity: 0.98;
 }
 .footer-logo-link {
   display: inline-flex;
@@ -186,17 +191,18 @@ nav.scrolled {
   text-decoration: none;
 }
 .footer-logo-img {
-  height: 38px;
+  height: 40px;
   width: auto;
-  max-width: 155px;
+  max-width: 210px;
   object-fit: contain;
   display: block;
-  opacity: 0.88;
+  opacity: 0.92;
   transition: opacity 0.25s ease;
 }
 .footer-logo-link:hover .footer-logo-img {
   opacity: 1;
 }
+
 
 .nav-links {
   display: flex;
@@ -1572,7 +1578,7 @@ html.reveal-ready .reveal.visible {
 <!-- ═══════════════ NAV ═══════════════ -->
 <nav id="navbar">
   <a href="/" class="nav-logo" title="EasyBillBro POS">
-    <img src="{% static 'images/easybillbro_logo.png' %}" alt="EasyBillBro" class="nav-logo-img">
+    <img src="{% static 'images/easybillbro_logo_white.png' %}" alt="EasyBillBro" class="nav-logo-img">
   </a>
 
   <ul class="nav-links">
@@ -2291,7 +2297,7 @@ html.reveal-ready .reveal.visible {
 <footer>
   <div class="footer-inner">
     <a href="/" class="footer-logo-link" title="EasyBillBro POS">
-      <img src="{% static 'images/easybillbro_logo.png' %}" alt="EasyBillBro" class="footer-logo-img">
+      <img src="{% static 'images/easybillbro_logo_white.png' %}" alt="EasyBillBro" class="footer-logo-img">
     </a>
     <div class="footer-links">
       <a href="#features">Features</a>

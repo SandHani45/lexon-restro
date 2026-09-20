@@ -196,6 +196,7 @@ async function createSupplier() {
 
 async function deleteSupplier(id, name) {
     if (!confirm(`Remove "${name}"? They will no longer appear in new POs. Existing POs are kept.`)) return;
+    if (!await ui.confirm('Remove Supplier?', `Remove "${name}"? They will no longer appear in new POs. Existing POs are kept.`, 'Remove Supplier')) return;
     const res = await fetch(`/inventory/suppliers/${id}/delete/`, {
         method: 'POST', headers: { 'X-CSRFToken': CSRF }
     });

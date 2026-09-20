@@ -1,0 +1,1203 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>EasyBillBro — Full Product Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="assets/music/audio-data.js"></script>
+    <style>
+      :root {
+        --gold: #ec2734;
+        --gold-hover: #d81f2f;
+        --orange: #fa7327;
+        --dark: #2c170e;
+        --cream: #f7f7f9;
+        --panel: #ffffff;
+        --border: #ece7e2;
+        --muted: #6b5d52;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: var(--cream);
+        color: var(--dark);
+        font-family: "Outfit", sans-serif;
+        overflow: hidden;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--cream);
+      }
+      #bg-glow {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      #bg-grid {
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(rgba(236, 39, 52, 0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(236, 39, 52, 0.05) 1px, transparent 1px);
+        background-size: 64px 64px;
+        -webkit-mask-image: radial-gradient(ellipse 75% 75% at 50% 45%, black 35%, transparent 100%);
+        mask-image: radial-gradient(ellipse 75% 75% at 50% 45%, black 35%, transparent 100%);
+      }
+      #bg-radial {
+        position: absolute;
+        top: 14%;
+        left: 50%;
+        width: 900px;
+        height: 900px;
+        transform: translateX(-50%);
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(236, 39, 52, 0.1) 0%, transparent 70%);
+      }
+
+      .clip {
+        position: absolute;
+        inset: 0;
+      }
+      .scene-fade {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .pill-btn {
+        border-radius: 999px;
+        font-family: "Outfit", sans-serif;
+      }
+      .icon-badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.22);
+      }
+
+      /* ── Scene 1: Hook ── */
+      .hook-lines {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 6px;
+      }
+      .hook-line {
+        font-family: "DM Serif Display", serif;
+        font-size: 104px;
+        line-height: 1.08;
+        letter-spacing: -1px;
+        color: var(--dark);
+      }
+      .hook-line em {
+        color: var(--gold);
+        font-style: italic;
+      }
+      .hook-muted {
+        color: var(--muted);
+      }
+
+      /* ── Scene 2: Login ── */
+      .login-split {
+        width: 1600px;
+        height: 820px;
+        display: flex;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 30px 80px rgba(44, 23, 14, 0.18);
+      }
+      .login-left {
+        width: 42%;
+        background: #0e0906;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 56px;
+        overflow: hidden;
+      }
+      .login-left::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(rgba(236, 39, 52, 0.08) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(236, 39, 52, 0.08) 1px, transparent 1px);
+        background-size: 48px 48px;
+      }
+      .login-left::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 480px;
+        height: 480px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(236, 39, 52, 0.18) 0%, transparent 70%);
+      }
+      .login-brand {
+        position: relative;
+        z-index: 1;
+        font-family: "DM Serif Display", serif;
+        font-size: 26px;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .login-diamond {
+        width: 26px;
+        height: 26px;
+        background: var(--gold);
+        transform: rotate(45deg);
+        flex-shrink: 0;
+      }
+      .login-quote {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        font-family: "DM Serif Display", serif;
+        font-size: 34px;
+        line-height: 1.35;
+        color: rgba(255, 255, 255, 0.9);
+      }
+      .login-quote em {
+        color: var(--gold);
+        font-style: italic;
+      }
+      .login-stats {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        justify-content: center;
+        gap: 48px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 28px;
+      }
+      .login-stat-num {
+        font-family: "DM Serif Display", serif;
+        font-size: 26px;
+        color: var(--gold);
+        text-align: center;
+      }
+      .login-stat-lbl {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: rgba(255, 255, 255, 0.35);
+        text-align: center;
+        margin-top: 4px;
+      }
+      .login-copyright {
+        position: relative;
+        z-index: 1;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.25);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+      .login-right {
+        width: 58%;
+        background: var(--panel);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+      .login-form-wrap {
+        width: 440px;
+      }
+      .login-form-brand {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+      .login-form-title {
+        font-family: "DM Serif Display", serif;
+        font-size: 32px;
+        color: var(--dark);
+      }
+      .login-form-sub {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+      .login-field {
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        height: 58px;
+        margin-bottom: 20px;
+        overflow: hidden;
+      }
+      .login-field-icon {
+        width: 54px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--muted);
+        border-right: 1px solid var(--border);
+        font-size: 18px;
+      }
+      .login-field-text {
+        padding-left: 18px;
+        color: var(--muted);
+        font-size: 15px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .login-field-text.filled {
+        color: var(--dark);
+        text-transform: none;
+        letter-spacing: 0;
+      }
+      .login-btn {
+        width: 100%;
+        height: 58px;
+        background: var(--gold);
+        color: #fff;
+        font-weight: 700;
+        font-size: 15px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: 0 8px 24px rgba(236, 39, 52, 0.32);
+      }
+      .login-cursor {
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--dark);
+        box-shadow: 0 4px 10px rgba(44, 23, 14, 0.35);
+      }
+
+      /* ── Scene 3: Dashboard ── */
+      .dash-shell {
+        width: 1700px;
+        height: 880px;
+        display: flex;
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 30px 80px rgba(44, 23, 14, 0.14);
+        background: var(--panel);
+      }
+      .dash-sidebar {
+        width: 260px;
+        background: #fff;
+        border-right: 1px solid var(--border);
+        padding: 36px 20px;
+      }
+      .dash-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: "DM Serif Display", serif;
+        font-size: 20px;
+        margin-bottom: 40px;
+        padding-left: 8px;
+      }
+      .dash-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 16px;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+      .dash-nav-item.active {
+        background: var(--gold);
+        color: #fff;
+        font-weight: 700;
+      }
+      .dash-main {
+        flex: 1;
+        padding: 44px 52px;
+      }
+      .dash-header-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 34px;
+      }
+      .dash-title {
+        font-family: "DM Serif Display", serif;
+        font-size: 34px;
+      }
+      .dash-branch {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--muted);
+      }
+      .kpi-row {
+        display: flex;
+        gap: 22px;
+      }
+      .kpi-tile {
+        flex: 1;
+        border-radius: 20px;
+        padding: 26px 26px;
+        color: #fff;
+      }
+      .kpi-num {
+        font-size: 40px;
+        font-weight: 800;
+        margin-top: 40px;
+        font-variant-numeric: tabular-nums;
+      }
+      .kpi-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: rgba(255, 255, 255, 0.8);
+        margin-top: 6px;
+      }
+
+      /* ── Scene 4: AI Menu Import ── */
+      .ai-card {
+        width: 760px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 44px 48px;
+        box-shadow: 0 20px 60px rgba(44, 23, 14, 0.1);
+      }
+      .ai-card-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-bottom: 22px;
+        margin-bottom: 22px;
+        border-bottom: 1px solid var(--border);
+      }
+      .ai-dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+      }
+      .ai-card-label {
+        font-family: "Space Mono", monospace;
+        font-size: 15px;
+        letter-spacing: 3px;
+        color: var(--gold);
+        margin-left: 6px;
+      }
+      .ai-rows {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .ai-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+      }
+      .ai-row-name {
+        font-size: 22px;
+        color: var(--dark);
+      }
+      .ai-row-price {
+        font-family: "Space Mono", monospace;
+        font-size: 20px;
+        color: var(--gold);
+        font-variant-numeric: tabular-nums;
+      }
+      .ai-footer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 28px;
+      }
+      .ai-timer {
+        font-family: "Space Mono", monospace;
+        font-size: 40px;
+        color: var(--dark);
+        font-variant-numeric: tabular-nums;
+      }
+      .ai-timer.settled {
+        color: var(--gold);
+      }
+      .ai-caption {
+        font-size: 14px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-top: 8px;
+        opacity: 0;
+      }
+
+      /* ── Scene 5: Tables ── */
+      .tables-wrap {
+        width: 1500px;
+      }
+      .tstat-row {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 34px;
+      }
+      .tstat-tile {
+        flex: 1;
+        border-radius: 18px;
+        padding: 22px 26px;
+      }
+      .tstat-num {
+        font-size: 34px;
+        font-weight: 800;
+      }
+      .tstat-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-top: 4px;
+        opacity: 0.85;
+      }
+      .table-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+      .table-card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 22px;
+        box-shadow: 0 8px 24px rgba(44, 23, 14, 0.06);
+      }
+      .table-card-num {
+        font-family: "DM Serif Display", serif;
+        font-size: 24px;
+        margin-bottom: 8px;
+      }
+      .table-status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      /* ── Scene 6: Kitchen ── */
+      .kitchen-wrap {
+        width: 1500px;
+      }
+      .station-row {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 30px;
+      }
+      .station-pill {
+        padding: 10px 24px;
+        border-radius: 999px;
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .station-pill.active {
+        background: var(--gold);
+        color: #fff;
+      }
+      .station-pill.inactive {
+        background: #fff;
+        border: 1px solid var(--border);
+        color: var(--muted);
+      }
+      .ticket-row {
+        display: flex;
+        gap: 20px;
+      }
+      .ticket-card {
+        flex: 1;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 22px;
+        box-shadow: 0 8px 24px rgba(44, 23, 14, 0.06);
+      }
+      .ticket-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+      }
+      .ticket-table {
+        font-family: "Space Mono", monospace;
+        font-size: 16px;
+        color: var(--dark);
+      }
+      .ticket-item {
+        font-size: 14px;
+        color: var(--muted);
+        padding: 5px 0;
+      }
+
+      /* ── Scene 7: Reports ── */
+      .reports-wrap {
+        width: 1500px;
+      }
+      .chart-row {
+        display: flex;
+        gap: 24px;
+        margin-top: 30px;
+      }
+      .bar-chart-card,
+      .top-items-card {
+        flex: 1;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 26px;
+        box-shadow: 0 8px 24px rgba(44, 23, 14, 0.06);
+      }
+      .bar-chart-title,
+      .top-items-title {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--muted);
+        margin-bottom: 22px;
+      }
+      .bars {
+        display: flex;
+        align-items: flex-end;
+        gap: 16px;
+        height: 160px;
+      }
+      .bar {
+        flex: 1;
+        background: #f2e9e6;
+        border-radius: 6px 6px 0 0;
+        transform-origin: bottom;
+      }
+      .bar.peak {
+        background: var(--gold);
+      }
+      .top-item-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 15px;
+      }
+      .top-item-bar {
+        height: 6px;
+        border-radius: 3px;
+        background: var(--gold);
+        margin-top: 6px;
+      }
+
+      /* ── Scene 8: Highlight ── */
+      .highlight-lines {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        text-align: center;
+      }
+      .highlight-main {
+        font-family: "DM Serif Display", serif;
+        font-size: 84px;
+        color: var(--dark);
+      }
+      .highlight-sub {
+        font-family: "Outfit", sans-serif;
+        font-weight: 700;
+        font-size: 28px;
+        color: var(--gold);
+      }
+
+      /* ── Scene 9: Outro ── */
+      .outro-stack {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 22px;
+      }
+      .outro-mark {
+        width: 64px;
+        height: 64px;
+        background: var(--gold);
+        transform: rotate(45deg) scale(0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .outro-mark-inner {
+        width: 26px;
+        height: 26px;
+        background: #fff;
+      }
+      .outro-wordmark {
+        font-family: "DM Serif Display", serif;
+        font-size: 74px;
+        color: var(--dark);
+      }
+      .outro-tagline {
+        font-family: "Space Mono", monospace;
+        font-size: 19px;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="easybillbro-demo"
+      data-start="0"
+      data-width="1920"
+      data-height="1080"
+      data-duration="60"
+    >
+      <div id="bg-glow">
+        <div id="bg-radial"></div>
+        <div id="bg-grid"></div>
+      </div>
+
+      <!-- SCENE 1 — Hook — 0-4s -->
+      <section class="clip" id="scene-1" data-start="0" data-duration="4">
+        <div class="scene-fade" id="s1-fade">
+          <div class="hook-lines">
+            <div class="hook-line" id="s1-line1">Your restaurant.</div>
+            <div class="hook-line" id="s1-line2"><em>Finally</em></div>
+            <div class="hook-line hook-muted" id="s1-line3">running like it should.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCENE 2 — Login — 4-11s -->
+      <section class="clip" id="scene-2" data-start="4" data-duration="7">
+        <div class="scene-fade" id="s2-fade">
+          <div class="login-split">
+            <div class="login-left">
+              <div class="login-brand" id="s2-brand"><div class="login-diamond"></div>EasyBillBro</div>
+              <div id="s2-quote">
+                <div class="login-quote">Your restaurant.<br /><em>Finally</em> running like it should.</div>
+              </div>
+              <div id="s2-stats">
+                <div class="login-stats">
+                  <div><div class="login-stat-num">60s</div><div class="login-stat-lbl">AI Menu Import</div></div>
+                  <div><div class="login-stat-num">&#8377;999</div><div class="login-stat-lbl">Per Month</div></div>
+                  <div><div class="login-stat-num">GST</div><div class="login-stat-lbl">Compliant</div></div>
+                </div>
+              </div>
+              <div class="login-copyright">&copy; 2026 EasyBillBro &middot; Bengaluru</div>
+            </div>
+            <div class="login-right">
+              <div class="login-form-wrap">
+                <div class="login-form-brand" id="s2-formbrand">
+                  <div class="login-form-title">EasyBillBro</div>
+                  <div class="login-form-sub">POS Platform &middot; Staff Access</div>
+                </div>
+                <div class="login-field" id="s2-field-user">
+                  <div class="login-field-icon">&#128100;</div>
+                  <div class="login-field-text" id="s2-user-text">Username</div>
+                </div>
+                <div class="login-field" id="s2-field-pass">
+                  <div class="login-field-icon">&#128273;</div>
+                  <div class="login-field-text">&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;</div>
+                </div>
+                <div class="login-btn pill-btn" id="s2-btn">Sign In &nbsp;&rarr;</div>
+              </div>
+            </div>
+            <div class="login-cursor" id="s2-cursor" style="opacity:0;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCENE 3 — Dashboard — 11-19s -->
+      <section class="clip" id="scene-3" data-start="11" data-duration="8">
+        <div class="scene-fade" id="s3-fade">
+          <div class="dash-shell">
+            <div class="dash-sidebar" id="s3-sidebar">
+              <div class="dash-logo"><div class="login-diamond" style="width:18px;height:18px;"></div>EasyBillBro</div>
+              <div class="dash-nav-item active"><i class="bi bi-receipt"></i>&nbsp;&nbsp;Orders</div>
+              <div class="dash-nav-item"><i class="bi bi-egg-fried"></i>&nbsp;&nbsp;Kitchen</div>
+              <div class="dash-nav-item"><i class="bi bi-grid-3x3-gap"></i>&nbsp;&nbsp;Tables</div>
+              <div class="dash-nav-item"><i class="bi bi-broadcast-pin"></i>&nbsp;&nbsp;Live Floor</div>
+              <div class="dash-nav-item"><i class="bi bi-people"></i>&nbsp;&nbsp;Customers</div>
+            </div>
+            <div class="dash-main">
+              <div class="dash-header-row" id="s3-header">
+                <div class="dash-title">Orders</div>
+                <div class="dash-branch">Main Branch</div>
+              </div>
+              <div class="kpi-row">
+                <div class="kpi-tile" id="s3-kpi-1" style="background:var(--gold);">
+                  <div class="icon-badge" style="width:38px;height:38px;font-size:18px;color:#fff;"><i class="bi bi-receipt"></i></div>
+                  <div class="kpi-num" id="s3-kpi-1-num">0</div>
+                  <div class="kpi-label">Active Orders</div>
+                </div>
+                <div class="kpi-tile" id="s3-kpi-2" style="background:#a3182a;">
+                  <div class="icon-badge" style="width:38px;height:38px;font-size:18px;color:#fff;"><i class="bi bi-check-circle"></i></div>
+                  <div class="kpi-num" id="s3-kpi-2-num">0</div>
+                  <div class="kpi-label">Served</div>
+                </div>
+                <div class="kpi-tile" id="s3-kpi-3" style="background:#e0630f;">
+                  <div class="icon-badge" style="width:38px;height:38px;font-size:18px;color:#fff;"><i class="bi bi-bar-chart"></i></div>
+                  <div class="kpi-num" id="s3-kpi-3-num">0</div>
+                  <div class="kpi-label">Today's Orders</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCENE 4 — AI Menu Import — 19-27s -->
+      <section class="clip" id="scene-4" data-start="19" data-duration="8">
+        <div class="scene-fade" id="s4-fade">
+          <div class="ai-card" id="ai-card">
+            <div class="ai-card-header" id="ai-header">
+              <div class="ai-dot" style="background:#ef4444;"></div>
+              <div class="ai-dot" style="background:#f59e0b;"></div>
+              <div class="ai-dot" style="background:#10b981;"></div>
+              <div class="ai-card-label">AI MENU IMPORT</div>
+            </div>
+            <div class="ai-rows">
+              <div class="ai-row" id="ai-row-1"><span class="ai-row-name">Paneer Tikka</span><span class="ai-row-price">&#8377;280</span></div>
+              <div class="ai-row" id="ai-row-2"><span class="ai-row-name">Garlic Naan</span><span class="ai-row-price">&#8377;55</span></div>
+              <div class="ai-row" id="ai-row-3"><span class="ai-row-name">Dal Makhani</span><span class="ai-row-price">&#8377;180</span></div>
+              <div class="ai-row" id="ai-row-4"><span class="ai-row-name">Mango Lassi</span><span class="ai-row-price">&#8377;120</span></div>
+              <div class="ai-row" id="ai-row-5"><span class="ai-row-name">Chicken Biryani</span><span class="ai-row-price">&#8377;320</span></div>
+              <div class="ai-row" id="ai-row-6"><span class="ai-row-name">Masala Chai</span><span class="ai-row-price">&#8377;60</span></div>
+            </div>
+            <div class="ai-footer">
+              <div class="ai-timer" id="ai-timer">0s</div>
+              <div class="ai-caption" id="ai-caption">Menu imported.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCENE 5 — Tables — 27-34s -->
+      <section class="clip" id="scene-5" data-start="27" data-duration="7">
+        <div class="scene-fade" id="s5-fade">
+          <div class="tables-wrap">
+            <div class="tstat-row">
+              <div class="tstat-tile" id="s5-stat-1" style="background:rgba(236,39,52,0.08);color:#c41f2b;">
+                <div class="tstat-num">20</div><div class="tstat-label">Total Tables</div>
+              </div>
+              <div class="tstat-tile" id="s5-stat-2" style="background:rgba(16,185,129,0.1);color:#047857;">
+                <div class="tstat-num">8</div><div class="tstat-label">Available</div>
+              </div>
+              <div class="tstat-tile" id="s5-stat-3" style="background:rgba(44,23,14,0.06);color:var(--dark);">
+                <div class="tstat-num">12</div><div class="tstat-label">Occupied</div>
+              </div>
+            </div>
+            <div class="table-grid">
+              <div class="table-card" id="s5-t1">
+                <div class="table-card-num">T-01</div>
+                <span class="table-status-pill" style="background:rgba(16,185,129,0.12);color:#047857;">Free</span>
+              </div>
+              <div class="table-card" id="s5-t2">
+                <div class="table-card-num">T-02</div>
+                <span class="table-status-pill" style="background:rgba(236,39,52,0.12);color:#c41f2b;">Occupied &middot; 24m</span>
+              </div>
+              <div class="table-card" id="s5-t3">
+                <div class="table-card-num">T-03</div>
+                <span class="table-status-pill" style="background:rgba(16,185,129,0.12);color:#047857;">Free</span>
+              </div>
+              <div class="table-card" id="s5-t4">
+                <div class="table-card-num">T-04</div>
+                <span class="table-status-pill" style="background:rgba(250,115,39,0.12);color:#b2521c;">Reserved &middot; 7:30p</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCENE 6 — Kitchen — 34-40s -->
+      <section class="clip" id="scene-6" data-start="34" data-duration="6">
+        <div class="scene-fade" id="s6-fade">
+          <div class="kitchen-wrap">
+            <div class="station-row" id="s6-stations">
+              <div class="station-pill active">All</div>
+              <div class="station-pill inactive">Grill</div>
+              <div class="station-pill inactive">Cold</div>
+              <div class="station-pill inactive">Dessert</div>
+            </div>
+            <div class="ticket-row">
+              <div class="ticket-card" id="s6-ticket-1">
+                <div class="ticket-head">
+                  <span class="ticket-table">T-05</span>
+                  <span class="table-status-pill" style="background:rgba(250,115,39,0.12);color:#b2521c;">Preparing</span>
+                </div>
+                <div class="ticket-item">2 &times; Chicken Biryani</div>
+                <div class="ticket-item">1 &times; Garlic Naan</div>
+              </div>
+              <div class="ticket-card" id="s6-ticket-2">
+                <div class="ticket-head">
+                  <span class="ticket-table">T-11</span>
+                  <span class="table-status-pill" style="background:rgba(16,185,129,0.12);color:#047857;">Ready</span>
+                </div>
+                <div class="ticket-item">1 &times; Paneer Tikka</div>
+                <div class="ticket-item">2 &times; Masala Chai</div>
+              </div>
+              <div class="ticket-card" id="s6-ticket-3">
+                <div class="ticket-head">
+                  <span class="ticket-table">T-08</span>
+                  <span class="table-status-pill" style="background:rgba(250,115,39,0.12);color:#b2521c;">Preparing</span>
+                </div>
+                <div class="ticket-item">1 &times; Dal Makhani</div>
+                <div class="ticket-item">3 &times; Garlic Naan</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCENE 7 — Reports — 40-47s -->
+      <section class="clip" id="scene-7" data-start="40" data-duration="7">
+        <div class="scene-fade" id="s7-fade">
+          <div class="reports-wrap">
+            <div class="kpi-row" id="s7-kpis">
+              <div class="kpi-tile" style="background:var(--gold);">
+                <div class="icon-badge" style="width:34px;height:34px;font-size:16px;color:#fff;"><i class="bi bi-currency-rupee"></i></div>
+                <div class="kpi-num" style="font-size:30px;margin-top:26px;">52,400</div>
+                <div class="kpi-label">Revenue Today</div>
+              </div>
+              <div class="kpi-tile" style="background:#a3182a;">
+                <div class="icon-badge" style="width:34px;height:34px;font-size:16px;color:#fff;"><i class="bi bi-receipt"></i></div>
+                <div class="kpi-num" style="font-size:30px;margin-top:26px;">184</div>
+                <div class="kpi-label">Orders</div>
+              </div>
+              <div class="kpi-tile" style="background:#e0630f;">
+                <div class="icon-badge" style="width:34px;height:34px;font-size:16px;color:#fff;"><i class="bi bi-people"></i></div>
+                <div class="kpi-num" style="font-size:30px;margin-top:26px;">46</div>
+                <div class="kpi-label">New Customers</div>
+              </div>
+            </div>
+            <div class="chart-row">
+              <div class="bar-chart-card">
+                <div class="bar-chart-title">Weekly Revenue</div>
+                <div class="bars">
+                  <div class="bar" id="s7-bar-1" style="height:40%;"></div>
+                  <div class="bar" id="s7-bar-2" style="height:55%;"></div>
+                  <div class="bar" id="s7-bar-3" style="height:48%;"></div>
+                  <div class="bar" id="s7-bar-4" style="height:62%;"></div>
+                  <div class="bar" id="s7-bar-5" style="height:58%;"></div>
+                  <div class="bar peak" id="s7-bar-6" style="height:100%;"></div>
+                </div>
+              </div>
+              <div class="top-items-card">
+                <div class="top-items-title">Top Selling Items</div>
+                <div id="s7-item-1">
+                  <div class="top-item-row"><span>Chicken Biryani</span><span>142</span></div>
+                  <div class="top-item-bar" style="width:90%;"></div>
+                </div>
+                <div id="s7-item-2" style="margin-top:14px;">
+                  <div class="top-item-row"><span>Paneer Tikka</span><span>98</span></div>
+                  <div class="top-item-bar" style="width:64%;"></div>
+                </div>
+                <div id="s7-item-3" style="margin-top:14px;">
+                  <div class="top-item-row"><span>Masala Chai</span><span>76</span></div>
+                  <div class="top-item-bar" style="width:48%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCENE 8 — Highlight — 47-53s -->
+      <section class="clip" id="scene-8" data-start="47" data-duration="6">
+        <div class="scene-fade" id="s8-fade">
+          <div class="highlight-lines">
+            <div class="highlight-main" id="s8-line1">No annual contract.</div>
+            <div class="highlight-sub" id="s8-line2">Cancel anytime.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCENE 9 — Outro — 53-60s -->
+      <section class="clip" id="scene-9" data-start="53" data-duration="7">
+        <div class="scene-fade" id="s9-fade">
+          <div class="outro-stack">
+            <div class="outro-mark" id="s9-mark"><div class="outro-mark-inner"></div></div>
+            <div class="outro-wordmark" id="s9-wordmark">EasyBillBro</div>
+            <div class="outro-tagline" id="s9-tagline">&#8377;999/month. No contract. Built in Bengaluru.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AUDIO -->
+      <audio
+        id="music-bed"
+        src="assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3"
+        data-start="0"
+        data-duration="60"
+        data-track-index="10"
+        data-volume="0.30"
+        data-automation='{"version":1,"lanes":[{"target":"volume","points":[
+          {"t":0,"v":0},
+          {"t":0.2,"v":0.3},
+          {"t":0.35,"v":0.14},
+          {"t":3.422,"v":0.14},
+          {"t":3.672,"v":0.3},
+          {"t":4.2,"v":0.3},
+          {"t":4.35,"v":0.14},
+          {"t":8.745,"v":0.14},
+          {"t":8.995,"v":0.3},
+          {"t":11.2,"v":0.3},
+          {"t":11.35,"v":0.14},
+          {"t":13.825,"v":0.14},
+          {"t":14.075,"v":0.3},
+          {"t":19.2,"v":0.3},
+          {"t":19.35,"v":0.14},
+          {"t":23.681,"v":0.14},
+          {"t":23.931,"v":0.3},
+          {"t":27.2,"v":0.3},
+          {"t":27.35,"v":0.14},
+          {"t":31.489,"v":0.14},
+          {"t":31.739,"v":0.3},
+          {"t":34.2,"v":0.3},
+          {"t":34.35,"v":0.14},
+          {"t":37.849,"v":0.14},
+          {"t":38.099,"v":0.3},
+          {"t":40.2,"v":0.3},
+          {"t":40.35,"v":0.14},
+          {"t":43.87,"v":0.14},
+          {"t":44.12,"v":0.3},
+          {"t":47.2,"v":0.3},
+          {"t":47.35,"v":0.14},
+          {"t":50.017,"v":0.14},
+          {"t":50.267,"v":0.3},
+          {"t":53.35,"v":0.3},
+          {"t":53.5,"v":0.14},
+          {"t":56.38,"v":0.14},
+          {"t":56.63,"v":0.3},
+          {"t":59.3,"v":0.3},
+          {"t":60,"v":0}
+        ]}]}'
+      ></audio>
+
+      <audio id="vo-1" src="assets/voice/vo-1-hook.wav" data-start="0.35" data-duration="3.072" data-track-index="3" data-volume="1"></audio>
+      <audio id="vo-2" src="assets/voice/vo-2-login.wav" data-start="4.35" data-duration="4.395" data-track-index="4" data-volume="1"></audio>
+      <audio id="vo-3" src="assets/voice/vo-3-dashboard.wav" data-start="11.35" data-duration="2.475" data-track-index="5" data-volume="1"></audio>
+      <audio id="vo-4" src="assets/voice/vo-4-aiimport.wav" data-start="19.35" data-duration="4.331" data-track-index="6" data-volume="1"></audio>
+      <audio id="vo-5" src="assets/voice/vo-5-tables.wav" data-start="27.35" data-duration="4.139" data-track-index="7" data-volume="1"></audio>
+      <audio id="vo-6" src="assets/voice/vo-6-kitchen.wav" data-start="34.35" data-duration="3.499" data-track-index="8" data-volume="1"></audio>
+      <audio id="vo-7" src="assets/voice/vo-7-reports.wav" data-start="40.35" data-duration="3.52" data-track-index="9" data-volume="1"></audio>
+      <audio id="vo-8" src="assets/voice/vo-8-highlight.wav" data-start="47.35" data-duration="2.667" data-track-index="11" data-volume="1"></audio>
+      <audio id="vo-9" src="assets/voice/vo-9-outro.wav" data-start="53.5" data-duration="2.88" data-track-index="12" data-volume="1"></audio>
+
+      <!-- beat-locked: 11.75s (near cue 10.93s, used as soft bias for scene3's first KPI tile) -->
+      <audio id="sfx-login" src="assets/sfx/impact/impactSoft_medium_002.ogg" data-start="6.55" data-duration="0.14" data-track-index="20" data-volume="0.55"></audio>
+      <audio id="sfx-kpi" src="assets/sfx/impact/impactSoft_medium_000.ogg" data-start="11.75" data-duration="0.12" data-track-index="21" data-volume="0.55"></audio>
+      <audio id="sfx-row1" src="assets/sfx/impact/impactSoft_medium_002.ogg" data-start="19.70" data-duration="0.14" data-track-index="22" data-volume="0.55"></audio>
+      <audio id="sfx-settle" src="assets/sfx/impact/impactSoft_medium_000.ogg" data-start="23.15" data-duration="0.12" data-track-index="23" data-volume="0.6"></audio>
+      <audio id="sfx-logo" src="assets/sfx/interface/bong_001.ogg" data-start="53.32" data-duration="0.13" data-track-index="24" data-volume="0.55"></audio>
+    </div>
+
+    <script>
+      document.fonts.ready.then(function () {
+        var tl = gsap.timeline({ paused: true });
+
+        // ── Scene fade-to-cream transitions ──
+        var scenes = [
+          ["#s1-fade", 0, 3.65],
+          ["#s2-fade", 4, 10.65],
+          ["#s3-fade", 11, 18.65],
+          ["#s4-fade", 19, 26.65],
+          ["#s5-fade", 27, 33.65],
+          ["#s6-fade", 34, 39.65],
+          ["#s7-fade", 40, 46.65],
+          ["#s8-fade", 47, 52.65],
+          ["#s9-fade", 53, 58.7],
+        ];
+        scenes.forEach(function (s, i) {
+          var sel = s[0],
+            inAt = s[1],
+            outAt = s[2];
+          var outDur = i === scenes.length - 1 ? 1.3 : 0.35;
+          tl.fromTo(sel, { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "none" }, inAt);
+          tl.to(sel, { opacity: 0, duration: outDur, ease: "none" }, outAt);
+        });
+
+        // ── Scene 1: Hook ──
+        tl.fromTo("#s1-line1", { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.15);
+        tl.fromTo("#s1-line2", { y: 20, opacity: 0, scale: 0.94 }, { y: 0, opacity: 1, scale: 1, duration: 0.55, ease: "back.out(1.5)" }, 0.85);
+        tl.fromTo("#s1-line3", { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 1.45);
+
+        // ── Scene 2: Login ──
+        tl.fromTo("#s2-brand", { y: -10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "none" }, 4.2);
+        tl.fromTo("#s2-quote", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "none" }, 4.35);
+        tl.fromTo("#s2-stats", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4, ease: "none" }, 4.7);
+        tl.fromTo("#s2-formbrand", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 4.3);
+        tl.fromTo("#s2-field-user", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, 4.6);
+        tl.fromTo("#s2-field-pass", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, 4.85);
+        tl.fromTo("#s2-btn", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, 5.1);
+        // simulated typing into the username field
+        tl.call(
+          function () {
+            document.getElementById("s2-user-text").textContent = "manager1";
+            document.getElementById("s2-user-text").classList.add("filled");
+          },
+          [],
+          5.6,
+        );
+        // simulated cursor move to Sign In button + click
+        gsap.set("#s2-cursor", { x: 720, y: 430 });
+        tl.to("#s2-cursor", { opacity: 1, duration: 0.01 }, 6.0);
+        tl.to("#s2-cursor", { x: 640, y: 560, duration: 0.5, ease: "power2.inOut" }, 6.0);
+        tl.to("#s2-cursor", { opacity: 0, duration: 0.15 }, 6.55);
+        // beat-locked: 6.55s soft-tap → sfx-login fires at 6.55
+        tl.to("#s2-btn", { scale: 0.97, duration: 0.1, ease: "power1.in" }, 6.5);
+        tl.to("#s2-btn", { scale: 1, duration: 0.2, ease: "back.out(2)" }, 6.6);
+
+        // ── Scene 3: Dashboard ──
+        tl.fromTo("#s3-sidebar", { opacity: 0, x: -14 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, 11.1);
+        tl.fromTo("#s3-header", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.4, ease: "none" }, 11.4);
+        var kpiTiles = ["#s3-kpi-1", "#s3-kpi-2", "#s3-kpi-3"];
+        var kpiStarts = [11.8, 12.2, 12.6];
+        var kpiVals = [
+          ["#s3-kpi-1-num", 14],
+          ["#s3-kpi-2-num", 96],
+          ["#s3-kpi-3-num", 128],
+        ];
+        kpiTiles.forEach(function (sel, i) {
+          tl.fromTo(sel, { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" }, kpiStarts[i]);
+          var counter = { v: 0 };
+          tl.to(
+            counter,
+            {
+              v: kpiVals[i][1],
+              duration: 0.6,
+              ease: "power1.out",
+              onUpdate: (function (id) {
+                return function () {
+                  document.getElementById(id.replace("#", "")).textContent = Math.round(this.targets()[0].v);
+                };
+              })(kpiVals[i][0]),
+            },
+            kpiStarts[i] + 0.1,
+          );
+        });
+
+        // ── Scene 4: AI Menu Import ──
+        tl.fromTo("#ai-card", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "power2.out" }, 19.05);
+        tl.fromTo("#ai-header", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "none" }, 19.25);
+        var rowStarts = [19.75, 20.23, 20.71, 21.19, 21.67, 22.15];
+        rowStarts.forEach(function (t, i) {
+          tl.fromTo("#ai-row-" + (i + 1), { x: -18, opacity: 0 }, { x: 0, opacity: 1, duration: 0.4, ease: "power2.out" }, t);
+        });
+        var counter4 = { v: 0 };
+        tl.to(
+          counter4,
+          {
+            v: 47,
+            duration: 3.45,
+            ease: "power1.inOut",
+            onUpdate: function () {
+              document.getElementById("ai-timer").textContent = Math.round(counter4.v) + "s";
+            },
+          },
+          19.75,
+        );
+        // beat-locked: 23.2s countdown settle
+        tl.call(
+          function () {
+            var timer = document.getElementById("ai-timer");
+            timer.textContent = "47s";
+            timer.classList.add("settled");
+          },
+          [],
+          23.2,
+        );
+        tl.fromTo("#ai-caption", { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "none" }, 23.2);
+
+        // ── Scene 5: Tables ──
+        tl.fromTo("#s5-stat-1", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" }, 27.2);
+        tl.fromTo("#s5-stat-2", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" }, 27.5);
+        tl.fromTo("#s5-stat-3", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" }, 27.8);
+        ["#s5-t1", "#s5-t2", "#s5-t3", "#s5-t4"].forEach(function (sel, i) {
+          tl.fromTo(sel, { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: "power2.out" }, 27.9 + i * 0.25);
+        });
+
+        // ── Scene 6: Kitchen ──
+        tl.fromTo("#s6-stations", { opacity: 0, x: -12 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, 34.2);
+        ["#s6-ticket-1", "#s6-ticket-2", "#s6-ticket-3"].forEach(function (sel, i) {
+          tl.fromTo(sel, { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" }, 34.6 + i * 0.3);
+        });
+
+        // ── Scene 7: Reports ──
+        tl.fromTo("#s7-kpis .kpi-tile:nth-child(1)", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" }, 40.2);
+        tl.fromTo("#s7-kpis .kpi-tile:nth-child(2)", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" }, 40.5);
+        tl.fromTo("#s7-kpis .kpi-tile:nth-child(3)", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" }, 40.8);
+        [1, 2, 3, 4, 5, 6].forEach(function (n, i) {
+          tl.fromTo(
+            "#s7-bar-" + n,
+            { scaleY: 0 },
+            { scaleY: 1, duration: 0.45, ease: "power2.out" },
+            41.2 + i * 0.15,
+          );
+        });
+        ["#s7-item-1", "#s7-item-2", "#s7-item-3"].forEach(function (sel, i) {
+          tl.fromTo(sel, { opacity: 0, x: 10 }, { opacity: 1, x: 0, duration: 0.35, ease: "none" }, 43.0 + i * 0.25);
+        });
+
+        // ── Scene 8: Highlight ──
+        tl.fromTo("#s8-line1", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 47.2);
+        tl.fromTo("#s8-line2", { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 47.9);
+
+        // ── Scene 9: Outro ──
+        tl.fromTo("#s9-mark", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(1.6)" }, 53.35);
+        tl.fromTo("#s9-wordmark", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 53.85);
+        tl.fromTo("#s9-tagline", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "none" }, 54.4);
+
+        // ── Audio-reactive: subtle brand-glow breathing ──
+        // Sampled every 3rd frame (10fps) rather than every frame -- a slow
+        // "breathing" glow doesn't need 30fps updates, and at 60s duration
+        // a full per-frame loop (1800 tl.call entries) was too slow to
+        // build within the render/check navigation timeout.
+        if (typeof AUDIO_DATA !== "undefined") {
+          for (var f = 0; f < AUDIO_DATA.totalFrames; f += 3) {
+            (function (frame) {
+              tl.call(
+                function () {
+                  var rms = frame.rms || 0;
+                  gsap.set("#bg-radial", {
+                    opacity: 0.6 + rms * 0.3,
+                    scale: 1 + rms * 0.03,
+                  });
+                },
+                [],
+                f / AUDIO_DATA.fps,
+              );
+            })(AUDIO_DATA.frames[f]);
+          }
+        }
+
+        window.__timelines["easybillbro-demo"] = tl;
+      });
+    </script>
+  </body>
+</html>

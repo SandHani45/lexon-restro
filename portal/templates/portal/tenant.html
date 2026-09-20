@@ -302,6 +302,7 @@
 <script>
 async function applyPreset(presetKey, label) {
   if (!confirm(`Apply preset "${label}"?\nThis overrides feature flags for {{ tenant.name }}.`)) return;
+  if (!await ui.confirm("Apply Preset?", `Apply preset "${label}"?\nThis overrides feature flags for {{ tenant.name }}.`, "Apply Preset")) return;
   const r = await fetch("{% url 'portal:preset' tenant.id %}", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded", "X-CSRFToken": apiClient.getCsrf() },

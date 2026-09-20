@@ -94,8 +94,8 @@ function getCookie(name) {
   return v ? v[2] : null;
 }
 
-function approveRefund(refundId) {
-  if (!confirm("Approve this refund?")) return;
+async function approveRefund(refundId) {
+  if (!await ui.confirm("Approve Refund?", "Are you sure you want to approve and process this refund?", "Approve Refund")) return;
   fetch(`/refund/approve/${refundId}/`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "X-CSRFToken": getCookie("csrftoken2") },
@@ -104,14 +104,14 @@ function approveRefund(refundId) {
   .then(r => r.json())
   .then(d => {
     if (d.success) location.reload();
-    else alert(d.error || "Failed.");
+    else ui.alert("Refund Failed", d.error || "Failed to approve refund.", "error");
   })
-  .catch(() => alert("Network error."));
+  .catch(() => ui.alert("Network Error", "Unable to contact server.", "error"));
 }
 
-function rejectRefund(refundId) {
-  const reason = prompt("Reason for rejection (optional):");
-  if (reason === null) return;
+async function rejectRefund(refundId) {
+  const reason = await ui.prompt("Reject Refund", "Reason for rejection (optional):", "");
+  if (reason === null || reason === false) return;
   fetch(`/refund/reject/${refundId}/`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "X-CSRFToken": getCookie("csrftoken2") },
@@ -120,9 +120,9 @@ function rejectRefund(refundId) {
   .then(r => r.json())
   .then(d => {
     if (d.success) location.reload();
-    else alert(d.error || "Failed.");
+    else ui.alert("Reject Failed", d.error || "Failed to reject refund.", "error");
   })
-  .catch(() => alert("Network error."));
+  .catch(() => ui.alert("Network Error", "Unable to contact server.", "error"));
 }
 </script>
 {% endblock %}

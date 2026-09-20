@@ -12,9 +12,14 @@
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <link rel="canonical" href="https://lexnorax.net/">
 
-<!-- FAVICON -->
-<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
-<link rel="apple-touch-icon" href="/static/icon-512.svg">
+<!-- FAVICON & APP ICONS -->
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="theme-color" content="#0a0a0a">
+
 
 <!-- OPEN GRAPH -->
 <meta property="og:type" content="website">
@@ -160,11 +165,12 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.1rem 
 .nav-inner.scrolled { background: rgba(10,10,10,0.92); box-shadow: 0 8px 30px rgba(0,0,0,0.35); }
 
 .nav-logo { display: flex; align-items: center; text-decoration: none; }
-.nav-logo-img { height: 40px; width: auto; max-width: 165px; object-fit: contain; display: block; transition: transform 0.25s ease, opacity 0.25s ease; }
-.nav-logo:hover .nav-logo-img { transform: scale(1.04); opacity: 0.95; }
+.nav-logo-img { height: 42px; width: auto; max-width: 240px; object-fit: contain; display: block; transition: transform 0.25s ease, opacity 0.25s ease; }
+.nav-logo:hover .nav-logo-img { transform: scale(1.03); opacity: 0.98; }
 .footer-logo-link { display: inline-flex; align-items: center; text-decoration: none; }
-.footer-logo-img { height: 38px; width: auto; max-width: 155px; object-fit: contain; display: block; opacity: 0.88; transition: opacity 0.25s ease; }
+.footer-logo-img { height: 40px; width: auto; max-width: 210px; object-fit: contain; display: block; opacity: 0.92; transition: opacity 0.25s ease; }
 .footer-logo-link:hover .footer-logo-img { opacity: 1; }
+
 
 .nav-links { display: flex; align-items: center; gap: 1.6rem; list-style: none; }
 .nav-links a { text-decoration: none; font-size: 0.8rem; letter-spacing: 0.5px; color: #9ca3af; font-weight: 500; transition: color 0.2s; }
@@ -1547,7 +1553,7 @@ html.reveal-ready .reveal.visible {
 <nav id="navbar">
   <div class="nav-inner" id="navInner">
     <a href="/" class="nav-logo" title="EasyBillBro POS">
-      <img src="/easybillbro_logo.png" alt="EasyBillBro" class="nav-logo-img">
+      <img src="/easybillbro_logo_white.png" alt="EasyBillBro" class="nav-logo-img">
     </a>
     <ul class="nav-links">
       <li class="nav-dropdown">
@@ -2333,7 +2339,7 @@ html.reveal-ready .reveal.visible {
 <footer>
   <div class="footer-inner">
     <a href="/" class="footer-logo-link" title="EasyBillBro POS">
-      <img src="/easybillbro_logo.png" alt="EasyBillBro" class="footer-logo-img">
+      <img src="/easybillbro_logo_white.png" alt="EasyBillBro" class="footer-logo-img">
     </a>
     <div class="footer-links">
       <a href="#features">Features</a>

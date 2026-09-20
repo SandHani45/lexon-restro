@@ -213,18 +213,6 @@
 </style>
 {% endblock %}
 
-{% block header_left %}
-<a href="/dashboard/" class="d-flex align-items-center gap-2 text-decoration-none" style="color:inherit;">
-    <div style="width:34px;height:34px;border-radius:10px;background:rgba(236, 39, 52,0.12);border:1px solid rgba(236, 39, 52,0.3);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex-shrink:0;">
-        <i class="bi bi-speedometer2" style="font-size:1.05rem;"></i>
-    </div>
-    <div>
-        <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.5px;color:var(--text-main);">Dashboard</h1>
-        <div class="text-muted" style="font-size:0.72rem;letter-spacing:0.5px;">{{ request.user.outlet.name|default:request.user.tenant.name }}</div>
-    </div>
-</a>
-{% endblock %}
-
 {% block header_right %}
 {% if 'platform_sync' in tenant_features %}
 <div class="aggregator-bar d-none d-md-flex">
@@ -284,7 +272,7 @@
 
         <!-- Card 2: Today's Revenue -->
         <div class="col-12 col-sm-6 col-xl-3">
-            <a href="/reports/" class="hero-kpi-card kpi-gradient-revenue">
+            <a href="/reports/dashboard/" class="hero-kpi-card kpi-gradient-revenue">
                 <div>
                     <div class="hero-icon-box"><i class="bi bi-currency-rupee"></i></div>
                     <div class="hero-stat-val" id="valRevenue">₹ {{ m.revenue|default:"0" }}</div>
@@ -333,63 +321,49 @@
     <!-- ══ MIDDLE ANALYTICS ROW (Charts) ════════════════════ -->
     <div class="row g-3 mb-4">
 
-        <!-- Weekly Revenue Bar Chart (SVG) -->
+        <!-- Weekly Revenue Bar Chart (SVG) — real data from weekly_revenue_series(), not hardcoded -->
         <div class="col-12 col-lg-8">
             <div class="dash-panel">
                 <div class="dash-panel-header">
                     <div>
                         <h4 class="dash-panel-title">Weekly Revenue</h4>
-                        <div class="dash-panel-sub">Mon - Sun • This week performance</div>
+                        <div class="dash-panel-sub">Last 7 days • {{ weekly_revenue.days.0.label }}&nbsp;-&nbsp;{{ weekly_revenue.days.6.label }}</div>
                     </div>
-                    <span class="badge rounded-pill" style="background:rgba(16,185,129,0.12);color:#10b981;font-weight:700;font-size:0.75rem;padding:0.35rem 0.75rem;">
-                        <i class="bi bi-arrow-up-right me-1"></i>+15.4% vs last week
+                    {% if weekly_revenue.change_pct is not None %}
+                    <span class="badge rounded-pill" style="background:{% if weekly_revenue.change_pct >= 0 %}rgba(16,185,129,0.12);color:#10b981{% else %}rgba(236,39,52,0.12);color:#EC2734{% endif %};font-weight:700;font-size:0.75rem;padding:0.35rem 0.75rem;">
+                        <i class="bi {% if weekly_revenue.change_pct >= 0 %}bi-arrow-up-right{% else %}bi-arrow-down-right{% endif %} me-1"></i>{{ weekly_revenue.change_pct }}% vs last week
                     </span>
+                    {% endif %}
                 </div>
 
                 <!-- Interactive SVG Bar Chart -->
                 <div style="flex:1;min-height:180px;display:flex;align-items:flex-end;position:relative;">
+                    {% if weekly_revenue.days %}
                     <svg viewBox="0 0 700 170" style="width:100%;height:100%;overflow:visible;">
                         <!-- Grid lines -->
-                        <line x1="30" y1="20" x2="680" y2="20" stroke="var(--border-color)" stroke-dasharray="3,3" />
+                        <line x1="30" y1="{{ weekly_revenue.chart_top }}" x2="680" y2="{{ weekly_revenue.chart_top }}" stroke="var(--border-color)" stroke-dasharray="3,3" />
                         <line x1="30" y1="60" x2="680" y2="60" stroke="var(--border-color)" stroke-dasharray="3,3" />
                         <line x1="30" y1="100" x2="680" y2="100" stroke="var(--border-color)" stroke-dasharray="3,3" />
-                        <line x1="30" y1="140" x2="680" y2="140" stroke="var(--border-color)" />
+                        <line x1="30" y1="{{ weekly_revenue.chart_bottom }}" x2="680" y2="{{ weekly_revenue.chart_bottom }}" stroke="var(--border-color)" />
 
                         <!-- Y-Axis labels -->
-                        <text x="0" y="24" fill="var(--text-muted)" font-size="10" font-family="sans-serif">₹2.0k</text>
-                        <text x="0" y="64" fill="var(--text-muted)" font-size="10" font-family="sans-serif">₹1.5k</text>
-                        <text x="0" y="104" fill="var(--text-muted)" font-size="10" font-family="sans-serif">₹1.0k</text>
+                        <text x="0" y="24" fill="var(--text-muted)" font-size="10" font-family="sans-serif">{{ weekly_revenue.max_revenue_label }}</text>
+                        <text x="0" y="64" fill="var(--text-muted)" font-size="10" font-family="sans-serif">{{ weekly_revenue.three_quarter_revenue_label }}</text>
+                        <text x="0" y="104" fill="var(--text-muted)" font-size="10" font-family="sans-serif">{{ weekly_revenue.mid_revenue_label }}</text>
                         <text x="0" y="144" fill="var(--text-muted)" font-size="10" font-family="sans-serif">₹0</text>
 
-                        <!-- Monday Bar -->
-                        <rect class="chart-bar-rect" x="70" y="75" width="44" height="65" rx="8" fill="rgba(236,39,52,0.18)" />
-                        <text x="92" y="160" text-anchor="middle" fill="var(--text-muted)" font-size="11" font-weight="600">Mon</text>
-
-                        <!-- Tuesday Bar -->
-                        <rect class="chart-bar-rect" x="160" y="60" width="44" height="80" rx="8" fill="rgba(236,39,52,0.18)" />
-                        <text x="182" y="160" text-anchor="middle" fill="var(--text-muted)" font-size="11" font-weight="600">Tue</text>
-
-                        <!-- Wednesday Bar -->
-                        <rect class="chart-bar-rect" x="250" y="85" width="44" height="55" rx="8" fill="rgba(236,39,52,0.18)" />
-                        <text x="272" y="160" text-anchor="middle" fill="var(--text-muted)" font-size="11" font-weight="600">Wed</text>
-
-                        <!-- Thursday Bar -->
-                        <rect class="chart-bar-rect" x="340" y="50" width="44" height="90" rx="8" fill="rgba(236,39,52,0.18)" />
-                        <text x="362" y="160" text-anchor="middle" fill="var(--text-muted)" font-size="11" font-weight="600">Thu</text>
-
-                        <!-- Friday Bar -->
-                        <rect class="chart-bar-rect" x="430" y="40" width="44" height="100" rx="8" fill="rgba(236,39,52,0.22)" />
-                        <text x="452" y="160" text-anchor="middle" fill="var(--text-muted)" font-size="11" font-weight="600">Fri</text>
-
-                        <!-- Saturday (Peak Day Highlight in Red #EC2734) -->
-                        <rect class="chart-bar-rect" x="520" y="18" width="44" height="122" rx="8" fill="#EC2734" />
-                        <text x="542" y="12" text-anchor="middle" fill="#EC2734" font-size="10" font-weight="700">₹2.4k</text>
-                        <text x="542" y="160" text-anchor="middle" fill="var(--text-main)" font-size="11" font-weight="800">Sat</text>
-
-                        <!-- Sunday Bar -->
-                        <rect class="chart-bar-rect" x="610" y="45" width="44" height="95" rx="8" fill="rgba(236,39,52,0.20)" />
-                        <text x="632" y="160" text-anchor="middle" fill="var(--text-muted)" font-size="11" font-weight="600">Sun</text>
+                        {% for day in weekly_revenue.days %}
+                        <rect class="chart-bar-rect" x="{{ day.x }}" y="{{ day.y }}" width="{{ day.bar_width }}" height="{{ day.height }}" rx="8"
+                              fill="{% if day.is_peak %}#EC2734{% else %}rgba(236,39,52,0.18){% endif %}" />
+                        {% if day.is_peak %}
+                        <text x="{{ day.text_x }}" y="{{ day.y|add:'-8' }}" text-anchor="middle" fill="#EC2734" font-size="10" font-weight="700">{{ day.revenue_label }}</text>
+                        {% endif %}
+                        <text x="{{ day.text_x }}" y="160" text-anchor="middle" fill="{% if day.is_peak %}var(--text-main){% else %}var(--text-muted){% endif %}" font-size="11" font-weight="{% if day.is_peak %}800{% else %}600{% endif %}">{{ day.label }}</text>
+                        {% endfor %}
                     </svg>
+                    {% else %}
+                    <div class="text-muted" style="font-size:0.85rem;padding:2rem 0;width:100%;text-align:center;">No revenue recorded yet this week.</div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -461,7 +435,7 @@
                         <h4 class="dash-panel-title">Top Selling Items</h4>
                         <div class="dash-panel-sub">Based on today's orders</div>
                     </div>
-                    <a href="/reports/" class="dash-panel-link">View all <i class="bi bi-chevron-right"></i></a>
+                    <a href="/reports/dashboard/" class="dash-panel-link">View all <i class="bi bi-chevron-right"></i></a>
                 </div>
 
                 <div class="d-flex flex-column gap-1">
@@ -736,7 +710,7 @@
                         </div>
                         <i class="bi bi-arrow-right text-muted" style="font-size:0.8rem;"></i>
                     </a>
-                    <a href="/reports/" class="quick-op-btn">
+                    <a href="/reports/dashboard/" class="quick-op-btn">
                         <i class="bi bi-bar-chart-line-fill"></i>
                         <div style="flex:1;">
                             <div>Reports & Analytics</div>

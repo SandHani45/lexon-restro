@@ -2,7 +2,7 @@
 # Consolidates all view modules so urls.py import path stays unchanged.
 # All names in __all__ are intentional public re-exports consumed by urls.py.
 
-from .billing_core import billing_view, bill_view
+from .billing_core import billing_view, bill_view, send_whatsapp_bill
 from .payment_views import pay_order, split_pay, refund_payment
 from .discount_views import apply_discount, make_item_complimentary, apply_item_discount, log_bypass
 from .print_views import generate_bill, print_bill_action, print_kot_action, print_split_bill, qz_receipt_data, printer_status, download_pdf_bill, thermal_receipt_view
@@ -41,6 +41,7 @@ __all__ = [
     # billing pages
     "billing_view",
     "bill_view",
+    "send_whatsapp_bill",
     # payment
     "pay_order",
     "split_pay",

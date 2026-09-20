@@ -25,6 +25,7 @@ TENANT_FEATURES = {
         # CRM
         'crm',
         'reservations',
+        'guest_feedback',
         # Operations
         'inventory',
         'purchase_orders',

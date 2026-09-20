@@ -1557,8 +1557,8 @@
     `;
   }
 
-  window.cancelOrder = function(orderId) {
-    if (!confirm("Are you sure you want to cancel this order?")) return;
+  window.cancelOrder = async function(orderId) {
+    if (!await ui.confirm("Cancel Order?", "Are you sure you want to cancel this order? This cannot be undone.", "Cancel Order")) return;
     fetch(`/cancel-order/${orderId}/`, {
       method: "POST",
       headers: {
@@ -1572,7 +1572,7 @@
       fetchOrdersData();
     })
     .catch(err => {
-      alert("Failed to cancel order: " + err);
+      ui.alert("Cancel Failed", "Failed to cancel order: " + err, "error");
     });
   };
 

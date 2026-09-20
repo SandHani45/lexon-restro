@@ -5,171 +5,754 @@
 
 {% block extra_css %}
 <style>
-    .page-body { max-width: 900px; margin: 0 auto; padding: 4rem 2rem; display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 3rem; align-items: start; }
-    @media(max-width: 720px) { .page-body { grid-template-columns: 1fr; } }
-
-    .page-eyebrow { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 4px; color: var(--accent-gold); margin-bottom: 0.5rem; }
-    .page-title { font-family: 'DM Serif Display', serif; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; }
-    .divider { width: 40px; height: 1px; background: var(--accent-gold); margin: 1.2rem 0; }
-    .page-sub { color: var(--text-muted); font-size: 0.8rem; line-height: 1.6; margin-bottom: 2rem; }
-
-    .form-label { display: block; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; margin-bottom: 0.5rem; }
-    .setup-input { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border-color); color: var(--text-main); padding: 0.6rem 0; font-size: 0.9rem; outline: none; margin-bottom: 1.5rem; font-family: inherit; }
-    .setup-input:focus { border-bottom-color: var(--accent-gold); }
-    .form-select { width: 100%; background: var(--panel-bg); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.6rem; font-size: 0.85rem; outline: none; margin-bottom: 1.5rem; font-family: inherit; }
-
-    .btn-create { width: 100%; padding: 0.9rem; background: var(--accent-gold); border: none; color: #fff; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 700; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; }
-    .btn-create:hover { background: var(--accent-hover); }
-
-    .sub-table { width: 100%; border-collapse: collapse; }
-    .sub-table th { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; padding: 0.75rem 0; border-bottom: 1px solid var(--border-color); text-align: left; }
-    .sub-table td { padding: 1rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; vertical-align: middle; }
-    .sub-table-scroll { overflow-x: auto; }
-
-    .btn-reset-pw {
-        background: transparent; border: 1px solid var(--border-color); color: var(--text-muted);
-        font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; padding: 4px 10px;
-        cursor: pointer; font-family: inherit; transition: all 0.2s;
+    /* ══════════════════════════════════════════════════════════════
+       KIMIPOS LUXURY REPORT SUBSCRIPTIONS DESIGN SYSTEM
+       ══════════════════════════════════════════════════════════════ */
+    :root {
+        --pos-red: #EC2734;
+        --pos-red-hover: #d81f2f;
+        --pos-red-soft: rgba(236, 39, 52, 0.08);
+        --pos-red-border: rgba(236, 39, 52, 0.22);
+        --pos-green: #10b981;
+        --pos-green-soft: rgba(16, 185, 129, 0.10);
+        --pos-green-border: rgba(16, 185, 129, 0.25);
+        --pos-amber: #f59e0b;
+        --pos-amber-soft: rgba(245, 158, 11, 0.10);
+        --pos-amber-border: rgba(245, 158, 11, 0.25);
+        --pos-blue: #3b82f6;
+        --pos-blue-soft: rgba(59, 130, 246, 0.10);
+        --pos-blue-border: rgba(59, 130, 246, 0.25);
     }
-    .btn-reset-pw:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+
+    body {
+        background: var(--bg-color) !important;
+    }
+
+    /* ── Sub-Header Bar (KimiPoS POS Layout) ──────────────────── */
+    .pos-subbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 1.1rem 1.5rem 0.5rem;
+        background: var(--bg-color);
+        max-width: 1240px;
+        margin: 0 auto;
+    }
+    .pos-subbar-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        letter-spacing: -0.4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .pos-breadcrumbs {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .pos-breadcrumbs a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.15s;
+    }
+    .pos-breadcrumbs a:hover {
+        color: var(--pos-red);
+    }
+    .pos-breadcrumbs .separator {
+        font-size: 0.65rem;
+        opacity: 0.6;
+    }
+    .pos-breadcrumbs .current {
+        color: var(--pos-red);
+        font-weight: 700;
+    }
+
+    /* Subbar Pill Buttons */
+    .btn-subbar-pill {
+        background: var(--panel-bg);
+        color: var(--text-main) !important;
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        padding: 7px 16px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-decoration: none !important;
+    }
+    .btn-subbar-pill:hover {
+        border-color: var(--pos-red-border);
+        background: var(--pos-red-soft);
+        color: var(--pos-red) !important;
+        transform: translateY(-1px);
+    }
+
+    .report-sub-wrap {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 0.5rem 1.5rem 5rem;
+    }
+
+    /* ── Hero KPI Cards ─────────────────────────────────────── */
+    .kpi-card {
+        background: var(--card-bg, #ffffff);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 1.15rem 1.35rem;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+    .kpi-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+    .kpi-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--text-muted);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .kpi-value {
+        font-size: 1.5rem;
+        font-weight: 900;
+        color: var(--text-main);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        line-height: 1.15;
+        margin-top: 2px;
+    }
+    .kpi-sub {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .kpi-badge-icon {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        flex-shrink: 0;
+    }
+
+    /* ── Squircle Cards ─────────────────────────────────────── */
+    .squircle-card {
+        background: var(--card-bg, #ffffff);
+        border: 1px solid var(--border-color);
+        border-radius: 24px;
+        padding: 1.5rem 1.65rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    .squircle-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding-bottom: 1.1rem;
+        margin-bottom: 1.25rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .squircle-title-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .squircle-icon-badge {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+    .squircle-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        letter-spacing: -0.2px;
+    }
+    .squircle-sub {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin: 2px 0 0 0;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+
+    /* ── What's Included Preview Box ───────────────────────── */
+    .digest-preview-box {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 1rem 1.2rem;
+        margin-bottom: 1.35rem;
+    }
+    .digest-feature-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 0.8rem;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        line-height: 1.5;
+        margin-bottom: 8px;
+    }
+    .digest-feature-row:last-child {
+        margin-bottom: 0;
+    }
+
+    /* ── Form Inputs ───────────────────────────────────────── */
+    .pos-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: var(--text-muted);
+        margin-bottom: 0.45rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .pos-input, .pos-select {
+        width: 100%;
+        background: var(--input-bg, #fbfbfb);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 0.75rem 1rem;
+        font-size: 0.88rem;
+        color: var(--text-main);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        transition: all 0.2s ease;
+        outline: none;
+    }
+    .pos-input:focus, .pos-select:focus {
+        border-color: var(--pos-red);
+        background: var(--card-bg, #ffffff);
+        box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.12);
+    }
+    .input-icon-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    .input-icon-group i.input-icon-lead {
+        position: absolute;
+        left: 14px;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        pointer-events: none;
+    }
+    .input-icon-group .pos-input {
+        padding-left: 2.6rem;
+    }
+
+    .pos-btn-submit {
+        background: var(--pos-red);
+        color: #ffffff;
+        border: none;
+        border-radius: 999px;
+        padding: 0.85rem 1.6rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 16px rgba(236, 39, 52, 0.32);
+        transition: all 0.2s ease;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+    .pos-btn-submit:hover {
+        background: var(--pos-red-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(236, 39, 52, 0.44);
+        color: #ffffff;
+    }
+
+    /* ── Subscriptions Table ───────────────────────────────── */
+    .sub-table-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+    }
+    .pos-modern-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .pos-modern-table thead th {
+        background: var(--table-header-bg, rgba(0, 0, 0, 0.02));
+        color: var(--text-muted);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        padding: 0.85rem 1.15rem;
+        border-bottom: 1px solid var(--border-color);
+        white-space: nowrap;
+    }
+    .pos-modern-table tbody td {
+        padding: 0.95rem 1.15rem;
+        border-bottom: 1px solid var(--border-color);
+        vertical-align: middle;
+        font-size: 0.85rem;
+        color: var(--text-main);
+        background: var(--card-bg, #ffffff);
+        transition: background 0.15s;
+    }
+    .pos-modern-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    .pos-modern-table tbody tr:hover td {
+        background: var(--pos-red-soft);
+    }
+
+    .status-pill {
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .status-pill.active {
+        background: var(--pos-green-soft);
+        color: var(--pos-green);
+        border: 1px solid var(--pos-green-border);
+    }
+    .status-pill.paused {
+        background: rgba(0, 0, 0, 0.04);
+        color: var(--text-muted);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-action-pill {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        border-radius: 999px;
+        padding: 5px 11px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.15s ease;
+    }
+    .btn-action-pill:hover {
+        border-color: var(--pos-red-border);
+        background: var(--pos-red-soft);
+        color: var(--pos-red);
+        transform: translateY(-1px);
+    }
+    .btn-action-pill.btn-delete:hover {
+        border-color: rgba(239, 68, 68, 0.3);
+        background: rgba(239, 68, 68, 0.08);
+        color: #ef4444;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 2.5rem 1.5rem;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+    }
 </style>
 {% endblock %}
 
-{% block header_left %}
-<div>
-    <a href="/dashboard/" style="text-decoration:none;color:inherit;">
-        <h1 class="brand-title mb-0">
-            <i class="bi bi-diamond-half" style="color:var(--accent-gold);"></i>
-            {{ request.user.tenant.name }}
-        </h1>
-    </a>
-    <p class="brand-subtitle">Setup — Report Subscriptions</p>
-</div>
-{% endblock %}
-
-{% block header_right %}
-<a href="/setup/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Setup Area</a>
-<a href="/reports/dashboard/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">Reports</a>
-<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme">
-    <i class="bi bi-moon" id="themeIcon"></i>
-</button>
-{% endblock %}
-
 {% block content %}
-<div class="page-body">
-
-    <!-- LEFT: ADD SUBSCRIPTION -->
+<!-- ══════════════════════════════════════════════════════════════
+     SUBBAR (BREADCRUMBS & TOP QUICK ACTIONS)
+     ══════════════════════════════════════════════════════════════ -->
+<div class="pos-subbar">
     <div>
-        <p class="page-eyebrow">Automation</p>
-        <h1 class="page-title">Daily Digest</h1>
-        <div class="divider"></div>
-        <p class="page-sub">A short daily email sent automatically every morning to whoever's subscribed here.</p>
+        <h1 class="pos-subbar-title">
+            <i class="bi bi-envelope-paper-heart-fill text-danger"></i>
+            Automated Report Subscriptions
+        </h1>
+        <nav class="pos-breadcrumbs">
+            <a href="/dashboard/">Dashboard</a>
+            <span class="separator">/</span>
+            <a href="/setup/">Setup</a>
+            <span class="separator">/</span>
+            <span class="current">Report Subscriptions</span>
+        </nav>
+    </div>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <a href="/setup/" class="btn-subbar-pill">
+            <i class="bi bi-sliders2"></i> Setup Hub
+        </a>
+        <a href="/reports/dashboard/" class="btn-subbar-pill">
+            <i class="bi bi-bar-chart-line"></i> Analytics &amp; Reports
+        </a>
+        <a href="/setup/outlet/" class="btn-subbar-pill">
+            <i class="bi bi-shop"></i> Outlet Settings
+        </a>
+    </div>
+</div>
 
-        <div style="background:var(--panel-bg);border:1px solid var(--border-color);padding:1rem 1.25rem;margin-bottom:2rem;">
-            <p class="form-label" style="margin-bottom:0.75rem;">What you'll actually receive</p>
-            <div style="font-size:0.82rem;line-height:1.9;">
-                <div><i class="bi bi-check-circle-fill" style="color:#10b981;"></i> Sales &amp; order count — always included</div>
-                <div style="{% if not has_advanced_reports %}color:var(--text-muted);{% endif %}">
-                    <i class="bi {% if has_advanced_reports %}bi-check-circle-fill" style="color:#10b981;{% else %}bi-x-circle" style="color:var(--text-muted);{% endif %}"></i>
-                    Net profit, labor cost, menu mix, discount/void summary
-                    {% if not has_advanced_reports %} — needs the Advanced Reports feature{% endif %}
+<div class="report-sub-wrap">
+    <!-- ══════════════════════════════════════════════════════════
+         3 HERO KPI CARDS
+         ══════════════════════════════════════════════════════════ -->
+    <div class="row g-3 mb-4">
+        <!-- 1. Active Subscriptions -->
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <span class="kpi-label">Active Subscriptions</span>
+                    <span class="kpi-value">{{ subscriptions|length }}</span>
+                    <span class="kpi-sub"><i class="bi bi-send-check text-success"></i> Automated daily digest recipients</span>
                 </div>
-                <div style="{% if not has_advanced_reports or not has_crm %}color:var(--text-muted);{% endif %}">
-                    <i class="bi {% if has_advanced_reports and has_crm %}bi-check-circle-fill" style="color:#10b981;{% else %}bi-x-circle" style="color:var(--text-muted);{% endif %}"></i>
-                    Repeat customer rate
-                    {% if not has_advanced_reports or not has_crm %} — needs Advanced Reports + CRM{% endif %}
+                <div class="kpi-badge-icon" style="background: var(--pos-red-soft); color: var(--pos-red);">
+                    <i class="bi bi-envelope-check-fill"></i>
                 </div>
             </div>
-            {% if not has_advanced_reports %}
-            <p style="font-size:0.72rem;color:var(--text-muted);margin-top:0.75rem;margin-bottom:0;">
-                <i class="bi bi-info-circle me-1"></i>Advanced Reports is a custom feature — ask EasyBillBro to enable it for your account to unlock the rest of the digest.
-            </p>
-            {% endif %}
         </div>
 
-        <form id="subForm" onsubmit="return false;">
-            <label class="form-label">Recipient Emails (comma-separated)</label>
-            <input type="text" id="sub-emails" class="setup-input" placeholder="owner@example.com, manager@example.com">
+        <!-- 2. Delivery Frequency -->
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <span class="kpi-label">Dispatch Schedule</span>
+                    <span class="kpi-value" style="font-size: 1.25rem; margin-top: 5px;">Daily at 06:00 AM</span>
+                    <span class="kpi-sub"><i class="bi bi-clock-history text-primary"></i> Immediately after business close</span>
+                </div>
+                <div class="kpi-badge-icon" style="background: var(--pos-blue-soft); color: var(--pos-blue);">
+                    <i class="bi bi-alarm-fill"></i>
+                </div>
+            </div>
+        </div>
 
-            <label class="form-label">Outlet</label>
-            <select id="sub-outlet" class="form-select">
-                <option value="">All outlets (tenant-wide digest)</option>
-                {% for o in outlets %}
-                <option value="{{ o.id }}">{{ o.name }}</option>
-                {% endfor %}
-            </select>
-
-            <button type="submit" class="btn-create" onclick="createSubscription()">Add Subscription</button>
-        </form>
-    </div>
-
-    <!-- RIGHT: CURRENT SUBSCRIPTIONS -->
-    <div>
-        <p class="page-eyebrow" style="opacity:0;">—</p>
-        <h2 class="page-title" style="font-size:1.2rem;">Active Subscriptions</h2>
-        <div class="divider"></div>
-
-        <div class="sub-table-scroll">
-        <table class="sub-table">
-            <thead>
-                <tr><th>Recipients</th><th>Outlet</th><th>Status</th><th></th></tr>
-            </thead>
-            <tbody id="subRows">
-                {% for s in subscriptions %}
-                <tr id="sub-row-{{ s.id }}">
-                    <td style="max-width:220px;overflow-wrap:break-word;">{{ s.recipient_emails }}</td>
-                    <td style="color:var(--text-muted);font-size:0.8rem;">{{ s.outlet.name|default:"All outlets" }}</td>
-                    <td>{% if s.is_active %}<span style="color:#10b981;">Active</span>{% else %}<span style="color:var(--text-muted);">Paused</span>{% endif %}</td>
-                    <td style="display:flex;gap:6px;">
-                        <button class="btn-reset-pw" onclick="toggleSubscription({{ s.id }})">{% if s.is_active %}Pause{% else %}Resume{% endif %}</button>
-                        <button class="btn-reset-pw" onclick="deleteSubscription({{ s.id }})">Delete</button>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="4" style="color:var(--text-muted);font-size:0.8rem;padding-top:1.5rem;">No subscriptions yet.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <!-- 3. Coverage -->
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <span class="kpi-label">Operating Scope</span>
+                    <span class="kpi-value" style="font-size: 1.25rem; margin-top: 5px;">
+                        {% if outlets %}{{ outlets|length }} Outlets{% else %}All Branches{% endif %}
+                    </span>
+                    <span class="kpi-sub"><i class="bi bi-building-check text-warning"></i> Multi-branch &amp; consolidated</span>
+                </div>
+                <div class="kpi-badge-icon" style="background: var(--pos-amber-soft); color: var(--pos-amber);">
+                    <i class="bi bi-buildings-fill"></i>
+                </div>
+            </div>
         </div>
     </div>
 
+    <!-- ══════════════════════════════════════════════════════════
+         MAIN SECTION: FORM (LEFT) & ACTIVE DIRECTORY (RIGHT)
+         ══════════════════════════════════════════════════════════ -->
+    <div class="row g-4">
+        <!-- ── LEFT: CREATE SUBSCRIPTION ────────────────────── -->
+        <div class="col-lg-5">
+            <div class="squircle-card">
+                <div class="squircle-card-header">
+                    <div class="squircle-title-wrap">
+                        <div class="squircle-icon-badge" style="background: var(--pos-red-soft); color: var(--pos-red);">
+                            <i class="bi bi-plus-circle-fill"></i>
+                        </div>
+                        <div>
+                            <h2 class="squircle-title">New Report Digest</h2>
+                            <p class="squircle-sub">Automated email dispatched every morning</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature Breakdown Box -->
+                <div class="digest-preview-box">
+                    <span class="pos-label mb-2"><i class="bi bi-file-earmark-bar-graph text-danger"></i> What you will receive:</span>
+                    <div class="digest-feature-row">
+                        <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                        <div><strong>Daily Gross &amp; Net Revenue</strong>, total settled orders, and payment breakdown (Cash, UPI, Cards).</div>
+                    </div>
+                    <div class="digest-feature-row {% if not has_advanced_reports %}text-muted{% endif %}">
+                        <i class="bi {% if has_advanced_reports %}bi-check-circle-fill text-success{% else %}bi-dash-circle text-muted{% endif %} mt-1"></i>
+                        <div>
+                            <strong>Net profit, food costs, labor %, discounts &amp; voids</strong>
+                            {% if not has_advanced_reports %}<span class="badge bg-secondary-subtle text-secondary ms-1">Requires Advanced Reports</span>{% endif %}
+                        </div>
+                    </div>
+                    <div class="digest-feature-row {% if not has_advanced_reports or not has_crm %}text-muted{% endif %}">
+                        <i class="bi {% if has_advanced_reports and has_crm %}bi-check-circle-fill text-success{% else %}bi-dash-circle text-muted{% endif %} mt-1"></i>
+                        <div>
+                            <strong>Repeat customer retention &amp; guest spend</strong>
+                            {% if not has_advanced_reports or not has_crm %}<span class="badge bg-secondary-subtle text-secondary ms-1">Requires CRM Analytics</span>{% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <form id="subForm" onsubmit="return false;">
+                    <!-- Recipient Emails -->
+                    <div class="mb-3">
+                        <label class="pos-label" for="sub-emails">
+                            <i class="bi bi-envelope"></i> Recipient Email Addresses
+                        </label>
+                        <div class="input-icon-group">
+                            <i class="bi bi-at input-icon-lead"></i>
+                            <input type="text"
+                                   id="sub-emails"
+                                   class="pos-input"
+                                   placeholder="e.g. owner@example.com, manager@example.com"
+                                   required>
+                        </div>
+                        <small class="text-muted" style="font-size: 0.72rem; margin-top: 4px; display: block;">
+                            Separate multiple email addresses with a comma.
+                        </small>
+                    </div>
+
+                    <!-- Outlet Select -->
+                    <div class="mb-4">
+                        <label class="pos-label" for="sub-outlet">
+                            <i class="bi bi-shop"></i> Branch Scope
+                        </label>
+                        <select id="sub-outlet" class="pos-select">
+                            <option value="">All outlets (Consolidated Group Digest)</option>
+                            {% for o in outlets %}
+                            <option value="{{ o.id }}">{{ o.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="pos-btn-submit" id="btn-add-sub" onclick="createSubscription()">
+                        <i class="bi bi-send-plus-fill"></i>
+                        <span>Create Daily Subscription</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ── RIGHT: ACTIVE SUBSCRIPTIONS DIRECTORY ──────────── -->
+        <div class="col-lg-7">
+            <div class="squircle-card">
+                <div class="squircle-card-header">
+                    <div class="squircle-title-wrap">
+                        <div class="squircle-icon-badge" style="background: var(--pos-blue-soft); color: var(--pos-blue);">
+                            <i class="bi bi-inbox-fill"></i>
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                <h2 class="squircle-title">Active Digest Subscriptions</h2>
+                                <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-2 py-1" style="font-size: 0.72rem;">
+                                    {{ subscriptions|length }} Active
+                                </span>
+                            </div>
+                            <p class="squircle-sub">Automated email targets for morning business summaries</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-table-scroll">
+                    <table class="pos-modern-table">
+                        <thead>
+                            <tr>
+                                <th>Recipient Emails</th>
+                                <th>Branch Outlet</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subRows">
+                            {% for s in subscriptions %}
+                            <tr id="sub-row-{{ s.id }}">
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="rounded-circle bg-danger-subtle text-danger d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; min-width: 32px; font-size: 0.85rem;">
+                                            <i class="bi bi-envelope"></i>
+                                        </div>
+                                        <div style="font-weight: 600; max-width: 240px; overflow-wrap: break-word; line-height: 1.3;">
+                                            {{ s.recipient_emails }}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill bg-light text-secondary border px-2 py-1" style="font-size: 0.75rem;">
+                                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                                        {{ s.outlet.name|default:"All Outlets (Consolidated)" }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if s.is_active %}
+                                        <span class="status-pill active">
+                                            <i class="bi bi-check-circle-fill"></i> Active
+                                        </span>
+                                    {% else %}
+                                        <span class="status-pill paused">
+                                            <i class="bi bi-pause-circle"></i> Paused
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-flex align-items-center justify-content-end gap-2">
+                                        <button type="button"
+                                                class="btn-action-pill"
+                                                title="{% if s.is_active %}Temporarily pause email digests{% else %}Resume email digests{% endif %}"
+                                                onclick="toggleSubscription({{ s.id }})">
+                                            <i class="bi {% if s.is_active %}bi-pause-circle text-warning{% else %}bi-play-circle text-success{% endif %}"></i>
+                                            {% if s.is_active %}Pause{% else %}Resume{% endif %}
+                                        </button>
+                                        <button type="button"
+                                                class="btn-action-pill btn-delete"
+                                                title="Remove this subscription"
+                                                onclick="deleteSubscription({{ s.id }})">
+                                            <i class="bi bi-trash3 text-danger"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4">
+                                    <div class="empty-state">
+                                        <div class="rounded-circle bg-danger-subtle text-danger d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px; font-size: 1.4rem;">
+                                            <i class="bi bi-envelope-x"></i>
+                                        </div>
+                                        <div style="font-weight: 700; margin-bottom: 2px;">No Subscriptions Configured</div>
+                                        <div>Add an email on the left to start receiving daily morning sales digests automatically.</div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 async function createSubscription() {
+    const rawEmails = document.getElementById('sub-emails').value;
+    const outletId = document.getElementById('sub-outlet').value;
+    const btn = document.getElementById('btn-add-sub');
+
+    if (!rawEmails || !rawEmails.trim()) {
+        if (typeof ui !== 'undefined' && ui.toast) {
+            ui.toast('Please enter at least one recipient email address.', 'error');
+        } else {
+            alert('Please enter at least one recipient email address.');
+        }
+        return;
+    }
+
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Saving...';
+    }
+
     const payload = {
-        recipient_emails: document.getElementById('sub-emails').value,
-        outlet_id: document.getElementById('sub-outlet').value,
+        recipient_emails: rawEmails,
+        outlet_id: outletId,
     };
     try {
         await apiClient.post('/setup/report-subscriptions/create/', payload);
-        ui.toast('Subscription added.', 'success');
-        setTimeout(() => location.reload(), 700);
+        if (typeof ui !== 'undefined' && ui.toast) {
+            ui.toast('Report subscription created successfully.', 'success');
+        }
+        setTimeout(() => location.reload(), 600);
     } catch (err) {
-        // apiClient already shows a toast on failure
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-send-plus-fill"></i><span>Create Daily Subscription</span>';
+        }
     }
 }
 
 async function toggleSubscription(subId) {
     try {
         await apiClient.post(`/setup/report-subscriptions/${subId}/toggle/`, {});
+        if (typeof ui !== 'undefined' && ui.toast) {
+            ui.toast('Subscription status updated.', 'success');
+        }
         setTimeout(() => location.reload(), 300);
     } catch (err) {
-        // apiClient already shows a toast on failure
+        // apiClient notifies on error
     }
 }
 
 async function deleteSubscription(subId) {
-    const result = await ui.confirm('Delete this subscription?', 'This cannot be undone.', 'Delete');
+    const isDark = typeof themeManager !== 'undefined' && themeManager.isDark();
+    const result = await Swal.fire({
+        title: 'Delete Subscription?',
+        text: 'This automated daily report digest will be permanently removed.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Delete',
+        confirmButtonColor: '#EC2734',
+        cancelButtonColor: '#6c757d',
+        background: isDark ? '#1a1a24' : '#ffffff',
+        color: isDark ? '#f4f4f5' : '#18181b',
+        customClass: {
+            popup: 'rounded-4 shadow-lg border',
+            confirmButton: 'btn btn-danger rounded-pill px-4',
+            cancelButton: 'btn btn-secondary rounded-pill px-4'
+        },
+    });
+
     if (!result.isConfirmed) return;
+
     try {
         await apiClient.post(`/setup/report-subscriptions/${subId}/delete/`, {});
-        document.getElementById(`sub-row-${subId}`).remove();
-        ui.toast('Subscription deleted.', 'success');
+        const row = document.getElementById(`sub-row-${subId}`);
+        if (row) row.remove();
+        if (typeof ui !== 'undefined' && ui.toast) {
+            ui.toast('Subscription deleted successfully.', 'success');
+        }
     } catch (err) {
-        // apiClient already shows a toast on failure
+        // apiClient notifies on error
     }
 }
 </script>

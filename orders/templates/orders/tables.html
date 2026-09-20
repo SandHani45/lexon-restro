@@ -4,305 +4,640 @@
 {% block extra_css %}
 <style>
   /* ══════════════════════════════════════════════════════════════
-     TABLES & FLOOR PLAN STYLES
+     KIMIPOS LUXURY FLOOR PLAN & TABLES DESIGN SYSTEM
      ══════════════════════════════════════════════════════════════ */
-  .table-card {
+  :root {
+    --pos-red: #EC2734;
+    --pos-red-hover: #d81f2f;
+    --pos-red-soft: rgba(236, 39, 52, 0.08);
+    --pos-red-border: rgba(236, 39, 52, 0.22);
+    --pos-green: #10b981;
+    --pos-green-soft: rgba(16, 185, 129, 0.10);
+    --pos-amber: #f59e0b;
+    --pos-amber-soft: rgba(245, 158, 11, 0.10);
+    --pos-orange: #f97316;
+    --pos-orange-soft: rgba(249, 115, 22, 0.10);
+    --pos-blue: #3b82f6;
+    --pos-blue-soft: rgba(59, 130, 246, 0.10);
+    --pos-cyan: #06b6d4;
+    --pos-cyan-soft: rgba(6, 182, 212, 0.10);
+    --pos-pink: #ec4899;
+    --pos-pink-soft: rgba(236, 72, 153, 0.10);
+    --pos-purple: #a855f7;
+    --pos-purple-soft: rgba(168, 85, 247, 0.10);
+    --pos-rose: #f43f5e;
+    --pos-rose-soft: rgba(244, 63, 94, 0.10);
+
+    /* Legacy semantic mappings for compatibility */
+    --c-free:    var(--pos-green);
+    --c-order:   var(--pos-amber);
+    --c-prepare: var(--pos-orange);
+    --c-serve:   var(--pos-blue);
+    --c-clean:   var(--pos-pink);
+  }
+
+  body {
+    background: var(--bg-color) !important;
+  }
+
+  /* ── Sub-Header Bar (KimiPoS POS Layout) ──────────────────── */
+  .pos-subbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 0.9rem 1.5rem 0.5rem;
+    background: var(--bg-color);
+  }
+  .pos-subbar-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin: 0;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    letter-spacing: -0.4px;
+  }
+  .pos-breadcrumbs {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+  }
+  .pos-breadcrumbs a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .pos-breadcrumbs a:hover {
+    color: var(--pos-red);
+  }
+  .pos-breadcrumbs .separator {
+    font-size: 0.65rem;
+    opacity: 0.6;
+  }
+  .pos-breadcrumbs .current {
+    color: var(--pos-red);
+    font-weight: 700;
+  }
+  .btn-subbar-new {
+    background: var(--pos-red);
+    color: #ffffff !important;
+    border: none;
+    border-radius: 999px;
+    padding: 7px 18px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 3px 12px rgba(236, 39, 52, 0.3);
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    cursor: pointer;
+    text-decoration: none !important;
+  }
+  .btn-subbar-new:hover {
+    background: var(--pos-red-hover);
+    transform: translateY(-1.5px);
+    box-shadow: 0 6px 18px rgba(236, 39, 52, 0.42);
+    color: #ffffff !important;
+  }
+  .btn-subbar-pill {
     background: var(--panel-bg);
+    color: var(--text-main) !important;
     border: 1px solid var(--border-color);
-    border-radius: 14px;
-    padding: 1.25rem;
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-decoration: none !important;
+  }
+  .btn-subbar-pill:hover {
+    border-color: rgba(236, 39, 52, 0.4);
+    background: var(--pos-red-soft);
+    color: var(--pos-red) !important;
+    transform: translateY(-1px);
+  }
+
+  /* ── KimiPoS Style 4 Hero KPI Cards ─────────────────────── */
+  .table-kpi-card {
+    border-radius: 18px;
+    padding: 1.25rem 1.4rem;
     position: relative;
     overflow: hidden;
-    transition: var(--transition-smooth);
+    min-height: 122px;
     display: flex;
-    flex-direction: column;
-    min-height: 220px;
+    justify-content: space-between;
+    align-items: center;
+    color: #ffffff !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+    transition: transform 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                box-shadow 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    text-decoration: none !important;
   }
-  .table-card:hover {
-    box-shadow: var(--shadow-hover);
-    border-color: var(--accent-gold);
+  .table-kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+    color: #ffffff !important;
   }
+  .kpi-card-total   { background: linear-gradient(135deg, #c2381e 0%, #d84524 50%, #e85532 100%); }
+  .kpi-card-free    { background: linear-gradient(135deg, #047857 0%, #059669 50%, #10b981 100%); }
+  .kpi-card-active  { background: linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #f97316 100%); }
+  .kpi-card-billing { background: linear-gradient(135deg, #0e7490 0%, #0891b2 50%, #06b6d4 100%); }
 
-  .table-status-line { position: absolute; top: 0; left: 0; right: 0; height: 3px; }
-  .table-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
-  .table-name { font-family: 'DM Serif Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin: 0; }
-  .table-timer { font-family: 'Space Mono', monospace; font-size: 0.75rem; padding: 2px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 5px; }
-  .table-status { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 0.5rem; }
-
-  /* Cooking items badge */
-  .cooking-badge {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 0.7rem; font-weight: 600; padding: 2px 9px;
-    border-radius: 999px; background: rgba(249,115,22,0.12);
-    color: var(--c-prepare); border: 1px solid rgba(249,115,22,0.25);
-    margin-bottom: 0.5rem; width: fit-content;
-  }
-
-  /* Status Colors */
-  :root {
-    --c-free:    #10b981;
-    --c-order:   #eab308;
-    --c-prepare: #f97316;
-    --c-serve:   #3b82f6;
-    --c-clean:   #ec4899;
-  }
-  .status-free     { color: var(--c-free); }     .bg-free    { background: var(--c-free); }
-  .status-ordering { color: var(--c-order); }    .bg-order   { background: var(--c-order); }
-  .status-preparing{ color: var(--c-prepare); }  .bg-prepare { background: var(--c-prepare); }
-  .status-served   { color: var(--c-serve); }    .bg-serve   { background: var(--c-serve); }
-  .status-billing  { color: #06b6d4; }           .bg-billing { background: #06b6d4; }
-  .status-cleaning { color: var(--c-clean); }    .bg-clean   { background: var(--c-clean); }
-  .status-merged   { color: #a855f7; }           .bg-merged  { background: #a855f7; }
-  .status-approval { color: #f43f5e; font-weight: bold; } .bg-approval { background: #f43f5e; }
-
-  .occupancy { font-size: 0.8rem; color: var(--text-muted); margin-top: 15px; display: flex; align-items: center; gap: 5px; }
-
-  .card-actions { margin-top: 1.25rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
-  /* .btn-card-action is now layout-only -- appearance comes from the shared
-     .btn-luxury / .btn-luxury-primary classes applied alongside it in the HTML. */
-  .btn-card-action { flex: 1; min-width: 30%; text-align: center; }
-
-  /* Metrics -- soft pastel count tiles, each tinted to its own stat */
-  .metric-card {
-    background: var(--metric-tint-bg, var(--panel-bg));
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 1.25rem 1.5rem;
-    text-align: left;
-    display: flex;
-    flex-direction: column;
+  .kpi-icon-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
-    gap: 0.3rem;
-    transition: var(--transition-smooth);
+    font-size: 0.95rem;
+    margin-bottom: 0.35rem;
   }
-  .metric-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
-  .metric-val { font-family: 'DM Serif Display', serif; font-size: 2.25rem; font-weight: 700; color: var(--metric-tint-color, var(--accent-gold)); line-height: 1; }
-  .metric-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-top: 0.15rem; font-weight: 700; }
-
-  /* Modal overrides */
-  .modal-content { background: var(--bg-color); border-radius: 8px; border: 1px solid var(--border-color); }
-  .modal-header { border-bottom: 1px solid var(--border-color); padding: 1.25rem 1.5rem; }
-  .modal-title { font-family: 'DM Serif Display', serif; font-size: 1.3rem; }
-  .modal-body { padding: 1.5rem; }
-  .modal-footer { border-top: 1px solid var(--border-color); padding: 1.25rem 1.5rem; }
-  html.dark .btn-close { filter: invert(1); }
-
-  .form-select-luxury { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-main); border-radius: 6px; padding: 0.65rem 0.85rem; font-size: 0.88rem; width: 100%; margin-bottom: 1rem; }
-
-  .toast-minimal {
-    position: fixed; top: 20px; right: 20px; background: var(--text-main); color: var(--bg-color);
-    padding: 1rem 1.5rem; z-index: 1060; opacity: 0; transition: opacity 0.3s ease;
-    pointer-events: none; text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem;
+  .kpi-val {
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    font-size: 1.85rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
   }
-  .toast-minimal.show { opacity: 1; pointer-events: auto; }
-
-  .waiter-badge {
-    width: 28px; height: 28px; border-radius: 50%; background: var(--accent-gold); color: #fff;
-    display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 800;
-    border: 2px solid var(--panel-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    position: absolute; top: -8px; right: -8px; z-index: 5; cursor: help;
+  .kpi-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    opacity: 0.95;
+    font-family: var(--font-main, 'Outfit', sans-serif);
   }
-  .waiter-badge.qr-badge { background: #f43f5e; }
-
-  /* Urgency overlays */
-  .card-urgent { border-color: #ef4444 !important; box-shadow: 0 0 0 2px rgba(239,68,68,.25) !important; }
-  .card-warn   { border-color: #f97316 !important; box-shadow: 0 0 0 2px rgba(249,115,22,.15) !important; }
-
-  /* Floor manager alert strip */
-  .alert-strip {
-    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-    padding: 8px 16px; border-radius: 8px; background: var(--panel-bg);
-    border: 1px solid var(--border-color); border-left: 4px solid var(--accent-gold);
-    margin-bottom: 1.5rem; font-size: 0.8rem;
+  .kpi-sub {
+    font-size: 0.68rem;
+    opacity: 0.85;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-main, 'Outfit', sans-serif);
   }
-  .alert-strip.clean { border-left-color: #10b981; }
-  .alert-chip {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 3px 10px; border-radius: 20px; font-size: 0.72rem;
+  .kpi-art-badge {
+    width: 64px;
+    height: 64px;
+    min-width: 64px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1.5px solid rgba(255, 255, 255, 0.28);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.1rem;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    user-select: none;
   }
-  .chip-danger { background: rgba(239,68,68,.1); color: #ef4444; border: 1px solid rgba(239,68,68,.3); }
-  .chip-warn   { background: rgba(249,115,22,.1); color: #f97316; border: 1px solid rgba(249,115,22,.3); }
-  .chip-info   { background: rgba(6,182,212,.1);  color: #06b6d4; border: 1px solid rgba(6,182,212,.3); }
-  .chip-ok     { background: rgba(16,185,129,.1); color: #10b981; border: 1px solid rgba(16,185,129,.3); }
 
-  /* ── Filter Tabs ─────────────────────────────────────────── */
+  /* ── Filter Tabs & Segmented Switcher ─────────────────────── */
+  .table-filters-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 1.25rem;
+  }
   .table-filters {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.45rem;
     overflow-x: auto;
-    padding-bottom: 0.35rem;
+    padding-bottom: 0.25rem;
     scrollbar-width: none;
-    -ms-overflow-style: none;
   }
   .table-filters::-webkit-scrollbar { display: none; }
 
   .filter-tab {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    padding: 0.35rem 0.85rem;
-    border-radius: 20px;
-    font-size: 0.72rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
+    gap: 0.4rem;
+    padding: 0.45rem 1rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    font-family: var(--font-main, 'Outfit', sans-serif);
     cursor: pointer;
     border: 1px solid var(--border-color);
     background: var(--panel-bg);
     color: var(--text-muted);
-    transition: all 0.15s ease;
+    transition: all 0.18s ease;
     white-space: nowrap;
     user-select: none;
-    font-family: var(--font-main, 'Outfit', sans-serif);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
   }
   .filter-tab:hover {
-    border-color: var(--text-main);
-    color: var(--text-main);
+    border-color: var(--pos-red);
+    color: var(--pos-red);
+    background: var(--pos-red-soft);
+    transform: translateY(-1px);
+  }
+  .filter-tab .filter-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
   }
   .filter-tab .filter-count {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: rgba(128,128,128,0.15);
-    border-radius: 10px;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 5px;
-    font-size: 0.65rem;
+    background: var(--surface-2);
+    border-radius: 999px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    font-size: 0.68rem;
+    font-weight: 800;
     line-height: 1;
+    color: var(--text-main);
+    transition: background 0.18s ease, color 0.18s ease;
   }
 
   /* Active states */
-  .filter-tab.active                          { border-color: var(--text-muted); color: var(--text-main); background: var(--sidebar-active-bg, rgba(236,39,52,0.08)); }
-  .filter-tab.active.filter-all               { border-color: var(--accent-gold); color: #ffffff; background: var(--accent-gold); font-weight: 700; }
-  .filter-tab.active.filter-free              { border-color: var(--c-free);    color: var(--c-free);    background: rgba(16,185,129,0.10); }
-  .filter-tab.active.filter-ordering          { border-color: var(--c-order);   color: var(--c-order);   background: rgba(234,179,8,0.10); }
-  .filter-tab.active.filter-preparing         { border-color: var(--c-prepare); color: var(--c-prepare); background: rgba(249,115,22,0.10); }
-  .filter-tab.active.filter-served            { border-color: var(--c-serve);   color: var(--c-serve);   background: rgba(59,130,246,0.10); }
-  .filter-tab.active.filter-billing           { border-color: #06b6d4;           color: #06b6d4;           background: rgba(6,182,212,0.10); }
-  .filter-tab.active.filter-cleaning          { border-color: var(--c-clean);   color: var(--c-clean);   background: rgba(236,72,153,0.10); }
-  .filter-tab.active.filter-linked            { border-color: #a855f7;           color: #a855f7;           background: rgba(168,85,247,0.10); }
-  .filter-tab.active.filter-review            { border-color: #f43f5e;           color: #f43f5e;           background: rgba(244,63,94,0.10); }
-
-  .filter-tab .filter-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
+  .filter-tab.active.filter-all {
+    background: var(--pos-red) !important;
+    border-color: var(--pos-red) !important;
+    color: #ffffff !important;
+    box-shadow: 0 3px 12px rgba(236, 39, 52, 0.35);
   }
+  .filter-tab.active.filter-all .filter-count {
+    background: rgba(255, 255, 255, 0.28);
+    color: #ffffff;
+  }
+  .filter-tab.active.filter-free      { border-color: var(--pos-green); color: var(--pos-green); background: var(--pos-green-soft); }
+  .filter-tab.active.filter-ordering  { border-color: var(--pos-amber); color: var(--pos-amber); background: var(--pos-amber-soft); }
+  .filter-tab.active.filter-preparing { border-color: var(--pos-orange); color: var(--pos-orange); background: var(--pos-orange-soft); }
+  .filter-tab.active.filter-served    { border-color: var(--pos-blue); color: var(--pos-blue); background: var(--pos-blue-soft); }
+  .filter-tab.active.filter-billing   { border-color: var(--pos-cyan); color: var(--pos-cyan); background: var(--pos-cyan-soft); }
+  .filter-tab.active.filter-cleaning  { border-color: var(--pos-pink); color: var(--pos-pink); background: var(--pos-pink-soft); }
+  .filter-tab.active.filter-linked    { border-color: var(--pos-purple); color: var(--pos-purple); background: var(--pos-purple-soft); }
+  .filter-tab.active.filter-review    { border-color: var(--pos-rose); color: var(--pos-rose); background: var(--pos-rose-soft); }
 
-  /* ── Visual Floor Map View ── */
-  .floor-map-container {
+  /* Segmented mode switcher */
+  .pos-segmented-mode {
     background: var(--panel-bg);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
-    box-shadow: var(--shadow-soft);
-    padding: 1.5rem;
-    overflow: auto;
-    margin-bottom: 2rem;
-    display: none;
-    transition: background 0.25s, border-color 0.25s;
+    border-radius: 999px;
+    padding: 3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   }
-  .floor-map-container.active { display: block; }
-  .floor-map-canvas {
-    position: relative;
-    margin: 0 auto;
-    background: #ffffff;
-    border: 1.5px solid var(--border-color);
-    border-radius: 8px;
-    background-image: 
-      linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
-    background-size: 40px 40px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-    transition: background 0.25s, border-color 0.25s;
+  .pos-mode-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    cursor: pointer;
+    transition: all 0.18s ease;
+    display: inline-flex;
+    align-items: center;
   }
-  html.dark .floor-map-canvas {
-    background: #11141b;
-    border: 1.5px solid rgba(255,255,255,0.12);
-    background-image: 
-      linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
-    box-shadow: 0 16px 36px rgba(0,0,0,0.5);
+  .pos-mode-btn.active {
+    background: var(--pos-red) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(236, 39, 52, 0.32);
   }
-  .floor-map-node {
-    position: absolute;
+
+  /* ── Floor Manager Alert Strip ───────────────────────────── */
+  .floor-alert-banner {
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0.75rem 1.25rem;
+    border-radius: 16px;
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    margin-bottom: 1.5rem;
+  }
+  .floor-alert-banner.is-clean {
+    border-left: 4px solid var(--pos-green);
+  }
+  .floor-alert-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--pos-red-soft);
+    color: var(--pos-red);
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #ffffff;
-    border: 2px solid #cbd5e1;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-    cursor: pointer;
-    transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s, background 0.25s;
-    user-select: none;
+    font-size: 0.9rem;
   }
-  html.dark .floor-map-node {
-    background: #181c25;
-    border: 2px solid rgba(255,255,255,0.12);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  .floor-alert-title {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-muted);
+    font-family: var(--font-main, 'Outfit', sans-serif);
   }
-  .floor-map-node:hover {
-    transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 8px 24px rgba(236, 39, 52, 0.2);
-    border-color: var(--accent-gold);
-    z-index: 10;
-  }
-  .floor-map-node.shape-square { border-radius: 10px; width: 80px; height: 80px; }
-  .floor-map-node.shape-round  { border-radius: 50%; width: 80px; height: 80px; }
-  .floor-map-node.shape-rect   { border-radius: 10px; width: 120px; height: 80px; }
-  .floor-map-node.shape-wall   { border-radius: 3px; width: 120px; height: 20px; background: #94a3b8; border-color: #64748b; cursor: default; }
-  html.dark .floor-map-node.shape-wall { background: #475569; border-color: #64748b; }
-  .floor-map-node-name { font-weight: 700; font-size: 0.95rem; color: var(--text-main); line-height: 1.1; }
-  .floor-map-node-cap  { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
-
-  .btn-group .btn-luxury.active {
-    background: var(--accent-gold) !important;
-    border-color: var(--accent-gold) !important;
-    color: #111 !important;
-    font-weight: 600;
-  }
-
-  /* ── Detailed Order Card (Grid View Matching Screenshot) ── */
-  .order-card-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 0.75rem;
-  }
-  .order-table-title {
-    font-size: 1.15rem;
+  .floor-alert-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 12px;
+    border-radius: 999px;
+    font-size: 0.74rem;
     font-weight: 700;
-    color: var(--text-main);
+    font-family: var(--font-main, 'Outfit', sans-serif);
+  }
+  .pill-danger { background: rgba(239, 68, 68, 0.12); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+  .pill-warn   { background: rgba(249, 115, 22, 0.12); color: #f97316; border: 1px solid rgba(249, 115, 22, 0.3); }
+  .pill-info   { background: rgba(6, 182, 212, 0.12); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3); }
+  .pill-ok     { background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+
+  /* ── Section Header Strip ────────────────────────────────── */
+  .floor-section-header {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text-main);
+    margin: 1.25rem 0 0.85rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .section-badge-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    background: var(--pos-red-soft);
+    color: var(--pos-red);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     TABLE CARDS (Grid View)
+     ══════════════════════════════════════════════════════════ */
+  .table-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 1.25rem 1.35rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                box-shadow 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                border-color 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    min-height: 240px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  }
+  .table-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(236, 39, 52, 0.12);
+    border-color: rgba(236, 39, 52, 0.35);
+  }
+
+  .table-status-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+  }
+
+  /* Status Colors */
+  .bg-free     { background: var(--pos-green); }
+  .bg-order    { background: var(--pos-amber); }
+  .bg-prepare  { background: var(--pos-orange); }
+  .bg-serve    { background: var(--pos-blue); }
+  .bg-billing  { background: var(--pos-cyan); }
+  .bg-clean    { background: var(--pos-pink); }
+  .bg-merged   { background: var(--pos-purple); }
+  .bg-approval { background: var(--pos-rose); }
+
+  .status-free     { color: var(--pos-green); }
+  .status-ordering { color: var(--pos-amber); }
+  .status-preparing{ color: var(--pos-orange); }
+  .status-served   { color: var(--pos-blue); }
+  .status-billing  { color: var(--pos-cyan); }
+  .status-cleaning { color: var(--pos-pink); }
+  .status-merged   { color: var(--pos-purple); }
+  .status-approval { color: var(--pos-rose); }
+
+  .table-name {
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin: 0;
     line-height: 1.2;
+    letter-spacing: -0.3px;
   }
-  .order-table-title i {
-    color: var(--accent-gold);
-    font-size: 1.05rem;
-  }
-  .order-table-meta {
-    font-size: 0.76rem;
+  .table-section-tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: var(--surface-2);
+    border: 1px solid var(--border-color);
     color: var(--text-muted);
-    margin-top: 3px;
-    letter-spacing: 0.3px;
+    border-radius: 999px;
+    padding: 2px 8px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .table-icon-circle {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: var(--pos-green-soft);
+    color: var(--pos-green);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+  }
+  .table-icon-circle.active {
+    background: var(--pos-red-soft);
+    color: var(--pos-red);
+  }
+  .table-icon-circle.cleaning {
+    background: var(--pos-pink-soft);
+    color: var(--pos-pink);
+  }
+  .table-icon-circle.merged {
+    background: var(--pos-purple-soft);
+    color: var(--pos-purple);
+  }
+
+  .table-timer {
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    font-size: 0.74rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-color);
+  }
+  .table-timer.urgent {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+
+  .pulse-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    display: inline-block;
+    box-shadow: 0 0 0 0 rgba(236, 39, 52, 0.4);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { transform: scale(0.95); opacity: 0.8; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(0.95); opacity: 0.8; }
+  }
+
+  /* Free table decorative body */
+  .table-free-body {
+    background: var(--surface-2);
+    border-radius: 14px;
+    padding: 1rem;
+    text-align: center;
+    margin: 0.75rem 0;
+    border: 1px dashed var(--border-color);
+  }
+  .table-emoji-art {
+    font-size: 2.2rem;
+    display: block;
+    margin-bottom: 0.25rem;
+    user-select: none;
+  }
+  .table-free-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .table-capacity-chip {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-main);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    padding: 2px 10px;
+    border-radius: 999px;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Waiter badge */
+  .waiter-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--pos-red);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 800;
+    border: 2px solid var(--panel-bg);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    z-index: 5;
+  }
+  .waiter-badge.qr-badge {
+    background: var(--pos-rose);
+  }
+
+  /* Urgency overlays */
+  .card-urgent { border-color: #ef4444 !important; box-shadow: 0 0 0 2px rgba(239,68,68,.25) !important; }
+  .card-warn   { border-color: #f97316 !important; box-shadow: 0 0 0 2px rgba(249,115,22,.15) !important; }
+
+  /* Cooking badge */
+  .cooking-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: rgba(249,115,22,0.12);
+    color: var(--pos-orange);
+    border: 1px solid rgba(249,115,22,0.25);
+  }
+
+  /* Detailed Order Card Styles */
+  .order-token-badge {
+    font-family: var(--font-mono, monospace);
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: var(--surface-2);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 1px 6px;
+    color: var(--text-main);
+  }
+  .table-order-meta {
+    font-size: 0.74rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
   }
   .order-chips-row {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 0.4rem;
-    margin-bottom: 0.9rem;
+    margin: 0.75rem 0;
   }
-  .order-chip {
+  .order-status-pill {
     font-size: 0.68rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.6px;
-    padding: 0.2rem 0.65rem;
+    padding: 0.22rem 0.65rem;
     border-radius: 999px;
     display: inline-flex;
     align-items: center;
@@ -334,11 +669,11 @@
   .order-items-list {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    max-height: 190px;
+    gap: 0.45rem;
+    max-height: 180px;
     overflow-y: auto;
     padding-right: 0.25rem;
-    margin-bottom: 0.85rem;
+    margin-bottom: 0.75rem;
   }
   .order-items-list::-webkit-scrollbar { width: 3px; }
   .order-items-list::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
@@ -348,16 +683,17 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
-    font-size: 0.88rem;
+    font-size: 0.85rem;
   }
   .order-item-qty {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     border-radius: 6px;
-    border: 1.5px solid #10b981;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid #10b981;
     color: #10b981;
-    font-weight: 700;
-    font-size: 0.75rem;
+    font-weight: 800;
+    font-size: 0.72rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -379,16 +715,16 @@
 
   .order-summary-box {
     border-top: 1px solid var(--border-color);
-    padding-top: 0.65rem;
+    padding-top: 0.6rem;
     margin-top: auto;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.2rem;
   }
   .order-summary-line {
     display: flex;
     justify-content: space-between;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     color: var(--text-muted);
   }
   .order-summary-line strong {
@@ -398,156 +734,425 @@
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    padding-top: 0.4rem;
-    margin-top: 0.35rem;
+    padding-top: 0.35rem;
+    margin-top: 0.25rem;
     border-top: 1px dashed var(--border-color);
   }
   .order-total-label {
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     font-weight: 800;
-    letter-spacing: 1px;
+    letter-spacing: 0.8px;
     text-transform: uppercase;
     color: var(--text-main);
+    font-family: var(--font-main, 'Outfit', sans-serif);
   }
   .order-total-val {
     font-size: 1.25rem;
     font-weight: 800;
-    color: var(--text-main);
-    font-family: var(--font-mono, monospace);
+    color: var(--pos-red);
+    font-family: var(--font-main, 'Outfit', sans-serif);
   }
 
+  /* Card Action Buttons */
   .order-card-buttons {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-top: 0.85rem;
+    margin-top: 0.75rem;
   }
-  /* Danger-colored modifier for the shared .btn-luxury shape (icon-only cancel action) */
-  .btn-luxury-danger {
-    color: var(--danger);
-    border-color: var(--danger);
+  .btn-table-primary {
+    flex: 1;
+    background: var(--pos-red);
+    color: #ffffff !important;
+    border: none;
+    border-radius: 999px;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    font-size: 0.86rem;
+    font-weight: 700;
+    padding: 0.6rem 1.1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: 0 3px 12px rgba(236, 39, 52, 0.28);
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    text-decoration: none !important;
+    cursor: pointer;
   }
-  .btn-luxury-danger:hover {
-    background: var(--danger);
-    border-color: var(--danger);
+  .btn-table-primary:hover {
+    background: var(--pos-red-hover);
+    transform: translateY(-1.5px);
+    box-shadow: 0 6px 16px rgba(236, 39, 52, 0.38);
+    color: #ffffff !important;
+  }
+  .btn-table-cancel {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    background: rgba(239, 68, 68, 0.08);
+    color: #ef4444;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-table-cancel:hover {
+    background: #ef4444;
     color: #ffffff;
+    border-color: #ef4444;
   }
-  /* Layout-only: let the primary action button fill the remaining row width
-     next to the fixed-size cancel button. Appearance comes from .btn-luxury-primary. */
-  .order-card-buttons .btn-luxury-primary { flex: 1; }
+  .order-sub-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-color);
+  }
+  .btn-table-sub {
+    flex: 1;
+    border: 1px solid var(--border-color);
+    background: var(--surface-2);
+    color: var(--text-main);
+    border-radius: 999px;
+    padding: 0.32rem 0.55rem;
+    font-size: 0.74rem;
+    font-weight: 700;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-table-sub:hover {
+    border-color: rgba(236, 39, 52, 0.4);
+    background: var(--pos-red-soft);
+    color: var(--pos-red);
+  }
+
+  /* ── Visual Floor Map View ── */
+  .floor-map-container {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    padding: 1.5rem;
+    overflow: auto;
+    margin-bottom: 2rem;
+    display: none;
+    transition: background 0.25s, border-color 0.25s;
+  }
+  .floor-map-container.active { display: block; }
+  .floor-map-canvas {
+    position: relative;
+    margin: 0 auto;
+    background: #ffffff;
+    border: 1.5px solid var(--border-color);
+    border-radius: 16px;
+    background-image: 
+      linear-gradient(to right, rgba(0,0,0,0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0,0,0,0.04) 1px, transparent 1px);
+    background-size: 36px 36px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+    transition: background 0.25s, border-color 0.25s;
+    max-width: 100%;
+  }
+  html.dark .floor-map-canvas {
+    background: #11141b;
+    border-color: rgba(255,255,255,0.08);
+    background-image: 
+      linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  }
+  .floor-map-node {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--panel-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    cursor: pointer;
+    transition: transform 0.18s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                box-shadow 0.18s ease, border-color 0.18s ease;
+    user-select: none;
+  }
+  .floor-map-node:hover {
+    transform: translateY(-3px) scale(1.04);
+    box-shadow: 0 10px 24px rgba(236, 39, 52, 0.22);
+    border-color: var(--pos-red) !important;
+    z-index: 10;
+  }
+  .floor-map-node.shape-square { border-radius: 16px; width: 84px; height: 84px; }
+  .floor-map-node.shape-round  { border-radius: 50%; width: 84px; height: 84px; }
+  .floor-map-node.shape-rect   { border-radius: 16px; width: 128px; height: 84px; }
+  .floor-map-node.shape-wall   { border-radius: 4px; width: 120px; height: 18px; background: #64748b; border-color: #475569; cursor: default; }
+  html.dark .floor-map-node.shape-wall { background: #475569; border-color: #334155; }
+  .floor-map-node-name { font-weight: 800; font-size: 0.95rem; color: var(--text-main); line-height: 1.1; font-family: var(--font-main, 'Outfit', sans-serif); }
+  .floor-map-node-cap  { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; font-weight: 600; font-family: var(--font-main, 'Outfit', sans-serif); }
+
+  /* ── Modals Modern Overrides ── */
+  .modal-content {
+    background: var(--panel-bg);
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16);
+  }
+  .modal-header {
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.25rem 1.6rem;
+  }
+  .modal-title {
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--text-main);
+  }
+  .modal-body {
+    padding: 1.5rem;
+  }
+  .modal-footer {
+    border-top: 1px solid var(--border-color);
+    padding: 1.25rem 1.6rem;
+  }
+  html.dark .btn-close { filter: invert(1); }
+
+  .form-select-luxury {
+    background-color: var(--surface-2);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    border-radius: 12px;
+    padding: 0.7rem 1rem;
+    font-size: 0.88rem;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    width: 100%;
+    margin-bottom: 1rem;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .form-select-luxury:focus {
+    border-color: var(--pos-red);
+    box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.18);
+    outline: none;
+  }
+
+  .btn-modal-primary {
+    background: var(--pos-red);
+    border: none;
+    color: #ffffff !important;
+    border-radius: 999px;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(236, 39, 52, 0.28);
+    width: 100%;
+  }
+  .btn-modal-primary:hover {
+    background: var(--pos-red-hover);
+    color: #ffffff !important;
+    transform: translateY(-1.5px);
+    box-shadow: 0 6px 18px rgba(236, 39, 52, 0.38);
+  }
+
+  .toast-minimal {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #181820;
+    color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    padding: 0.85rem 1.4rem;
+    z-index: 1060;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+    font-size: 0.82rem;
+    font-weight: 700;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    transform: translateY(-8px);
+  }
+  .toast-minimal.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
 </style>
 {% endblock %}
 
 {% block header_left %}
 <a href="/tables/" class="d-flex align-items-center gap-2 text-decoration-none" style="color:inherit;">
-  <div style="width:34px;height:34px;border-radius:10px;background:rgba(236,39,52,0.12);border:1px solid rgba(236,39,52,0.3);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex-shrink:0;">
+  <div style="width:34px;height:34px;border-radius:10px;background:rgba(236,39,52,0.12);border:1px solid rgba(236,39,52,0.3);display:flex;align-items:center;justify-content:center;color:var(--pos-red);flex-shrink:0;">
     <i class="bi bi-grid-3x3-gap-fill" style="font-size:1.05rem;"></i>
   </div>
   <div>
-    <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.5px;color:var(--text-main);">Floor Plan &amp; Tables</h1>
-    <div class="text-muted" style="font-size:0.72rem;letter-spacing:0.5px;">{{ request.user.outlet.name }}</div>
+    <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.3px;color:var(--text-main);font-family:var(--font-main, 'Outfit', sans-serif);">Floor Plan &amp; Tables</h1>
+    <div class="text-muted" style="font-size:0.72rem;letter-spacing:0.3px;font-family:var(--font-main, 'Outfit', sans-serif);">{{ request.user.outlet.name }}</div>
   </div>
 </a>
 {% endblock %}
 
 {% block header_right %}
 <div class="action-group d-flex align-items-center flex-wrap gap-2">
-  <button class="btn-luxury" data-bs-toggle="modal" data-bs-target="#manageTablesModal"><i class="bi bi-gear me-1"></i> Tables</button>
-  <!-- Live / Floor Editor / QR Codes removed -- all three are permanent
-       sidebar nav items (base.html) sitting right next to this page; having
-       them here too was pure duplication. (The removed button's "F3" badge
-       wasn't an actual bound shortcut -- no keydown handler for it exists
-       anywhere in this template -- so nothing functional was lost.) -->
-  <button class="btn-luxury" data-bs-toggle="modal" data-bs-target="#mergeModal">Combine</button>
-  <button class="btn-luxury" data-bs-toggle="modal" data-bs-target="#transferModal">Transfer</button>
-
-  {% include "core/_notif_badges_luxury.html" %}
-
+  <button class="btn-subbar-pill" data-bs-toggle="modal" data-bs-target="#manageTablesModal">
+    <i class="bi bi-gear me-1"></i> Tables
+  </button>
+  <button class="btn-subbar-pill" data-bs-toggle="modal" data-bs-target="#mergeModal">
+    <i class="bi bi-diagram-3 me-1"></i> Combine
+  </button>
+  <button class="btn-subbar-pill" data-bs-toggle="modal" data-bs-target="#transferModal">
+    <i class="bi bi-arrow-left-right me-1"></i> Transfer
+  </button>
   <button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme">
     <i class="bi bi-moon" id="themeIcon"></i>
   </button>
 </div>
 {% endblock %}
 
+{% block header_notifications %}
+{% include "core/_notif_badges_luxury.html" %}
+{% endblock %}
+
 {% block content %}
 <div id="toastBox" class="toast-minimal">Message</div>
 
-<div class="container-fluid mx-auto py-3 py-md-5" style="max-width:1400px;padding-left:1rem;padding-right:1rem;">
+<!-- Sub-Header Bar (KimiPoS POS Style) -->
+<div class="pos-subbar">
+  <div>
+    <h1 class="pos-subbar-title">Floor Plan &amp; Tables</h1>
+    <div class="pos-breadcrumbs">
+      <a href="/dashboard/"><i class="bi bi-house-door me-1"></i>Dashboard</a>
+      <i class="bi bi-chevron-right separator"></i>
+      <span class="current">Live Floor Layout</span>
+    </div>
+  </div>
+  <div class="d-flex align-items-center gap-2 flex-wrap">
+    <button class="btn-subbar-new" onclick="window.location.href='/billing/'">
+      <i class="bi bi-plus-lg"></i> New Order
+    </button>
+    <button class="btn-subbar-pill" data-bs-toggle="modal" data-bs-target="#manageTablesModal">
+      <i class="bi bi-gear me-1"></i> Manage Tables
+    </button>
+    <button class="btn-subbar-pill" data-bs-toggle="modal" data-bs-target="#mergeModal">
+      <i class="bi bi-diagram-3 me-1"></i> Combine
+    </button>
+    <button class="btn-subbar-pill" data-bs-toggle="modal" data-bs-target="#transferModal">
+      <i class="bi bi-arrow-left-right me-1"></i> Transfer
+    </button>
+    {% if request.user.role in "owner,manager" or request.user.is_superuser %}
+    <a href="/floor-editor/" class="btn-subbar-pill text-decoration-none">
+      <i class="bi bi-pencil-square me-1"></i> Floor Editor
+    </a>
+    {% endif %}
+  </div>
+</div>
 
-  <!-- METRICS -->
-  <div class="row g-4 mb-5">
+<div class="container-fluid mx-auto py-3 py-md-4" style="max-width:1440px;padding-left:1.25rem;padding-right:1.25rem;">
+
+  <!-- 4 HERO KPI STAT CARDS (KimiPoS Style) -->
+  <div class="row g-3 mb-4">
     <div class="col-6 col-md-3">
-      <div class="metric-card" style="--metric-tint-bg:rgba(236,39,52,0.08);--metric-tint-color:var(--accent-gold);">
-        <div class="metric-val" id="stat-total">0</div>
-        <div class="metric-label">Total Tables</div>
+      <div class="table-kpi-card kpi-card-total">
+        <div>
+          <div class="kpi-icon-badge"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+          <div class="kpi-val" id="stat-total">0</div>
+          <div class="kpi-label">Total Tables</div>
+          <div class="kpi-sub"><i class="bi bi-building"></i> {{ request.user.outlet.name }}</div>
+        </div>
+        <div class="kpi-art-badge">🍽️</div>
       </div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="metric-card" style="--metric-tint-bg:rgba(16,185,129,0.10);--metric-tint-color:var(--c-free);">
-        <div class="metric-val" id="stat-free">0</div>
-        <div class="metric-label">Tables Free</div>
+      <div class="table-kpi-card kpi-card-free">
+        <div>
+          <div class="kpi-icon-badge"><i class="bi bi-check-circle-fill"></i></div>
+          <div class="kpi-val" id="stat-free">0</div>
+          <div class="kpi-label">Available Now</div>
+          <div class="kpi-sub"><i class="bi bi-sparkles"></i> Ready to Seat</div>
+        </div>
+        <div class="kpi-art-badge">✨</div>
       </div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="metric-card" style="--metric-tint-bg:rgba(234,179,8,0.10);--metric-tint-color:var(--c-order);">
-        <div class="metric-val" id="stat-active">0</div>
-        <div class="metric-label">Active Orders</div>
+      <div class="table-kpi-card kpi-card-active">
+        <div>
+          <div class="kpi-icon-badge"><i class="bi bi-fire"></i></div>
+          <div class="kpi-val" id="stat-active">0</div>
+          <div class="kpi-label">Active Dining</div>
+          <div class="kpi-sub"><i class="bi bi-clock-history"></i> In Service</div>
+        </div>
+        <div class="kpi-art-badge">🍔</div>
       </div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="metric-card" style="--metric-tint-bg:rgba(6,182,212,0.10);--metric-tint-color:#06b6d4;">
-        <div class="metric-val" id="stat-billing">0</div>
-        <div class="metric-label">Awaiting Payment</div>
+      <div class="table-kpi-card kpi-card-billing">
+        <div>
+          <div class="kpi-icon-badge"><i class="bi bi-credit-card-2-front-fill"></i></div>
+          <div class="kpi-val" id="stat-billing">0</div>
+          <div class="kpi-label">Awaiting Payment</div>
+          <div class="kpi-sub"><i class="bi bi-receipt"></i> Ready for Checkout</div>
+        </div>
+        <div class="kpi-art-badge">💳</div>
       </div>
     </div>
   </div>
 
   <!-- VIEW TOGGLE & STATUS FILTER TABS -->
-  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+  <div class="table-filters-wrapper">
     <div class="table-filters mb-0" id="tableFilters">
       <button class="filter-tab filter-all active" data-filter="all" onclick="setTableFilter('all', this)">
-        All <span class="filter-count" id="fc-all">0</span>
+        All Tables <span class="filter-count" id="fc-all">0</span>
       </button>
       <button class="filter-tab filter-free" data-filter="free" onclick="setTableFilter('free', this)">
-        <span class="filter-dot" style="background:var(--c-free);"></span>
-        Free <span class="filter-count" id="fc-free">0</span>
+        <span class="filter-dot" style="background:var(--pos-green);"></span>
+        Available <span class="filter-count" id="fc-free">0</span>
       </button>
       <button class="filter-tab filter-ordering" data-filter="ordering" onclick="setTableFilter('ordering', this)">
-        <span class="filter-dot" style="background:var(--c-order);"></span>
+        <span class="filter-dot" style="background:var(--pos-amber);"></span>
         Ordering <span class="filter-count" id="fc-ordering">0</span>
       </button>
       <button class="filter-tab filter-preparing" data-filter="preparing" onclick="setTableFilter('preparing', this)">
-        <span class="filter-dot" style="background:var(--c-prepare);"></span>
+        <span class="filter-dot" style="background:var(--pos-orange);"></span>
         Preparing <span class="filter-count" id="fc-preparing">0</span>
       </button>
       <button class="filter-tab filter-served" data-filter="served" onclick="setTableFilter('served', this)">
-        <span class="filter-dot" style="background:var(--c-serve);"></span>
+        <span class="filter-dot" style="background:var(--pos-blue);"></span>
         Served <span class="filter-count" id="fc-served">0</span>
       </button>
       <button class="filter-tab filter-billing" data-filter="billing" onclick="setTableFilter('billing', this)">
-        <span class="filter-dot" style="background:#06b6d4;"></span>
+        <span class="filter-dot" style="background:var(--pos-cyan);"></span>
         Billing <span class="filter-count" id="fc-billing">0</span>
       </button>
       <button class="filter-tab filter-cleaning" data-filter="cleaning" onclick="setTableFilter('cleaning', this)">
-        <span class="filter-dot" style="background:var(--c-clean);"></span>
-        Cleaning <span class="filter-count" id="fc-cleaning">0</span>
+        <span class="filter-dot" style="background:var(--pos-pink);"></span>
+        Dirty <span class="filter-count" id="fc-cleaning">0</span>
       </button>
       <button class="filter-tab filter-linked" data-filter="merged" onclick="setTableFilter('merged', this)">
-        <span class="filter-dot" style="background:#a855f7;"></span>
+        <span class="filter-dot" style="background:var(--pos-purple);"></span>
         Linked <span class="filter-count" id="fc-merged">0</span>
       </button>
       <button class="filter-tab filter-review" data-filter="needs_approval" onclick="setTableFilter('needs_approval', this)">
-        <span class="filter-dot" style="background:#f43f5e;"></span>
+        <span class="filter-dot" style="background:var(--pos-rose);"></span>
         Review <span class="filter-count" id="fc-needs_approval">0</span>
       </button>
     </div>
 
-    <!-- View Mode Toggle Buttons -->
-    <div class="btn-group" role="group" aria-label="Floor View Mode">
-      <button type="button" class="btn-luxury active" id="btnModeGrid" onclick="setTableViewMode('grid')">
-        <i class="bi bi-grid-fill me-1"></i> Grid
+    <!-- Segmented View Mode Toggle -->
+    <div class="pos-segmented-mode" role="group" aria-label="Floor View Mode">
+      <button type="button" class="pos-mode-btn active" id="btnModeGrid" onclick="setTableViewMode('grid')">
+        <i class="bi bi-grid-fill me-1"></i> Grid View
       </button>
-      <button type="button" class="btn-luxury" id="btnModeMap" onclick="setTableViewMode('map')">
+      <button type="button" class="pos-mode-btn" id="btnModeMap" onclick="setTableViewMode('map')">
         <i class="bi bi-diagram-3 me-1"></i> Floor Map
       </button>
     </div>
@@ -555,25 +1160,28 @@
 
   <!-- VISUAL FLOOR MAP VIEW -->
   <div class="floor-map-container" id="floorMapContainer">
-    <div class="d-flex align-items-center justify-content-between mb-3">
+    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
       <div class="d-flex align-items-center gap-2">
-        <span class="text-uppercase fw-bold text-muted small" style="letter-spacing:1px;">FLOOR:</span>
-        <select id="floorMapSectionSelect" class="form-select-luxury py-1 px-2" style="font-size:0.8rem;width:auto;" onchange="renderFloorMapView()"></select>
+        <span class="text-uppercase fw-bold text-muted small" style="letter-spacing:1px;font-family:var(--font-main, 'Outfit', sans-serif);">SECTION:</span>
+        <select id="floorMapSectionSelect" class="form-select-luxury py-1 px-3" style="font-size:0.84rem;width:auto;margin:0;" onchange="renderFloorMapView()"></select>
       </div>
       {% if request.user.role in "owner,manager" or request.user.is_superuser %}
-      <a href="/floor-editor/" class="btn-luxury text-decoration-none">
-        <i class="bi bi-pencil me-1"></i> Edit in Floor Editor
+      <a href="/floor-editor/" class="btn-subbar-pill text-decoration-none">
+        <i class="bi bi-pencil-square me-1"></i> Edit in Floor Editor
       </a>
       {% endif %}
     </div>
-    <div class="floor-map-canvas" id="floorMapCanvas" style="width: 900px; height: 500px;">
+    <div class="floor-map-canvas" id="floorMapCanvas" style="width: 100%; height: 520px;">
       <!-- Positioned table nodes rendered by JS -->
     </div>
   </div>
 
   <!-- TABLES GRID -->
   <div class="row g-4" id="tableGrid">
-    <div class="col-12 text-center text-muted" style="letter-spacing:2px;font-size:0.8rem;text-transform:uppercase;">Loading Configuration...</div>
+    <div class="col-12 text-center text-muted py-5" style="letter-spacing:1.5px;font-size:0.85rem;text-transform:uppercase;font-family:var(--font-main, 'Outfit', sans-serif);">
+      <div class="spinner-border text-danger mb-3" role="status" style="width:2.5rem;height:2.5rem;"></div>
+      <div>Loading Floor Plan &amp; Live Tables...</div>
+    </div>
   </div>
 </div>
 
@@ -598,19 +1206,21 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title m-0">Combine Tables</h5>
+        <h5 class="modal-title m-0"><i class="bi bi-diagram-3 me-2 text-danger"></i>Combine Tables</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <label class="text-muted text-uppercase mb-2" style="font-size:0.7rem;letter-spacing:1px;">Primary Table (Maintains Data)</label>
+        <label class="text-muted text-uppercase mb-2" style="font-size:0.72rem;letter-spacing:1px;font-weight:700;">Primary Table (Maintains Active Order)</label>
         <select id="mergePrimary" class="form-select-luxury">
           <option value="" disabled selected>Select Primary Table...</option>
         </select>
-        <label class="text-muted text-uppercase mt-2 mb-2" style="font-size:0.7rem;letter-spacing:1px;">Secondary Table (Will be merged)</label>
+        <label class="text-muted text-uppercase mt-2 mb-2" style="font-size:0.72rem;letter-spacing:1px;font-weight:700;">Secondary Table (Will be linked)</label>
         <select id="mergeSecondary" class="form-select-luxury">
           <option value="" disabled selected>Select a table to merge...</option>
         </select>
-        <button onclick="executeMerge()" class="btn-luxury w-100 mt-4" style="background:var(--accent-gold);border-color:var(--accent-gold);color:#111;">Execute Merge</button>
+        <button onclick="executeMerge()" class="btn-modal-primary mt-3">
+          <i class="bi bi-link-45deg me-1"></i> Combine Tables Now
+        </button>
       </div>
     </div>
   </div>
@@ -621,18 +1231,20 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title m-0">Transfer Table</h5>
+        <h5 class="modal-title m-0"><i class="bi bi-arrow-left-right me-2 text-danger"></i>Transfer Table Order</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <input type="hidden" id="transferOrderId">
-        <label class="text-muted text-uppercase mb-2" style="font-size:0.7rem;letter-spacing:1px;">Source Table</label>
+        <label class="text-muted text-uppercase mb-2" style="font-size:0.72rem;letter-spacing:1px;font-weight:700;">Source Table</label>
         <select id="transferFrom" class="form-select-luxury" disabled></select>
-        <label class="text-muted text-uppercase mt-2 mb-2" style="font-size:0.7rem;letter-spacing:1px;">Destination (New) Table</label>
+        <label class="text-muted text-uppercase mt-2 mb-2" style="font-size:0.72rem;letter-spacing:1px;font-weight:700;">Destination Table</label>
         <select id="transferTo" class="form-select-luxury">
           <option value="" disabled selected>Select Destination Table...</option>
         </select>
-        <button onclick="executeTransfer()" class="btn-luxury w-100 mt-4" style="background:var(--accent-gold);border-color:var(--accent-gold);color:#111;">Execute Transfer</button>
+        <button onclick="executeTransfer()" class="btn-modal-primary mt-3">
+          <i class="bi bi-arrow-right-circle me-1"></i> Execute Table Transfer
+        </button>
       </div>
     </div>
   </div>
@@ -643,10 +1255,10 @@
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header d-flex justify-content-between align-items-center">
-        <h5 class="modal-title m-0">Manage Tables</h5>
+        <h5 class="modal-title m-0"><i class="bi bi-gear-wide-connected me-2 text-danger"></i>Manage Floor Tables</h5>
         <div class="d-flex align-items-center gap-2">
-          <a href="/floor-editor/" class="btn-luxury text-decoration-none">
-            <i class="bi bi-grid-1x2 me-1"></i> Open Floor Editor
+          <a href="/floor-editor/" class="btn-subbar-pill text-decoration-none">
+            <i class="bi bi-pencil-square me-1"></i> Open Floor Editor
           </a>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
@@ -655,17 +1267,30 @@
         <div class="table-responsive">
           <table class="table table-borderless align-middle" style="color:var(--text-main);">
             <thead style="border-bottom:2px solid var(--border-color);">
-              <tr><th>Table Name</th><th>Section</th><th>QR Code</th><th>Actions</th></tr>
+              <tr style="font-family:var(--font-main, 'Outfit', sans-serif);font-size:0.78rem;text-transform:uppercase;color:var(--text-muted);letter-spacing:0.8px;">
+                <th>Table Name</th>
+                <th>Section</th>
+                <th>QR Code</th>
+                <th>Actions</th>
+              </tr>
             </thead>
             <tbody id="tblManageList"></tbody>
           </table>
         </div>
         <hr class="my-2" style="border-color:var(--border-color);">
-        <h6 style="font-family:'DM Serif Display',serif;">Add New Table</h6>
-        <div class="row g-2">
-          <div class="col-5"><input type="text" id="newTableName" class="form-control form-select-luxury m-0" placeholder="Table Name (e.g. T-12)"></div>
-          <div class="col-4"><input type="text" id="newTableSection" class="form-control form-select-luxury m-0" placeholder="Section (e.g. Patio)"></div>
-          <div class="col-3"><button class="btn-luxury w-100 h-100" style="background:var(--accent-gold);color:#111;" onclick="createTable()">Create</button></div>
+        <h6 style="font-family:var(--font-main, 'Outfit', sans-serif);font-weight:800;" class="mb-3">Add New Floor Table</h6>
+        <div class="row g-2 align-items-center">
+          <div class="col-12 col-md-5">
+            <input type="text" id="newTableName" class="form-control form-select-luxury m-0" placeholder="Table Name (e.g. T-12)">
+          </div>
+          <div class="col-12 col-md-4">
+            <input type="text" id="newTableSection" class="form-control form-select-luxury m-0" placeholder="Section (e.g. Patio, Hall)">
+          </div>
+          <div class="col-12 col-md-3">
+            <button class="btn-modal-primary m-0" style="padding:0.7rem 1.2rem;" onclick="createTable()">
+              <i class="bi bi-plus-lg me-1"></i> Add Table
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -677,15 +1302,21 @@
   <div class="modal-dialog modal-dialog-centered modal-sm">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title m-0" id="qrModalTitle">Table QR</h5>
+        <h5 class="modal-title m-0" id="qrModalTitle">Table QR Code</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body text-center p-4">
-        <img id="qrImage" src="" alt="QR Code" class="img-fluid rounded mb-3" style="border:4px solid #fff;">
-        <p class="text-muted small">Scan this code to load the digital menu for this table.</p>
+        <div style="background:#ffffff;padding:12px;border-radius:14px;display:inline-block;box-shadow:0 4px 14px rgba(0,0,0,0.08);margin-bottom:1rem;">
+          <img id="qrImage" src="" alt="QR Code" class="img-fluid rounded" style="width:200px;height:200px;display:block;">
+        </div>
+        <p class="text-muted small mb-3">Scan this QR code to load the digital self-ordering menu for this table.</p>
         <div class="d-flex gap-2">
-          <button class="btn-luxury btn-card-action w-50" id="qrViewBtn">View Large</button>
-          <button class="btn-luxury btn-card-action w-50" data-bs-toggle="modal" data-bs-target="#manageTablesModal">Back</button>
+          <button class="btn-subbar-new flex-1 justify-content-center" id="qrViewBtn">
+            <i class="bi bi-box-arrow-up-right me-1"></i> View Large
+          </button>
+          <button class="btn-subbar-pill flex-1 justify-content-center" data-bs-toggle="modal" data-bs-target="#manageTablesModal">
+            Back
+          </button>
         </div>
       </div>
     </div>
@@ -696,55 +1327,25 @@
 {% block extra_js %}
 <script>
   function showToast(msg) {
-    const t = document.getElementById("toastBox");
-    t.innerText = msg; t.classList.add("show");
-    setTimeout(() => t.classList.remove("show"), 3000);
+    const box = document.getElementById("toastBox");
+    if (!box) return;
+    box.innerText = msg;
+    box.classList.add("show");
+    setTimeout(() => box.classList.remove("show"), 2800);
   }
 
   function escapeHtml(str) {
     if (!str) return '';
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 
-  window.cancelOrder = function(orderId) {
-    if (!orderId) return;
-    Swal.fire({
-      title: 'Cancel Order?',
-      text: 'Are you sure you want to cancel this order? Non-served items will be voided.',
-      icon: 'warning',
-      input: 'text',
-      inputPlaceholder: 'Reason for cancellation (optional)',
-      showCancelButton: true,
-      confirmButtonColor: '#ef4444',
-      confirmButtonText: 'Yes, Cancel Order'
-    }).then(res => {
-      if (res.isConfirmed) {
-        fetch(`/cancel-order/${orderId}/`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': apiClient.getCsrf()
-          },
-          body: JSON.stringify({ reason: res.value || 'Cancelled from floor plan' })
-        })
-        .then(r => r.json())
-        .then(data => {
-          if (data.success) {
-            ui.toast('Order cancelled', 'success');
-            refreshLayout();
-          } else {
-            Swal.fire('Error', data.error || 'Failed to cancel order', 'error');
-          }
-        })
-        .catch(err => {
-          Swal.fire('Error', err.message || 'Request failed', 'error');
-        });
-      }
-    });
-  };
-
   let tableDataStore = [];
-  let activeFilter = 'all'; // current status filter
+  let activeFilter = 'all';
   let currentViewMode = 'grid';
 
   window.setTableViewMode = function(mode) {
@@ -794,18 +1395,18 @@
       : tables.filter(t => activeFilter === 'served' ? (t.status === 'served' || t.status === 'ready') : t.status === activeFilter);
 
     if (visibleTables.length === 0) {
-      canvas.innerHTML = `<div class="d-flex align-items-center justify-content-center h-100 text-muted small text-uppercase" style="letter-spacing:1px;min-height:300px;">No tables match filter on this floor</div>`;
+      canvas.innerHTML = `<div class="d-flex align-items-center justify-content-center h-100 text-muted small text-uppercase" style="letter-spacing:1px;min-height:340px;font-family:var(--font-main, 'Outfit', sans-serif);font-weight:700;"><i class="bi bi-funnel me-2"></i>No tables match filter on this floor section</div>`;
       return;
     }
 
     const statusColors = {
-      free: 'var(--c-free, #10b981)',
-      ordering: 'var(--c-order, #eab308)',
-      preparing: 'var(--c-prepare, #f97316)',
-      served: 'var(--c-serve, #3b82f6)',
-      ready: 'var(--c-serve, #3b82f6)',
+      free: '#10b981',
+      ordering: '#f59e0b',
+      preparing: '#f97316',
+      served: '#3b82f6',
+      ready: '#3b82f6',
       billing: '#06b6d4',
-      cleaning: 'var(--c-clean, #ec4899)',
+      cleaning: '#ec4899',
       merged: '#a855f7',
       needs_approval: '#f43f5e'
     };
@@ -813,8 +1414,8 @@
     visibleTables.forEach((t, idx) => {
       let x = t.pos_x, y = t.pos_y;
       if (x == null || y == null) {
-        x = 40 + (idx % 6) * 120;
-        y = 40 + Math.floor(idx / 6) * 120;
+        x = 30 + (idx % 6) * 135;
+        y = 30 + Math.floor(idx / 6) * 135;
       }
 
       const node = document.createElement('div');
@@ -824,7 +1425,7 @@
       node.style.top = y + 'px';
       if (t.width) node.style.width = t.width + 'px';
       if (t.height) node.style.height = t.height + 'px';
-      node.style.borderColor = statusColors[t.status] || 'rgba(255,255,255,0.15)';
+      node.style.borderColor = statusColors[t.status] || 'rgba(236,39,52,0.3)';
 
       if (shape === 'wall') {
         node.style.cursor = 'default';
@@ -918,19 +1519,24 @@
     const billingCount  = tables.filter(t => t.status === "billing").length;
     const isClean = stuckCount === 0 && approvalCount === 0;
 
-    let fullHtml = `<div class="col-12"><div class="alert-strip ${isClean ? 'clean' : ''}">
-      <span style="color:var(--text-muted);text-transform:uppercase;letter-spacing:2px;font-size:0.65rem;">Floor</span>`;
-    if (stuckCount > 0)    fullHtml += `<span class="alert-chip chip-danger"><i class="bi bi-exclamation-triangle-fill"></i> ${stuckCount} stuck &gt;30m</span>`;
-    if (approvalCount > 0) fullHtml += `<span class="alert-chip chip-warn"><i class="bi bi-hourglass-split"></i> ${approvalCount} need approval</span>`;
-    if (billingCount > 0)  fullHtml += `<span class="alert-chip chip-info"><i class="bi bi-receipt"></i> ${billingCount} awaiting payment</span>`;
-    if (isClean)           fullHtml += `<span class="alert-chip chip-ok"><i class="bi bi-check-circle-fill"></i> All clear</span>`;
-    fullHtml += `</div></div>`;
+    let fullHtml = `<div class="col-12"><div class="floor-alert-banner ${isClean ? 'is-clean' : ''}">
+      <div class="d-flex align-items-center gap-2">
+        <span class="floor-alert-icon"><i class="bi bi-broadcast"></i></span>
+        <span class="floor-alert-title">Floor Status</span>
+      </div>
+      <div class="d-flex align-items-center gap-2 flex-wrap">`;
+    if (stuckCount > 0)    fullHtml += `<span class="floor-alert-pill pill-danger"><i class="bi bi-exclamation-triangle-fill"></i> ${stuckCount} stuck &gt;30m</span>`;
+    if (approvalCount > 0) fullHtml += `<span class="floor-alert-pill pill-warn"><i class="bi bi-hourglass-split"></i> ${approvalCount} need approval</span>`;
+    if (billingCount > 0)  fullHtml += `<span class="floor-alert-pill pill-info"><i class="bi bi-receipt"></i> ${billingCount} awaiting payment</span>`;
+    if (isClean)           fullHtml += `<span class="floor-alert-pill pill-ok"><i class="bi bi-check-circle-fill"></i> All tables operating smoothly</span>`;
+    fullHtml += `</div></div></div>`;
 
     // ── Show "no tables" message when filter returns nothing ──────────────
     if (filtered.length === 0 && activeFilter !== 'all') {
-      fullHtml += `<div class="col-12 text-center py-5" style="color:var(--text-muted);">
+      fullHtml += `<div class="col-12 text-center py-5" style="color:var(--text-muted);font-family:var(--font-main, 'Outfit', sans-serif);">
         <i class="bi bi-funnel fs-1 d-block mb-3 opacity-50"></i>
-        <span style="text-transform:uppercase;letter-spacing:2px;font-size:0.8rem;">No tables with status <strong>${activeFilter.replace('_', ' ')}</strong></span>
+        <div style="font-weight:700;font-size:1.05rem;" class="mb-1">No Tables Found</div>
+        <div style="font-size:0.82rem;">No active tables currently have the status <strong>"${activeFilter.replace('_', ' ')}"</strong></div>
       </div>`;
       container.innerHTML = fullHtml;
       const statTotal   = tables.length;
@@ -945,22 +1551,26 @@
     // ── Group FILTERED tables by section ──────────────────────────────────
     const sections = {};
     filtered.forEach(t => {
-      const sec = t.section || "";
+      const sec = t.section || "Main Hall";
       if (!sections[sec]) sections[sec] = [];
       sections[sec].push(t);
     });
     const sectionKeys = Object.keys(sections).sort();
 
     sectionKeys.forEach(sec => {
-      if (sec) {
-        fullHtml += `<div class="col-12"><div class="section-header" style="font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);font-size:0.8rem;margin-bottom:0.5rem;"><i class="bi bi-grid-3x3-gap me-1"></i>${sec}</div></div>`;
-      }
+      fullHtml += `<div class="col-12">
+        <div class="floor-section-header">
+          <span class="section-badge-icon"><i class="bi bi-grid-3x3-gap-fill"></i></span>
+          <span>${sec}</span>
+          <span class="badge rounded-pill bg-light text-dark border ms-2" style="font-size:0.7rem;font-weight:700;">${sections[sec].length}</span>
+        </div>
+      </div>`;
 
       sections[sec].forEach(t => {
         let statusText = t.status || "free";
         let statusClass = "status-free", bgClass = "bg-free";
         let cardClasses = "";
-        let timerHtml = "", actionsHtml = "", cookingBadge = "";
+        let timerHtml = "", cookingBadge = "";
 
         if      (statusText === "ordering")       { statusClass = "status-ordering";  bgClass = "bg-order";   }
         else if (statusText === "preparing")      { statusClass = "status-preparing"; bgClass = "bg-prepare"; }
@@ -979,43 +1589,19 @@
 
         // Cooking badge
         if (t.cooking_items > 0) {
-          cookingBadge = `<span class="cooking-badge"><i class="bi bi-fire"></i> ${t.cooking_items} in kitchen</span>`;
-        }
-
-        if (statusText === "free") {
-          actionsHtml = `<button onclick="window.location.href='/billing/?table=${t.id}'" class="btn-luxury btn-card-action w-100"><i class="bi bi-plus-lg me-1"></i> New Order</button>`;
-          if (t.is_primary) actionsHtml += `<button onclick="unmergeTable(${t.id})" class="btn-luxury btn-card-action w-100" style="color:#ef4444;margin-top:5px;"><i class="bi bi-scissors"></i> Unmerge</button>`;
-        } else if (statusText === "merged") {
-          const pName = t.primary_table_name || t.primary_table;
-          timerHtml = `<div class="table-timer status-merged"><i class="bi bi-link"></i> Linked</div>`;
-          actionsHtml = `<button onclick="window.location.href='/billing/?table=${t.primary_table}'" class="btn-luxury btn-card-action w-100">Go to Primary (${pName})</button>`;
-        } else if (statusText === "cleaning") {
-          timerHtml = `<div class="table-timer text-muted"><i class="bi bi-stars"></i> Table Dirty</div>`;
-          actionsHtml = `<button onclick="markTableCleaned(${t.id})" class="btn-luxury btn-luxury-primary btn-card-action w-100">Mark Clean</button>`;
-        } else if (statusText === "billing") {
-          timerHtml = `<div class="table-timer status-billing"><i class="bi bi-receipt"></i> Billing</div>`;
-          actionsHtml = `<button onclick="window.location.href='/bill/${t.order_id}/'" class="btn-luxury btn-luxury-primary btn-card-action w-100" style="background:#06b6d4;border-color:#06b6d4;"><i class="bi bi-credit-card me-1"></i> Pay Bill</button>
-            <button onclick="handleTableClick(${t.id})" class="btn-luxury btn-card-action" title="More Options"><i class="bi bi-three-dots d-block mb-1 mx-auto fs-5"></i> More</button>`;
-        } else if (statusText === "needs_approval") {
-          timerHtml = `<div class="table-timer bg-approval text-white"><i class="bi bi-exclamation-triangle"></i> Review</div>`;
-          actionsHtml = `<button onclick="handleTableClick(${t.id})" class="btn-luxury btn-luxury-primary btn-card-action w-100" style="background:#f43f5e;border-color:#f43f5e;"><i class="bi bi-check-circle me-1"></i> Approve QR</button>`;
-        } else {
-          if (t.elapsed !== undefined) timerHtml = `<div class="table-timer ${statusClass}"><i class="bi bi-clock"></i> ${t.elapsed}m</div>`;
-          actionsHtml = `<button onclick="window.location.href='/billing/?table=${t.id}'" class="btn-luxury btn-card-action" title="Add Items"><i class="bi bi-cart-plus d-block mb-1 mx-auto fs-5"></i> Add</button>
-            <button onclick="generateBillForOrder(${t.order_id})" class="btn-luxury btn-card-action" title="Generate Bill"><i class="bi bi-receipt d-block mb-1 mx-auto fs-5"></i> Bill</button>
-            <button onclick="handleTableClick(${t.id})" class="btn-luxury btn-card-action" title="More Options"><i class="bi bi-three-dots d-block mb-1 mx-auto fs-5"></i> More</button>`;
+          cookingBadge = `<span class="cooking-badge"><i class="bi bi-fire"></i> ${t.cooking_items} cooking</span>`;
         }
 
         let mergeBadge = '';
         if (statusText === "merged") {
-          mergeBadge = `<div class="occupancy"><i class="bi bi-link-45deg"></i> Linked to ${t.primary_table_name || 'Primary'}</div>`;
+          mergeBadge = `<div class="text-muted small mt-2 d-flex align-items-center gap-1"><i class="bi bi-link-45deg text-purple"></i> Linked to ${t.primary_table_name || 'Primary Table'}</div>`;
         } else if (t.is_primary) {
-          mergeBadge = `<div class="occupancy"><i class="bi bi-diagram-3"></i> Merged w/ ${t.merged_with_names}</div>`;
+          mergeBadge = `<div class="text-muted small mt-2 d-flex align-items-center gap-1"><i class="bi bi-diagram-3 text-purple"></i> Merged with ${t.merged_with_names}</div>`;
         }
 
         let cardInnerHtml = '';
 
-        // ── DETAILED ORDER CARD (Matching Reference Screenshot) ──
+        // ── 1. ACTIVE ORDER CARD (Ordering, Preparing, Served, Billing, Review) ──
         if (t.order && t.order.items && t.order.items.length > 0) {
           const o = t.order;
 
@@ -1027,16 +1613,13 @@
           else if (statusText === "needs_approval") { placedChipClass = "chip-unpaid"; placedText = "REVIEW"; }
 
           const displayName = (t.name || '').trim().toLowerCase().startsWith('table') ? t.name : `Table ${t.name}`;
-          const cutlerySvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.85;margin-right:6px;vertical-align:-2px;"><path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8Z"/><path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7"/><path d="m2.1 21.8 6.4-6.3"/><path d="m19 5-7 7"/></svg>`;
-          const checkSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:3px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>`;
-          const banSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>`;
 
           const paidChip = o.is_paid 
-            ? `<span class="order-chip chip-paid"><i class="bi bi-check-circle-fill"></i> PAID</span>`
-            : `<span class="order-chip chip-unpaid">UNPAID</span>`;
+            ? `<span class="order-status-pill chip-paid"><i class="bi bi-check-circle-fill"></i> PAID</span>`
+            : `<span class="order-status-pill chip-unpaid">UNPAID</span>`;
 
           const markPaidBtn = !o.is_paid 
-            ? `<button class="chip-btn-mark-paid" onclick="window.location.href='/billing/?table=${t.id}'" title="Pay Order">${checkSvg}MARK PAID</button>`
+            ? `<button class="chip-btn-mark-paid" onclick="window.location.href='/billing/?table=${t.id}'" title="Pay Order"><i class="bi bi-check-lg"></i> MARK PAID</button>`
             : ``;
 
           let itemsHtml = `<div class="order-items-list">`;
@@ -1066,27 +1649,40 @@
             primaryActionText = "Approve QR &rarr;";
             primaryActionClick = `handleTableClick(${t.id})`;
           } else if (statusText === "preparing" || statusText === "served") {
-            primaryActionText = "Accept Order &rarr;";
+            primaryActionText = "Manage Bill &rarr;";
             primaryActionClick = `window.location.href='/billing/?table=${t.id}'`;
           }
 
+          if (t.elapsed !== undefined) {
+            const isDelayed = (t.elapsed || 0) > 25;
+            timerHtml = `<div class="table-timer ${isDelayed ? 'urgent' : ''}"><span class="pulse-dot"></span> ⏱️ ${t.elapsed}m</div>`;
+          }
+
           cardInnerHtml = `
-            <div class="table-card w-100 shadow-sm ${cardClasses}">
+            <div class="table-card w-100 ${cardClasses}">
               <div class="table-status-line ${bgClass}"></div>
               ${t.waiter_initials ? `<div class="waiter-badge ${t.waiter_initials === 'QR' ? 'qr-badge' : ''}" title="Waiter: ${t.waiter_name}">${t.waiter_initials}</div>` : ''}
               
-              <div class="order-card-header">
-                <div>
-                  <div class="order-table-title">${cutlerySvg}${displayName}</div>
-                  <div class="order-table-meta">${o.time} &bull; ${o.short_id}</div>
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="table-icon-circle active"><i class="bi bi-receipt-cutoff"></i></div>
+                  <div>
+                    <div class="table-name mb-0">${displayName}</div>
+                    <div class="table-order-meta">
+                      <span class="order-token-badge">${o.short_id}</span>
+                      <span>${o.time}</span>
+                      <span class="table-section-tag">${t.section || 'Floor'}</span>
+                    </div>
+                  </div>
                 </div>
                 ${timerHtml}
               </div>
 
               <div class="order-chips-row">
-                <span class="order-chip ${placedChipClass}">${placedText}</span>
+                <span class="order-status-pill ${placedChipClass}">${placedText}</span>
                 ${paidChip}
                 ${markPaidBtn}
+                ${cookingBadge}
               </div>
 
               ${itemsHtml}
@@ -1107,35 +1703,125 @@
               </div>
 
               <div class="order-card-buttons">
-                <button class="btn-luxury btn-luxury-danger" onclick="cancelOrder(${t.order_id})" title="Cancel Order">
-                  ${banSvg}
+                <button class="btn-table-cancel" onclick="cancelOrder(${t.order_id})" title="Cancel Order">
+                  <i class="bi bi-trash3"></i>
                 </button>
-                <button class="btn-luxury btn-luxury-primary" onclick="${primaryActionClick}">
+                <button class="btn-table-primary" onclick="${primaryActionClick}">
                   ${primaryActionText}
                 </button>
               </div>
 
-              <div class="d-flex gap-1 mt-2 pt-2 border-top" style="border-color:var(--border-color)!important;">
-                <button onclick="window.location.href='/billing/?table=${t.id}'" class="btn-luxury btn-card-action" title="Add Items"><i class="bi bi-cart-plus me-1"></i> Add</button>
-                <button onclick="generateBillForOrder(${t.order_id})" class="btn-luxury btn-card-action" title="Generate Bill"><i class="bi bi-receipt me-1"></i> Bill</button>
-                <button onclick="handleTableClick(${t.id})" class="btn-luxury btn-card-action" title="More Options"><i class="bi bi-three-dots me-1"></i> More</button>
+              <div class="order-sub-actions">
+                <button onclick="window.location.href='/billing/?table=${t.id}'" class="btn-table-sub" title="Add Items">
+                  <i class="bi bi-cart-plus me-1"></i> Add Items
+                </button>
+                <button onclick="generateBillForOrder(${t.order_id})" class="btn-table-sub" title="Generate Bill">
+                  <i class="bi bi-receipt me-1"></i> Bill
+                </button>
+                <button onclick="handleTableClick(${t.id})" class="btn-table-sub" title="More Options">
+                  <i class="bi bi-three-dots"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        } else if (statusText === "cleaning") {
+          // ── 2. CLEANING / DIRTY TABLE CARD ──
+          cardInnerHtml = `
+            <div class="table-card w-100 ${cardClasses}">
+              <div class="table-status-line bg-clean"></div>
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="table-icon-circle cleaning"><i class="bi bi-stars"></i></div>
+                  <div>
+                    <h3 class="table-name mb-0">${t.name}</h3>
+                    <span class="table-section-tag">${t.section || 'Floor'}</span>
+                  </div>
+                </div>
+                <span class="table-timer" style="color:var(--pos-pink);border-color:rgba(236,72,153,0.3);background:rgba(236,72,153,0.08);">
+                  <i class="bi bi-brush"></i> Needs Cleaning
+                </span>
+              </div>
+              <div class="table-free-body" style="background:rgba(236,72,153,0.04);border-color:rgba(236,72,153,0.2);">
+                <span class="table-emoji-art">🧹</span>
+                <span class="table-free-hint">Table is marked dirty and needs sanitization</span>
+              </div>
+              <div class="mt-auto pt-2">
+                <button onclick="markTableCleaned(${t.id})" class="btn-table-primary w-100" style="background:var(--pos-green);box-shadow:0 3px 12px rgba(16,185,129,0.28);">
+                  <i class="bi bi-check-circle-fill me-1"></i> Mark as Cleaned
+                </button>
+              </div>
+            </div>
+          `;
+        } else if (statusText === "merged") {
+          // ── 3. MERGED / LINKED TABLE CARD ──
+          const pName = t.primary_table_name || t.primary_table;
+          cardInnerHtml = `
+            <div class="table-card w-100 ${cardClasses}">
+              <div class="table-status-line bg-merged"></div>
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="table-icon-circle merged"><i class="bi bi-link-45deg"></i></div>
+                  <div>
+                    <h3 class="table-name mb-0">${t.name}</h3>
+                    <span class="table-section-tag">${t.section || 'Floor'}</span>
+                  </div>
+                </div>
+                <span class="table-timer" style="color:var(--pos-purple);border-color:rgba(168,85,247,0.3);background:rgba(168,85,247,0.08);">
+                  <i class="bi bi-diagram-3"></i> Linked Table
+                </span>
+              </div>
+              <div class="table-free-body" style="background:rgba(168,85,247,0.04);border-color:rgba(168,85,247,0.2);">
+                <span class="table-emoji-art">🔗</span>
+                <span class="table-free-hint">Linked to <strong>${pName}</strong></span>
+              </div>
+              <div class="mt-auto pt-2">
+                <button onclick="window.location.href='/billing/?table=${t.primary_table}'" class="btn-table-primary w-100" style="background:var(--pos-purple);box-shadow:0 3px 12px rgba(168,85,247,0.28);">
+                  Go to Primary (${pName}) &rarr;
+                </button>
               </div>
             </div>
           `;
         } else {
-          // Standard card for tables with no active order items (Free, Cleaning, Merged)
+          // ── 4. FREE / AVAILABLE TABLE CARD (KimiPoS Luxury Style) ──
+          const unmergeBtn = t.is_primary 
+            ? `<button onclick="unmergeTable(${t.id})" class="btn-table-sub w-100 mt-2" style="color:#ef4444;border-color:rgba(239,68,68,0.3);"><i class="bi bi-scissors me-1"></i> Unmerge Table</button>`
+            : '';
+
           cardInnerHtml = `
-            <div class="table-card w-100 shadow-sm ${cardClasses}">
-              <div class="table-status-line ${bgClass}"></div>
+            <div class="table-card w-100 ${cardClasses}">
+              <div class="table-status-line bg-free"></div>
               ${t.waiter_initials ? `<div class="waiter-badge ${t.waiter_initials === 'QR' ? 'qr-badge' : ''}" title="Waiter: ${t.waiter_name}">${t.waiter_initials}</div>` : ''}
-              <div class="table-header">
-                <div class="d-flex align-items-center flex-wrap"><h3 class="table-name mb-0">${t.name}</h3></div>
-                ${timerHtml}
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="table-icon-circle"><i class="bi bi-grid-1x2-fill"></i></div>
+                  <div>
+                    <h3 class="table-name mb-0">${t.name}</h3>
+                    <span class="table-section-tag">${t.section || 'Floor'}</span>
+                  </div>
+                </div>
+                <span class="table-timer status-free" style="border-color:rgba(16,185,129,0.3);background:rgba(16,185,129,0.08);">
+                  <span class="pulse-dot"></span> Available
+                </span>
               </div>
-              <div class="table-status ${statusClass}">${statusText.replace('_', ' ')}</div>
-              ${cookingBadge}
+              
+              <div class="table-free-body">
+                <div class="table-capacity-chip">
+                  <i class="bi bi-people-fill text-muted"></i> ${t.capacity || 4} Guests Capacity
+                </div>
+                <div class="table-free-graphic">
+                  <span class="table-emoji-art">🍽️</span>
+                  <span class="table-free-hint">Ready for new guest seating</span>
+                </div>
+              </div>
+
               ${mergeBadge}
-              <div class="mt-auto"><div class="card-actions">${actionsHtml}</div></div>
+
+              <div class="mt-auto pt-2">
+                <button onclick="window.location.href='/billing/?table=${t.id}'" class="btn-table-primary w-100">
+                  <i class="bi bi-plus-lg me-1"></i> New Order
+                </button>
+                ${unmergeBtn}
+              </div>
             </div>
           `;
         }
@@ -1146,7 +1832,7 @@
 
     container.innerHTML = fullHtml;
 
-    // ── Metric cards (always from ALL tables) ──────────────────────────────
+    // ── Metric cards (always calculated from ALL tables) ───────────────────
     const statTotal   = tables.length;
     const statFree    = tables.filter(x => x.status === "free").length;
     const statBilling = tables.filter(x => x.status === "billing").length;
@@ -1187,11 +1873,11 @@
 
     if (mList) {
       mList.innerHTML = tableDataStore.map(t => `
-        <tr>
-          <td><input type="text" class="form-control form-control-sm form-select-luxury m-0" value="${t.name}" id="editName_${t.id}"></td>
-          <td><input type="text" class="form-control form-control-sm form-select-luxury m-0" value="${t.section}" id="editSec_${t.id}"></td>
-          <td><button class="btn-luxury" onclick="showQrModal('${t.qr_token}', '${t.name}')"><i class="bi bi-qr-code"></i> View</button></td>
-          <td><button class="btn-luxury" onclick="updateTable(${t.id})">Save</button></td>
+        <tr style="border-bottom:1px solid var(--border-color);">
+          <td style="padding:0.65rem 0.5rem;"><input type="text" class="form-control form-select-luxury m-0 py-1 px-2" style="font-size:0.85rem;" value="${t.name}" id="editName_${t.id}"></td>
+          <td style="padding:0.65rem 0.5rem;"><input type="text" class="form-control form-select-luxury m-0 py-1 px-2" style="font-size:0.85rem;" value="${t.section || ''}" id="editSec_${t.id}"></td>
+          <td style="padding:0.65rem 0.5rem;"><button class="btn-subbar-pill" style="padding:4px 10px;font-size:0.75rem;" onclick="showQrModal('${t.qr_token}', '${t.name}')"><i class="bi bi-qr-code"></i> View QR</button></td>
+          <td style="padding:0.65rem 0.5rem;"><button class="btn-subbar-new" style="padding:4px 12px;font-size:0.75rem;" onclick="updateTable(${t.id})">Save</button></td>
         </tr>
       `).join('');
     }
@@ -1208,7 +1894,7 @@
   function createTable() {
     const name = document.getElementById("newTableName").value;
     const section = document.getElementById("newTableSection").value;
-    if (!name) { showToast("Name is required"); return; }
+    if (!name) { showToast("Table name is required"); return; }
     fetch("{% url 'manage-table' %}", {
       method: "POST",
       headers: { "Content-Type": "application/json", "X-CSRFToken": apiClient.getCsrf() },
@@ -1246,33 +1932,33 @@
 
     if (t.status === "free") {
       document.getElementById("actionModalStatus").innerText = "Available for Seating";
-      const unmergeBtn = t.is_primary ? `<button onclick="unmergeTable(${t.id})" class="btn-luxury w-100" style="color:#ef4444;border-color:#ef4444;">Unmerge Tables</button>` : '';
-      btns.innerHTML = `<button onclick="window.location.href='/billing/?table=${t.id}'" class="btn-luxury w-100" style="background:var(--accent-gold);border-color:var(--accent-gold);color:#111;">Create New Order</button>
+      const unmergeBtn = t.is_primary ? `<button onclick="unmergeTable(${t.id})" class="btn-subbar-pill w-100" style="color:#ef4444;border-color:#ef4444;">Unmerge Tables</button>` : '';
+      btns.innerHTML = `<button onclick="window.location.href='/billing/?table=${t.id}'" class="btn-modal-primary"><i class="bi bi-plus-lg me-1"></i> Create New Order</button>
         ${unmergeBtn}`;
     } else if (t.status === "merged") {
       document.getElementById("actionModalStatus").innerText = `Linked to ${t.primary_table_name || 'Primary Table'}`;
-      btns.innerHTML = `<button onclick="window.location.href='/billing/?table=${t.primary_table}'" class="btn-luxury w-100">Go to Primary Table (${t.primary_table_name})</button>
-        <button onclick="unmergeTable(${t.primary_table})" class="btn-luxury w-100" style="color:#ef4444;border-color:#ef4444;">Unmerge All</button>`;
+      btns.innerHTML = `<button onclick="window.location.href='/billing/?table=${t.primary_table}'" class="btn-modal-primary">Go to Primary Table (${t.primary_table_name})</button>
+        <button onclick="unmergeTable(${t.primary_table})" class="btn-subbar-pill w-100" style="color:#ef4444;border-color:#ef4444;">Unmerge All</button>`;
     } else if (t.status === "cleaning") {
       document.getElementById("actionModalStatus").innerText = "Needs Cleaning & Sanitizing";
-      btns.innerHTML = `<button onclick="markTableCleaned(${t.id})" class="btn-luxury w-100" style="background:var(--accent-gold);border-color:var(--accent-gold);color:#111;">Mark as Cleaned</button>`;
+      btns.innerHTML = `<button onclick="markTableCleaned(${t.id})" class="btn-modal-primary" style="background:var(--pos-green);"><i class="bi bi-check-circle-fill me-1"></i> Mark as Cleaned</button>`;
     } else if (t.status === "billing") {
       document.getElementById("actionModalStatus").innerText = `Order Active (${t.status})`;
-      const unmergeBtn = t.is_primary ? `<button onclick="unmergeTable(${t.id})" class="btn-luxury w-100" style="color:#ef4444;border-color:#ef4444;">Unmerge Tables</button>` : '';
-      btns.innerHTML = `<button onclick="window.location.href='/bill/${t.order_id}/'" class="btn-luxury w-100" style="color:#06b6d4;border-color:#06b6d4;">Pay Bill UI</button>
-        <button onclick="window.location.href='/billing/?table=${t.id}'" class="btn-luxury w-100">Add More Items</button>
+      const unmergeBtn = t.is_primary ? `<button onclick="unmergeTable(${t.id})" class="btn-subbar-pill w-100" style="color:#ef4444;border-color:#ef4444;">Unmerge Tables</button>` : '';
+      btns.innerHTML = `<button onclick="window.location.href='/bill/${t.order_id}/'" class="btn-modal-primary" style="background:var(--pos-cyan);"><i class="bi bi-credit-card me-1"></i> Pay Bill</button>
+        <button onclick="window.location.href='/billing/?table=${t.id}'" class="btn-subbar-pill w-100">Add More Items</button>
         ${unmergeBtn}`;
     } else if (t.status === "needs_approval") {
       document.getElementById("actionModalStatus").innerText = "Customer added items via QR";
-      btns.innerHTML = `<button onclick="approveTableItems(${t.order_id})" class="btn-luxury w-100" style="color:#f43f5e;border-color:#f43f5e;background:rgba(244,63,94,0.1);"><i class="bi bi-check-circle me-2"></i>Approve All Items</button>
-        <button onclick="window.location.href='/order/${t.order_id}/'" class="btn-luxury w-100">Review Items Individually</button>`;
+      btns.innerHTML = `<button onclick="approveTableItems(${t.order_id})" class="btn-modal-primary" style="background:var(--pos-rose);"><i class="bi bi-check-circle me-1"></i> Approve All Items</button>
+        <button onclick="window.location.href='/order/${t.order_id}/'" class="btn-subbar-pill w-100">Review Items Individually</button>`;
     } else {
       document.getElementById("actionModalStatus").innerText = `Order Active (${t.status})`;
-      const unmergeBtn = t.is_primary ? `<button onclick="unmergeTable(${t.id})" class="btn-luxury w-100" style="color:#ef4444;border-color:#ef4444;">Unmerge Tables</button>` : '';
-      btns.innerHTML = `<button onclick="window.location.href='/billing/?table=${t.id}'" class="btn-luxury w-100">Add Items</button>
-        <button onclick="window.location.href='/order/${t.order_id}/'" class="btn-luxury w-100">Show Running Order</button>
-        <button onclick="openSmartTransfer(${t.id}, ${t.order_id})" class="btn-luxury w-100">Transfer Table</button>
-        <button onclick="generateBillForOrder(${t.order_id})" class="btn-luxury w-100" style="color:#10b981;border-color:#10b981;">Generate Bill</button>
+      const unmergeBtn = t.is_primary ? `<button onclick="unmergeTable(${t.id})" class="btn-subbar-pill w-100" style="color:#ef4444;border-color:#ef4444;">Unmerge Tables</button>` : '';
+      btns.innerHTML = `<button onclick="window.location.href='/billing/?table=${t.id}'" class="btn-modal-primary"><i class="bi bi-cart-plus me-1"></i> Add Items</button>
+        <button onclick="window.location.href='/order/${t.order_id}/'" class="btn-subbar-pill w-100"><i class="bi bi-receipt me-1"></i> Running Order</button>
+        <button onclick="openSmartTransfer(${t.id}, ${t.order_id})" class="btn-subbar-pill w-100"><i class="bi bi-arrow-left-right me-1"></i> Transfer Table</button>
+        <button onclick="generateBillForOrder(${t.order_id})" class="btn-subbar-pill w-100" style="color:var(--pos-green);border-color:var(--pos-green);"><i class="bi bi-receipt-cutoff me-1"></i> Generate Bill</button>
         ${unmergeBtn}`;
     }
 
@@ -1367,3 +2053,4 @@
   });
 </script>
 {% endblock %}
+

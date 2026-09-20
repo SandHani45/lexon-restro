@@ -1,0 +1,748 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Guest Reviews &amp; Ratings | {{ request.user.tenant.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ══════════════════════════════════════════════════════════════
+       KIMIPOS LUXURY REVIEWS DESIGN SYSTEM
+       ══════════════════════════════════════════════════════════════ */
+    :root {
+        --pos-red: #EC2734;
+        --pos-red-hover: #d81f2f;
+        --pos-red-soft: rgba(236, 39, 52, 0.08);
+        --pos-red-border: rgba(236, 39, 52, 0.22);
+        --pos-green: #10b981;
+        --pos-green-soft: rgba(16, 185, 129, 0.10);
+        --pos-green-border: rgba(16, 185, 129, 0.25);
+        --pos-amber: #f59e0b;
+        --pos-amber-soft: rgba(245, 158, 11, 0.10);
+        --pos-amber-border: rgba(245, 158, 11, 0.25);
+        --pos-blue: #3b82f6;
+        --pos-blue-soft: rgba(59, 130, 246, 0.10);
+        --pos-blue-border: rgba(59, 130, 246, 0.25);
+    }
+
+    body {
+        background: var(--bg-color) !important;
+    }
+
+    /* ── Sub-Header Bar (KimiPoS POS Layout) ──────────────────── */
+    .pos-subbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 1rem 1.5rem 0.5rem;
+        background: var(--bg-color);
+        max-width: 1440px;
+        margin: 0 auto;
+    }
+    .pos-subbar-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        letter-spacing: -0.4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .pos-breadcrumbs {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .pos-breadcrumbs a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.15s;
+    }
+    .pos-breadcrumbs a:hover {
+        color: var(--pos-red);
+    }
+    .pos-breadcrumbs .separator {
+        font-size: 0.65rem;
+        opacity: 0.6;
+    }
+    .pos-breadcrumbs .current {
+        color: var(--pos-red);
+        font-weight: 700;
+    }
+
+    /* Subbar Pill Buttons */
+    .btn-subbar-pill {
+        background: var(--panel-bg);
+        color: var(--text-main) !important;
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        padding: 7px 16px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-decoration: none !important;
+    }
+    .btn-subbar-pill:hover {
+        border-color: var(--pos-red-border);
+        background: var(--pos-red-soft);
+        color: var(--pos-red) !important;
+        transform: translateY(-1px);
+    }
+
+    .reviews-wrap {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 0.5rem 1.5rem 4rem;
+    }
+
+    /* ── Hero KPI Cards ────────────────────────────────────────── */
+    .kpi-card {
+        background: var(--card-bg, #ffffff);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 1.25rem 1.4rem;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+    .kpi-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+    }
+    .kpi-card.kpi-rating::before    { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .kpi-card.kpi-total::before     { background: linear-gradient(90deg, #c2381e, #EC2734); }
+    .kpi-card.kpi-positive::before  { background: linear-gradient(90deg, #059669, #10b981); }
+    .kpi-card.kpi-critical::before  { background: linear-gradient(90deg, #dc2626, #f87171); }
+
+    .kpi-info { flex: 1; min-width: 0; }
+    .kpi-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: var(--text-muted);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        margin-bottom: 0.25rem;
+    }
+    .kpi-val {
+        font-size: 1.85rem;
+        font-weight: 800;
+        color: var(--text-main);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        line-height: 1.1;
+        letter-spacing: -0.5px;
+        margin-bottom: 0.25rem;
+    }
+    .kpi-sub {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+    }
+    .kpi-icon-wrap {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        flex-shrink: 0;
+    }
+    .icon-rating   { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+    .icon-total    { background: rgba(236, 39, 52, 0.12); color: var(--pos-red); }
+    .icon-positive { background: rgba(16, 185, 129, 0.12); color: var(--pos-green); }
+    .icon-critical { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+
+    /* Stars display */
+    .stars-gold {
+        color: #f59e0b;
+        font-size: 1.05rem;
+        letter-spacing: 2px;
+    }
+    .stars-muted {
+        color: rgba(0, 0, 0, 0.15);
+    }
+    html.dark .stars-muted {
+        color: rgba(255, 255, 255, 0.15);
+    }
+
+    /* ── Distribution & Filter Strip ───────────────────────────── */
+    .analytics-filter-card {
+        background: var(--card-bg, #ffffff);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 1.25rem 1.4rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+    }
+    .star-bar-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.78rem;
+        margin-bottom: 6px;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .star-bar-label {
+        width: 45px;
+        font-weight: 700;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .star-bar-track {
+        flex: 1;
+        height: 8px;
+        background: var(--panel-bg);
+        border-radius: 999px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+    }
+    .star-bar-fill {
+        height: 100%;
+        border-radius: 999px;
+        transition: width 0.4s ease;
+    }
+    .star-bar-fill.fill-5 { background: #10b981; }
+    .star-bar-fill.fill-4 { background: #34d399; }
+    .star-bar-fill.fill-3 { background: #f59e0b; }
+    .star-bar-fill.fill-2 { background: #fb923c; }
+    .star-bar-fill.fill-1 { background: #ef4444; }
+    .star-bar-count {
+        width: 45px;
+        text-align: right;
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+
+    /* Filter Pills */
+    .filter-pills-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-color);
+    }
+    .pill-filter {
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: 1px solid var(--border-color);
+        background: var(--panel-bg);
+        color: var(--text-main);
+        text-decoration: none !important;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.15s ease;
+    }
+    .pill-filter:hover {
+        border-color: var(--pos-red-border);
+        color: var(--pos-red);
+        background: var(--pos-red-soft);
+    }
+    .pill-filter.active {
+        background: var(--pos-red);
+        border-color: var(--pos-red);
+        color: #ffffff !important;
+        box-shadow: 0 2px 8px rgba(236, 39, 52, 0.3);
+    }
+
+    .search-input-wrap {
+        position: relative;
+        flex: 1;
+        min-width: 220px;
+    }
+    .search-input-wrap input {
+        width: 100%;
+        background: var(--panel-bg);
+        border: 1.5px solid var(--border-color);
+        color: var(--text-main);
+        padding: 0.5rem 0.85rem 0.5rem 2.2rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        outline: none;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        transition: border-color 0.18s;
+    }
+    .search-input-wrap input:focus {
+        border-color: var(--pos-red);
+        box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.12);
+    }
+    .search-input-wrap i {
+        position: absolute;
+        left: 0.85rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    /* ── Review Cards Feed ─────────────────────────────────────── */
+    .review-card {
+        background: var(--card-bg, #ffffff);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 1.35rem 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .review-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+    }
+    .review-card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 0.85rem;
+    }
+    .reviewer-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .reviewer-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: var(--pos-red-soft);
+        border: 1px solid var(--pos-red-border);
+        color: var(--pos-red);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.95rem;
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .reviewer-name {
+        font-weight: 800;
+        font-size: 0.95rem;
+        color: var(--text-main);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        margin: 0;
+    }
+    .review-date {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        margin-top: 1px;
+    }
+    .sentiment-badge {
+        font-size: 0.68rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 3px 10px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .sentiment-great { background: var(--pos-green-soft); color: #059669; border: 1px solid var(--pos-green-border); }
+    .sentiment-good  { background: var(--pos-amber-soft); color: #d97706; border: 1px solid var(--pos-amber-border); }
+    .sentiment-bad   { background: var(--pos-red-soft); color: #dc2626; border: 1px solid var(--pos-red-border); }
+
+    .review-comment {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        color: var(--text-main);
+        margin-bottom: 0.85rem;
+        padding: 0.75rem 1rem;
+        background: var(--panel-bg);
+        border-radius: 12px;
+        border-left: 3px solid var(--pos-red);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    .review-comment.empty-comment {
+        font-style: italic;
+        color: var(--text-muted);
+        border-left-color: var(--border-color);
+        font-size: 0.84rem;
+    }
+
+    .review-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        flex-wrap: wrap;
+    }
+    .order-link-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--text-main);
+        text-decoration: none !important;
+        font-family: 'Space Mono', monospace;
+    }
+    .order-link-pill:hover {
+        border-color: var(--pos-red-border);
+        color: var(--pos-red);
+    }
+
+    /* ── Pagination ─────────────────────────────────────────────── */
+    .pag {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+    .pag a, .pag span {
+        padding: 0.45rem 0.9rem;
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        text-decoration: none;
+        color: var(--text-main);
+        background: var(--panel-bg);
+        font-family: var(--font-main, 'Outfit', sans-serif);
+        transition: all 0.15s ease;
+    }
+    .pag .current {
+        background: var(--pos-red);
+        border-color: var(--pos-red);
+        color: #ffffff;
+        box-shadow: 0 2px 8px rgba(236, 39, 52, 0.3);
+    }
+    .pag a:hover {
+        border-color: var(--pos-red-border);
+        color: var(--pos-red);
+        background: var(--pos-red-soft);
+    }
+
+    @media (max-width: 768px) {
+        .pos-subbar { padding: 0.75rem 1rem; }
+        .reviews-wrap { padding: 0.5rem 1rem 4rem; }
+        .review-card-top { flex-direction: column; align-items: flex-start; }
+    }
+</style>
+{% endblock %}
+
+{% block header_left %}
+<a href="{% url 'reviews-list' %}" class="d-flex align-items-center gap-2 text-decoration-none" style="color:inherit;">
+  <div style="width:34px;height:34px;border-radius:10px;background:rgba(236,39,52,0.12);border:1px solid rgba(236,39,52,0.3);display:flex;align-items:center;justify-content:center;color:var(--pos-red);flex-shrink:0;">
+    <i class="bi bi-star-fill" style="font-size:1rem;color:#f59e0b;"></i>
+  </div>
+  <div>
+    <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.3px;color:var(--text-main);font-family:var(--font-main, 'Outfit', sans-serif);">Guest Reviews</h1>
+    <div class="text-muted" style="font-size:0.72rem;letter-spacing:0.3px;font-family:var(--font-main, 'Outfit', sans-serif);">{{ request.user.outlet.name|default:request.user.tenant.name }}</div>
+  </div>
+</a>
+{% endblock %}
+
+{% block header_right %}
+<a href="{% url 'crm-dashboard' %}" class="btn-subbar-pill no-print">
+  <i class="bi bi-people me-1"></i>Customers
+</a>
+<a href="{% url 'reservation-list' %}" class="btn-subbar-pill no-print">
+  <i class="bi bi-calendar-check me-1"></i>Reservations
+</a>
+{% endblock %}
+
+{% block header_notifications %}
+{% include "core/_notif_badges_luxury.html" %}
+{% endblock %}
+
+{% block content %}
+<!-- Sub-Header Bar (KimiPoS POS Style) -->
+<div class="pos-subbar">
+  <div>
+    <h1 class="pos-subbar-title">
+      <i class="bi bi-star-fill text-warning"></i>
+      Customer Reviews &amp; Ratings
+    </h1>
+    <div class="pos-breadcrumbs">
+      <a href="/dashboard/"><i class="bi bi-house-door me-1"></i>Dashboard</a>
+      <i class="bi bi-chevron-right separator"></i>
+      <a href="{% url 'crm-dashboard' %}">CRM</a>
+      <i class="bi bi-chevron-right separator"></i>
+      <span class="current">Guest Reviews</span>
+    </div>
+  </div>
+  <div class="d-flex align-items-center gap-2 flex-wrap">
+    <a href="{% url 'crm-dashboard' %}" class="btn-subbar-pill no-print">
+      <i class="bi bi-people"></i> Guests Directory
+    </a>
+    <a href="{% url 'reservation-list' %}" class="btn-subbar-pill no-print">
+      <i class="bi bi-calendar2-week"></i> Table Bookings
+    </a>
+  </div>
+</div>
+
+<div class="reviews-wrap">
+
+  <!-- 4 Hero KPI Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-rating">
+        <div class="kpi-info">
+          <div class="kpi-label">Average Rating</div>
+          <div class="kpi-val d-flex align-items-baseline gap-2">
+            <span>{{ avg_rating }}</span>
+            <span style="font-size:0.95rem;color:#f59e0b;">★</span>
+          </div>
+          <div class="kpi-sub">Overall satisfaction</div>
+        </div>
+        <div class="kpi-icon-wrap icon-rating">
+          <i class="bi bi-star-fill"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-total">
+        <div class="kpi-info">
+          <div class="kpi-label">Total Reviews</div>
+          <div class="kpi-val">{{ total_reviews }}</div>
+          <div class="kpi-sub">Verified customer feedback</div>
+        </div>
+        <div class="kpi-icon-wrap icon-total">
+          <i class="bi bi-chat-heart"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-positive">
+        <div class="kpi-info">
+          <div class="kpi-label">Positive Sentiment</div>
+          <div class="kpi-val">{{ pos_pct }}%</div>
+          <div class="kpi-sub">4★ and 5★ experiences</div>
+        </div>
+        <div class="kpi-icon-wrap icon-positive">
+          <i class="bi bi-hand-thumbs-up-fill"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-critical">
+        <div class="kpi-info">
+          <div class="kpi-label">Critical Alerts</div>
+          <div class="kpi-val">{{ crit_count }}</div>
+          <div class="kpi-sub">1★ and 2★ reviews needing attention</div>
+        </div>
+        <div class="kpi-icon-wrap icon-critical">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rating Breakdown & Filter Strip Card -->
+  <div class="analytics-filter-card">
+    <div class="row g-4 align-items-center">
+      <!-- Star Distribution -->
+      <div class="col-12 col-lg-6">
+        <div style="font-size:0.75rem;font-weight:800;text-transform:uppercase;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:0.75rem;font-family:var(--font-main, 'Outfit', sans-serif);">
+          Rating Distribution
+        </div>
+        {% for star in "5,4,3,2,1"|make_list %}
+        {% with star_num=star|add:0 %}
+        <div class="star-bar-row">
+          <div class="star-bar-label">{{ star }} ★</div>
+          <div class="star-bar-track">
+            <div class="star-bar-fill fill-{{ star }}" style="width: {% if star_num == 5 %}{{ dist_pct.5 }}{% elif star_num == 4 %}{{ dist_pct.4 }}{% elif star_num == 3 %}{{ dist_pct.3 }}{% elif star_num == 2 %}{{ dist_pct.2 }}{% else %}{{ dist_pct.1 }}{% endif %}%;"></div>
+          </div>
+          <div class="star-bar-count">
+            {% if star_num == 5 %}{{ dist_map.5 }}{% elif star_num == 4 %}{{ dist_map.4 }}{% elif star_num == 3 %}{{ dist_map.3 }}{% elif star_num == 2 %}{{ dist_map.2 }}{% else %}{{ dist_map.1 }}{% endif %}
+          </div>
+        </div>
+        {% endwith %}
+        {% endfor %}
+      </div>
+
+      <!-- Search Input -->
+      <div class="col-12 col-lg-6">
+        <form method="get" class="d-flex flex-column gap-2">
+          <label style="font-size:0.75rem;font-weight:800;text-transform:uppercase;color:var(--text-muted);letter-spacing:0.5px;font-family:var(--font-main, 'Outfit', sans-serif);">
+            Search Comments or Guest Name
+          </label>
+          <div class="d-flex gap-2">
+            <div class="search-input-wrap">
+              <i class="bi bi-search"></i>
+              <input type="text" name="q" value="{{ query }}" placeholder="Search by guest name, comment, order #...">
+            </div>
+            {% if rating_filter %}<input type="hidden" name="rating" value="{{ rating_filter }}">{% endif %}
+            <button type="submit" class="btn-subbar-pill" style="background:var(--pos-red);color:#fff !important;border:none;">
+              Search
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Quick Filter Pills -->
+    <div class="filter-pills-row">
+      <span style="font-size:0.75rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-right:4px;">Filter:</span>
+      <a href="?{% if query %}q={{ query }}{% endif %}" class="pill-filter {% if not rating_filter %}active{% endif %}">
+        All ({{ total_reviews }})
+      </a>
+      <a href="?rating=5{% if query %}&q={{ query }}{% endif %}" class="pill-filter {% if rating_filter == '5' %}active{% endif %}">
+        5 Stars ({{ dist_map.5 }})
+      </a>
+      <a href="?rating=4{% if query %}&q={{ query }}{% endif %}" class="pill-filter {% if rating_filter == '4' %}active{% endif %}">
+        4 Stars ({{ dist_map.4 }})
+      </a>
+      <a href="?rating=3{% if query %}&q={{ query }}{% endif %}" class="pill-filter {% if rating_filter == '3' %}active{% endif %}">
+        3 Stars ({{ dist_map.3 }})
+      </a>
+      <a href="?rating=2{% if query %}&q={{ query }}{% endif %}" class="pill-filter {% if rating_filter == '2' %}active{% endif %}">
+        2 Stars ({{ dist_map.2 }})
+      </a>
+      <a href="?rating=1{% if query %}&q={{ query }}{% endif %}" class="pill-filter {% if rating_filter == '1' %}active{% endif %}">
+        1 Star ({{ dist_map.1 }})
+      </a>
+      <a href="?rating=critical{% if query %}&q={{ query }}{% endif %}" class="pill-filter {% if rating_filter == 'critical' %}active{% endif %}">
+        <i class="bi bi-exclamation-circle text-danger"></i> Needs Attention ({{ crit_count }})
+      </a>
+    </div>
+  </div>
+
+  <!-- Reviews List Feed -->
+  {% if reviews %}
+    <div class="reviews-feed">
+      {% for fb in reviews %}
+      <div class="review-card">
+        <div class="review-card-top">
+          <div class="reviewer-meta">
+            <div class="reviewer-avatar">
+              {{ fb.guest_name|default:"G"|slice:":1"|upper }}
+            </div>
+            <div>
+              <h4 class="reviewer-name">{{ fb.guest_name|default:"Anonymous Guest" }}</h4>
+              <div class="review-date">
+                <i class="bi bi-clock me-1"></i>{{ fb.created_at|date:"d M Y, H:i" }}
+                {% if fb.outlet %}· {{ fb.outlet.name }}{% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-3">
+            <div class="stars-gold">
+              {% for i in "12345"|make_list %}
+                {% if forloop.counter <= fb.rating %}
+                  ★
+                {% else %}
+                  <span class="stars-muted">★</span>
+                {% endif %}
+              {% endfor %}
+            </div>
+            {% if fb.rating >= 4 %}
+              <span class="sentiment-badge sentiment-great"><i class="bi bi-check-circle-fill"></i> Positive</span>
+            {% elif fb.rating == 3 %}
+              <span class="sentiment-badge sentiment-good"><i class="bi bi-dash-circle-fill"></i> Neutral</span>
+            {% else %}
+              <span class="sentiment-badge sentiment-bad"><i class="bi bi-exclamation-triangle-fill"></i> Critical</span>
+            {% endif %}
+          </div>
+        </div>
+
+        {% if fb.comment %}
+          <div class="review-comment">
+            "{{ fb.comment }}"
+          </div>
+        {% else %}
+          <div class="review-comment empty-comment">
+            Rated {{ fb.rating }} out of 5 stars without additional comments.
+          </div>
+        {% endif %}
+
+        <div class="review-footer">
+          <div>
+            {% if fb.order %}
+              <span class="me-2">Associated Bill:</span>
+              <a href="{% url 'order-history' %}?q={{ fb.order.order_number|default:fb.order.id }}" class="order-link-pill">
+                <i class="bi bi-receipt me-1"></i>#{{ fb.order.order_number|default:fb.order.id }}
+              </a>
+              {% if fb.order.table %}
+                <span class="badge bg-light text-dark border ms-2" style="font-size:0.7rem;">
+                  <i class="bi bi-grid-3x3-gap me-1"></i>{{ fb.order.table.name }}
+                </span>
+              {% endif %}
+            {% else %}
+              <span style="color:var(--text-muted);font-size:0.75rem;">Direct guest rating</span>
+            {% endif %}
+          </div>
+          <div style="font-size:0.72rem;color:var(--text-muted);">
+            Rating Score: <strong>{{ fb.rating }} / 5</strong>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    <div class="pag no-print">
+      <div class="me-auto" style="font-size:0.8rem;color:var(--text-muted);">
+        Showing page <strong>{{ page.number }}</strong> of <strong>{{ page.paginator.num_pages }}</strong> ({{ page.paginator.count }} total)
+      </div>
+      {% if page.has_previous %}
+      <a href="?page={{ page.previous_page_number }}{% if rating_filter %}&rating={{ rating_filter }}{% endif %}{% if query %}&q={{ query }}{% endif %}">
+        <i class="bi bi-chevron-left me-1"></i>Previous
+      </a>
+      {% endif %}
+      <span class="current">{{ page.number }}</span>
+      {% if page.has_next %}
+      <a href="?page={{ page.next_page_number }}{% if rating_filter %}&rating={{ rating_filter }}{% endif %}{% if query %}&q={{ query }}{% endif %}">
+        Next<i class="bi bi-chevron-right ms-1"></i>
+      </a>
+      {% endif %}
+    </div>
+
+  {% else %}
+    <div class="analytics-filter-card" style="text-align:center;padding:5rem 2rem;color:var(--text-muted);">
+      <div style="width:72px;height:72px;border-radius:20px;background:var(--pos-red-soft);border:1px solid var(--pos-red-border);display:inline-flex;align-items:center;justify-content:center;color:var(--pos-red);font-size:2rem;margin-bottom:1.25rem;">
+        <i class="bi bi-star"></i>
+      </div>
+      <h4 style="font-weight:800;color:var(--text-main);margin-bottom:0.5rem;font-family:var(--font-main, 'Outfit', sans-serif);">No Reviews Found</h4>
+      <p style="font-size:0.85rem;max-width:440px;margin:0 auto 1.5rem;">
+        No customer feedback matches the selected filters. Customers can submit reviews by scanning the QR code or link on their digital bills.
+      </p>
+      <a href="{% url 'reviews-list' %}" class="btn-subbar-pill">
+        <i class="bi bi-arrow-clockwise me-1"></i>Clear Filters
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+

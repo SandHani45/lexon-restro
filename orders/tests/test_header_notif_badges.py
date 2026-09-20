@@ -30,6 +30,9 @@ class HeaderNotifBadgeConsistencyTest(TestCase):
             username="badge_waiter", password="pw", role="waiter",
             tenant=self.tenant, outlet=self.outlet,
         )
+        from menu.models import MenuCategory, MenuItem
+        cat = MenuCategory.objects.create(tenant=self.tenant, outlet=self.outlet, name="General")
+        MenuItem.objects.create(tenant=self.tenant, outlet=self.outlet, category=cat, name="Test Item", price=10)
         self.client = Client()
 
     def _login(self, user):
@@ -89,11 +92,52 @@ class HeaderNotifBadgeConsistencyTest(TestCase):
         # at the same breakpoint the desktop row switches on at
         import re
         mobile_wrapper = re.search(
-            r'<span class="notif-wrapper[^"]*"[^>]*>\s*<a href="/waiter-dashboard/" class="btn-icon"',
+            r'<span class="notif-wrapper[^"]*d-sm-none[^"]*"[^>]*>\s*<a href="/waiter-dashboard/" class="btn-icon"',
             content,
         )
         self.assertIsNotNone(mobile_wrapper, "mobile icon-only Calls wrapper not found")
         self.assertIn("d-sm-none", mobile_wrapper.group(0))
+
+    def test_billing_desktop_calls_badge_is_clean_bell_icon(self):
+        """
+        Billing header desktop Calls badge must be the clean circular bell icon
+        (btn-icon) matching the order header, rather than the text button btn-luxury.
+        """
+        self._login(self.manager)
+        resp = self.client.get("/billing/")
+        content = resp.content.decode()
+        import re
+        desktop_calls = re.search(
+            r'<span class="notif-wrapper[^"]*d-none d-sm-inline-flex[^"]*"[^>]*>\s*<a href="/waiter-dashboard/" class="btn-icon"[^>]*title="Calls">\s*<i class="bi bi-bell"></i>\s*</a>',
+            content,
+        )
+        self.assertIsNotNone(desktop_calls, "Desktop Calls badge should be a btn-icon with bell icon")
+
+    def test_universal_bell_icon_rendered_on_all_pages(self):
+        """
+        Notification bell icon must be present across all application page headers,
+        even pages that override header_right (e.g. order history, tables, billing).
+        """
+        self._login(self.manager)
+        for url in ["/billing/", "/tables/", "/orders/history/", "/dashboard/"]:
+            resp = self.client.get(url)
+            self.assertEqual(resp.status_code, 200, f"Failed loading {url}")
+            self.assertIn('id="notif-badge-waiter"', resp.content.decode(), f"Bell icon badge missing on {url}")
+
+    def test_profile_details_positioned_last_in_topbar(self):
+        """
+        User profile details (.user-role-badge) must ALWAYS appear at the very end
+        (top right last) of the .topbar-right container, after action buttons and notifications.
+        """
+        self._login(self.manager)
+        for url in ["/billing/", "/tables/", "/orders/history/"]:
+            resp = self.client.get(url)
+            content = resp.content.decode()
+            notif_idx = content.find('id="notif-badge-waiter"')
+            profile_idx = content.find('class="user-role-badge"')
+            self.assertNotEqual(notif_idx, -1, f"notif badge not found on {url}")
+            self.assertNotEqual(profile_idx, -1, f"user-role-badge not found on {url}")
+            self.assertGreater(profile_idx, notif_idx, f"Profile details must be positioned after notification badges on {url}")
 
     def test_tables_no_longer_ships_its_own_redundant_poller(self):
         """
@@ -107,6 +151,22 @@ class HeaderNotifBadgeConsistencyTest(TestCase):
         self._login(self.manager)
         resp = self.client.get("/tables/")
         self.assertNotIn("setInterval(pollNotifications, 10000)", resp.content.decode())
+
+    def test_sidebar_orders_link_does_not_contain_notif_badge(self):
+        """
+        Regression guard: the sidebar 'Orders' link previously had
+        notif-badge-waiter embedded inside it by mistake, which caused
+        kitchen-ready and waiter-call notifications to display on the
+        'Orders' sidebar item instead of on the notification bell icon.
+        """
+        self._login(self.manager)
+        resp = self.client.get("/tables/")
+        self.assertEqual(resp.status_code, 200)
+        content = resp.content.decode()
+        import re
+        orders_link = re.search(r'<a\s+href="/orders/"[^>]*>(.*?)</a>', content, re.DOTALL)
+        self.assertIsNotNone(orders_link, "Sidebar Orders link not found")
+        self.assertNotIn("notif-badge", orders_link.group(1), "Orders sidebar link should not have a notification badge")
 
 
 class TokenBillingHeaderBadgeTest(TestCase):

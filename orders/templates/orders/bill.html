@@ -433,6 +433,26 @@
     </div>
     {% endif %}
 
+    <!-- Send bill to WhatsApp — manual, cashier-triggered (distinct from the
+         automatic receipt sent on payment; lets staff (re-)send on demand,
+         to a number typed in on the spot if none is on file, or to resend
+         if the customer says they never got it). -->
+    {% if 'whatsapp_receipts' in tenant_features %}
+    <div class="loyalty-section no-print">
+        <div class="loyalty-title"><i class="bi bi-whatsapp me-1" style="color:#25D366"></i>Send Bill to WhatsApp</div>
+        <div style="display:flex;gap:0.5rem;">
+            <input id="whatsappPhone" type="tel" class="input-pay"
+                   style="margin:0;flex:1;padding:0.6rem 0.8rem;font-size:0.9rem;font-family:'Outfit',sans-serif;text-align:left;"
+                   placeholder="Customer WhatsApp number" maxlength="10" inputmode="numeric"
+                   value="{{ order.customer_phone|default:'' }}">
+            <button id="sendWhatsAppBtn" class="btn-pay" style="flex:0 0 130px;" onclick="sendToWhatsApp()">
+                <i class="bi bi-whatsapp me-1"></i>Send
+            </button>
+        </div>
+        <div id="whatsappMsg" class="loyalty-msg"></div>
+    </div>
+    {% endif %}
+
 </div><!-- .bill-wrap -->
 </div><!-- .bill-page -->
 
@@ -599,15 +619,14 @@ renderUpiQR({{ remaining }});
         } catch(e) {}
     }
 
-    function promptItemDiscount(itemId, name, currentPct) {
-        ui.confirm(`Apply discount % for ${name}?`, 'Enter 0 to remove.', 'Apply').then(r => {
-            if (!r.isConfirmed) return;
-            const pct = parseFloat(prompt(`Discount % for ${name}:`, currentPct));
-            if (isNaN(pct) || pct < 0 || pct > 100) { ui.toast('Enter 0–100', 'warning'); return; }
-            apiClient.post(`/orders/item-discount/${itemId}/`, { percent: pct })
-                .then(d => { if (d.success) location.reload(); else ui.toast(d.error, 'error'); })
-                .catch(() => {});
-        });
+    async function promptItemDiscount(itemId, name, currentPct) {
+        const pctStr = await ui.prompt(`Discount % for ${name}`, 'Enter percentage (0 to remove):', currentPct || 0);
+        if (pctStr === null || pctStr === false) return;
+        const pct = parseFloat(pctStr);
+        if (isNaN(pct) || pct < 0 || pct > 100) { ui.toast('Enter 0–100', 'warning'); return; }
+        apiClient.post(`/orders/item-discount/${itemId}/`, { percent: pct })
+            .then(d => { if (d.success) location.reload(); else ui.toast(d.error, 'error'); })
+            .catch(() => {});
     }
 
     /* Auto-populate promo picker */
@@ -626,6 +645,13 @@ renderUpiQR({{ remaining }});
         /* Auto-lookup if order had a customer phone */
         const phone = document.getElementById('guestPhone');
         if (phone && phone.value.trim()) lookupGuest();
+
+        /* "Bill & Print" on the billing screen lands here with ?autoprint=1 --
+           print immediately instead of making the cashier find the print
+           button again for a bill they just asked to print. */
+        if (new URLSearchParams(window.location.search).get('autoprint') === '1') {
+            printReceipt({{ order.id }});
+        }
     });
 
     function applyPromo(select) {
@@ -849,9 +875,9 @@ renderUpiQR({{ remaining }});
     // Opens the cash register inline (used when a payment is blocked because no
     // session is open), then re-runs the caller's payment attempt.
     async function offerOpenRegister(retry) {
-        if (!confirm('No cash register is open for this outlet.\n\nOpen it now to take payment?')) return;
-        const floatStr = prompt('Opening cash already in the drawer (starting float):', '0');
-        if (floatStr === null) return;
+        if (!await ui.confirm('No Register Open', 'No cash register is open for this outlet.\n\nOpen it now to take payment?', 'Open Register')) return;
+        const floatStr = await ui.prompt('Opening Float', 'Opening cash already in the drawer (starting float):', '0');
+        if (floatStr === null || floatStr === false) return;
         try {
             const r = await apiClient.post('/shifts/sessions/open/', { opening_balance: floatStr || '0' });
             if (r && r.success) {
@@ -922,7 +948,11 @@ renderUpiQR({{ remaining }});
     }
 
     async function confirmBypass(orderId) {
-        if (!confirm("Bypass payment gate?\n\nThis will close Order #" + orderId + " WITHOUT collecting payment. This action is logged for audit purposes.\n\nAre you sure you want to proceed?")) {
+        if (!await ui.confirm(
+            "Bypass Payment Gate?",
+            "This will close Order #" + orderId + " WITHOUT collecting payment. This action is logged for audit purposes.\n\nAre you sure you want to proceed?",
+            "Bypass Payment"
+        )) {
             return;
         }
         try {
@@ -992,6 +1022,35 @@ renderUpiQR({{ remaining }});
                 msg.style.color = '#ef4444'; msg.textContent = d.error;
             }
         } catch(e) { msg.style.display='block'; msg.style.color='#ef4444'; msg.textContent='Failed'; }
+    }
+
+    async function sendToWhatsApp() {
+        const phoneEl = document.getElementById('whatsappPhone');
+        const btn     = document.getElementById('sendWhatsAppBtn');
+        const msg     = document.getElementById('whatsappMsg');
+        const phone   = phoneEl?.value.trim();
+        if (!phone) { ui.toast('Enter a phone number first', 'warning'); phoneEl?.focus(); return; }
+
+        const originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+        try {
+            const d = await apiClient.post("{% url 'send-whatsapp-bill' order.id %}", { phone });
+            if (msg) {
+                msg.style.display = 'block';
+                msg.style.color = '#10b981';
+                msg.textContent = `Sent to ${d.phone}`;
+            }
+            ui.toast('Bill sent to WhatsApp!', 'success');
+        } catch (e) {
+            // apiClient.post already toasted the specific error (invalid
+            // number, feature disabled, WhatsApp unreachable, etc.) — just
+            // leave an inline trace for anyone who missed the toast.
+            if (msg) { msg.style.display = 'block'; msg.style.color = '#ef4444'; msg.textContent = e.message || 'Could not send.'; }
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
     }
 </script>
 
