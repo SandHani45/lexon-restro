@@ -1,6 +1,7 @@
 """Customer-facing views: QR menu, digital self-order menu, waiter call."""
 import json
 import logging
+import uuid as uuid_lib
 from django.http import JsonResponse, Http404, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_POST
@@ -11,6 +12,34 @@ from orders.models import Table
 from waiter.models import WaiterCall
 
 logger = logging.getLogger("pos.menu")
+
+
+def _resolve_by_token(token):
+    """Table.qr_token or Outlet.qr_token -> (table_or_None, outlet, tenant), else (None, None, None).
+
+    Both are looked up from client-supplied strings (a query param or JSON
+    body field, never a validated <uuid:...> URL segment), so an
+    attacker/typo can hand us garbage that isn't a UUID at all. Table/Outlet
+    .qr_token is a UUIDField -- filtering on a non-UUID string raises
+    django.core.exceptions.ValidationError deep inside the ORM (uncaught,
+    it 500s), rather than the empty queryset a lookup miss would normally
+    give. Validate the shape first so a bad token is just "not found",
+    exactly like a real-but-unmatched UUID would be.
+    """
+    try:
+        uuid_lib.UUID(str(token))
+    except (ValueError, AttributeError, TypeError):
+        return None, None, None
+
+    from tenants.models import Outlet
+
+    table = Table.objects.filter(qr_token=token).first()
+    if table:
+        return table, table.outlet, table.tenant
+    outlet = Outlet.objects.filter(qr_token=token).first()
+    if outlet:
+        return None, outlet, outlet.tenant
+    return None, None, None
 
 
 def _build_modifier_data(categories):
@@ -35,6 +64,28 @@ def _build_modifier_data(categories):
             if groups:
                 data[str(item.id)] = groups
     return json.dumps(data)
+
+
+def _build_carousel_items(categories, limit=8):
+    """Pick a handful of photographed, available items for the hero carousel.
+
+    Interleaves across categories (round-robin) rather than draining the
+    first category, so a tenant with one huge "Main Course" list and a
+    handful of desserts still gets visual variety in the carousel instead
+    of 8 main-course photos in a row.
+    """
+    per_category = [
+        [item for item in cat.items.all() if item.is_available and item.image]
+        for cat in categories
+    ]
+    picked = []
+    while len(picked) < limit and any(per_category):
+        for bucket in per_category:
+            if bucket:
+                picked.append(bucket.pop(0))
+                if len(picked) >= limit:
+                    break
+    return picked
 
 
 @ratelimit(key="ip", rate="30/m", method="GET", block=False)
@@ -81,6 +132,7 @@ def menu_view(request, qr_token):
         "tenant":              tenant,
         "outlet":              outlet,
         "item_modifier_data":  _build_modifier_data(categories),
+        "carousel_items":      _build_carousel_items(categories),
         # The token this page was reached with -- a Table's if one matched,
         # otherwise the Outlet's counter token. submitOrder() sends this
         # straight back as table_token; it must never fall back to
@@ -210,6 +262,76 @@ def order_status(request, signed_token):
     })
 
 
+@ratelimit(key="ip", rate="5/m", method="POST", block=False)
+@require_POST
+def lookup_orders_by_phone(request):
+    """
+    Guest self-service: "I've ordered here before, show my past orders."
+
+    Deliberately NOT staff-authenticated -- a returning guest has no account,
+    same as every other endpoint on this page. That makes this the one
+    genuinely sensitive addition in the guest flow: unlike order_status
+    (keyed by an unguessable signed token), this endpoint is keyed by a
+    phone number the guest TYPES IN, so anyone who already knows or guesses
+    someone's number could look up their name/order history at this one
+    tenant (never across tenants, and never financial details -- same
+    no-prices contract as order_status). That's a real, accepted trade-off
+    (confirmed with the product owner) for guest convenience, not an
+    oversight -- mitigated by rate-limiting far tighter than every other
+    public endpoint here (5/min per IP vs. 20-30/min elsewhere) to make
+    brute-forcing numbers against this tenant impractical.
+
+    Returns only {order_id, status_token, placed_at} per match -- never the
+    order contents directly -- so the frontend re-uses the exact same
+    signed-token order_status fetch/render path as "My Orders At This
+    Table" instead of a second, parallel data shape.
+    """
+    if getattr(request, "limited", False):
+        return JsonResponse({"error": "Too many requests. Please wait a moment."}, status=429)
+
+    from django.core.exceptions import ValidationError
+    from core.validators import normalize_phone
+    from orders.models import Order
+    from orders.views.public_views import make_order_status_token
+
+    try:
+        data = json.loads(request.body)
+    except (json.JSONDecodeError, TypeError):
+        return JsonResponse({"error": "Invalid request."}, status=400)
+
+    _table, _outlet, tenant = _resolve_by_token(data.get("table_token"))
+    if not tenant:
+        return JsonResponse({"error": "Invalid table token."}, status=404)
+
+    try:
+        phone = normalize_phone(data.get("phone"))
+    except ValidationError:
+        phone = None
+    if not phone:
+        return JsonResponse({"error": "Enter a valid 10-digit phone number."}, status=400)
+
+    # Tenant-wide, not outlet-scoped: a guest asking "have I ordered here
+    # before" reasonably means the whole restaurant/brand, not just this
+    # branch -- matches crm.Guest, which is also keyed (tenant, phone) with
+    # no outlet in the uniqueness constraint.
+    orders = (
+        Order.objects
+        .filter(tenant=tenant, customer_phone=phone)
+        .exclude(status="cancelled")
+        .order_by("-created_at")[:5]
+    )
+    return JsonResponse({
+        "orders": [
+            {
+                "order_id": o.id,
+                "status_token": make_order_status_token(o.id),
+                "placed_at": o.created_at.isoformat(),
+            }
+            for o in orders
+        ]
+    })
+
+
 @ratelimit(key="ip", rate="30/m", method="GET", block=False)
 def digital_menu(request):
     """Customer-facing self-order menu with category tabs and cart.
@@ -232,12 +354,12 @@ def digital_menu(request):
     # /menu/digital-menu/?table=, staff's own "preview menu" link
     # (reports/dashboard.html) uses no query params at all.
     table_token = request.GET.get("table_token")
-    table = None
+    table, outlet, tenant = (None, None, None)
     if table_token:
-        table = Table.objects.filter(qr_token=table_token).first()
+        table, outlet, tenant = _resolve_by_token(table_token)
 
-    if table:
-        tenant, outlet = table.tenant, table.outlet
+    if table or outlet:
+        pass
     elif request.user.is_authenticated:
         tenant, outlet = request.user.tenant, request.user.outlet
     else:
@@ -254,5 +376,6 @@ def digital_menu(request):
     return render(request, "menu/digital_menu.html", {
         "categories": categories, "table": table, "tenant": tenant, "outlet": outlet,
         "item_modifier_data": _build_modifier_data(categories),
+        "carousel_items": _build_carousel_items(categories),
         "qr_token": str(table.qr_token) if table else str(outlet.qr_token),
     })

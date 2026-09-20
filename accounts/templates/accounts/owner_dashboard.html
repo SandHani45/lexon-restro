@@ -539,8 +539,8 @@
                             </div>
                             <div style="flex:1;min-width:0;">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span class="fw-semibold text-truncate" style="color:var(--text-main);">Order #{{ ord.token_number|default:ord.id }}</span>
-                                    <span class="fw-bold" style="color:var(--text-main);font-size:0.75rem;">₹{{ ord.total_amount|default:"0" }}</span>
+                                    <span class="fw-semibold text-truncate" style="color:var(--text-main);">{{ ord.order_number|default:ord.id }}</span>
+                                    <span class="fw-bold" style="color:var(--text-main);font-size:0.75rem;">₹{{ ord.grand_total|floatformat:2 }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center mt-1">
                                     <span class="text-muted" style="font-size:0.68rem;">
