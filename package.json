@@ -1,0 +1,14 @@
+{
+  "name": "easybillbro-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Playwright end-to-end automation for the EasyBillBro POS Django app.",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
+  }
+}

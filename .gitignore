@@ -29,6 +29,14 @@ staticfiles/
 .idea/
 *.swp
 
+# Playwright E2E (package.json/playwright.config.ts/e2e/ ARE committed —
+# only the generated Node deps and run artifacts are ignored here)
+node_modules/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
 # OS
 .DS_Store
 Thumbs.db
