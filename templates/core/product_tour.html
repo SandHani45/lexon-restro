@@ -49,16 +49,14 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --cream: #0a0a0a;
-  --cream-soft: #18181b;
-  --white: #18181b;
-  --navy: #18181b;
-  --navy-soft: #2f3742;
-  --olive: #22c55e;
-  --olive-dark: #16a34a;
-  --rust: #EC2734;
-  --rust-light: #ff4d5a;
-  --rust-dark: #c41f2b;
+  --bg: #0a0a0a;
+  --surface: #18181b;
+  --slate: #2f3742;
+  --green: #22c55e;
+  --gold: #f59e0b;
+  --red: #EC2734;
+  --red-hover: #ff4d5a;
+  --red-dark: #c41f2b;
   --text: #f4f4f6;
   --muted: #9ca3af;
   --muted-2: #71717a;
@@ -70,7 +68,7 @@ html { scroll-behavior: smooth; }
 
 body {
   font-family: 'Outfit', sans-serif;
-  background: var(--cream);
+  background: var(--bg);
   color: var(--text);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
@@ -95,7 +93,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.1rem 
 .nav-inner.scrolled { background: rgba(10,10,10,0.92); box-shadow: 0 8px 30px rgba(0,0,0,0.35); }
 
 .nav-logo { display: flex; align-items: center; text-decoration: none; }
-.nav-logo-img { height: 40px; width: auto; max-width: 165px; object-fit: contain; display: block; transition: transform 0.25s ease, opacity 0.25s ease; }
+.nav-logo-img { height: 42px; width: auto; max-width: 240px; object-fit: contain; display: block; transition: transform 0.25s ease, opacity 0.25s ease; }
 .nav-logo:hover .nav-logo-img { transform: scale(1.04); opacity: 0.95; }
 
 .nav-links { display: flex; align-items: center; gap: 1.6rem; list-style: none; }
@@ -115,10 +113,10 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.1rem 
 .nav-dropdown-menu li a:hover, .nav-dropdown-menu li a.current { background: rgba(236,39,52,0.12); color: #ff4d5a; }
 
 .nav-actions { display: flex; align-items: center; gap: 0.9rem; }
-.nav-login { color: #9ca3af; font-size: 0.8rem; font-weight: 600; text-decoration: none; letter-spacing: 0.5px; padding: 0.5rem 0.3rem; transition: color 0.2s; }
-.nav-login:hover { color: #f4f4f6; }
+.btn-nav-login { color: #9ca3af; font-size: 0.8rem; font-weight: 600; text-decoration: none; letter-spacing: 0.5px; padding: 0.5rem 0.3rem; transition: color 0.2s; }
+.btn-nav-login:hover { color: #f4f4f6; }
 
-.nav-cta {
+.btn-nav-cta {
   display: inline-flex; align-items: center; gap: 8px;
   background: #EC2734 !important; color: #ffffff !important;
   padding: 0.6rem 1.3rem !important; border-radius: 999px;
@@ -126,7 +124,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.1rem 
   letter-spacing: 0.3px; transition: all 0.25s ease;
   box-shadow: 0 4px 20px rgba(236,39,52,0.35);
 }
-.nav-cta:hover { background: #ff4d5a !important; transform: translateY(-1px); box-shadow: 0 6px 28px rgba(236,39,52,0.5); }
+.btn-nav-cta:hover { background: #ff4d5a !important; transform: translateY(-1px); box-shadow: 0 6px 28px rgba(236,39,52,0.5); }
 
 .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 6px; background: none; border: none; }
 .nav-hamburger span { display: block; width: 22px; height: 2px; background: #f4f4f6; border-radius: 2px; transition: all 0.3s ease; }
@@ -145,10 +143,10 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.1rem 
 .nav-mobile-menu.open { display: flex; transform: translateY(0); }
 .nav-mobile-menu a { text-decoration: none; font-size: 1.05rem; font-weight: 600; color: #9ca3af; padding: 0.55rem 0; border-bottom: 1px solid rgba(255,255,255,0.08); transition: color 0.2s; }
 .nav-mobile-menu a:hover { color: #EC2734; }
-.nav-mobile-menu .nav-cta { align-self: flex-start; margin-top: 0.6rem; }
+.nav-mobile-menu .btn-nav-cta { align-self: flex-start; margin-top: 0.6rem; }
 
 @media (max-width: 980px) {
-  .nav-links, .nav-login { display: none; }
+  .nav-links, .btn-nav-login { display: none; }
   .nav-hamburger { display: flex; }
 }
 @media (max-width: 640px) {
@@ -170,7 +168,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.1rem 
   font-size: 0.7rem;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: var(--rust);
+  color: var(--red);
   font-weight: 700;
   margin-bottom: 1.5rem;
   border: 1px solid rgba(236,39,52,0.3);
@@ -181,7 +179,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.1rem 
 .eyebrow-chip::before {
   content: '';
   width: 6px; height: 6px;
-  background: var(--rust);
+  background: var(--red);
   border-radius: 50%;
 }
 .hero h1 {
@@ -191,7 +189,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.1rem 
   color: var(--text);
   margin-bottom: 1.2rem;
 }
-.hero h1 em { color: var(--rust); font-style: italic; }
+.hero h1 em { color: var(--red); font-style: italic; }
 .hero p.sub {
   font-size: 1.05rem;
   color: var(--muted);
@@ -210,7 +208,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.1rem 
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: var(--olive);
+  background: var(--red);
   color: #ffffff;
   text-decoration: none;
   padding: 1rem 2.2rem;
@@ -219,12 +217,12 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.1rem 
   font-size: 0.9rem;
   transition: all 0.25s ease;
 }
-.btn-primary:hover { background: var(--olive-dark); transform: translateY(-2px); box-shadow: 0 12px 30px rgba(34,197,94,0.28); }
+.btn-primary:hover { background: var(--red-hover); transform: translateY(-2px); box-shadow: 0 12px 30px rgba(236,39,52,0.28); }
 .btn-secondary {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: var(--white);
+  background: var(--surface);
   color: var(--text);
   text-decoration: none;
   padding: 1rem 2.2rem;
@@ -234,7 +232,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.1rem 
   border: 1px solid var(--border);
   transition: all 0.25s ease;
 }
-.btn-secondary:hover { border-color: var(--rust); color: var(--rust); }
+.btn-secondary:hover { border-color: var(--red); color: var(--red); }
 
 /* ── TOUR PHOTO ── */
 .tour-photo-wrap { padding: 0 4rem; max-width: 1200px; margin: 0 auto; }
@@ -258,7 +256,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.1rem 
   font-size: 0.68rem;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: var(--olive);
+  color: var(--red);
   font-weight: 700;
   margin-bottom: 1rem;
 }
@@ -278,7 +276,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.1rem 
   max-width: 460px;
 }
 .tour-link {
-  color: var(--rust);
+  color: var(--red);
   text-decoration: none;
   font-weight: 600;
   font-size: 0.9rem;
@@ -290,7 +288,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.1rem 
 
 /* Mockup panel shell */
 .mockup {
-  background: var(--white);
+  background: var(--surface);
   border: 1px solid var(--border-light);
   border-radius: 22px;
   box-shadow: 0 20px 50px rgba(0,0,0,0.4);
@@ -310,13 +308,13 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.1rem 
 
 /* Dashboard stat mockup */
 .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
-.stat-card { background: var(--cream-soft); border-radius: 14px; padding: 1rem 1.1rem; }
+.stat-card { background: var(--surface); border-radius: 14px; padding: 1rem 1.1rem; }
 .stat-card .num { font-family: 'Space Mono', monospace; font-size: 1.3rem; color: var(--text); }
 .stat-card .lbl { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
 .stat-card.accent { background: rgba(236,39,52,0.1); }
-.stat-card.accent .num { color: var(--rust); }
+.stat-card.accent .num { color: var(--red); }
 .stat-card.olive { background: rgba(34,197,94,0.12); }
-.stat-card.olive .num { color: var(--olive); }
+.stat-card.olive .num { color: var(--green); }
 
 /* Floor plan mockup */
 .floor-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; }
@@ -329,13 +327,13 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.1rem 
   font-weight: 700;
   color: #fff;
 }
-.table-cell.free { background: var(--olive); }
-.table-cell.occupied { background: var(--rust); }
-.table-cell.reserved { background: var(--navy-soft); }
+.table-cell.free { background: var(--green); }
+.table-cell.occupied { background: var(--red); }
+.table-cell.reserved { background: var(--gold); }
 
 /* KOT ticket mockup */
 .kot-stack { display: flex; flex-direction: column; gap: 0.7rem; }
-.kot-ticket { background: var(--cream-soft); border-left: 3px solid var(--rust); border-radius: 10px; padding: 0.8rem 1rem; }
+.kot-ticket { background: var(--surface); border-left: 3px solid var(--red); border-radius: 10px; padding: 0.8rem 1rem; }
 .kot-ticket .t-head { display: flex; justify-content: space-between; font-size: 0.78rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
 .kot-ticket .t-item { font-size: 0.76rem; color: var(--muted); }
 
@@ -343,18 +341,18 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.1rem 
 .bill-panel { font-family: 'Space Mono', monospace; font-size: 0.78rem; }
 .bill-row { display: flex; justify-content: space-between; padding: 0.45rem 0; border-bottom: 1px dashed var(--border-light); color: var(--muted); }
 .bill-row.total { color: var(--text); font-weight: 700; border-bottom: none; padding-top: 0.8rem; }
-.bill-tag { display: inline-block; background: rgba(34,197,94,0.12); color: var(--olive); border-radius: 999px; padding: 3px 10px; font-size: 0.65rem; margin-top: 0.6rem; }
+.bill-tag { display: inline-block; background: rgba(34,197,94,0.12); color: var(--green); border-radius: 999px; padding: 3px 10px; font-size: 0.65rem; margin-top: 0.6rem; }
 
 /* Reports mockup */
 .bar-row { display: flex; align-items: flex-end; gap: 0.6rem; height: 140px; }
-.bar { flex: 1; border-radius: 8px 8px 0 0; background: var(--olive); position: relative; }
-.bar:nth-child(2) { background: var(--rust); }
-.bar:nth-child(4) { background: var(--rust); }
-.bar:nth-child(6) { background: var(--navy-soft); }
+.bar { flex: 1; border-radius: 8px 8px 0 0; background: var(--green); position: relative; }
+.bar:nth-child(2) { background: var(--red); }
+.bar:nth-child(4) { background: var(--red); }
+.bar:nth-child(6) { background: var(--gold); }
 
 /* ── FINAL CTA ── */
 .final-cta {
-  background: var(--rust);
+  background: var(--red);
   border-radius: 32px;
   margin: 40px 4rem 90px;
   padding: 80px 3rem;
@@ -384,12 +382,12 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.1rem 
 .final-cta-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
 .btn-dark {
   display: inline-flex; align-items: center; gap: 10px;
-  background: #ffffff; color: var(--rust);
+  background: #ffffff; color: var(--red);
   text-decoration: none; padding: 1.05rem 2.3rem;
   border-radius: 999px; font-weight: 700; font-size: 0.88rem;
   transition: all 0.25s;
 }
-.btn-dark:hover { background: var(--navy); color: #fff; transform: translateY(-2px); }
+.btn-dark:hover { background: var(--bg); color: #fff; transform: translateY(-2px); }
 .btn-dark-outline {
   display: inline-flex; align-items: center; gap: 10px;
   background: transparent; color: #ffffff;
@@ -402,36 +400,32 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.1rem 
 
 /* ── FOOTER ── */
 footer {
-  background: var(--navy);
-  border-radius: 28px;
-  margin: 0 4rem 3rem;
-  padding: 2.6rem 3rem;
+  background: var(--bg);
+  border-radius: 30px 30px 0 0;
+  margin: 0 1rem;
+  padding: 3rem 4rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1200px;
-  margin-left: auto; margin-right: auto;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 .footer-left { font-family: 'DM Serif Display', serif; font-size: 1.25rem; color: #fff; }
-.footer-left span { color: var(--rust-light); }
+.footer-left span { color: var(--red-hover); }
 .footer-right { font-size: 0.75rem; color: rgba(255,255,255,0.45); }
 .footer-login { font-size: 0.78rem; color: rgba(255,255,255,0.7); text-decoration: none; }
-.footer-login:hover { color: var(--rust-light); }
+.footer-login:hover { color: var(--red-hover); }
 
 .reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.7s ease, transform 0.7s ease; }
 .reveal.visible { opacity: 1; transform: translateY(0); }
 
-/* ── NAV DROPDOWN ── */
-.nav-dropdown { position: relative; }
-.nav-dropdown-menu { position: absolute; top: calc(100% + 14px); left: 50%; transform: translateX(-50%) translateY(8px); background: var(--white); border: 1px solid var(--border-light, var(--border)); border-radius: 16px; padding: 0.6rem; min-width: 230px; list-style: none; opacity: 0; visibility: hidden; transition: all 0.25s ease; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-.nav-dropdown:hover .nav-dropdown-menu, .nav-dropdown.open .nav-dropdown-menu { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
-.nav-dropdown-menu li a { display: block; padding: 0.55rem 0.8rem; border-radius: 10px; font-size: 0.78rem; text-transform: none; letter-spacing: 0; white-space: nowrap; }
-.nav-dropdown-menu li a:hover { background: rgba(236,39,52,0.12); color: var(--rust-light); }
-
+@media (max-width: 900px) {
+  .tour-inner { grid-template-columns: 1fr; gap: 2.4rem; }
+  .tour-block.reverse .tour-inner { direction: ltr; }
+}
 @media (max-width: 768px) {
   nav { padding: 1rem 1.25rem; }
   .nav-links { gap: 1rem; }
-  .nav-links li:not(:last-child) { display: none; }
   .hero { padding: 60px 1.5rem 40px; }
   .tour-photo-wrap { padding: 0 1.25rem; }
   .tour-photo { height: 200px; border-radius: 18px; }
@@ -448,19 +442,19 @@ footer {
 <nav id="navbar">
   <div class="nav-inner" id="navInner">
     <a href="/" class="nav-logo" title="EasyBillBro POS">
-      <img src="/easybillbro_logo.png" alt="EasyBillBro" class="nav-logo-img">
+      <img src="/easybillbro_logo_white.png" alt="EasyBillBro" class="nav-logo-img">
     </a>
     <ul class="nav-links">
       <li class="nav-dropdown">
         <a href="/#features" class="nav-dropdown-toggle">Platform ▾</a>
         <ul class="nav-dropdown-menu">
-          <li><a href="/platform/billing/">Billing & POS</a></li>
-          <li><a href="/platform/floor-and-kitchen/">Floor & Kitchen</a></li>
-          <li><a href="/platform/menu/">Menu & QR Ordering</a></li>
-          <li><a href="/platform/inventory/">Inventory & Stock</a></li>
-          <li><a href="/platform/crm/">CRM & Loyalty</a></li>
-          <li><a href="/platform/reports/">Reports & Analytics</a></li>
-          <li><a href="/platform/staff/">Staff & Shifts</a></li>
+          <li><a href="/platform/billing/">Billing &amp; POS</a></li>
+          <li><a href="/platform/floor-and-kitchen/">Floor &amp; Kitchen</a></li>
+          <li><a href="/platform/menu/">Menu &amp; QR Ordering</a></li>
+          <li><a href="/platform/inventory/">Inventory &amp; Stock</a></li>
+          <li><a href="/platform/crm/">CRM &amp; Loyalty</a></li>
+          <li><a href="/platform/reports/">Reports &amp; Analytics</a></li>
+          <li><a href="/platform/staff/">Staff &amp; Shifts</a></li>
           <li><a href="/platform/integrations/">Integrations</a></li>
           <li><a href="/platform/multi-outlet/">Multi-Outlet</a></li>
         </ul>
@@ -472,8 +466,8 @@ footer {
       <li><a href="/contact/">Contact</a></li>
     </ul>
     <div class="nav-actions">
-      <a href="/login/" class="nav-login">Login</a>
-      <a href="https://wa.me/917780181920?text=Hi%2C%20I%27d%20like%20to%20request%20a%20demo%20of%20EasyBillBro%20POS" target="_blank" class="nav-cta">
+      <a href="/login/" class="btn-nav-login">Login</a>
+      <a href="https://wa.me/917780181920?text=Hi%2C%20I%27d%20like%20to%20request%20a%20demo%20of%20EasyBillBro%20POS" target="_blank" class="btn-nav-cta">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
         Get a Demo
       </a>
@@ -483,13 +477,13 @@ footer {
 </nav>
 
 <div class="nav-mobile-menu" id="mobileMenu">
-  <a href="/platform/billing/" onclick="closeNav()">Billing & POS</a>
-  <a href="/platform/floor-and-kitchen/" onclick="closeNav()">Floor & Kitchen</a>
-  <a href="/platform/menu/" onclick="closeNav()">Menu & QR Ordering</a>
-  <a href="/platform/inventory/" onclick="closeNav()">Inventory & Stock</a>
-  <a href="/platform/crm/" onclick="closeNav()">CRM & Loyalty</a>
-  <a href="/platform/reports/" onclick="closeNav()">Reports & Analytics</a>
-  <a href="/platform/staff/" onclick="closeNav()">Staff & Shifts</a>
+  <a href="/platform/billing/" onclick="closeNav()">Billing &amp; POS</a>
+  <a href="/platform/floor-and-kitchen/" onclick="closeNav()">Floor &amp; Kitchen</a>
+  <a href="/platform/menu/" onclick="closeNav()">Menu &amp; QR Ordering</a>
+  <a href="/platform/inventory/" onclick="closeNav()">Inventory &amp; Stock</a>
+  <a href="/platform/crm/" onclick="closeNav()">CRM &amp; Loyalty</a>
+  <a href="/platform/reports/" onclick="closeNav()">Reports &amp; Analytics</a>
+  <a href="/platform/staff/" onclick="closeNav()">Staff &amp; Shifts</a>
   <a href="/platform/integrations/" onclick="closeNav()">Integrations</a>
   <a href="/platform/multi-outlet/" onclick="closeNav()">Multi-Outlet</a>
   <a href="/product-tour/" onclick="closeNav()">Product Tour</a>
@@ -498,7 +492,7 @@ footer {
   <a href="/about/" onclick="closeNav()">About</a>
   <a href="/contact/" onclick="closeNav()">Contact</a>
   <a href="/login/" onclick="closeNav()">Customer Login →</a>
-  <a href="https://wa.me/917780181920?text=Hi%2C%20I%27d%20like%20a%20demo" target="_blank" class="nav-cta">Get a Demo</a>
+  <a href="https://wa.me/917780181920?text=Hi%2C%20I%27d%20like%20a%20demo" target="_blank" class="btn-nav-cta">Get a Demo</a>
 </div>
 
 <section class="hero">
@@ -553,7 +547,7 @@ footer {
     <div class="reveal">
       <div class="tour-eyebrow">Fill More Seats</div>
       <h2 class="tour-heading">The live floor plan<br>every waiter can see.</h2>
-      <p class="tour-desc">Color-coded table states update in real time across every device in the restaurant. Green is free, rust is occupied, navy is reserved — no shouting across the floor to find an open table during rush.</p>
+      <p class="tour-desc">Color-coded table states update in real time across every device in the restaurant. Green is free, red is occupied, gold is reserved — no shouting across the floor to find an open table during rush.</p>
       <a href="/live-demo/" class="tour-link">See it live →</a>
     </div>
     <div class="reveal">
