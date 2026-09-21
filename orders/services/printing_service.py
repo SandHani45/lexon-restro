@@ -118,9 +118,16 @@ class PrintingService:
             p.cut(mode="PART")
         # "none" → skip cut; staff tears manually
 
-    def _currency(self, amount) -> str:
-        """₹ doesn't exist in CP437 — always use Rs. for safety."""
-        return f"Rs.{float(amount):.0f}"
+    def _currency(self, amount, symbol="₹") -> str:
+        """₹/AED don't exist in CP437 — always use Rs./AED text for safety.
+
+        `symbol` selects the label word, not the raw glyph (CP437 has
+        neither ₹ nor a special AED glyph) — "₹" (the default, preserves
+        every existing call site) maps to "Rs.", anything else (e.g. "AED")
+        is used as a plain prefix word.
+        """
+        prefix = "Rs." if symbol == "₹" else f"{symbol} "
+        return f"{prefix}{float(amount):.0f}"
 
     def _sep(self) -> str:
         return "-" * self.W
@@ -206,7 +213,7 @@ class PrintingService:
 
         if show_total:
             p.set(align="left", bold=True)
-            p.text(self._two_col("Total", self._currency(kot_total)) + "\n")
+            p.text(self._two_col("Total", self._currency(kot_total, order.outlet.currency_symbol)) + "\n")
 
         p.set(align="right", bold=False)
         p.text(f"{timezone.localtime(order.created_at).strftime('%d/%m %H:%M')}\n")
@@ -235,12 +242,13 @@ class PrintingService:
             p.text(f"Ph: {order.outlet.phone}\n")
 
         # Each compliance field on its own line
-        if order.outlet.gst_no:
-            p.text(f"GSTIN: {order.outlet.gst_no}\n")
-        if order.outlet.fssai_no:
-            p.text(f"FSSAI: {order.outlet.fssai_no}\n")
-        sac = getattr(order.outlet, 'sac_code', None) or '996331'
-        p.text(f"SAC: {sac}\n")
+        if order.outlet.tax_reg_number:
+            p.text(f"{order.outlet.tax_reg_label}: {order.outlet.tax_reg_number}\n")
+        if order.outlet.tax_regime_supports_hsn_sac:
+            if order.outlet.fssai_no:
+                p.text(f"FSSAI: {order.outlet.fssai_no}\n")
+            sac = getattr(order.outlet, 'sac_code', None) or '996331'
+            p.text(f"SAC: {sac}\n")
 
         p.text(self._sep() + "\n")
 
@@ -277,22 +285,24 @@ class PrintingService:
         p.text(sep_inner + "\n")
 
         # ── SUBTOTALS — centered block, Font A ──────────────────────────
+        currency = order.outlet.currency_symbol
         p.set(align="center", bold=False, font='a')
-        p.text(tc("Subtotal", self._currency(order.subtotal)) + "\n")
+        p.text(tc("Subtotal", self._currency(order.subtotal, currency)) + "\n")
         if order.gst_total:
-            label = "GST (incl.)" if gst_inclusive else "GST"
-            p.text(tc(label, self._currency(order.gst_total)) + "\n")
+            tax_word = order.outlet.tax_label
+            label = f"{tax_word} (incl.)" if gst_inclusive else tax_word
+            p.text(tc(label, self._currency(order.gst_total, currency)) + "\n")
         if order.discount_total > 0:
-            p.text(tc("Discount", f"-{self._currency(order.discount_total)}") + "\n")
+            p.text(tc("Discount", f"-{self._currency(order.discount_total, currency)}") + "\n")
         parcel = getattr(order, 'parcel_surcharge', 0)
         if parcel and parcel > 0:
-            p.text(tc("Parcel", self._currency(parcel)) + "\n")
+            p.text(tc("Parcel", self._currency(parcel, currency)) + "\n")
 
         p.text(sep_inner + "\n")
 
         # ── TOTAL — centered block, Font A bold ─────────────────────────
         p.set(align="center", bold=True, font='a')
-        p.text(tc("TOTAL", self._currency(order.grand_total)) + "\n")
+        p.text(tc("TOTAL", self._currency(order.grand_total, currency)) + "\n")
 
         payment = order.payments.order_by("-paid_at").first()
         if payment:
@@ -301,7 +311,7 @@ class PrintingService:
 
         if gst_inclusive:
             p.set(align="center", bold=False, font='a')
-            p.text("(prices include GST)\n")
+            p.text(f"(prices include {order.outlet.tax_label})\n")
 
         p.text(sep_inner + "\n")
 
@@ -362,14 +372,17 @@ class PrintingService:
 
     def _print_summary_slip(self, p, order, group_list):
         W = self.W
-        is_comp = getattr(order.outlet, "is_composition_scheme", False)
+        is_comp = (
+            getattr(order.outlet, "is_composition_scheme", False)
+            and order.outlet.tax_regime_supports_composition
+        )
 
         p.set(align="center", bold=True, double_width=True, double_height=True)
         p.text(f"{str(order.tenant.name)[:W//2]}\n")
         p.set(bold=False, double_width=False, double_height=False)
         p.text(f"{order.outlet.name}\n")
-        if order.outlet.gst_no:
-            p.text(f"GSTIN: {order.outlet.gst_no}\n")
+        if order.outlet.tax_reg_number:
+            p.text(f"{order.outlet.tax_reg_label}: {order.outlet.tax_reg_number}\n")
         if is_comp:
             p.set(bold=True)
             p.text("BILL OF SUPPLY\n")
@@ -402,19 +415,20 @@ class PrintingService:
             p.text(f"{name:<{name_w}} {qty:>3} {amt:>5}\n")
 
         p.text(self._sep() + "\n")
-        # Subtotal, GST (or Bill of Supply note), parcel
-        p.text(self._two_col("Subtotal", self._currency(order.subtotal)) + "\n")
+        # Subtotal, GST/VAT (or Bill of Supply note), parcel
+        currency = order.outlet.currency_symbol
+        p.text(self._two_col("Subtotal", self._currency(order.subtotal, currency)) + "\n")
         if not is_comp and order.gst_total:
-            p.text(self._two_col("GST", self._currency(order.gst_total)) + "\n")
+            p.text(self._two_col(order.outlet.tax_label, self._currency(order.gst_total, currency)) + "\n")
         parcel = getattr(order, "parcel_surcharge", 0)
         if parcel and parcel > 0:
-            p.text(self._two_col("Parcel Charge", self._currency(parcel)) + "\n")
+            p.text(self._two_col("Parcel Charge", self._currency(parcel, currency)) + "\n")
         if order.discount_total > 0:
-            p.text(self._two_col("Discount", f"-{self._currency(order.discount_total)}") + "\n")
+            p.text(self._two_col("Discount", f"-{self._currency(order.discount_total, currency)}") + "\n")
 
         p.text(self._sep() + "\n")
         p.set(bold=True, double_height=True)
-        p.text(self._two_col("TOTAL", self._currency(order.grand_total)) + "\n")
+        p.text(self._two_col("TOTAL", self._currency(order.grand_total, currency)) + "\n")
         p.set(bold=False, double_height=False)
 
         payment = order.payments.order_by("-paid_at").first()
@@ -460,7 +474,7 @@ class PrintingService:
         p.text(self._sep() + "\n")
         p.set(bold=True)
         p.text(self._two_col(f"{cat_name[:W-10]} Total",
-                             self._currency(group["total"])) + "\n")
+                             self._currency(group["total"], order.outlet.currency_symbol)) + "\n")
         p.set(bold=False)
         p.set(align="center")
         p.text("Powered by EasyBillBro\n")
@@ -511,10 +525,11 @@ class PrintingService:
         p.text(f"{str(order.tenant.name)[:W]}\n")
         p.set(bold=False)
         p.text(f"{order.outlet.name}\n")
-        if order.outlet.gst_no:
-            p.text(f"GSTIN: {order.outlet.gst_no}\n")
-        sac = getattr(order.outlet, "sac_code", None) or "996331"
-        p.text(f"SAC: {sac}\n")
+        if order.outlet.tax_reg_number:
+            p.text(f"{order.outlet.tax_reg_label}: {order.outlet.tax_reg_number}\n")
+        if order.outlet.tax_regime_supports_hsn_sac:
+            sac = getattr(order.outlet, "sac_code", None) or "996331"
+            p.text(f"SAC: {sac}\n")
         p.text(self._sep() + "\n")
 
         # Token number — as large as the printer supports
@@ -544,7 +559,7 @@ class PrintingService:
 
         # Totals
         p.set(bold=True)
-        p.text(self._two_col("TOTAL", self._currency(order.grand_total)) + "\n")
+        p.text(self._two_col("TOTAL", self._currency(order.grand_total, order.outlet.currency_symbol)) + "\n")
         p.set(bold=False)
 
         payment = order.payments.order_by("-paid_at").first()

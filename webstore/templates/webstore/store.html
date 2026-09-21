@@ -421,7 +421,7 @@
                 <img src="{{ item.image.url }}" alt="{{ item.name }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
                 <div class="hero-slide-info">
                     <span class="hero-slide-name serif-text">{{ item.name }}</span>
-                    <span class="hero-slide-price">₹{{ item.price }}</span>
+                    <span class="hero-slide-price">{{ outlet.currency_symbol }}{{ item.price }}</span>
                 </div>
             </div>
             {% endfor %}
@@ -496,7 +496,7 @@
                             </div>
                             <p class="item-desc">{{ item.description|default:"Delicious and freshly prepared." }}</p>
                             <div class="item-footer">
-                                <div class="item-price">₹{{ item.price }}</div>
+                                <div class="item-price">{{ outlet.currency_symbol }}{{ item.price }}</div>
                             </div>
                         </div>
                     </div>
@@ -514,7 +514,7 @@
     <div class="cart-bar" id="cartBar">
         <div class="cart-info">
             <span class="cart-items-text"><span id="totalItems">0</span> ITEMS</span>
-            <span class="cart-total-text">₹<span id="totalPrice">0</span></span>
+            <span class="cart-total-text">{{ outlet.currency_symbol }}<span id="totalPrice">0</span></span>
         </div>
         <button class="view-cart-btn" onclick="openCart()">VIEW CART <i class="bi bi-arrow-right"></i></button>
     </div>
@@ -527,7 +527,7 @@
         <h3 id="modifierItemName" class="modifier-item-title"></h3>
         <div id="modifierGroupsContainer"></div>
         <div class="d-flex justify-content-between align-items-center mt-3 pt-2" style="border-top:1px solid var(--border-color);">
-            <div class="modifier-total">Total: ₹<span id="modTotalAmt">0</span></div>
+            <div class="modifier-total">Total: {{ outlet.currency_symbol }}<span id="modTotalAmt">0</span></div>
             <button class="confirm-modifier-btn" onclick="confirmModifiers()">ADD TO CART <i class="bi bi-cart-plus"></i></button>
         </div>
     </div>
@@ -542,9 +542,9 @@
         <div id="cartItemsContainer"></div>
 
         <div class="bill-summary">
-            <div class="bill-row"><span>Subtotal</span><span>₹<span id="billSubtotal">0</span></span></div>
-            <div class="bill-row"><span>GST</span><span>₹<span id="billGst">0</span></span></div>
-            <div class="bill-total"><span>Total</span><span>₹<span id="billTotal">0</span></span></div>
+            <div class="bill-row"><span>Subtotal</span><span>{{ outlet.currency_symbol }}<span id="billSubtotal">0</span></span></div>
+            <div class="bill-row"><span>GST</span><span>{{ outlet.currency_symbol }}<span id="billGst">0</span></span></div>
+            <div class="bill-total"><span>Total</span><span>{{ outlet.currency_symbol }}<span id="billTotal">0</span></span></div>
         </div>
 
         <div class="field-col">
@@ -632,6 +632,10 @@
     const CREATE_ORDER_URL = "{% url 'webstore_create_order' tenant_slug=tenant.slug %}";
     const LOGIN_URL = "{% url 'webstore_login' tenant_slug=tenant.slug %}";
     const CSRF_TOKEN = "{{ csrf_token }}";
+    // Outlet's tax-regime currency symbol -- see
+    // tenants.models.Outlet.currency_symbol. Used by every client-side
+    // price string below instead of a hardcoded symbol.
+    const CURRENCY_SYMBOL = "{{ outlet.currency_symbol|escapejs }}";
     let cart = {};
 
     // Menu item/order-status names come from a tenant's own data and get
@@ -861,7 +865,7 @@
                 const priceSpan = document.createElement('span');
                 if (m.price > 0) {
                     priceSpan.className = 'modifier-price ms-auto';
-                    priceSpan.textContent = `+₹${m.price}`;
+                    priceSpan.textContent = `+${CURRENCY_SYMBOL}${m.price}`;
                 } else {
                     priceSpan.className = 'ms-auto';
                 }
@@ -1010,7 +1014,7 @@
                         <button class="qty-btn" onclick="increaseItem('${item.id}')">+</button>
                     </div>
                 </div>
-                <div class="cart-item-price">₹${itemTotal.toFixed(2)}</div>
+                <div class="cart-item-price">${CURRENCY_SYMBOL}${itemTotal.toFixed(2)}</div>
             `;
             container.appendChild(row);
         }

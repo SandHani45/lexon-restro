@@ -236,9 +236,11 @@
         <li><a class="dropdown-item" href="#" onclick="triggerExport('audit')">Discount/Void Audit</a></li>
         <li><a class="dropdown-item" href="#" onclick="triggerExport('crm_analytics')">CRM Analytics</a></li>
         {% endif %}
+        {% if request.user.tenant.country == 'IN' %}
         <li><hr class="dropdown-divider"></li>
         <li><h6 class="dropdown-header" style="font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;">Compliance</h6></li>
         <li><a class="dropdown-item" href="#" onclick="triggerExport('gstr1')"><i class="bi bi-file-earmark-excel me-2" style="color:#107c41;"></i>GSTR-1 B2CS</a></li>
+        {% endif %}
       </ul>
     </div>
 
@@ -273,7 +275,7 @@
     </strong>
     {% if gst_inclusive %}
     <span class="ms-3" style="font-size:0.65rem;font-weight:700;background:rgba(16,185,129,.12);color:#10b981;padding:3px 10px;border-radius:var(--radius-pill, 999px);letter-spacing:1px;text-transform:uppercase;">
-      GST Inclusive Pricing
+      {{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }} Inclusive Pricing
     </span>
     {% endif %}
     {% if is_limited_view %}
@@ -284,10 +286,10 @@
   {% if gst_inclusive %}
   <div style="background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-left:3px solid #10b981;padding:0.6rem 1rem;margin-bottom:1.5rem;font-size:0.78rem;color:var(--text-muted);">
     <i class="bi bi-info-circle me-1" style="color:#10b981;"></i>
-    <strong style="color:var(--text-main);">GST-Inclusive Mode:</strong>
-    Revenue figures show the total collected from customers (GST inside).
-    <em>Net Revenue</em> = grand total − GST back-calculated from each order.
-    <em>GST</em> = amount embedded in customer prices, not added on top.
+    <strong style="color:var(--text-main);">{{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }}-Inclusive Mode:</strong>
+    Revenue figures show the total collected from customers ({{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }} inside).
+    <em>Net Revenue</em> = grand total − {{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }} back-calculated from each order.
+    <em>{{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }}</em> = amount embedded in customer prices, not added on top.
     <a href="/setup/outlet/" style="color:#10b981;margin-left:6px;">Change pricing mode →</a>
   </div>
   {% endif %}
@@ -299,10 +301,10 @@
         <div class="kpi-icon-badge"><i class="bi bi-currency-rupee"></i></div>
         <p class="kpi-val mb-0">₹{{ sales.total_sales|floatformat:0 }}</p>
         <span class="kpi-label">
-          {% if gst_inclusive %}Revenue (incl. GST){% else %}Net Sales Revenue{% endif %}
+          {% if gst_inclusive %}Revenue (incl. {{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }}){% else %}Net Sales Revenue{% endif %}
         </span>
         {% if gst_inclusive %}
-        <div class="kpi-sub">GST inside: ₹{{ sales.gst_total|floatformat:0 }}</div>
+        <div class="kpi-sub">{{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }} inside: ₹{{ sales.gst_total|floatformat:0 }}</div>
         {% endif %}
       </div>
     </div>
@@ -419,15 +421,15 @@
 
       <div style="padding:0.75rem;border-left:3px solid var(--accent-gold);">
         <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);">
-          {% if gst_inclusive %}Revenue (incl. GST){% else %}Gross Revenue{% endif %}
+          {% if gst_inclusive %}Revenue (incl. {{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }}){% else %}Gross Revenue{% endif %}
         </div>
         <div style="font-family:'DM Serif Display',serif;font-size:1.3rem;">₹{{ pl.gross_revenue|floatformat:0 }}</div>
-        {% if gst_inclusive %}<div style="font-size:0.65rem;color:var(--text-muted);">GST inside the price</div>{% endif %}
+        {% if gst_inclusive %}<div style="font-size:0.65rem;color:var(--text-muted);">{{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }} inside the price</div>{% endif %}
       </div>
 
       <div style="padding:0.75rem;border-left:3px solid var(--border-color);">
         <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);">
-          {% if gst_inclusive %}GST (back-calculated){% else %}GST Collected{% endif %}
+          {% if gst_inclusive %}{{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }} (back-calculated){% else %}{{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }} Collected{% endif %}
         </div>
         <div style="font-family:'DM Serif Display',serif;font-size:1.3rem;color:var(--text-muted);">₹{{ pl.gst_collected|floatformat:0 }}</div>
         <div style="font-size:0.65rem;color:var(--text-muted);">
@@ -437,10 +439,10 @@
 
       <div style="padding:0.75rem;border-left:3px solid #3b82f6;">
         <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);">
-          {% if gst_inclusive %}Your Income (excl. GST){% else %}Net Revenue (excl. GST){% endif %}
+          {% if gst_inclusive %}Your Income (excl. {{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }}){% else %}Net Revenue (excl. {{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }}){% endif %}
         </div>
         <div style="font-family:'DM Serif Display',serif;font-size:1.3rem;color:#3b82f6;">₹{{ pl.net_revenue|floatformat:0 }}</div>
-        {% if gst_inclusive %}<div style="font-size:0.65rem;color:var(--text-muted);">= Revenue − back-calc GST</div>{% endif %}
+        {% if gst_inclusive %}<div style="font-size:0.65rem;color:var(--text-muted);">= Revenue − back-calc {{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }}</div>{% endif %}
       </div>
 
       <div style="padding:0.75rem;border-left:3px solid var(--border-color);">

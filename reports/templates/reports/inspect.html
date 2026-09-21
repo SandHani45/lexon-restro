@@ -189,15 +189,15 @@
 <!-- ── Report Header ─────────────────────────────────── -->
 <div class="report-header">
   <div class="outlet-name">{{ outlet.name }}</div>
-  {% if outlet.gstin %}
-    <div class="gstin">GSTIN: {{ outlet.gstin }}</div>
+  {% if outlet.tax_reg_number %}
+    <div class="gstin">{{ outlet.tax_reg_label }}: {{ outlet.tax_reg_number }}</div>
   {% endif %}
   {% if outlet.address %}
     <div class="gstin">{{ outlet.address }}</div>
   {% endif %}
   <div class="report-title">Daily Inspection Report</div>
   <div class="report-date">Date: {{ today|date:"l, d F Y" }}</div>
-  {% if is_composition %}
+  {% if is_composition and outlet.tax_regime_supports_composition %}
     <div class="mt-2"><span class="composition-badge">Composition Scheme — Bill of Supply</span></div>
   {% endif %}
 </div>
@@ -216,30 +216,30 @@
     <div class="col-6 col-md-3">
       <div class="summary-card tile-maroon">
         <div class="icon-badge"><i class="bi bi-cash-stack"></i></div>
-        <div class="value gold">₹{{ gross|floatformat:2 }}</div>
+        <div class="value gold">{{ outlet.currency_symbol }}{{ gross|floatformat:2 }}</div>
         <div class="label">Gross Revenue</div>
       </div>
     </div>
-    {% if not is_composition %}
+    {% if not is_composition or not outlet.tax_regime_supports_composition %}
     <div class="col-6 col-md-3">
       <div class="summary-card tile-orange">
         <div class="icon-badge"><i class="bi bi-percent"></i></div>
-        <div class="value">₹{{ gst|floatformat:2 }}</div>
-        <div class="label">GST Collected</div>
+        <div class="value">{{ outlet.currency_symbol }}{{ gst|floatformat:2 }}</div>
+        <div class="label">{{ outlet.tax_label }} Collected</div>
       </div>
     </div>
     <div class="col-6 col-md-3">
       <div class="summary-card">
         <div class="icon-badge"><i class="bi bi-graph-up"></i></div>
-        <div class="value">₹{{ net|floatformat:2 }}</div>
-        <div class="label">Net Revenue (excl. GST)</div>
+        <div class="value">{{ outlet.currency_symbol }}{{ net|floatformat:2 }}</div>
+        <div class="label">Net Revenue (excl. {{ outlet.tax_label }})</div>
       </div>
     </div>
     {% else %}
     <div class="col-6 col-md-3">
       <div class="summary-card tile-orange">
         <div class="icon-badge"><i class="bi bi-tag"></i></div>
-        <div class="value">₹{{ discounts|floatformat:2 }}</div>
+        <div class="value">{{ outlet.currency_symbol }}{{ discounts|floatformat:2 }}</div>
         <div class="label">Discounts Given</div>
       </div>
     </div>
@@ -247,7 +247,7 @@
       <div class="summary-card">
         <div class="icon-badge"><i class="bi bi-percent"></i></div>
         <div class="value">Not Applicable</div>
-        <div class="label">GST</div>
+        <div class="label">{{ outlet.tax_label }}</div>
         <div class="sub">Composition Scheme</div>
       </div>
     </div>
@@ -271,13 +271,13 @@
         <tr>
           <td>{{ p.method|title }}</td>
           <td class="text-end">{{ p.count }}</td>
-          <td class="text-end mono">₹{{ p.total|floatformat:2 }}</td>
+          <td class="text-end mono">{{ outlet.currency_symbol }}{{ p.total|floatformat:2 }}</td>
         </tr>
         {% endfor %}
         <tr class="total-row">
           <td>Total</td>
           <td class="text-end">{{ order_count }}</td>
-          <td class="text-end mono">₹{{ gross|floatformat:2 }}</td>
+          <td class="text-end mono">{{ outlet.currency_symbol }}{{ gross|floatformat:2 }}</td>
         </tr>
       </tbody>
     </table>
@@ -286,41 +286,54 @@
     {% endif %}
   </div>
 
-  <!-- ── GST Breakdown by Rate ───────────────────────── -->
-  {% if not is_composition %}
+  <!-- ── GST/VAT Breakdown by Rate ────────────────────── -->
+  {% if not is_composition or not outlet.tax_regime_supports_composition %}
   <div class="panel">
-    <div class="section-label">GST Breakdown by Rate</div>
+    <div class="section-label">{{ outlet.tax_label }} Breakdown by Rate</div>
     {% if gst_by_rate %}
     <table class="table-clean">
       <thead>
         <tr>
-          <th>GST Rate</th>
+          <th>{{ outlet.tax_label }} Rate</th>
           <th class="text-end">Taxable Value</th>
+          {% if outlet.tax_regime_supports_split %}
           <th class="text-end">CGST</th>
           <th class="text-end">SGST</th>
-          <th class="text-end">Total GST</th>
+          {% else %}
+          <th class="text-end">{{ outlet.tax_label }}</th>
+          {% endif %}
+          <th class="text-end">Total {{ outlet.tax_label }}</th>
         </tr>
       </thead>
       <tbody>
         {% for row in gst_by_rate %}
         <tr>
           <td>{{ row.rate }}%</td>
-          <td class="text-end mono">₹{{ row.taxable|floatformat:2 }}</td>
-          <td class="text-end mono">₹{{ row.cgst|floatformat:2 }}</td>
-          <td class="text-end mono">₹{{ row.sgst|floatformat:2 }}</td>
-          <td class="text-end mono">₹{{ row.cgst|add:row.sgst|floatformat:2 }}</td>
+          <td class="text-end mono">{{ outlet.currency_symbol }}{{ row.taxable|floatformat:2 }}</td>
+          {% if outlet.tax_regime_supports_split %}
+          <td class="text-end mono">{{ outlet.currency_symbol }}{{ row.cgst|floatformat:2 }}</td>
+          <td class="text-end mono">{{ outlet.currency_symbol }}{{ row.sgst|floatformat:2 }}</td>
+          <td class="text-end mono">{{ outlet.currency_symbol }}{{ row.cgst|add:row.sgst|floatformat:2 }}</td>
+          {% else %}
+          <td class="text-end mono">{{ outlet.currency_symbol }}{{ row.tax|floatformat:2 }}</td>
+          <td class="text-end mono">{{ outlet.currency_symbol }}{{ row.tax|floatformat:2 }}</td>
+          {% endif %}
         </tr>
         {% endfor %}
         <tr class="total-row">
           <td>Total</td>
-          <td class="text-end mono">₹{{ net|floatformat:2 }}</td>
+          <td class="text-end mono">{{ outlet.currency_symbol }}{{ net|floatformat:2 }}</td>
+          {% if outlet.tax_regime_supports_split %}
           <td colspan="2"></td>
-          <td class="text-end mono">₹{{ gst|floatformat:2 }}</td>
+          {% else %}
+          <td></td>
+          {% endif %}
+          <td class="text-end mono">{{ outlet.currency_symbol }}{{ gst|floatformat:2 }}</td>
         </tr>
       </tbody>
     </table>
     {% else %}
-      <div class="empty-state">No GST transactions today.</div>
+      <div class="empty-state">No {{ outlet.tax_label }} transactions today.</div>
     {% endif %}
   </div>
   {% endif %}
@@ -376,13 +389,13 @@
             {% elif order.token %}Token {{ order.token.number }}
             {% else %}—{% endif %}
           </td>
-          <td class="text-end mono">₹{{ order.grand_total|floatformat:2 }}</td>
+          <td class="text-end mono">{{ outlet.currency_symbol }}{{ order.grand_total|floatformat:2 }}</td>
           <td class="text-end no-print"><span class="status-paid">{{ order.status }}</span></td>
         </tr>
         {% endfor %}
         <tr class="total-row">
           <td colspan="3">Total ({{ order_count }} orders)</td>
-          <td class="text-end mono">₹{{ gross|floatformat:2 }}</td>
+          <td class="text-end mono">{{ outlet.currency_symbol }}{{ gross|floatformat:2 }}</td>
           <td class="no-print"></td>
         </tr>
       </tbody>

@@ -7,6 +7,7 @@ from django.db.models import Sum, F
 from django.utils import timezone
 from orders.models import Order, OrderItem
 from core.utils import get_business_date_range
+from tenants.tax_regimes import get_regime
 import openpyxl
 from openpyxl.styles import Font, Alignment
 
@@ -27,6 +28,17 @@ GST_STATE_CODES = {
     "34": "Puducherry", "35": "Andaman and Nicobar Islands", "36": "Telangana",
     "37": "Andhra Pradesh", "38": "Ladakh", "97": "Other Territory",
 }
+
+
+def _tax_label(tenant, outlet):
+    """'GST' or 'VAT' depending on regime -- outlet.tax_label when a specific
+    outlet is in scope, otherwise derived from the tenant's own country
+    (every outlet under one tenant shares the same country/regime, so this
+    is equivalent, just doesn't require an Outlet instance for the
+    "all outlets" / no-outlet-filter exports)."""
+    if outlet is not None:
+        return outlet.tax_label
+    return get_regime(getattr(tenant, "country", None))["tax_label"]
 
 
 def _place_of_supply(outlet):
@@ -55,7 +67,7 @@ def generate_orders_csv(tenant, outlet, start_date, end_date):
 
     writer.writerow([
         'Order ID', 'Order No', 'Date', 'Time', 'Outlet', 'Source',
-        'Status', 'Customer Name', 'Subtotal', 'Discount', 'GST',
+        'Status', 'Customer Name', 'Subtotal', 'Discount', _tax_label(tenant, outlet),
         'Round Off', 'Grand Total', 'Payment Methods'
     ])
     
@@ -166,7 +178,17 @@ def generate_gstr1_excel(tenant, outlet, start_date, end_date):
     Table 12 HSN/SAC summary — mandatory for every GST filer regardless
     of B2B/B2C mix, unlike the B2CS sheet which only matters once there's
     B2C turnover to report.
+
+    India-only. GSTR-1 is an India GST-portal-format filing; there is no
+    UAE VAT equivalent built here (a real FTA VAT201 e-filing export is a
+    separate, larger piece of work). The view (export_reports) already
+    gates on this before calling in, but this check is kept here too as a
+    second line of defense in case this function is ever called directly
+    from elsewhere.
     """
+    if getattr(tenant, "country", "IN") != "IN":
+        raise ValueError("GSTR-1 export is only available for India tenants.")
+
     from orders.services.tax_service import split_cgst_sgst
 
     wb = openpyxl.Workbook()
@@ -521,7 +543,7 @@ def generate_pl_csv(tenant, outlet, start_date, end_date):
     writer.writerow(['NET PROFIT REPORT', f'Period: {start_date} to {end_date}'])
     writer.writerow([])
     writer.writerow(['Gross Revenue', report['gross_revenue']])
-    writer.writerow(['GST Collected', report['gst_collected']])
+    writer.writerow([f'{_tax_label(tenant, outlet)} Collected', report['gst_collected']])
     writer.writerow(['Net Revenue', report['net_revenue']])
     writer.writerow(['Discounts Given', report['discounts']])
     writer.writerow(['COGS', report['cogs']])

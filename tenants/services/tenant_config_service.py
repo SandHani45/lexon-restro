@@ -139,6 +139,10 @@ def update_outlet_from_post(outlet, post):
     """Applies the "update_outlet" POST action. Saves the outlet."""
     outlet.phone       = post.get("phone", "").strip() or None
     outlet.gst_no      = post.get("gst_no", "").strip().upper() or None
+    # UAE tenants have no gst_no to submit -- their TRN input posts trn_no
+    # instead. Read unconditionally so it's saved whichever field the
+    # template actually rendered (see tenants/tax_regimes.py).
+    outlet.trn_no      = post.get("trn_no", "").strip().upper() or None
     outlet.fssai_no    = post.get("fssai_no", "").strip() or None
     outlet.address     = post.get("address", "").strip()
     outlet.sac_code    = post.get("sac_code", "996331").strip() or "996331"

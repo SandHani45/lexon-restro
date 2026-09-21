@@ -157,6 +157,9 @@ def weekly_revenue_series(user):
             )
         return float(total)
 
+    currency_symbol = outlets[0].currency_symbol
+    use_lakh = tenant.country == "IN"
+
     today = get_business_date(timezone.now(), outlets[0])
     last_7_dates = [today - timedelta(days=i) for i in range(6, -1, -1)]
     days = [
@@ -196,15 +199,15 @@ def weekly_revenue_series(user):
         d["y"] = round(chart_bottom - height, 1)
         d["text_x"] = d["x"] + bar_width / 2
         d["is_peak"] = (i == peak_index)
-        d["revenue_label"] = _compact_currency(d["revenue"])
+        d["revenue_label"] = _compact_currency(d["revenue"], currency_symbol, use_lakh)
 
     result = {
         "days": days,
         "change_pct": change_pct,
         "max_revenue": max_revenue,
-        "max_revenue_label": _compact_currency(max_revenue),
-        "mid_revenue_label": _compact_currency(max_revenue * 0.5),
-        "three_quarter_revenue_label": _compact_currency(max_revenue * 0.75),
+        "max_revenue_label": _compact_currency(max_revenue, currency_symbol, use_lakh),
+        "mid_revenue_label": _compact_currency(max_revenue * 0.5, currency_symbol, use_lakh),
+        "three_quarter_revenue_label": _compact_currency(max_revenue * 0.75, currency_symbol, use_lakh),
         "chart_top": chart_top,
         "chart_bottom": chart_bottom,
     }
@@ -212,11 +215,13 @@ def weekly_revenue_series(user):
     return result
 
 
-def _compact_currency(amount):
-    """₹0, ₹850, ₹2.4k, ₹1.2L -- matches the original hardcoded chart's ₹2.0k-style labels."""
+def _compact_currency(amount, symbol="₹", use_lakh=True):
+    """₹0, ₹850, ₹2.4k, ₹1.2L -- matches the original hardcoded chart's ₹2.0k-style labels.
+    Lakh notation (10^5) is India-specific -- non-INR regimes (e.g. UAE's AED)
+    just keep counting in thousands past 100k, via use_lakh=False."""
     amount = float(amount or 0)
-    if amount >= 100000:
-        return f"₹{amount / 100000:.1f}L"
+    if use_lakh and amount >= 100000:
+        return f"{symbol}{amount / 100000:.1f}L"
     if amount >= 1000:
-        return f"₹{amount / 1000:.1f}k"
-    return f"₹{amount:.0f}"
+        return f"{symbol}{amount / 1000:.1f}k"
+    return f"{symbol}{amount:.0f}"

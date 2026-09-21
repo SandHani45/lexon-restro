@@ -275,7 +275,7 @@
             <a href="/reports/dashboard/" class="hero-kpi-card kpi-gradient-revenue">
                 <div>
                     <div class="hero-icon-box"><i class="bi bi-currency-rupee"></i></div>
-                    <div class="hero-stat-val" id="valRevenue">₹ {{ m.revenue|default:"0" }}</div>
+                    <div class="hero-stat-val" id="valRevenue">{{ request.user.outlet.currency_symbol }} {{ m.revenue|default:"0" }}</div>
                     <div class="hero-stat-label">Today's Revenue</div>
                     <div class="hero-stat-sub">
                         <span style="color:#4ade80;"><i class="bi bi-arrow-up-short"></i>+12.5%</span> vs yesterday
@@ -350,7 +350,7 @@
                         <text x="0" y="24" fill="var(--text-muted)" font-size="10" font-family="sans-serif">{{ weekly_revenue.max_revenue_label }}</text>
                         <text x="0" y="64" fill="var(--text-muted)" font-size="10" font-family="sans-serif">{{ weekly_revenue.three_quarter_revenue_label }}</text>
                         <text x="0" y="104" fill="var(--text-muted)" font-size="10" font-family="sans-serif">{{ weekly_revenue.mid_revenue_label }}</text>
-                        <text x="0" y="144" fill="var(--text-muted)" font-size="10" font-family="sans-serif">₹0</text>
+                        <text x="0" y="144" fill="var(--text-muted)" font-size="10" font-family="sans-serif">{{ request.user.outlet.currency_symbol }}0</text>
 
                         {% for day in weekly_revenue.days %}
                         <rect class="chart-bar-rect" x="{{ day.x }}" y="{{ day.y }}" width="{{ day.bar_width }}" height="{{ day.height }}" rx="8"
@@ -540,7 +540,7 @@
                             <div style="flex:1;min-width:0;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="fw-semibold text-truncate" style="color:var(--text-main);">{{ ord.order_number|default:ord.id }}</span>
-                                    <span class="fw-bold" style="color:var(--text-main);font-size:0.75rem;">₹{{ ord.grand_total|floatformat:2 }}</span>
+                                    <span class="fw-bold" style="color:var(--text-main);font-size:0.75rem;">{{ request.user.outlet.currency_symbol }}{{ ord.grand_total|floatformat:2 }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center mt-1">
                                     <span class="text-muted" style="font-size:0.68rem;">
@@ -558,28 +558,28 @@
                         <div class="dash-item-row">
                             <div class="item-icon-squircle" style="color:var(--accent-gold);background:rgba(236,39,52,0.1);"><i class="bi bi-person-fill"></i></div>
                             <div style="flex:1;min-width:0;">
-                                <div class="d-flex justify-content-between"><span class="fw-semibold">Sarah Johnson</span><span class="fw-bold" style="color:var(--accent-gold);">₹840</span></div>
+                                <div class="d-flex justify-content-between"><span class="fw-semibold">Sarah Johnson</span><span class="fw-bold" style="color:var(--accent-gold);">{{ request.user.outlet.currency_symbol }}840</span></div>
                                 <div class="d-flex justify-content-between text-muted" style="font-size:0.68rem;"><span>ORD-1039 • Table 4</span><span class="status-pill served" style="font-size:0.6rem;padding:2px 6px;">SERVED</span></div>
                             </div>
                         </div>
                         <div class="dash-item-row">
                             <div class="item-icon-squircle" style="color:var(--accent-gold);background:rgba(236,39,52,0.1);"><i class="bi bi-person-fill"></i></div>
                             <div style="flex:1;min-width:0;">
-                                <div class="d-flex justify-content-between"><span class="fw-semibold">Mike Chen</span><span class="fw-bold" style="color:var(--accent-gold);">₹1,250</span></div>
+                                <div class="d-flex justify-content-between"><span class="fw-semibold">Mike Chen</span><span class="fw-bold" style="color:var(--accent-gold);">{{ request.user.outlet.currency_symbol }}1,250</span></div>
                                 <div class="d-flex justify-content-between text-muted" style="font-size:0.68rem;"><span>ORD-1040 • Table 1</span><span class="status-pill pending" style="font-size:0.6rem;padding:2px 6px;">PREPARING</span></div>
                             </div>
                         </div>
                         <div class="dash-item-row">
                             <div class="item-icon-squircle" style="color:var(--accent-gold);background:rgba(236,39,52,0.1);"><i class="bi bi-person-fill"></i></div>
                             <div style="flex:1;min-width:0;">
-                                <div class="d-flex justify-content-between"><span class="fw-semibold">Emma Wilson</span><span class="fw-bold" style="color:var(--accent-gold);">₹420</span></div>
+                                <div class="d-flex justify-content-between"><span class="fw-semibold">Emma Wilson</span><span class="fw-bold" style="color:var(--accent-gold);">{{ request.user.outlet.currency_symbol }}420</span></div>
                                 <div class="d-flex justify-content-between text-muted" style="font-size:0.68rem;"><span>ORD-1041 • Takeaway</span><span class="status-pill served" style="font-size:0.6rem;padding:2px 6px;">READY</span></div>
                             </div>
                         </div>
                         <div class="dash-item-row">
                             <div class="item-icon-squircle" style="color:var(--accent-gold);background:rgba(236,39,52,0.1);"><i class="bi bi-person-fill"></i></div>
                             <div style="flex:1;min-width:0;">
-                                <div class="d-flex justify-content-between"><span class="fw-semibold">James Brown</span><span class="fw-bold" style="color:var(--accent-gold);">₹1,890</span></div>
+                                <div class="d-flex justify-content-between"><span class="fw-semibold">James Brown</span><span class="fw-bold" style="color:var(--accent-gold);">{{ request.user.outlet.currency_symbol }}1,890</span></div>
                                 <div class="d-flex justify-content-between text-muted" style="font-size:0.68rem;"><span>ORD-1042 • Table 7</span><span class="status-pill new" style="font-size:0.6rem;padding:2px 6px;">NEW</span></div>
                             </div>
                         </div>
@@ -729,6 +729,11 @@
 
 {% block extra_js %}
 <script>
+    // Outlet's tax-regime currency symbol -- see
+    // tenants.models.Outlet.currency_symbol. Used by the live metrics
+    // refresh below instead of a hardcoded symbol.
+    const CURRENCY_SYMBOL = "{{ request.user.outlet.currency_symbol|escapejs }}";
+
     async function toggleAggregator(platform, enable) {
         try {
             const data = await apiClient.post('/setup/aggregators/toggle/', { platform, enabled: enable });
@@ -766,7 +771,7 @@
                 const ord = document.getElementById('valOrders');
                 const tbl = document.getElementById('valActiveTables');
                 const kit = document.getElementById('valKitchen');
-                if (rev) rev.textContent = '₹ ' + m.revenue;
+                if (rev) rev.textContent = CURRENCY_SYMBOL + ' ' + m.revenue;
                 if (ord) ord.textContent = m.orders;
                 if (tbl) tbl.textContent = m.active_tables;
                 if (kit) kit.textContent = m.kitchen_orders;

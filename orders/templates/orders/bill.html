@@ -168,14 +168,14 @@
             {% endif %}
             <div style="font-size:0.85rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.4rem;">{{ order.outlet.name }}</div>
             <div class="r-address">{{ order.outlet.address|default:""|linebreaksbr }}</div>
-            {% if order.outlet.gst_no %}<div class="r-gst">GSTIN: {{ order.outlet.gst_no }}</div>{% endif %}
-            {% if order.outlet.fssai_no %}<div class="r-gst">FSSAI: {{ order.outlet.fssai_no }}</div>{% endif %}
-            <div class="r-gst">SAC: {{ order.outlet.sac_code|default:"996331" }}</div>
+            {% if order.outlet.tax_reg_number %}<div class="r-gst">{{ order.outlet.tax_reg_label }}: {{ order.outlet.tax_reg_number }}</div>{% endif %}
+            {% if order.outlet.tax_regime_supports_hsn_sac and order.outlet.fssai_no %}<div class="r-gst">FSSAI: {{ order.outlet.fssai_no }}</div>{% endif %}
+            {% if order.outlet.tax_regime_supports_hsn_sac %}<div class="r-gst">SAC: {{ order.outlet.sac_code|default:"996331" }}</div>{% endif %}
         </div>
 
         <!-- Order meta -->
         <div class="meta">
-            <div><span class="label">{% if is_composition %}Bill of Supply{% else %}Tax Invoice{% endif %}</span><span>{{ order.order_number|default:order.id }}</span></div>
+            <div><span class="label">{% if is_composition and order.outlet.tax_regime_supports_composition %}Bill of Supply{% else %}Tax Invoice{% endif %}</span><span>{{ order.order_number|default:order.id }}</span></div>
             <div style="text-align:right"><span class="label">Date</span><span>{{ order.created_at|date:"d.M.Y H:i" }}</span></div>
         </div>
         <div class="meta" style="margin-top:-6px">
@@ -201,16 +201,16 @@
                     {% endif %}
                     {% if item.modifiers.all %}
                     <div style="font-size:0.7rem;color:var(--text-muted);padding-left:0.4rem;">
-                        {% for mod in item.modifiers.all %}+ {{ mod.name }}{% if mod.price > 0 %} (₹{{ mod.price }}){% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}
+                        {% for mod in item.modifiers.all %}+ {{ mod.name }}{% if mod.price > 0 %} ({{ order.outlet.currency_symbol }}{{ mod.price }}){% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}
                     </div>
                     {% endif %}
                 </span>
                 <span class="item-val">
                     {% if item.is_complimentary %}COMP
                     {% elif item.item_discount_pct > 0 %}
-                        <div style="text-decoration:line-through;font-size:0.7rem;color:var(--text-muted);">₹{{ item.total_price }}</div>
-                        <div>₹{{ item.discounted_price }}</div>
-                    {% else %}₹{{ item.total_price }}{% endif %}
+                        <div style="text-decoration:line-through;font-size:0.7rem;color:var(--text-muted);">{{ order.outlet.currency_symbol }}{{ item.total_price }}</div>
+                        <div>{{ order.outlet.currency_symbol }}{{ item.discounted_price }}</div>
+                    {% else %}{{ order.outlet.currency_symbol }}{{ item.total_price }}{% endif %}
                 </span>
             </div>
             {% endif %}{% endfor %}
@@ -218,20 +218,20 @@
 
         <!-- Totals -->
         {% if is_composition %}
-        <div class="total-row"><span>Subtotal</span><span>₹{{ order.subtotal }}</span></div>
+        <div class="total-row"><span>Subtotal</span><span>{{ order.outlet.currency_symbol }}{{ order.subtotal }}</span></div>
         {% elif gst_inclusive %}
-        <div class="total-row"><span>Subtotal (excl. GST)</span><span>₹{{ order.subtotal }}</span></div>
+        <div class="total-row"><span>Subtotal (excl. {{ order.outlet.tax_label }})</span><span>{{ order.outlet.currency_symbol }}{{ order.subtotal }}</span></div>
         {% else %}
-        <div class="total-row"><span>Subtotal</span><span>₹{{ order.subtotal }}</span></div>
+        <div class="total-row"><span>Subtotal</span><span>{{ order.outlet.currency_symbol }}{{ order.subtotal }}</span></div>
         {% endif %}
         {% if order.discount_total > 0 %}
-        <div class="total-row" style="color:#ef4444"><span>Discount</span><span>−₹{{ order.discount_total }}</span></div>
+        <div class="total-row" style="color:#ef4444"><span>Discount</span><span>−{{ order.outlet.currency_symbol }}{{ order.discount_total }}</span></div>
         {% endif %}
 
         {% if order.parcel_surcharge %}
         <div class="total-row" style="color:var(--text-muted);font-size:0.85rem;">
             <span><i class="bi bi-bag me-1"></i>Parcel Charge</span>
-            <span>₹{{ order.parcel_surcharge|floatformat:0 }}</span>
+            <span>{{ order.outlet.currency_symbol }}{{ order.parcel_surcharge|floatformat:0 }}</span>
         </div>
         {% endif %}
 
@@ -242,40 +242,52 @@
                 Tax Breakdown
                 {% if gst_inclusive %}<span style="font-size:0.65rem;font-weight:400;color:var(--text-muted);"> (included in price)</span>{% endif %}
             </div>
+            {% if order.outlet.tax_regime_supports_split %}
             {% for gst in order.gst_breakdown %}
             <div style="margin-bottom:0.4rem;">
                 <div style="font-size:0.7rem;color:var(--text-muted);font-weight:600;margin-bottom:0.2rem;">
-                    GST @ {{ gst.rate }}%{% if gst_inclusive %} (incl.){% endif %}
+                    {{ order.outlet.tax_label }} @ {{ gst.rate }}%{% if gst_inclusive %} (incl.){% endif %}
                 </div>
-                <div class="total-row" style="font-size:0.78rem;padding:0.1rem 0;"><span style="color:var(--text-muted)">CGST @ {{ gst.cgst_rate }}%</span><span>₹{{ gst.cgst_amount }}</span></div>
-                <div class="total-row" style="font-size:0.78rem;padding:0.1rem 0;"><span style="color:var(--text-muted)">{% if order.outlet.uses_utgst %}UTGST{% else %}SGST{% endif %} @ {{ gst.sgst_rate }}%</span><span>₹{{ gst.sgst_amount }}</span></div>
+                <div class="total-row" style="font-size:0.78rem;padding:0.1rem 0;"><span style="color:var(--text-muted)">CGST @ {{ gst.cgst_rate }}%</span><span>{{ order.outlet.currency_symbol }}{{ gst.cgst_amount }}</span></div>
+                <div class="total-row" style="font-size:0.78rem;padding:0.1rem 0;"><span style="color:var(--text-muted)">{% if order.outlet.uses_utgst %}UTGST{% else %}SGST{% endif %} @ {{ gst.sgst_rate }}%</span><span>{{ order.outlet.currency_symbol }}{{ gst.sgst_amount }}</span></div>
             </div>
             {% endfor %}
+            {% else %}
+            {% for gst in order.gst_breakdown %}
+            <div class="total-row" style="font-size:0.78rem;padding:0.1rem 0;"><span style="color:var(--text-muted)">{{ order.outlet.tax_label }} @ {{ gst.rate }}%{% if gst_inclusive %} (incl.){% endif %}</span><span>{{ order.outlet.currency_symbol }}{{ gst.tax_amount }}</span></div>
+            {% endfor %}
+            {% endif %}
             <div class="total-row" style="font-size:0.82rem;font-weight:700;border-top:1px solid var(--border-color);padding-top:0.4rem;margin-top:0.3rem;">
-                <span>Total GST{% if gst_inclusive %} (incl.){% endif %}</span><span>₹{{ order.gst_total }}</span>
+                <span>Total {{ order.outlet.tax_label }}{% if gst_inclusive %} (incl.){% endif %}</span><span>{{ order.outlet.currency_symbol }}{{ order.gst_total }}</span>
             </div>
         </div>
-        {# Print: compact CGST+SGST/UTGST lines — legally required on GST invoice #}
+        {# Print: compact CGST+SGST/UTGST lines (India) or a flat VAT line (UAE) — legally required on the printed tax invoice #}
         <div class="print-gst" style="border-top:1px dashed #000;border-bottom:1px dashed #000;padding:0.35rem 0;margin:0.4rem 0;">
-            {% if gst_inclusive %}<div style="font-size:0.72rem;font-style:italic;">(All prices inclusive of GST)</div>{% endif %}
+            {% if gst_inclusive %}<div style="font-size:0.72rem;font-style:italic;">(All prices inclusive of {{ order.outlet.tax_label }})</div>{% endif %}
+            {% if order.outlet.tax_regime_supports_split %}
             {% for gst in order.gst_breakdown %}
-            <div class="total-row" style="font-size:0.78rem;"><span>CGST @ {{ gst.cgst_rate }}%</span><span>₹{{ gst.cgst_amount }}</span></div>
-            <div class="total-row" style="font-size:0.78rem;"><span>{% if order.outlet.uses_utgst %}UTGST{% else %}SGST{% endif %} @ {{ gst.sgst_rate }}%</span><span>₹{{ gst.sgst_amount }}</span></div>
+            <div class="total-row" style="font-size:0.78rem;"><span>CGST @ {{ gst.cgst_rate }}%</span><span>{{ order.outlet.currency_symbol }}{{ gst.cgst_amount }}</span></div>
+            <div class="total-row" style="font-size:0.78rem;"><span>{% if order.outlet.uses_utgst %}UTGST{% else %}SGST{% endif %} @ {{ gst.sgst_rate }}%</span><span>{{ order.outlet.currency_symbol }}{{ gst.sgst_amount }}</span></div>
             {% endfor %}
+            {% else %}
+            {% for gst in order.gst_breakdown %}
+            <div class="total-row" style="font-size:0.78rem;"><span>{{ order.outlet.tax_label }} @ {{ gst.rate }}%</span><span>{{ order.outlet.currency_symbol }}{{ gst.tax_amount }}</span></div>
+            {% endfor %}
+            {% endif %}
         </div>
         {% endif %}
 
         {% if order.round_off != 0 %}
-        <div class="total-row" style="color:var(--text-muted)"><span>Round Off</span><span>{% if order.round_off > 0 %}+{% endif %}₹{{ order.round_off }}</span></div>
+        <div class="total-row" style="color:var(--text-muted)"><span>Round Off</span><span>{% if order.round_off > 0 %}+{% endif %}{{ order.outlet.currency_symbol }}{{ order.round_off }}</span></div>
         {% endif %}
 
         <div class="grand-total">
-            <span>TOTAL</span><span>₹{{ order.grand_total }}</span>
+            <span>TOTAL</span><span>{{ order.outlet.currency_symbol }}{{ order.grand_total }}</span>
         </div>
-        {% if is_composition %}
-        <div style="font-size:0.68rem;color:var(--text-muted);text-align:right;margin-top:3px;">Bill of Supply — GST not applicable (Composition Scheme)</div>
+        {% if is_composition and order.outlet.tax_regime_supports_composition %}
+        <div style="font-size:0.68rem;color:var(--text-muted);text-align:right;margin-top:3px;">Bill of Supply — {{ order.outlet.tax_label }} not applicable (Composition Scheme)</div>
         {% elif gst_inclusive %}
-        <div style="font-size:0.68rem;color:var(--text-muted);text-align:right;margin-top:3px;">All prices inclusive of GST</div>
+        <div style="font-size:0.68rem;color:var(--text-muted);text-align:right;margin-top:3px;">All prices inclusive of {{ order.outlet.tax_label }}</div>
         {% endif %}
 
         <!-- Payment splits -->
@@ -285,11 +297,11 @@
             {% for p in order.payments.all %}
             <div class="total-row" style="font-size:0.85rem;">
                 <span>{{ p.method|title }} <small style="color:var(--text-muted)">({{ p.created_at|date:"H:i" }})</small></span>
-                <span>−₹{{ p.amount }}</span>
+                <span>−{{ order.outlet.currency_symbol }}{{ p.amount }}</span>
             </div>
             {% endfor %}
             <div class="total-row" style="margin-top:0.4rem;font-weight:700;">
-                <span>Balance Due</span><span>₹{{ remaining }}</span>
+                <span>Balance Due</span><span>{{ order.outlet.currency_symbol }}{{ remaining }}</span>
             </div>
         </div>
         {% endif %}
@@ -298,7 +310,7 @@
         {% if config.upi_id and remaining > 0 %}
         <div id="upi-qr-wrap" style="margin:1.25rem 0;text-align:center;border:1px dashed var(--border-color);padding:1.25rem;">
             <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:0.75rem;">
-                Scan &amp; Pay  ·  ₹{{ remaining }}
+                Scan &amp; Pay  ·  {{ order.outlet.currency_symbol }}{{ remaining }}
             </div>
             <div id="upi-qr-canvas" style="display:inline-block;"></div>
             <div id="upi-qr-fallback" style="display:none;font-size:0.78rem;color:#dc2626;margin-top:0.4rem;">
@@ -316,7 +328,7 @@
         <!-- Balance status -->
         <div class="balance-card {% if remaining <= 0 %}fully-paid{% endif %} no-print">
             <div class="balance-label">{% if remaining <= 0 %}Status{% else %}Balance Due{% endif %}</div>
-            <div class="balance-val">{% if remaining <= 0 %}FULLY PAID{% else %}₹{{ remaining }}{% endif %}</div>
+            <div class="balance-val">{% if remaining <= 0 %}FULLY PAID{% else %}{{ order.outlet.currency_symbol }}{{ remaining }}{% endif %}</div>
         </div>
 
         <!-- Discount section (managers/cashiers, unpaid only) -->
@@ -332,7 +344,7 @@
             <div class="field-row">
                 <select id="discount-type" class="field-select" style="max-width:110px;">
                     <option value="percentage">% Off</option>
-                    <option value="amount">₹ Flat</option>
+                    <option value="amount">{{ order.outlet.currency_symbol }} Flat</option>
                 </select>
                 <input type="number" id="discount-value" class="field-num" placeholder="0" min="0" step="0.01">
                 <button class="btn-apply" onclick="applyDiscount()">Apply</button>
@@ -342,8 +354,8 @@
             </div>
             {% if order.discount_value > 0 %}
             <div style="margin-top:0.7rem;font-size:0.78rem;color:var(--accent-gold);">
-                Active: {% if order.discount_type == 'percentage' %}{{ order.discount_value }}% Off{% else %}₹{{ order.discount_value }} Flat{% endif %}
-                &nbsp;(−₹{{ order.discount_total }})
+                Active: {% if order.discount_type == 'percentage' %}{{ order.discount_value }}% Off{% else %}{{ order.outlet.currency_symbol }}{{ order.discount_value }} Flat{% endif %}
+                &nbsp;(−{{ order.outlet.currency_symbol }}{{ order.discount_total }})
             </div>
             {% endif %}
         </div>
@@ -357,7 +369,7 @@
                 <!-- Change-to-give — appears only when cashier enters more than balance -->
                 <div id="change-display" style="display:none;background:#dc2626;color:#fff;text-align:center;padding:0.9rem 1rem;margin-bottom:0.75rem;">
                     <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:3px;opacity:.85;margin-bottom:0.2rem;">Change to Give Back</div>
-                    <div id="change-amount" style="font-family:'DM Serif Display',serif;font-size:2.8rem;font-weight:700;line-height:1.1;">₹0</div>
+                    <div id="change-amount" style="font-family:'DM Serif Display',serif;font-size:2.8rem;font-weight:700;line-height:1.1;">{{ order.outlet.currency_symbol }}0</div>
                 </div>
                 <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;">
                     <button class="btn-set" onclick="setVal('{{ remaining }}')">Pay All</button>
@@ -637,7 +649,7 @@ renderUpiQR({{ remaining }});
             (data.promos || []).forEach(p => {
                 const label = p.discount_type === 'percentage'
                     ? `${p.name} — ${p.discount_value}% Off`
-                    : `${p.name} — ₹${p.discount_value} Flat`;
+                    : `${p.name} — {{ order.outlet.currency_symbol }}${p.discount_value} Flat`;
                 sel.appendChild(new Option(label, JSON.stringify(p)));
             });
         }).catch(() => {});
@@ -660,7 +672,7 @@ renderUpiQR({{ remaining }});
         try { promo = JSON.parse(select.value); } catch(e) { return; }
         const subtotal = parseFloat('{{ order.subtotal|default:0 }}');
         if (promo.min_order && subtotal < parseFloat(promo.min_order)) {
-            ui.toast(`Minimum order ₹${promo.min_order} required`, 'warning');
+            ui.toast(`Minimum order {{ order.outlet.currency_symbol }}${promo.min_order} required`, 'warning');
             select.selectedIndex = 0; return;
         }
         document.getElementById('discount-type').value = promo.discount_type;
@@ -688,7 +700,7 @@ renderUpiQR({{ remaining }});
         const display = document.getElementById('change-display');
         if (!display) return;
         if (change > 0) {
-            document.getElementById('change-amount').textContent = '₹' + change;
+            document.getElementById('change-amount').textContent = '{{ order.outlet.currency_symbol }}' + change;
             display.style.display = 'block';
         } else {
             display.style.display = 'none';

@@ -1582,7 +1582,7 @@
 
               <!-- Item Footer -->
               <div class="pos-item-footer">
-                <span class="pos-item-price">₹{{ item.price|floatformat:0 }}</span>
+                <span class="pos-item-price">{{ outlet.currency_symbol }}{{ item.price|floatformat:0 }}</span>
                 <button type="button" class="btn-pos-add" aria-label="Add {{ item.name }}">
                   <i class="bi bi-plus-lg"></i>
                 </button>
@@ -1679,39 +1679,39 @@
     <div class="pos-cart-footer" id="cartSummaryBlock">
       <div class="pos-summary-row">
         <span>Sub Total</span>
-        <span class="view-subtotal fw-bold">₹0</span>
+        <span class="view-subtotal fw-bold">{{ outlet.currency_symbol }}0</span>
       </div>
       <div class="pos-summary-row" id="productDiscountRow" style="color:var(--pos-green);">
         <span>Product Discount</span>
-        <span class="view-prod-discount fw-bold">-₹0</span>
+        <span class="view-prod-discount fw-bold">-{{ outlet.currency_symbol }}0</span>
       </div>
       <div class="pos-summary-row" id="extraDiscountRow">
         <span>Extra Discount</span>
-        <span class="fw-bold">₹0</span>
+        <span class="fw-bold">{{ outlet.currency_symbol }}0</span>
       </div>
       <div class="pos-summary-row" id="couponDiscountRow">
         <span>Coupon Discount</span>
-        <span class="fw-bold">₹0</span>
+        <span class="fw-bold">{{ outlet.currency_symbol }}0</span>
       </div>
       <div class="pos-summary-row">
-        <span>GST (5%)</span>
-        <span class="view-gst fw-bold">₹0</span>
+        <span>{{ outlet.tax_label }}</span>
+        <span class="view-gst fw-bold">{{ outlet.currency_symbol }}0</span>
       </div>
 
       {% if outlet.parcel_charge_amount %}
       <div class="pos-summary-row parcel-row" style="display:none;color:var(--pos-red);">
         <span><i class="bi bi-box-seam me-1"></i>Parcel Charge</span>
-        <span class="fw-bold">₹{{ outlet.parcel_charge_amount|floatformat:0 }}</span>
+        <span class="fw-bold">{{ outlet.currency_symbol }}{{ outlet.parcel_charge_amount|floatformat:0 }}</span>
       </div>
       <button type="button" class="pos-parcel-btn parcel-btn" onclick="toggleParcel()">
         <i class="bi bi-box-seam"></i>
-        <span class="parcel-btn-text">Add Parcel +₹{{ outlet.parcel_charge_amount|floatformat:0 }}</span>
+        <span class="parcel-btn-text">Add Parcel +{{ outlet.currency_symbol }}{{ outlet.parcel_charge_amount|floatformat:0 }}</span>
       </button>
       {% endif %}
 
       <div class="pos-summary-row total-row">
         <span class="pos-total-label">Total</span>
-        <span class="pos-total-val view-total">₹0</span>
+        <span class="pos-total-val view-total">{{ outlet.currency_symbol }}0</span>
       </div>
 
       <!-- Exactly 4 Buttons matching KimiPoS Reference -->
@@ -1763,7 +1763,7 @@
     <span class="fw-bold">View Order</span>
   </div>
   <div class="d-flex align-items-center gap-2">
-    <span class="fw-bold view-total">₹0</span>
+    <span class="fw-bold view-total">{{ outlet.currency_symbol }}0</span>
     <i class="bi bi-chevron-right" style="font-size:1.1rem;"></i>
   </div>
 </button>
@@ -1838,27 +1838,27 @@
   <div class="pos-cart-footer" id="cartSummaryBlockMobile">
     <div class="pos-summary-row">
       <span>Sub-total</span>
-      <span class="view-subtotal fw-bold">₹0</span>
+      <span class="view-subtotal fw-bold">{{ outlet.currency_symbol }}0</span>
     </div>
     <div class="pos-summary-row">
-      <span>GST (5%)</span>
-      <span class="view-gst fw-bold">₹0</span>
+      <span>{{ outlet.tax_label }}</span>
+      <span class="view-gst fw-bold">{{ outlet.currency_symbol }}0</span>
     </div>
 
     {% if outlet.parcel_charge_amount %}
     <div class="pos-summary-row parcel-row" style="display:none;color:var(--pos-red);">
       <span><i class="bi bi-box-seam me-1"></i>Parcel Charge</span>
-      <span class="fw-bold">₹{{ outlet.parcel_charge_amount|floatformat:0 }}</span>
+      <span class="fw-bold">{{ outlet.currency_symbol }}{{ outlet.parcel_charge_amount|floatformat:0 }}</span>
     </div>
     <button type="button" class="pos-parcel-btn parcel-btn" onclick="toggleParcel()">
       <i class="bi bi-box-seam"></i>
-      <span class="parcel-btn-text">Add Parcel +₹{{ outlet.parcel_charge_amount|floatformat:0 }}</span>
+      <span class="parcel-btn-text">Add Parcel +{{ outlet.currency_symbol }}{{ outlet.parcel_charge_amount|floatformat:0 }}</span>
     </button>
     {% endif %}
 
     <div class="pos-summary-row total-row">
       <span class="pos-total-label">Total Payable</span>
-      <span class="pos-total-val view-total">₹0</span>
+      <span class="pos-total-val view-total">{{ outlet.currency_symbol }}0</span>
     </div>
 
     <div class="pos-action-grid">
@@ -1951,7 +1951,7 @@
       <div class="modal-body" style="padding:1rem 1.5rem 1.25rem;">
         <div style="background:var(--surface-2);border-radius:18px;padding:1rem;text-align:center;margin-bottom:1.2rem;border:1px solid var(--border-color);">
           <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:var(--text-muted);margin-bottom:2px;">Grand Total Due</div>
-          <div style="font-size:2.4rem;font-family:var(--font-display);font-weight:800;color:var(--pos-red);" id="qsrGrandTotal">₹ —</div>
+          <div style="font-size:2.4rem;font-family:var(--font-display);font-weight:800;color:var(--pos-red);" id="qsrGrandTotal">{{ outlet.currency_symbol }} —</div>
         </div>
 
         <label style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.5rem;">Payment Method</label>
@@ -1968,7 +1968,7 @@
         </div>
 
         <div style="margin-bottom:0.75rem;" id="qsrAmountRow">
-          <label style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.3rem;">Amount Tendered (₹)</label>
+          <label style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.3rem;">Amount Tendered ({{ outlet.currency_symbol }})</label>
           <input type="number" id="qsrAmount" min="0" step="0.01" placeholder="Enter amount received"
             style="width:100%;height:44px;background:var(--surface-2);border:1.5px solid var(--border-color);border-radius:12px;color:var(--text-main);font-size:1.15rem;font-weight:700;padding:0 12px;outline:none;"
             oninput="updateQSRChange()">
@@ -2004,6 +2004,11 @@
 
 {% block extra_js %}
 <script>
+  /* Regime-aware currency symbol ("₹" for India, "AED" for UAE, etc.) --
+     read once here so the JS-built cart/payment strings below don't
+     hardcode the Indian Rupee sign for every tenant. */
+  const CURRENCY_SYMBOL = "{{ outlet.currency_symbol|default:'₹'|escapejs }}";
+
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js').catch(() => {});
@@ -2224,7 +2229,7 @@
                 ${g.group_name} ${g.is_required ? '<span class="text-danger">*</span>' : ''}${limitHint}
               </label>`;
             g.modifiers.forEach(m => {
-              html += `<div class="form-check py-1"><input class="form-check-input modifier-check" type="${inputType}" name="${inputName}" value="${m.name}" data-price="${m.price}" data-group="${g.group_name}" data-max="${g.max_select}" id="mod_${m.id}" onchange="enforceModifierLimit(this)"><label class="form-check-label d-flex justify-content-between w-100 fw-semibold" for="mod_${m.id}" style="cursor:pointer;font-size:0.85rem;"><span>${m.name}</span>${m.price > 0 ? `<span class="badge rounded-pill bg-light text-danger">+₹${m.price}</span>` : ''}</label></div>`;
+              html += `<div class="form-check py-1"><input class="form-check-input modifier-check" type="${inputType}" name="${inputName}" value="${m.name}" data-price="${m.price}" data-group="${g.group_name}" data-max="${g.max_select}" id="mod_${m.id}" onchange="enforceModifierLimit(this)"><label class="form-check-label d-flex justify-content-between w-100 fw-semibold" for="mod_${m.id}" style="cursor:pointer;font-size:0.85rem;"><span>${m.name}</span>${m.price > 0 ? `<span class="badge rounded-pill bg-light text-danger">+${CURRENCY_SYMBOL}${m.price}</span>` : ''}</label></div>`;
             });
             html += `</div>`;
           });
@@ -2326,7 +2331,7 @@
             ${i.note ? `<div class="pos-cart-item-note"><i class="bi bi-chat-left-text me-1"></i>${i.note}</div>` : ''}
             <div class="pos-cart-item-bottom">
               <div class="pos-cart-item-price-wrap">
-                <span class="pos-cart-item-price">₹${total}</span>
+                <span class="pos-cart-item-price">${CURRENCY_SYMBOL}${total}</span>
               </div>
               <div class="pos-stepper">
                 <button type="button" class="btn-step btn-step-dec" onclick="dec(${idx})" aria-label="Decrease quantity"><i class="bi bi-dash"></i></button>
@@ -2347,9 +2352,9 @@
     gst = Math.round(gst);
     const grandTotal = subtotal + gst + (_parcelOn ? _parcelChargeAmount : 0);
 
-    document.querySelectorAll(".view-subtotal").forEach(e => e.innerText = "₹" + subtotal);
-    document.querySelectorAll(".view-gst").forEach(e => e.innerText = "₹" + gst);
-    document.querySelectorAll(".view-total").forEach(e => e.innerText = "₹" + grandTotal);
+    document.querySelectorAll(".view-subtotal").forEach(e => e.innerText = CURRENCY_SYMBOL + subtotal);
+    document.querySelectorAll(".view-gst").forEach(e => e.innerText = CURRENCY_SYMBOL + gst);
+    document.querySelectorAll(".view-total").forEach(e => e.innerText = CURRENCY_SYMBOL + grandTotal);
 
     // Update Mobile FAB Count
     const fabBadge = document.getElementById("mobileCartFabCount");
@@ -2495,7 +2500,7 @@
     document.querySelectorAll(".parcel-row").forEach(el => {
       el.style.display = _parcelOn ? "flex" : "none";
       const amountEl = el.querySelector("span:last-child");
-      if (amountEl) amountEl.textContent = "₹" + Math.round(_parcelChargeAmount);
+      if (amountEl) amountEl.textContent = CURRENCY_SYMBOL + Math.round(_parcelChargeAmount);
     });
     document.querySelectorAll(".parcel-btn").forEach(btn => {
       btn.style.borderColor = _parcelOn ? "var(--pos-red)" : "var(--border-color)";
@@ -2505,7 +2510,7 @@
     document.querySelectorAll(".parcel-btn-text").forEach(el =>
       el.textContent = _parcelOn
         ? "Parcel Added ✓ (tap to remove)"
-        : `Add Parcel +₹${_parcelChargeAmount}`
+        : `Add Parcel +${CURRENCY_SYMBOL}${_parcelChargeAmount}`
     );
     renderCart();
   }
@@ -2794,7 +2799,7 @@
       if (!d2.success) { showToast(d2.error || "Could not calculate total"); resetSendBtn(); return; }
 
       _qsrTotal = d2.grand_total || 0;
-      document.getElementById("qsrGrandTotal").textContent = "₹ " + parseFloat(_qsrTotal).toFixed(2);
+      document.getElementById("qsrGrandTotal").textContent = CURRENCY_SYMBOL + " " + parseFloat(_qsrTotal).toFixed(2);
       document.getElementById("qsrAmount").value = "";
       document.getElementById("qsrChangeLine").style.display = "none";
       _qsrMethod = null;
@@ -2836,7 +2841,7 @@
       const change = (amt - _qsrTotal).toFixed(2);
       if (parseFloat(change) > 0) {
         changeLine.style.display = "block";
-        changeLine.textContent = "Change to return: ₹" + change;
+        changeLine.textContent = "Change to return: " + CURRENCY_SYMBOL + change;
       } else {
         changeLine.style.display = "none";
       }
@@ -2903,7 +2908,7 @@
         const confirm = document.getElementById("qsrConfirm");
         document.getElementById("qsrConfirmNum").textContent = "Order #" + (d.order_number || qsrPendingOrderId);
         const change = parseFloat(d.change_due || 0);
-        document.getElementById("qsrChangeDue").textContent = change > 0 ? "Change to return: ₹" + change.toFixed(2) : "";
+        document.getElementById("qsrChangeDue").textContent = change > 0 ? "Change to return: " + CURRENCY_SYMBOL + change.toFixed(2) : "";
         confirm.style.display = "flex";
 
         setTimeout(() => {
