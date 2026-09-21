@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In | {{ tenant.name }}</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+    :root {
+        --bg: #f7f7f9; --panel: #ffffff; --text: #1c1c1e; --muted: #71717a;
+        --border: #ececec; --red: #EC2734; --red-hover: #d81f2f;
+    }
+    body.dark {
+        --bg: #0a0a0a; --panel: #18181b; --text: #f4f4f6; --muted: #9ca3af; --border: #27272a;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+        background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; padding: 1.5rem;
+    }
+    .auth-card {
+        width: 100%; max-width: 380px; background: var(--panel); border: 1px solid var(--border);
+        border-radius: 20px; padding: 2rem 1.75rem; box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+    }
+    .auth-eyebrow { font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; color: var(--red); font-weight: 700; text-align: center; }
+    h1 { font-family: 'DM Serif Display', serif; font-size: 1.5rem; text-align: center; margin: 0.35rem 0 1.5rem; }
+    label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 0.35rem; }
+    .field { margin-bottom: 1rem; }
+    input {
+        width: 100%; padding: 0.75rem 1rem; border-radius: 12px; border: 1.5px solid var(--border);
+        background: var(--bg); color: var(--text); font-size: 0.95rem; font-family: inherit;
+    }
+    input:focus { outline: none; border-color: var(--red); }
+    .btn-submit {
+        width: 100%; background: var(--red); color: #fff; border: none; border-radius: 999px;
+        padding: 0.85rem; font-weight: 700; font-size: 0.95rem; margin-top: 0.5rem; cursor: pointer;
+        transition: background 0.2s;
+    }
+    .btn-submit:hover { background: var(--red-hover); }
+    .error-box { background: rgba(236,39,52,0.08); border: 1px solid rgba(236,39,52,0.25); color: var(--red);
+        border-radius: 10px; padding: 0.7rem 0.9rem; font-size: 0.82rem; margin-bottom: 1rem; }
+    .switch-link { text-align: center; margin-top: 1.25rem; font-size: 0.85rem; color: var(--muted); }
+    .switch-link a { color: var(--red); font-weight: 700; text-decoration: none; }
+</style>
+</head>
+<body>
+    <div class="auth-card">
+        <div class="auth-eyebrow">{{ tenant.name }}</div>
+        <h1>Welcome back</h1>
+        {% if error %}<div class="error-box">{{ error }}</div>{% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="field">
+                <label>Username</label>
+                <input type="text" name="username" value="{{ username|default:'' }}" required autofocus>
+            </div>
+            <div class="field">
+                <label>Password</label>
+                <input type="password" name="password" required>
+            </div>
+            <button type="submit" class="btn-submit">Sign In</button>
+        </form>
+        <div class="switch-link">New here? <a href="{% url 'webstore_register' tenant_slug=tenant.slug %}">Create an account</a></div>
+    </div>
+</body>
+</html>

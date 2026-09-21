@@ -134,6 +134,7 @@ INSTALLED_APPS = [
     'agency',
     'portal',
     'billing',
+    'webstore',
     'django_celery_results',
 ]
 

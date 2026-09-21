@@ -302,6 +302,16 @@ urlpatterns = [
 
     # notifications module
     path('', include('notifications.urls')),
+
+    # webstore — browser ordering with no QR code, at /<restaurant-slug>/.
+    # Deliberately last (right before the catch-all below): a single-segment
+    # <slug:...> converter can never intercept any multi-segment path, but
+    # placing it after every literal top-level path/include above guarantees
+    # it can't shadow any of them for a same-segment collision either
+    # (Django matches top-down, first match wins). Tenant.RESERVED_SLUGS
+    # additionally stops a tenant from ever picking a slug that collides
+    # with one of those literal paths in the first place.
+    path('<slug:tenant_slug>/', include('webstore.urls')),
 ]
 
 from django.conf import settings

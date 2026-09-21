@@ -34,6 +34,30 @@ RESERVED_SLUGS = frozenset({
     'help', 'mail', 'smtp', 'lexnorax', 'health', 'favicon',
     # Reserved to prevent confusion with EasyBillBro branding
     'billing', 'dashboard', 'setup',
+    # Every other real top-level URL segment registered in core/urls.py,
+    # added when the webstore app's path('<slug:tenant_slug>/', ...) was
+    # introduced at the root -- a tenant whose slug matched any of these
+    # would have their friendly ordering URL silently unreachable (the
+    # literal path always wins, being registered earlier), so this list
+    # has to stay a superset of every app's urls.py top segment, not just
+    # the handful that existed when this set was first written.
+    'demo', 'sitemap.xml', 'robots.txt', 'product-tour', 'pricing',
+    'about', 'contact', 'platform', 'sw.js', 'manifest.json',
+    'live-demo', 'sales', 'superuser', 'orders', 'create-order', 'bill',
+    'pay', 'print-bill', 'print-split-bill', 'qz-data', 'print-kot',
+    'printer-status', 'download-pdf', 'thermal-receipt', 'history',
+    'tables', 'tables-data', 'manage-table', 'floor-editor', 'floor-data',
+    'floor-save', 'clean-table', 'cancel-order', 'cancel-item',
+    'toggle-parcel', 'running-order-items', 'order', 'order-data',
+    'generate-bill', 'approve-items', 'approve-item', 'apply-discount',
+    'complimentary-item', 'transfer-table', 'available-tables', 'refund',
+    'refunds', 'razorpay', 'api', 'item-discount', 'log-bypass',
+    'split-pay', 'promos', 'token', 'display', 'kitchen', 'kitchen-data',
+    'item-start', 'item-ready', 'bump-kot', 'serve-item',
+    'resolve-kitchen-message', 'send-to-kitchen', 'send-kitchen-message',
+    'waiter-dashboard', 'resolve-waiter', 'merge-tables', 'unmerge-tables',
+    'menu', 'reports', 'inventory', 'shifts', 'crm', 'finance', 'agency',
+    'portal', 'notifications', 'compare', 'android',
 })
 
 

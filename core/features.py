@@ -143,6 +143,13 @@ FEATURE_GROUPS = {
         'razorpay_gateway',
         'whatsapp_receipts',
     ],
+    'Online Ordering': [
+        # Custom-only, same reasoning as ai_recipe_import/razorpay_gateway
+        # above — a brand-new, login-gated, no-QR ordering surface
+        # (webstore app) with its own delivery-address flow. Off for every
+        # tenant until a superuser opts one in via TenantFeatureOverride.
+        'web_ordering',
+    ],
 }
 
 

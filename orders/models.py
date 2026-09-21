@@ -156,6 +156,12 @@ class Order(TenantScopedModel):
 
     customer_name = models.CharField(max_length=100, null=True, blank=True)
     customer_phone = models.CharField(max_length=20, null=True, blank=True)
+    # Populated for source="delivery" orders placed through the webstore app
+    # (browser ordering, no QR/table). Staff still dispatch delivery
+    # manually -- there's no rider/logistics system -- so this is also
+    # folded into `notes` at creation time to guarantee it's visible on the
+    # existing kitchen ticket/billing screen with no template changes.
+    delivery_address = models.TextField(null=True, blank=True)
 
     subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))
     gst_total = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))
