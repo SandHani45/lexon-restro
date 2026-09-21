@@ -171,6 +171,12 @@ def create_order(request):
             {"error": "Enter a valid 10-digit mobile number."}, status=400
         )
 
+    # Name is mandatory for guest QR orders (phone stays optional) -- staff
+    # placing an order from the POS dashboard (user is not None) are
+    # unaffected, since they're never asked for the guest's name at all.
+    if user is None and not (data.get("customer_name") or "").strip():
+        return JsonResponse({"error": "Please enter your name."}, status=400)
+
     try:
         with transaction.atomic():
             cust_name = data.get("customer_name")
