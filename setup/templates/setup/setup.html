@@ -478,7 +478,7 @@
       </div>
       <div>
         <h3 class="setup-card-title">Menu &amp; Categories</h3>
-        <p class="setup-card-desc">Add food categories, dishes, modifiers, GST tax slabs, and station assignments.</p>
+        <p class="setup-card-desc">Add food categories, dishes, modifiers, {{ request.user.outlet.tax_label|default:"GST" }} rates, and station assignments.</p>
       </div>
       <div class="setup-card-footer">
         <span class="setup-status-badge {% if menu_done %}done{% else %}missing{% endif %}">
@@ -650,7 +650,7 @@
       <i class="bi bi-sliders"></i>
       Outlet Compliance &amp; Staff
     </h2>
-    <span class="text-muted small">GST compliance, staff credentials &amp; emails</span>
+    <span class="text-muted small">{{ request.user.outlet.tax_label|default:"GST" }} compliance, staff credentials &amp; emails</span>
   </div>
 
   <div class="setup-grid">
@@ -664,13 +664,13 @@
         <i class="bi bi-chevron-right setup-arrow-icon"></i>
       </div>
       <div>
-        <h3 class="setup-card-title">Outlet Profile &amp; GSTIN</h3>
-        <p class="setup-card-desc">Restaurant legal name, FSSAI number, GSTIN registration, contact phone, and tax address.</p>
+        <h3 class="setup-card-title">Outlet Profile &amp; {{ request.user.outlet.tax_reg_label|default:"GSTIN" }}</h3>
+        <p class="setup-card-desc">Restaurant legal name{% if request.user.outlet.tax_regime_supports_hsn_sac %}, FSSAI number{% endif %}, {{ request.user.outlet.tax_reg_label|default:"GSTIN" }} registration, contact phone, and tax address.</p>
       </div>
       <div class="setup-card-footer">
-        <span class="setup-status-badge {% if request.user.outlet.gst_no %}done{% else %}missing{% endif %}">
-          <i class="bi {% if request.user.outlet.gst_no %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %}"></i>
-          {% if request.user.outlet.gst_no %}GST Compliant{% else %}GSTIN Missing{% endif %}
+        <span class="setup-status-badge {% if request.user.outlet.tax_reg_number %}done{% else %}missing{% endif %}">
+          <i class="bi {% if request.user.outlet.tax_reg_number %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %}"></i>
+          {% if request.user.outlet.tax_reg_number %}{{ request.user.outlet.tax_label|default:"GST" }} Compliant{% else %}{{ request.user.outlet.tax_reg_label|default:"GSTIN" }} Missing{% endif %}
         </span>
         <span class="setup-card-action">Edit Details <i class="bi bi-arrow-right"></i></span>
       </div>
