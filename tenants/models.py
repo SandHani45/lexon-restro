@@ -22,6 +22,11 @@ fssai_validator = RegexValidator(
     message="FSSAI licence number must be exactly 14 digits."
 )
 
+trn_validator = RegexValidator(
+    regex=r'^\d{15}$',
+    message="TRN (Tax Registration Number) must be exactly 15 digits."
+)
+
 
 # --------------------------------------------------
 # TENANT (Restaurant / Company)
@@ -129,6 +134,23 @@ class Tenant(models.Model):
         help_text="Controls which features are visible to the tenant"
     )
 
+    class Country(models.TextChoices):
+        INDIA = 'IN', 'India'
+        UAE = 'AE', 'United Arab Emirates'
+
+    country = models.CharField(
+        max_length=2,
+        choices=Country.choices,
+        default=Country.INDIA,
+        help_text=(
+            "Controls the tax regime (GST vs VAT), currency, and every "
+            "receipt/report/setup-screen label this tenant sees — see "
+            "tenants.tax_regimes.TAX_REGIMES. Changing this after a tenant "
+            "has live orders does not retroactively rewrite past bills; it "
+            "only affects orders created from that point on."
+        )
+    )
+
     # --------------------------------------------------
     # INTERNAL BILLING & SUBSCRIPTION (Only visible to Admin)
     # --------------------------------------------------
@@ -168,6 +190,7 @@ class Tenant(models.Model):
         indexes = [
             # slug has unique=True — Postgres already creates a unique index on it.
             models.Index(fields=["tenant_type"]),
+            models.Index(fields=["country"]),
         ]
 
     def __str__(self):
@@ -309,7 +332,15 @@ class Outlet(models.Model):
         blank=True,
         null=True,
         validators=[gstin_validator],
-        help_text="Restaurant GSTIN (15 characters, e.g. 29ABCDE1234F1Z5)"
+        help_text="Restaurant GSTIN (15 characters, e.g. 29ABCDE1234F1Z5) — India tenants only"
+    )
+
+    trn_no = models.CharField(
+        max_length=15,
+        blank=True,
+        null=True,
+        validators=[trn_validator],
+        help_text="Federal Tax Authority Tax Registration Number (15 digits) — UAE tenants only"
     )
 
     phone = models.CharField(
@@ -593,6 +624,56 @@ class Outlet(models.Model):
         if self.gst_no and len(self.gst_no) >= 2:
             return self.gst_no[:2] in self._UT_STATE_CODES
         return self.is_union_territory
+
+    # --------------------------------------------------
+    # TAX REGIME CONVENIENCE PROPERTIES (tenants/tax_regimes.py)
+    # Read these instead of branching on tenant.country directly -- see
+    # the module docstring in tax_regimes.py for why that duplication is
+    # exactly what made GSTIN/CGST/SGST hardcoded independently across
+    # five separate receipt/print implementations before this existed.
+    # --------------------------------------------------
+    @property
+    def _tax_regime(self):
+        from tenants.tax_regimes import get_regime
+        return get_regime(self.tenant.country)
+
+    @property
+    def tax_label(self) -> str:
+        """'GST' or 'VAT'."""
+        return self._tax_regime["tax_label"]
+
+    @property
+    def tax_reg_label(self) -> str:
+        """'GSTIN' or 'TRN'."""
+        return self._tax_regime["reg_label"]
+
+    @property
+    def tax_reg_number(self):
+        """The actual registration number for whichever regime applies."""
+        return self.gst_no if self.tenant.country == "IN" else self.trn_no
+
+    @property
+    def currency_symbol(self) -> str:
+        return self._tax_regime["currency_symbol"]
+
+    @property
+    def tax_rate_options(self):
+        """[(Decimal rate, label), ...] for the menu GST/VAT-rate picker."""
+        return self._tax_regime["rate_options"]
+
+    @property
+    def tax_regime_supports_split(self) -> bool:
+        """False for UAE (flat VAT, no CGST/SGST-style breakdown)."""
+        return self._tax_regime["supports_cgst_sgst_split"]
+
+    @property
+    def tax_regime_supports_composition(self) -> bool:
+        """False for UAE -- India's Composition Scheme has no UAE analog."""
+        return self._tax_regime["supports_composition_scheme"]
+
+    @property
+    def tax_regime_supports_hsn_sac(self) -> bool:
+        return self._tax_regime["supports_hsn_sac"]
 
 
 class TenantFeatureOverride(models.Model):

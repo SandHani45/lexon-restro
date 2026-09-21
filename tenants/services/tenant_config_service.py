@@ -95,6 +95,20 @@ PRESETS = {
                     "barcode_transfer", "counter_billing"],
         "outlet":  {"split_bill_by_category": False},
     },
+    "uae_vat": {
+        "label": "Switch to UAE VAT",
+        "icon":  "bi-flag",
+        "color": "#00732f",
+        # composition_scheme (India's fixed-tax "Bill of Supply" regime) and
+        # gstr_export (India GST-portal return format) have no UAE
+        # equivalent -- disabled outright rather than left on and unused,
+        # matching tenants.tax_regimes.TAX_REGIMES["AE"]'s
+        # supports_composition_scheme/supports_statutory_export = False.
+        "enable":  [],
+        "disable": ["composition_scheme", "gstr_export"],
+        "tenant":  {"country": "AE"},
+        "outlet":  {"is_composition_scheme": False},
+    },
 }
 
 # The full feature set shown on a tenant's config screen. Superuser's copy
@@ -245,6 +259,11 @@ def apply_preset_to_tenant(tenant, preset_key, changed_by):
             tenant=tenant, feature=feature, enabled=False, source=f"preset:{preset_key}",
             changed_by=changed_by, notes=f"Applied by {changed_by.username} via preset '{preset_key}'",
         )
+
+    if preset.get("tenant"):
+        for field, val in preset["tenant"].items():
+            setattr(tenant, field, val)
+        tenant.save()
 
     outlet = tenant.outlets.first()
     if outlet and preset.get("outlet"):
