@@ -849,19 +849,30 @@
     transition: background 0.25s, border-color 0.25s;
   }
   .floor-map-container.active { display: block; }
-  .floor-map-canvas {
+  /* Sized to the layout's actual content in px by JS (renderFloorMapView),
+     then clipped to whatever width fits the viewport -- the canvas itself
+     is scaled down via transform (see .floor-map-canvas) so every table
+     stays visible at once on mobile instead of overflowing off-screen or
+     requiring a horizontal scroll to find tables placed further right. */
+  .floor-map-scale-wrapper {
     position: relative;
     margin: 0 auto;
+    overflow: hidden;
+  }
+  .floor-map-canvas {
+    position: relative;
+    top: 0;
+    left: 0;
     background: #ffffff;
     border: 1.5px solid var(--border-color);
     border-radius: 16px;
-    background-image: 
+    background-image:
       linear-gradient(to right, rgba(0,0,0,0.04) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(0,0,0,0.04) 1px, transparent 1px);
     background-size: 36px 36px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.04);
     transition: background 0.25s, border-color 0.25s;
-    max-width: 100%;
+    transform-origin: top left;
   }
   html.dark .floor-map-canvas {
     background: #11141b;
@@ -1171,8 +1182,10 @@
       </a>
       {% endif %}
     </div>
-    <div class="floor-map-canvas" id="floorMapCanvas" style="width: 100%; height: 520px;">
-      <!-- Positioned table nodes rendered by JS -->
+    <div class="floor-map-scale-wrapper" id="floorMapScaleWrapper">
+      <div class="floor-map-canvas" id="floorMapCanvas" style="width: 100%; height: 520px;">
+        <!-- Positioned table nodes rendered by JS -->
+      </div>
     </div>
   </div>
 
@@ -1399,6 +1412,11 @@
 
     if (visibleTables.length === 0) {
       canvas.innerHTML = `<div class="d-flex align-items-center justify-content-center h-100 text-muted small text-uppercase" style="letter-spacing:1px;min-height:340px;font-family:var(--font-main, 'Outfit', sans-serif);font-weight:700;"><i class="bi bi-funnel me-2"></i>No tables match filter on this floor section</div>`;
+      canvas.style.transform = 'none';
+      canvas.style.width = '100%';
+      canvas.style.height = '340px';
+      const emptyWrapper = document.getElementById('floorMapScaleWrapper');
+      if (emptyWrapper) { emptyWrapper.style.width = '100%'; emptyWrapper.style.height = 'auto'; }
       return;
     }
 
@@ -1448,7 +1466,56 @@
 
       canvas.appendChild(node);
     });
+
+    // ── Scale-to-fit: node positions/sizes are raw px from the Floor
+    // Editor's desktop-width canvas. On a narrow viewport those px
+    // coordinates can place tables past the visible edge (the original
+    // bug -- tables cut off with no visual indication more existed).
+    // Fit the whole layout's actual footprint into whatever width the
+    // container has by shrinking it uniformly, so every table is always
+    // visible in one screen without scrolling. Never scale up past 1x.
+    const shapeDefaults = { square: [84, 84], round: [84, 84], rect: [128, 84], wall: [120, 18] };
+    const FLOOR_PAD = 30;
+    let maxX = 0, maxY = 0;
+    visibleTables.forEach((t, idx) => {
+      let x = t.pos_x, y = t.pos_y;
+      if (x == null || y == null) {
+        x = 30 + (idx % 6) * 135;
+        y = 30 + Math.floor(idx / 6) * 135;
+      }
+      const [defW, defH] = shapeDefaults[t.shape] || shapeDefaults.square;
+      maxX = Math.max(maxX, x + (t.width || defW));
+      maxY = Math.max(maxY, y + (t.height || defH));
+    });
+    const neededW = Math.max(maxX + FLOOR_PAD, 300);
+    const neededH = Math.max(maxY + FLOOR_PAD, 340);
+
+    canvas.style.width = neededW + 'px';
+    canvas.style.height = neededH + 'px';
+
+    const wrapper = document.getElementById('floorMapScaleWrapper');
+    const containerEl = document.getElementById('floorMapContainer');
+    if (wrapper && containerEl) {
+      const containerStyle = getComputedStyle(containerEl);
+      const availableW = containerEl.clientWidth
+        - parseFloat(containerStyle.paddingLeft || 0)
+        - parseFloat(containerStyle.paddingRight || 0);
+      const scale = Math.min(1, availableW > 0 ? availableW / neededW : 1);
+      canvas.style.transform = `scale(${scale})`;
+      wrapper.style.width = (neededW * scale) + 'px';
+      wrapper.style.height = (neededH * scale) + 'px';
+    }
   };
+
+  // Re-fit the floor map on viewport/orientation changes (e.g. rotating
+  // the phone, or resizing a desktop window) without waiting on the next
+  // 5s data refresh.
+  let floorMapResizeTimer = null;
+  window.addEventListener('resize', () => {
+    if (currentViewMode !== 'map') return;
+    clearTimeout(floorMapResizeTimer);
+    floorMapResizeTimer = setTimeout(() => renderFloorMapView(), 150);
+  });
 
   // ── Filter tab click handler ─────────────────────────────────────────────
   function setTableFilter(status, btn) {
