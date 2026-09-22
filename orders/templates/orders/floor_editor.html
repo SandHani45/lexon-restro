@@ -457,6 +457,39 @@
     line-height: 1.1;
   }
 
+  /* ══════════════════════════════════════════════════════════════
+     MOBILE: stack the sidebar above the canvas instead of beside it.
+     .editor-shell is a row flex layout with a fixed 280px sidebar --
+     on a phone that left only ~110px for the actual drag-and-drop
+     canvas. The canvas itself is left as-is (.canvas-viewport already
+     pans/scrolls when .floor-canvas is bigger than the viewport, which
+     is the normal way to work an oversized design canvas); it just
+     gets the full screen width now instead of a sliver.
+     ══════════════════════════════════════════════════════════════ */
+  @media (max-width: 767px) {
+    .editor-shell {
+      flex-direction: column;
+    }
+    .editor-sidebar {
+      width: 100%;
+      min-width: 0;
+      max-height: 46vh;
+      border-right: none;
+      border-bottom: 1px solid var(--editor-border);
+    }
+    .canvas-viewport {
+      min-height: 260px;
+      padding: 1.25rem;
+    }
+    /* Fixed at 290px wide, this overlapped/overflowed the now-narrow
+       canvas viewport instead of fitting inside it. */
+    .simulation-card {
+      width: min(290px, calc(100% - 24px));
+      right: 12px;
+      bottom: 12px;
+    }
+  }
+
   /* Unsaved badge */
   .unsaved-indicator {
     display: inline-block;
