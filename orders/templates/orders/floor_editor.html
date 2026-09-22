@@ -797,23 +797,33 @@
     font-weight: 700 !important;
     border-radius: 999px !important;
     padding: 6px 16px !important;
-    box-shadow: 0 4px 12px rgba(236, 39, 52, 0.28) !important;
+    box-shadow: 0 4px 14px rgba(236, 39, 52, 0.32) !important;
     transition: all 0.2s ease !important;
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 0.82rem;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    font-size: 0.84rem !important;
+    line-height: 1.2 !important;
+    min-height: 32px !important;
   }
   .btn-subbar-save:hover {
     background: var(--editor-accent-hover, #d81f2f) !important;
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(236, 39, 52, 0.38) !important;
+    box-shadow: 0 6px 16px rgba(236, 39, 52, 0.42) !important;
     color: #ffffff !important;
+  }
+  .btn-subbar-save:active {
+    transform: translateY(0);
   }
   .btn-subbar-save:disabled {
     opacity: 0.65;
     cursor: not-allowed;
     transform: none !important;
+  }
+  .btn-subbar-save .unsaved-indicator {
+    background: #ffffff !important;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.85);
   }
 
   /* ══════════════════════════════════════════════════════════════
@@ -848,6 +858,25 @@
     /* Hide floating desktop simulator completely on mobile to prevent overlapping */
     .simulation-card {
       display: none !important;
+    }
+    .editor-subbar {
+      padding: 0.4rem 0.6rem;
+      gap: 0.35rem;
+    }
+    .editor-subbar-primary {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      width: 100% !important;
+      gap: 6px !important;
+    }
+    .editor-subbar-secondary {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      width: 100% !important;
+      gap: 4px !important;
+      margin-top: 2px !important;
     }
     #pos-main {
       height: calc(100dvh - var(--topbar-height, 56px));
@@ -897,30 +926,36 @@
 {% block content %}
 <!-- Sub-Header Bar (KimiPoS POS Layout) -->
 <div class="pos-subbar editor-subbar">
-  <div class="d-flex align-items-center gap-2 flex-wrap" style="min-width:0;">
-    <!-- Back to Floor Plan Button (Inside Screen) -->
-    <a href="/tables/" class="btn-subbar-pill text-decoration-none" title="Back to Floor Plan">
-      <i class="bi bi-arrow-left me-1"></i> <span class="d-none d-sm-inline">Back to Floor Plan</span><span class="d-inline d-sm-none">Back</span>
-    </a>
+  <!-- Primary Row: Back, Floor selector, and Prominent Save button -->
+  <div class="editor-subbar-primary d-flex align-items-center justify-content-between gap-2" style="min-width:0;">
+    <div class="d-flex align-items-center gap-2" style="min-width:0;">
+      <!-- Back to Floor Plan Button (Inside Screen) -->
+      <a href="/tables/" class="btn-subbar-pill text-decoration-none" title="Back to Floor Plan">
+        <i class="bi bi-arrow-left me-1"></i> <span class="d-none d-sm-inline">Back to Floor Plan</span><span class="d-inline d-sm-none">Back</span>
+      </a>
 
-    <!-- Floor selector pill -->
-    <div class="subbar-section-pill">
-      <i class="bi bi-layers-fill text-danger me-1"></i>
-      <span class="text-muted small me-1 d-none d-sm-inline">Floor:</span>
-      <select class="subbar-select" id="floorSelector" onchange="switchSection(this.value)">
-        <option value="Main Hall">Main Hall</option>
-      </select>
-      <button class="subbar-icon-btn" onclick="promptAddSection()" title="Add New Floor / Section">
-        <i class="bi bi-plus-lg"></i>
-      </button>
+      <!-- Floor selector pill -->
+      <div class="subbar-section-pill">
+        <i class="bi bi-layers-fill text-danger me-1"></i>
+        <span class="text-muted small me-1 d-none d-sm-inline">Floor:</span>
+        <select class="subbar-select" id="floorSelector" onchange="switchSection(this.value)">
+          <option value="Main Hall">Main Hall</option>
+        </select>
+        <button class="subbar-icon-btn" onclick="promptAddSection()" title="Add New Floor / Section">
+          <i class="bi bi-plus-lg"></i>
+        </button>
+      </div>
     </div>
 
-    <!-- Save Layout Button (Always Visible inside the page) -->
-    <button class="btn-subbar-pill btn-subbar-save" id="btnSaveSubbar" onclick="saveCurrentFloorLayout()" title="Save Floor Layout">
+    <!-- Save Layout Button (Always Visible inside the page, never hidden inside menu!) -->
+    <button class="btn-subbar-pill btn-subbar-save flex-shrink-0" id="btnSaveSubbar" onclick="saveCurrentFloorLayout()" title="Save Floor Layout">
       <i class="bi bi-floppy-fill me-1"></i> <span class="fw-bold">Save</span>
       <span class="unsaved-indicator" id="subbarUnsavedDot"></span>
     </button>
+  </div>
 
+  <!-- Secondary Row / Tools: Zoom, Dimensions, Simulation, Grid -->
+  <div class="editor-subbar-secondary d-flex align-items-center justify-content-between gap-2">
     <!-- Zoom & Tools Pills -->
     <div class="d-flex align-items-center gap-1">
       <button class="btn-subbar-pill" id="btnFitZoom" onclick="toggleFitZoom()" title="Fit Floor to Screen">
@@ -933,15 +968,18 @@
         <i class="bi bi-stars text-danger me-1"></i> <span>Simulate</span>
       </button>
     </div>
-  </div>
 
-  <!-- Status / Details (Desktop) -->
-  <div class="d-none d-md-flex align-items-center gap-2">
-    <span class="text-muted small" id="gridStatusLabel"><i class="bi bi-grid-3x3 me-1"></i>Grid: 40px</span>
-    <span class="badge bg-secondary-subtle text-secondary" id="tableCountBadge">0 Tables</span>
-    <button class="btn-subbar-pill" onclick="resetCanvasZoom()" title="Reset to 100%">
-      <span id="zoomLevelLabel">100%</span>
-    </button>
+    <!-- Status / Details (Desktop) -->
+    <div class="d-none d-md-flex align-items-center gap-2">
+      <span class="text-muted small" id="gridStatusLabel"><i class="bi bi-grid-3x3 me-1"></i>Grid: 40px</span>
+      <span class="badge bg-secondary-subtle text-secondary" id="tableCountBadge">0 Tables</span>
+      <button class="btn-subbar-pill" onclick="resetCanvasZoom()" title="Reset to 100%">
+        <span id="zoomLevelLabel">100%</span>
+      </button>
+    </div>
+
+    <!-- Mobile Version Indicator -->
+    <span class="badge bg-secondary-subtle text-secondary d-md-none ms-auto" style="font-family:'Space Mono',monospace;font-size:0.65rem;" title="Floor Editor Build Version">v{{ APP_VERSION }}</span>
   </div>
 </div>
 

@@ -10,4 +10,4 @@ Format: MAJOR.MINOR.PATCH, patch zero-padded to 2 digits (1.0.01,
 reach production; MAJOR/MINOR are bumped manually for real milestones,
 not by this per-commit convention.
 """
-APP_VERSION = "1.0.01"
+APP_VERSION = "1.0.02"

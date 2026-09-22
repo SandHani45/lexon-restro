@@ -98,8 +98,9 @@ def demo_switch(request):
 
 def health_check(request):
     try:
+        from core.version import APP_VERSION
         connection.ensure_connection()
-        return JsonResponse({"status": "healthy", "database": "connected"}, status=200)
+        return JsonResponse({"status": "healthy", "database": "connected", "version": APP_VERSION}, status=200)
     except Exception:
         # Public endpoint — never leak the raw DB error (may contain host/creds).
         # Log the detail server-side; return a generic status to the caller.
