@@ -305,6 +305,17 @@
     box-shadow: var(--editor-item-shadow);
     cursor: move;
     user-select: none;
+    /* Selecting/dragging a table is implemented entirely with pointer
+       events (attachItemDrag, below) -- without this, a real touchscreen
+       browser's native scroll/pan gesture recognizer (this sits inside
+       .canvas-viewport, which is overflow:auto) can claim the touch
+       instead, especially when a "tap" has even a pixel or two of finger
+       movement, which is normal on touch. That reads as tapping a table
+       just not doing anything -- it works with mouse clicks (no gesture
+       ambiguity there) and even works when the click is dispatched
+       programmatically, which is why it wasn't caught by that kind of
+       testing; it only shows up with real touch input. */
+    touch-action: none;
     transition: box-shadow 0.15s, border-color 0.15s, background 0.25s;
     z-index: 10;
   }

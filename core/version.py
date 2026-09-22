@@ -6,4 +6,4 @@ is to make it obvious at a glance, on the live site itself, whether a
 deploy actually picked up the latest code -- bump APP_VERSION by one
 with every commit meant to reach production.
 """
-APP_VERSION = "B3"
+APP_VERSION = "B4"

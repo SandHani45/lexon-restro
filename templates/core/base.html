@@ -1123,17 +1123,27 @@
            exceed the viewport width. Rather than scroll (previous
            approach -- worked, but hid content behind a swipe gesture
            with no strong visual cue) or let #pos-topbar's overflow:hidden
-           silently clip whatever falls past the edge, the secondary
-           icons collapse into a single "more" button that opens a small
-           floating panel. The user avatar/role badge is deliberately
-           kept OUTSIDE this menu, always visible in the row itself --
-           it's the one thing that should never require an extra tap.
-           Desktop is unaffected: .topbar-more-menu uses display:contents
-           there, so header_right/header_notifications render exactly as
-           direct children of .topbar-right, identical to before this
-           wrapper existed. */
+           silently clip whatever falls past the edge, the secondary,
+           non-urgent icons (header_right: order history, theme toggle,
+           any page-specific action buttons) collapse into a single "more"
+           button that opens a small floating panel. Two things are
+           deliberately kept OUTSIDE this menu, always visible in the row
+           itself: the user avatar/role badge (shouldn't need an extra tap
+           to confirm who's logged in), and header_notifications (.topbar-
+           notif-slot below) -- those carry live unread counts (calls, QR
+           orders, low stock), so burying them would mean silently missing
+           something that needs attention. Desktop is unaffected:
+           .topbar-more-menu uses display:contents there, so header_right
+           renders exactly as direct children of .topbar-right, identical
+           to before this wrapper existed. */
         .topbar-more-wrap {
             display: contents;
+        }
+        .topbar-notif-slot {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            flex-shrink: 0;
         }
         /* #pos-topbar .btn-icon (below, later in source) sets
            display:inline-flex at the same ID+class specificity as a
@@ -1168,9 +1178,20 @@
                 flex-wrap: wrap;
                 align-items: center;
                 gap: 0.5rem;
-                position: absolute;
-                top: calc(100% + 10px);
-                right: 0;
+                /* #pos-topbar has overflow:hidden (needed elsewhere, to stop
+                   a long title from wrapping/growing the header). As a
+                   descendant, an absolutely-positioned panel extending below
+                   the topbar's own box was silently clipped to nothing --
+                   it "opened" (opacity/visibility toggled correctly) but was
+                   invisible, which read as the button just not working.
+                   position:fixed escapes that ancestor clipping entirely
+                   (verified no ancestor sets transform/filter/perspective,
+                   which would otherwise re-scope it). Anchored to the
+                   topbar's own height rather than the trigger button, so it
+                   doesn't need JS to compute a position. */
+                position: fixed;
+                top: calc(var(--topbar-height) + 10px);
+                right: 12px;
                 width: max-content;
                 max-width: min(260px, calc(100vw - 24px));
                 background: var(--panel-bg);
@@ -1894,12 +1915,20 @@
                             <i class="bi bi-moon" id="themeIcon"></i>
                         </button>
                         {% endblock %}
-
-                        {% block header_notifications %}
-                        {% include "core/_notif_badges.html" %}
-                        {% endblock %}
                     </div>
                     </div><!-- /.topbar-more-wrap -->
+
+                    <!-- Notification/alert badges (calls, QR orders, low stock)
+                         stay permanently visible -- these carry live unread
+                         counts, so hiding them behind the "more" menu would
+                         mean silently missing something that needs attention.
+                         Only non-urgent utility actions (order history, theme
+                         toggle, page-specific buttons) collapse into that menu. -->
+                    <div class="topbar-notif-slot">
+                    {% block header_notifications %}
+                    {% include "core/_notif_badges.html" %}
+                    {% endblock %}
+                    </div>
 
                     {% if request.user.is_authenticated %}
                     <!-- User Avatar + Role Badge (Always Top Right Last) -->
