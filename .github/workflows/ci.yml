@@ -137,7 +137,12 @@ jobs:
             --verbosity=1 --keepdb
 
   deploy:
-    needs: test
+    # TEMPORARY, requested 2026-09-22: test suite is failing and blocking
+    # deploy; `needs: test` removed so deploy no longer waits on / is
+    # gated by the test job's result. The `test` job below is untouched
+    # and still runs on every push for visibility -- this only stops a
+    # red test run from blocking deploy. Re-add `needs: test` the next
+    # time this is touched, unless explicitly told to keep it off.
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/qsr' && github.event_name == 'push'
 
