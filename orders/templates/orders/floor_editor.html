@@ -60,6 +60,22 @@
     --editor-viewport-dot: rgba(255, 255, 255, 0.03);
   }
 
+  /* Unlike the shared .topbar-page-title this replaces, this page's own
+     header_left override had no width constraint or truncation at all --
+     "Floor Editor — <outlet name>" could eat most of the header's width
+     on a narrow screen, leaving no room for the Save/Floor Plan buttons
+     before the shared topbar's overflow handling ever kicked in. */
+  .topbar-outlet-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--text-main);
+    font-family: var(--font-main, 'Outfit', sans-serif);
+  }
+
   #pos-main {
     overflow: hidden !important;
     display: flex;
@@ -455,8 +471,8 @@
 {% endblock %}
 
 {% block header_left %}
-<div class="d-flex align-items-center gap-2">
-  <a href="/tables/" class="btn-icon" title="Back to Floor Plan">
+<div class="d-flex align-items-center gap-2" style="overflow:hidden;min-width:0;">
+  <a href="/tables/" class="btn-icon" title="Back to Floor Plan" style="flex-shrink:0;">
     <i class="bi bi-arrow-left"></i>
   </a>
   <span class="topbar-outlet-name">Floor Editor &mdash; {{ request.user.outlet.name }}</span>
