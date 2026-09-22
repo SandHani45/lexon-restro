@@ -937,6 +937,22 @@
             flex-shrink: 0;
         }
 
+        /* ── Build version badge ─────────────────────────────
+           Deliberately tiny/muted -- its job is just to make it obvious
+           at a glance whether the live site picked up the latest deploy,
+           not to be a visible product feature. */
+        .sidebar-version {
+            flex-shrink: 0;
+            text-align: center;
+            font-size: 0.62rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            opacity: 0.55;
+            padding: 0.3rem 0 0.5rem;
+            user-select: none;
+        }
+
         /* ── Sidebar Promo / Summary Card ────────────────── */
         .sidebar-promo-card {
             margin: 0.45rem 0.75rem 0.55rem;
@@ -1730,6 +1746,8 @@
                 </a>
                 {% endif %}
             </div><!-- /.sidebar-bottom -->
+
+            <div class="sidebar-version" title="Build version">{{ APP_VERSION }}</div>
 
             </div><!-- /#pos-sidebar-inner -->
 

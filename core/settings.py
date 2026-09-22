@@ -173,6 +173,7 @@ TEMPLATES = [
 		'core.context_processors.base_url',
                 'core.context_processors.tenant_features',
                 'core.context_processors.currency',
+                'core.context_processors.app_version',
             ],
             **({} if DEBUG else {
                 'loaders': [

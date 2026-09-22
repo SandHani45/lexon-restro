@@ -4,6 +4,10 @@ from django.conf import settings
 def base_url(request):
     return {'BASE_URL': settings.BASE_URL}
 
+def app_version(request):
+    from core.version import APP_VERSION
+    return {'APP_VERSION': APP_VERSION}
+
 def currency(request):
     """
     Tenant-aware currency symbol for every operational template (₹ for
