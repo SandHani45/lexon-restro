@@ -24,6 +24,93 @@
     --pos-purple: #8b5cf6;
     --pos-purple-soft: rgba(139, 92, 246, 0.10);
     --pos-purple-border: rgba(139, 92, 246, 0.25);
+    --card-bg: var(--panel-bg, #ffffff);
+  }
+
+  html.dark {
+    --card-bg: #161922;
+  }
+  html.dark .kpi-card {
+    background: #161922;
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  }
+  html.dark .filter-card {
+    background: #161922;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  html.dark .f-group input,
+  html.dark .f-group select {
+    background: #0d0d0f;
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #f4f4f6;
+  }
+  html.dark .f-group select option {
+    background: #161922;
+    color: #f4f4f6;
+  }
+  html.dark .table-card {
+    background: #161922;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  html.dark .detail-panel {
+    background: #161922;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  html.dark .detail-panel-head {
+    background: #161922;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  html.dark .detail-section {
+    background: #101218;
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+  html.dark .modal-content,
+  html.dark .refund-modal {
+    background: #161922;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  html.dark .refund-modal input,
+  html.dark .refund-modal textarea {
+    background: #0d0d0f;
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #f4f4f6;
+  }
+  html.dark .method-tag {
+    background: #101218;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+  }
+  html.dark .pag-btn,
+  html.dark .pag a,
+  html.dark .pag span:not(.current) {
+    background: #161922;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+  }
+  html.dark .btn-filter-clear {
+    background: #161922;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+  }
+  html.dark .btn-subbar-pill,
+  html.dark .btn-refund-cancel,
+  html.dark .close-circle-btn {
+    background: #161922;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+  }
+  html.dark .btn-subbar-pill {
+    color: #f4f4f6 !important;
+  }
+  html.dark .btn-subbar-pill:hover {
+    border-color: var(--pos-red-border);
+    background: var(--pos-red-soft);
+    color: var(--pos-red) !important;
+  }
+  html.dark .order-item-row {
+    background: #101218;
+    border-color: rgba(255, 255, 255, 0.06);
   }
 
   body {
@@ -139,7 +226,7 @@
     margin-bottom: 1.5rem;
   }
   .kpi-card {
-    background: var(--card-bg, #ffffff);
+    background: var(--card-bg, var(--panel-bg));
     border: 1px solid var(--border-color);
     border-radius: 22px;
     padding: 1.25rem 1.4rem;
@@ -216,7 +303,7 @@
 
   /* ── Filter Bar ─────────────────────────────────────────────── */
   .filter-card {
-    background: var(--card-bg, #ffffff);
+    background: var(--card-bg, var(--panel-bg));
     border: 1px solid var(--border-color);
     border-radius: 22px;
     padding: 1.25rem 1.4rem;
@@ -324,7 +411,7 @@
 
   /* ── Orders Table Card ──────────────────────────────────────── */
   .table-card {
-    background: var(--card-bg, #ffffff);
+    background: var(--card-bg, var(--panel-bg));
     border: 1px solid var(--border-color);
     border-radius: 24px;
     overflow: hidden;
@@ -533,7 +620,7 @@
     flex: 1;
   }
   .detail-section {
-    background: var(--card-bg, #ffffff);
+    background: var(--card-bg, var(--panel-bg));
     border: 1px solid var(--border-color);
     border-radius: 18px;
     padding: 1.15rem;
@@ -735,7 +822,7 @@
   }
   .refund-modal-overlay.open { display: flex; }
   .refund-modal {
-    background: var(--card-bg, #ffffff);
+    background: var(--card-bg, var(--panel-bg));
     border: 1px solid var(--border-color);
     border-radius: 28px;
     padding: 2rem;

@@ -3,19 +3,44 @@
 
 {% block extra_css %}
 <style>
-  /* ── FULLSCREEN LIVE TABLES OVERVIEW (Matches Reference Screenshot) ── */
+  /* ── DUAL-MODE TOKENS (LIGHT & DARK) ── */
   :root {
-    --live-bg: #0a0a0a;
-    --live-panel-bg: #241a16;
-    --live-card-dark: #2a1f19;
-    --live-card-dark-border: rgba(255, 255, 255, 0.09);
-    --live-card-light: #fff8f0;
-    --live-card-light-border: #fdd5be;
-    --live-text-main: #f7f1ec;
-    --live-text-muted: #a89a90;
+    --live-bg: var(--bg-color, #F7F7F9);
+    --live-panel-bg: var(--panel-bg, #ffffff);
+    --live-card-free: #ffffff;
+    --live-card-free-border: var(--border-color, #ECE7E2);
+    --live-card-free-text: var(--text-main, #2C170E);
+    --live-card-free-muted: var(--text-muted, #8a7d74);
+    --live-canvas-bg: #ffffff;
+    --live-canvas-border: var(--border-color, #ECE7E2);
+    --live-canvas-grid: rgba(0, 0, 0, 0.045);
+    --live-canvas-shadow: inset 0 0 20px rgba(0, 0, 0, 0.03);
+    --live-text-main: var(--text-main, #2C170E);
+    --live-text-muted: var(--text-muted, #8a7d74);
+    --live-border: var(--border-color, #ECE7E2);
+    --live-control-bg: var(--surface-2, #F2EDE9);
+    --live-control-border: var(--border-color, #ECE7E2);
     --live-accent-amber: #EC2734;
     --live-accent-orange: #FA7327;
     --live-accent-red: #ef4444;
+  }
+
+  html.dark {
+    --live-bg: var(--bg-color, #0a0a0a);
+    --live-panel-bg: var(--panel-bg, #121214);
+    --live-card-free: #18181b;
+    --live-card-free-border: rgba(255, 255, 255, 0.09);
+    --live-card-free-text: var(--text-main, #f4f4f6);
+    --live-card-free-muted: var(--text-muted, #9ca3af);
+    --live-canvas-bg: #11141b;
+    --live-canvas-border: rgba(255, 255, 255, 0.09);
+    --live-canvas-grid: rgba(255, 255, 255, 0.04);
+    --live-canvas-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+    --live-text-main: var(--text-main, #f4f4f6);
+    --live-text-muted: var(--text-muted, #9ca3af);
+    --live-border: rgba(255, 255, 255, 0.08);
+    --live-control-bg: rgba(255, 255, 255, 0.04);
+    --live-control-border: rgba(255, 255, 255, 0.12);
   }
 
   /* Page wrapper */
@@ -25,6 +50,7 @@
     color: var(--live-text-main);
     padding: 1.5rem 2rem 3rem 2rem;
     font-family: var(--font-main, 'Outfit', sans-serif);
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   /* ── Header ── */
@@ -36,7 +62,7 @@
     gap: 1rem;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid var(--live-border);
   }
   .live-header-left {
     display: flex;
@@ -80,8 +106,9 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: var(--live-control-bg);
+    border: 1px solid var(--live-control-border);
+    color: var(--live-text-main);
     border-radius: 999px;
     padding: 0.4rem 0.85rem;
     transition: border-color 0.15s, background 0.15s;
@@ -123,8 +150,8 @@
     width: 38px;
     height: 38px;
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--live-control-border);
+    background: var(--live-control-bg);
     color: var(--live-text-muted);
     display: flex;
     align-items: center;
@@ -173,18 +200,19 @@
   }
 
   .floor-canvas-frame {
-    background: #150d0a;
-    border: 1px solid rgba(255, 255, 255, 0.09);
+    background: var(--live-canvas-bg);
+    border: 1.5px solid var(--live-canvas-border);
     border-radius: 12px;
     position: relative;
     overflow: hidden;
     height: 320px;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+    box-shadow: var(--live-canvas-shadow);
     /* Graph paper grid background */
     background-image:
-      linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+      linear-gradient(to right, var(--live-canvas-grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--live-canvas-grid) 1px, transparent 1px);
     background-size: 28px 28px;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
   }
 
   .floor-canvas-content {
@@ -202,7 +230,7 @@
     font-family: var(--font-main, sans-serif);
     cursor: pointer;
     user-select: none;
-    transition: transform 0.15s, box-shadow 0.2s;
+    transition: transform 0.15s, box-shadow 0.2s, background-color 0.2s, border-color 0.2s;
   }
   .canvas-table-node:hover {
     transform: scale(1.05);
@@ -226,29 +254,35 @@
     height: 56px;
   }
   .canvas-table-node.shape-wall {
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.3);
+    background: var(--border-color, #ECE7E2);
+    border: 1px solid var(--border-color, #ECE7E2);
     border-radius: 4px;
     cursor: default;
+  }
+  html.dark .canvas-table-node.shape-wall {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
   }
 
   /* State: Free */
   .canvas-table-node.state-free {
-    background: var(--live-card-dark);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: var(--live-text-muted);
+    background: var(--live-card-free);
+    border: 1.5px solid var(--live-card-free-border);
+    color: var(--live-card-free-text);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   }
   .canvas-table-node.state-free .node-name {
     font-weight: 700;
     font-size: 0.92rem;
+    color: var(--live-card-free-text);
   }
 
   /* State: Busy (<= 15 min) */
   .canvas-table-node.state-busy {
-    background: rgba(250, 115, 39, 0.09);
+    background: #fff3e6;
     border: 1.5px solid var(--live-accent-orange);
-    color: #fcab7d;
-    box-shadow: 0 0 10px rgba(250, 115, 39, 0.25);
+    color: #c2530a;
+    box-shadow: 0 2px 10px rgba(250, 115, 39, 0.2);
   }
   .canvas-table-node.state-busy .node-name {
     font-weight: 800;
@@ -259,16 +293,25 @@
     font-size: 0.68rem;
     font-family: var(--font-mono, monospace);
     font-weight: 700;
-    color: #fcab7d;
+    color: #af511b;
     margin-top: 1px;
   }
+  html.dark .canvas-table-node.state-busy {
+    background: rgba(250, 115, 39, 0.09);
+    border: 1.5px solid var(--live-accent-orange);
+    color: #fcab7d;
+    box-shadow: 0 0 10px rgba(250, 115, 39, 0.25);
+  }
+  html.dark .canvas-table-node.state-busy .node-timer {
+    color: #fcab7d;
+  }
 
-  /* State: >15 min Urgent (Matches T2 31:32 and B3 47:32 in screenshot!) */
+  /* State: >15 min Urgent */
   .canvas-table-node.state-urgent {
-    background: rgba(239, 68, 68, 0.08);
+    background: #fef2f2;
     border: 1.5px solid var(--live-accent-red);
-    color: #fca5a5;
-    box-shadow: 0 0 16px rgba(239, 68, 68, 0.35), inset 0 0 8px rgba(239, 68, 68, 0.15);
+    color: #b91c1c;
+    box-shadow: 0 2px 12px rgba(239, 68, 68, 0.25);
     animation: urgentPulse 3s infinite alternate ease-in-out;
   }
   @keyframes urgentPulse {
@@ -286,6 +329,12 @@
     font-weight: 700;
     color: var(--live-accent-red);
     margin-top: 1px;
+  }
+  html.dark .canvas-table-node.state-urgent {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1.5px solid var(--live-accent-red);
+    color: #fca5a5;
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.35), inset 0 0 8px rgba(239, 68, 68, 0.15);
   }
 
   /* Dimmed state when party size doesn't fit */
@@ -356,42 +405,43 @@
     justify-content: space-between;
     position: relative;
     cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s, background-color 0.2s, border-color 0.2s;
     text-decoration: none;
   }
   .live-table-card:hover {
     transform: translateY(-2px);
   }
 
-  /* Card: Free Table (Dark theme) */
+  /* Card: Free Table */
   .live-table-card.card-free {
-    background: var(--live-card-dark);
-    border: 1px solid var(--live-card-dark-border);
+    background: var(--live-card-free);
+    border: 1px solid var(--live-card-free-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
   }
   .live-table-card.card-free .card-label {
     font-size: 0.72rem;
     font-weight: 500;
-    color: var(--live-text-muted);
+    color: var(--live-card-free-muted);
   }
   .live-table-card.card-free .card-title {
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--live-text-main);
+    color: var(--live-card-free-text);
     line-height: 1.1;
   }
   .live-table-card.card-free .card-meta {
     font-size: 0.68rem;
-    color: var(--live-text-muted);
+    color: var(--live-card-free-muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  /* Card: Occupied Table (Illuminated Cream theme matching screenshot!) */
+  /* Card: Occupied Table */
   .live-table-card.card-occupied {
-    background: var(--live-card-light);
-    border: 1.5px solid var(--live-card-light-border);
-    box-shadow: 0 4px 14px rgba(250, 115, 39, 0.12);
+    background: #fff8f0;
+    border: 1.5px solid #fdd5be;
+    box-shadow: 0 4px 14px rgba(250, 115, 39, 0.15);
   }
   .live-table-card.card-occupied .card-badge-occ {
     position: absolute;
@@ -425,6 +475,16 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  /* Dark mode overrides for occupied cards */
+  html.dark .live-table-card.card-occupied {
+    background: #24160f;
+    border-color: rgba(250, 115, 39, 0.45);
+    box-shadow: 0 4px 16px rgba(250, 115, 39, 0.25);
+  }
+  html.dark .live-table-card.card-occupied .card-meta {
+    color: #fcab7d;
   }
 
   /* Dimmed card for party size */
@@ -474,7 +534,7 @@
   <!-- ── MULTI-FLOOR VIEW (CANVASES) ── -->
   <div class="floors-grid-container" id="floorsGridContainer">
     <!-- Populated by JavaScript with each Floor / Section -->
-    <div class="text-center text-muted py-5" style="letter-spacing:1px;font-size:0.85rem;">
+    <div class="text-center py-5" style="letter-spacing:1px;font-size:0.85rem;color:var(--live-text-muted);">
       <div class="spinner-border spinner-border-sm text-warning me-2" role="status"></div>
       Loading live floor plans...
     </div>

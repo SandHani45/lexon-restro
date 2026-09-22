@@ -468,36 +468,348 @@
     line-height: 1.1;
   }
 
+  /* ── SUBBAR (KimiPoS POS Layout) ────────────────────────── */
+  .editor-subbar {
+    background: var(--editor-panel);
+    border-bottom: 1px solid var(--editor-border);
+    padding: 0.45rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    z-index: 25;
+    flex-shrink: 0;
+  }
+  .subbar-section-pill {
+    display: inline-flex;
+    align-items: center;
+    background: var(--editor-card);
+    border: 1px solid var(--editor-card-border);
+    border-radius: 999px;
+    padding: 2px 8px 2px 10px;
+    gap: 4px;
+    min-height: 32px;
+  }
+  .subbar-select {
+    background: transparent;
+    border: none;
+    color: var(--editor-text-main);
+    font-size: 0.84rem;
+    font-weight: 700;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    outline: none;
+    cursor: pointer;
+    padding-right: 4px;
+  }
+  .subbar-select option {
+    background: var(--editor-panel);
+    color: var(--editor-text-main);
+  }
+  .subbar-icon-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: var(--editor-accent-soft);
+    color: var(--editor-accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
+  }
+  .subbar-icon-btn:hover {
+    background: var(--editor-accent);
+    color: #fff;
+    transform: scale(1.08);
+  }
+  .btn-subbar-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0.32rem 0.75rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    border-radius: 999px;
+    border: 1px solid var(--editor-card-border);
+    background: var(--editor-card);
+    color: var(--editor-text-main);
+    text-decoration: none !important;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    line-height: 1.2;
+    min-height: 32px;
+  }
+  .btn-subbar-pill:hover {
+    border-color: var(--editor-accent);
+    color: var(--editor-accent);
+  }
+  .btn-save-layout {
+    background: #EC2734 !important;
+    border-color: #EC2734 !important;
+    color: #ffffff !important;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(236, 39, 52, 0.25);
+  }
+  .btn-save-layout:hover {
+    background: #d81f2f !important;
+    border-color: #d81f2f !important;
+    color: #ffffff !important;
+  }
+
+  /* ── CANVAS VIEWPORT ENHANCEMENTS ────────────────────────── */
+  .canvas-viewport {
+    align-items: safe center;
+    justify-content: safe center;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y pinch-zoom;
+  }
+  .floor-canvas {
+    transform-origin: center center;
+    transition: width 0.2s ease, height 0.2s ease, background 0.25s, border-color 0.25s, transform 0.15s ease-out;
+  }
+
+  /* ── SIMULATE CUSTOMER (DESKTOP WIDGET) ─────────────────── */
+  .simulation-card.collapsed {
+    width: auto;
+    min-width: 195px;
+  }
+  .simulation-card.collapsed .sim-body {
+    display: none;
+  }
+  .sim-toggle-chevron {
+    color: var(--editor-text-muted);
+    font-size: 0.8rem;
+    transition: transform 0.2s ease;
+  }
+  .simulation-card.collapsed .sim-toggle-chevron i {
+    transform: rotate(180deg);
+  }
+
+  /* ── MOBILE QUICK SHAPES BAR ────────────────────────────── */
+  .mobile-quick-shapes-bar {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--editor-panel);
+    border: 1px solid var(--editor-border);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.22);
+    border-radius: 999px;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    z-index: 40;
+    max-width: calc(100vw - 20px);
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    backdrop-filter: blur(12px);
+  }
+  .mobile-quick-shapes-bar::-webkit-scrollbar { display: none; }
+  .quick-add-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--editor-text-muted);
+    letter-spacing: 0.5px;
+    padding-right: 4px;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+  }
+  .quick-shape-btn {
+    background: var(--editor-card);
+    border: 1px solid var(--editor-card-border);
+    color: var(--editor-text-main);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+  }
+  .quick-shape-btn:active {
+    background: var(--editor-accent-soft);
+    border-color: var(--editor-accent);
+    transform: scale(0.96);
+  }
+  .shape-icon-sm {
+    display: inline-block;
+    border: 1.5px solid var(--editor-accent);
+  }
+  .shape-square-sm { width: 12px; height: 12px; border-radius: 2px; }
+  .shape-round-sm { width: 12px; height: 12px; border-radius: 50%; }
+  .shape-rect-sm { width: 16px; height: 10px; border-radius: 2px; }
+  .shape-wall-sm { width: 16px; height: 4px; background: var(--editor-accent); border: none; border-radius: 1px; }
+
+  /* ── MOBILE TABLE INSPECTOR BOTTOM SHEET ─────────────────── */
+  .mobile-inspector-sheet {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--editor-panel);
+    border-top: 1px solid var(--editor-border);
+    box-shadow: 0 -10px 32px rgba(0, 0, 0, 0.2);
+    border-radius: 22px 22px 0 0;
+    padding: 0.85rem 1rem 1.1rem;
+    z-index: 45;
+    transform: translateY(115%);
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(14px);
+  }
+  .mobile-inspector-sheet.active {
+    transform: translateY(0);
+  }
+  .inspector-sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.45rem;
+    border-bottom: 1px solid var(--editor-card-border);
+  }
+  .inspector-badge {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--editor-accent-soft);
+    color: var(--editor-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .inspector-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--editor-text-main);
+    line-height: 1.2;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+  }
+  .inspector-sub {
+    font-size: 0.7rem;
+    color: var(--editor-text-muted);
+  }
+  .btn-close-inspector {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--editor-card-border);
+    background: var(--editor-card);
+    color: var(--editor-text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .btn-close-inspector:hover {
+    background: var(--editor-accent-soft);
+    color: var(--editor-accent);
+  }
+
+  /* Stepper */
+  .stepper-wrap {
+    display: flex;
+    align-items: center;
+    background: var(--editor-panel);
+    border: 1px solid var(--editor-card-border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .stepper-btn {
+    width: 34px;
+    height: 36px;
+    background: var(--editor-card);
+    border: none;
+    color: var(--editor-text-main);
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+  .stepper-btn:active {
+    background: var(--editor-accent-soft);
+    color: var(--editor-accent);
+  }
+  .stepper-input {
+    border: none !important;
+    text-align: center;
+    padding: 0 !important;
+    height: 36px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    width: 100%;
+    min-width: 0;
+    background: transparent !important;
+  }
+
+  .btn-remove-table {
+    height: 38px;
+    border-radius: 8px;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-remove-table:hover, .btn-remove-table:active {
+    background: #ef4444;
+    color: #fff;
+  }
+
+  /* ── SIMULATE & DIMENSIONS MODALS ────────────────────────── */
+  .sim-modal-content {
+    background: var(--editor-panel);
+    border: 1px solid var(--editor-card-border);
+    border-radius: 22px;
+    color: var(--editor-text-main);
+    box-shadow: var(--editor-sim-shadow);
+  }
+
   /* ══════════════════════════════════════════════════════════════
-     MOBILE: stack the sidebar above the canvas instead of beside it.
-     .editor-shell is a row flex layout with a fixed 280px sidebar --
-     on a phone that left only ~110px for the actual drag-and-drop
-     canvas. The canvas itself is left as-is (.canvas-viewport already
-     pans/scrolls when .floor-canvas is bigger than the viewport, which
-     is the normal way to work an oversized design canvas); it just
-     gets the full screen width now instead of a sliver.
+     RESPONSIVE BREAKPOINTS (Mobile & Tablet)
      ══════════════════════════════════════════════════════════════ */
   @media (max-width: 767px) {
     .editor-shell {
       flex-direction: column;
+      position: relative;
     }
     .editor-sidebar {
-      width: 100%;
-      min-width: 0;
-      max-height: 46vh;
-      border-right: none;
-      border-bottom: 1px solid var(--editor-border);
+      display: none !important;
     }
     .canvas-viewport {
-      min-height: 260px;
-      padding: 1.25rem;
+      min-height: 0;
+      flex: 1;
+      padding: 1rem;
+      align-items: safe center;
+      justify-content: safe center;
     }
-    /* Fixed at 290px wide, this overlapped/overflowed the now-narrow
-       canvas viewport instead of fitting inside it. */
+    /* Hide floating desktop simulator completely on mobile to prevent overlapping */
     .simulation-card {
-      width: min(290px, calc(100% - 24px));
-      right: 12px;
-      bottom: 12px;
+      display: none !important;
+    }
+    #pos-main {
+      height: calc(100dvh - var(--topbar-height, 56px));
     }
   }
 
@@ -515,37 +827,79 @@
 {% endblock %}
 
 {% block header_left %}
-<div class="d-flex align-items-center gap-2" style="overflow:hidden;min-width:0;">
-  <a href="/tables/" class="btn-icon" title="Back to Floor Plan" style="flex-shrink:0;">
-    <i class="bi bi-arrow-left"></i>
-  </a>
-  {# Outlet name dropped -- it's shown on the page body itself right below,
-     and had no length limit on its own (nothing to truncate now that it's
-     gone). "Floor Editor" is a short, fixed label, no truncation risk. #}
-  <span class="topbar-outlet-name">Floor Editor</span>
+<div class="d-flex align-items-center gap-2" style="min-width:0;overflow:hidden;">
+  <div style="width:34px;height:34px;border-radius:10px;background:rgba(236,39,52,0.12);border:1px solid rgba(236,39,52,0.3);display:flex;align-items:center;justify-content:center;color:var(--editor-accent);flex-shrink:0;">
+    <i class="bi bi-pencil-square" style="font-size:1.05rem;"></i>
+  </div>
+  <div style="min-width:0;overflow:hidden;">
+    <h1 class="h6 mb-0 fw-bold text-truncate" style="letter-spacing:0.3px;color:var(--editor-text-main);font-family:var(--font-main, 'Outfit', sans-serif);">Floor Editor</h1>
+    <div class="text-muted text-truncate d-none d-sm-block" style="font-size:0.72rem;letter-spacing:0.3px;font-family:var(--font-main, 'Outfit', sans-serif);">{{ request.user.outlet.name }}</div>
+  </div>
 </div>
 {% endblock %}
 
 {% block header_right %}
-<div class="d-flex align-items-center gap-2">
-  <button class="btn-luxury" id="btnSaveTop" onclick="saveCurrentFloorLayout()">
-    <i class="bi bi-cloud-arrow-up me-1"></i> Save Layout
+<div class="action-group d-flex align-items-center flex-wrap gap-2">
+  <button class="btn-subbar-pill btn-save-layout" id="btnSaveTop" onclick="saveCurrentFloorLayout()">
+    <i class="bi bi-floppy-fill me-1"></i> <span class="d-none d-sm-inline">Save Layout</span><span class="d-inline d-sm-none">Save</span>
     <span class="unsaved-indicator" id="topUnsavedDot"></span>
-  </button>
-  <a href="/tables/" class="btn-luxury text-decoration-none">
-    <i class="bi bi-grid-3x3-gap me-1"></i> Floor Plan
-  </a>
-  <button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme">
-    <i class="bi bi-moon" id="themeIcon"></i>
   </button>
 </div>
 {% endblock %}
 
+{% block header_notifications %}
+{% include "core/_notif_badges_luxury.html" %}
+{% endblock %}
+
 {% block content %}
+<!-- Sub-Header Bar (KimiPoS POS Layout) -->
+<div class="pos-subbar editor-subbar">
+  <div class="d-flex align-items-center gap-2 flex-wrap" style="min-width:0;">
+    <!-- Back to Floor Plan Button (Inside Screen) -->
+    <a href="/tables/" class="btn-subbar-pill text-decoration-none" title="Back to Floor Plan">
+      <i class="bi bi-arrow-left me-1"></i> <span class="d-none d-sm-inline">Back to Floor Plan</span><span class="d-inline d-sm-none">Back</span>
+    </a>
+
+    <!-- Floor selector pill -->
+    <div class="subbar-section-pill">
+      <i class="bi bi-layers-fill text-danger me-1"></i>
+      <span class="text-muted small me-1 d-none d-sm-inline">Floor:</span>
+      <select class="subbar-select" id="floorSelector" onchange="switchSection(this.value)">
+        <option value="Main Hall">Main Hall</option>
+      </select>
+      <button class="subbar-icon-btn" onclick="promptAddSection()" title="Add New Floor / Section">
+        <i class="bi bi-plus-lg"></i>
+      </button>
+    </div>
+
+    <!-- Zoom & Tools Pills -->
+    <div class="d-flex align-items-center gap-1">
+      <button class="btn-subbar-pill" id="btnFitZoom" onclick="toggleFitZoom()" title="Fit Floor to Screen">
+        <i class="bi bi-aspect-ratio me-1"></i> <span id="fitZoomText">Fit</span>
+      </button>
+      <button class="btn-subbar-pill d-md-none" data-bs-toggle="modal" data-bs-target="#dimensionsModal" title="Canvas Dimensions">
+        <i class="bi bi-arrows-angle-expand me-1"></i> <span>Size</span>
+      </button>
+      <button class="btn-subbar-pill d-md-none" data-bs-toggle="modal" data-bs-target="#simModal" title="Simulate Customer Flow">
+        <i class="bi bi-stars text-danger me-1"></i> <span>Simulate</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Status / Details (Desktop) -->
+  <div class="d-none d-md-flex align-items-center gap-2">
+    <span class="text-muted small" id="gridStatusLabel"><i class="bi bi-grid-3x3 me-1"></i>Grid: 40px</span>
+    <span class="badge bg-secondary-subtle text-secondary" id="tableCountBadge">0 Tables</span>
+    <button class="btn-subbar-pill" onclick="resetCanvasZoom()" title="Reset to 100%">
+      <span id="zoomLevelLabel">100%</span>
+    </button>
+  </div>
+</div>
+
 <div class="editor-shell">
 
-  <!-- ══════════════ LEFT SIDEBAR ══════════════ -->
-  <aside class="editor-sidebar">
+  <!-- ══════════════ LEFT SIDEBAR (DESKTOP) ══════════════ -->
+  <aside class="editor-sidebar d-none d-md-flex">
 
     <!-- Header title -->
     <div>
@@ -553,7 +907,7 @@
       <div class="editor-subtitle">Grid Size: 40px</div>
     </div>
 
-    <!-- Section / Floor Selector -->
+    <!-- Section / Floor Selector (in sidebar) -->
     <div class="editor-section-card">
       <div class="d-flex align-items-center justify-content-between mb-2">
         <div class="editor-label-gold mb-0"><i class="bi bi-layers"></i> FLOOR / SECTION</div>
@@ -561,7 +915,7 @@
           <i class="bi bi-plus-lg"></i> New
         </button>
       </div>
-      <select class="editor-select" id="floorSelector" onchange="switchSection(this.value)">
+      <select class="editor-select" id="floorSelectorSidebar" onchange="switchSection(this.value)">
         <option value="Main Hall">Main Hall</option>
       </select>
     </div>
@@ -642,7 +996,7 @@
 
     <!-- Save button at bottom of sidebar -->
     <div class="mt-auto pt-2">
-      <button class="btn-luxury w-100 py-2" onclick="saveCurrentFloorLayout()" style="background:var(--editor-accent);border-color:var(--editor-accent);color:#111;font-weight:700;">
+      <button class="btn-luxury w-100 py-2" onclick="saveCurrentFloorLayout()" style="background:var(--editor-accent);border-color:var(--editor-accent);color:#fff;font-weight:700;">
         <i class="bi bi-check2-circle me-1"></i> Save Layout
       </button>
     </div>
@@ -659,13 +1013,16 @@
       <!-- Table nodes placed dynamically -->
     </div>
 
-    <!-- ══════════════ SIMULATE A CUSTOMER WIDGET ══════════════ -->
-    <div class="simulation-card" id="simCard">
+    <!-- ══════════════ SIMULATE A CUSTOMER WIDGET (DESKTOP ONLY) ══════════════ -->
+    <div class="simulation-card collapsed d-none d-md-block" id="simCard">
       <div class="sim-header" onclick="toggleSimCard()">
         <div class="sim-title">
-          <i class="bi bi-stars"></i> Simulate a customer
+          <i class="bi bi-stars text-danger"></i> Simulate a customer
         </div>
-        <button type="button" class="btn-close btn-close-white" style="font-size:0.65rem;" onclick="event.stopPropagation(); toggleSimCard();"></button>
+        <div class="d-flex align-items-center gap-1">
+          <span class="sim-toggle-chevron"><i class="bi bi-chevron-down" id="simChevron"></i></span>
+          <button type="button" class="btn-close" style="font-size:0.65rem;" onclick="event.stopPropagation(); toggleSimCard();"></button>
+        </div>
       </div>
       <div class="sim-body">
         <div class="sim-action" onclick="simulateAction('qr_order')">
@@ -715,6 +1072,169 @@
 
   </main>
 
+  <!-- ══════════════ MOBILE QUICK SHAPES BAR (MOBILE ONLY) ══════════════ -->
+  <div class="mobile-quick-shapes-bar d-flex d-md-none" id="mobileQuickShapesBar">
+    <span class="quick-add-label"><i class="bi bi-plus-circle-fill text-danger me-1"></i>ADD:</span>
+    <button class="quick-shape-btn" onclick="addTableFromPalette('square')">
+      <span class="shape-icon-sm shape-square-sm"></span> Square
+    </button>
+    <button class="quick-shape-btn" onclick="addTableFromPalette('round')">
+      <span class="shape-icon-sm shape-round-sm"></span> Round
+    </button>
+    <button class="quick-shape-btn" onclick="addTableFromPalette('rect')">
+      <span class="shape-icon-sm shape-rect-sm"></span> Rect
+    </button>
+    <button class="quick-shape-btn" onclick="addTableFromPalette('wall')">
+      <span class="shape-icon-sm shape-wall-sm"></span> Wall
+    </button>
+  </div>
+
+  <!-- ══════════════ MOBILE TABLE INSPECTOR SHEET (MOBILE ONLY) ══════════════ -->
+  <div class="mobile-inspector-sheet d-md-none" id="mobileInspectorSheet">
+    <div class="inspector-sheet-header">
+      <div class="d-flex align-items-center gap-2">
+        <div class="inspector-badge" id="mobileInspectShapeBadge">
+          <i class="bi bi-grid-fill"></i>
+        </div>
+        <div>
+          <div class="inspector-title" id="mobileInspectTitle">Table T1</div>
+          <div class="inspector-sub">Floor: <span id="mobileInspectSection">Main Hall</span></div>
+        </div>
+      </div>
+      <button class="btn-close-inspector" onclick="deselectTable()" title="Close Inspector">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="inspector-sheet-body">
+      <!-- Row: Table Name & Capacity -->
+      <div class="row g-2 mb-2">
+        <div class="col-7">
+          <label class="dim-label mb-1">TABLE NAME</label>
+          <input type="text" id="inspectNameMobile" class="dim-input text-start ps-2" placeholder="e.g. T1"
+                 oninput="updateSelectedTableField('name', this.value)">
+        </div>
+        <div class="col-5">
+          <label class="dim-label mb-1">CAPACITY</label>
+          <div class="stepper-wrap">
+            <button type="button" class="stepper-btn" onclick="stepCapacityMobile(-1)">−</button>
+            <input type="number" id="inspectCapMobile" class="dim-input stepper-input" min="0" max="50"
+                   oninput="updateSelectedTableField('capacity', parseInt(this.value)||0)">
+            <button type="button" class="stepper-btn" onclick="stepCapacityMobile(1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row: Shape Selection & Delete -->
+      <div class="row g-2 align-items-end">
+        <div class="col-7">
+          <label class="dim-label mb-1">SHAPE</label>
+          <select id="inspectShapeMobile" class="editor-select" onchange="updateSelectedTableField('shape', this.value)">
+            <option value="square">Square Table</option>
+            <option value="round">Round Table</option>
+            <option value="rect">Rectangle Table</option>
+            <option value="wall">Wall Divider</option>
+          </select>
+        </div>
+        <div class="col-5">
+          <button class="btn-remove-table w-100" onclick="deleteSelectedTable()">
+            <i class="bi bi-trash3 me-1"></i> Remove
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════ SIMULATE A CUSTOMER MODAL (MOBILE ONLY) ══════════════ -->
+<div class="modal fade" id="simModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content sim-modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold" style="font-size:0.95rem;">
+          <i class="bi bi-stars text-danger me-2"></i>Simulate a Customer
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-3">
+        <p class="text-muted small mb-2">Test customer flows and live floor events:</p>
+        <div class="sim-actions-list">
+          <div class="sim-action" onclick="runSimActionAndClose('qr_order')">
+            <i class="bi bi-qr-code-scan"></i>
+            <div class="sim-action-text">
+              <strong>QR dine-in order</strong>
+              <span>A guest scans a table QR and orders</span>
+            </div>
+          </div>
+          <div class="sim-action" onclick="runSimActionAndClose('upi_delivery')">
+            <i class="bi bi-bicycle"></i>
+            <div class="sim-action-text">
+              <strong>Delivery order (UPI paid)</strong>
+              <span>Paid online before it reaches you</span>
+            </div>
+          </div>
+          <div class="sim-action" onclick="runSimActionAndClose('cod_delivery')">
+            <i class="bi bi-cash-coin"></i>
+            <div class="sim-action-text">
+              <strong>Delivery order (cash on delivery)</strong>
+              <span>Collect on delivery</span>
+            </div>
+          </div>
+          <div class="sim-action" onclick="runSimActionAndClose('takeaway')">
+            <i class="bi bi-bag-check"></i>
+            <div class="sim-action-text">
+              <strong>Takeaway order</strong>
+              <span>Phoned in for pickup</span>
+            </div>
+          </div>
+          <div class="sim-action" onclick="runSimActionAndClose('waiter_call')">
+            <i class="bi bi-bell"></i>
+            <div class="sim-action-text">
+              <strong>Guest calls a waiter</strong>
+              <span>Service request from a table</span>
+            </div>
+          </div>
+          <div class="sim-action" onclick="runSimActionAndClose('open_qr')">
+            <i class="bi bi-phone"></i>
+            <div class="sim-action-text">
+              <strong>Open the guest QR menu</strong>
+              <span>Order as a diner and watch it arrive</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ DIMENSIONS MODAL (MOBILE ONLY) ══════════════ -->
+<div class="modal fade" id="dimensionsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content sim-modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold" style="font-size:0.95rem;">
+          <i class="bi bi-aspect-ratio text-danger me-2"></i>Canvas Dimensions
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-3">
+        <div class="dim-grid mb-3">
+          <div class="dim-box">
+            <span class="dim-label">Width (px)</span>
+            <input type="number" id="canvasWidthInputMobile" class="dim-input" value="900" min="400" max="2400" step="40">
+          </div>
+          <div class="dim-box">
+            <span class="dim-label">Height (px)</span>
+            <input type="number" id="canvasHeightInputMobile" class="dim-input" value="500" min="300" max="1600" step="40">
+          </div>
+        </div>
+        <button class="btn btn-danger w-100" onclick="applyDimensionsFromMobile()" style="border-radius:10px;background:#EC2734;font-weight:700;">
+          Apply Dimensions
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
@@ -730,11 +1250,16 @@
   let deletedIds = [];
   let selectedTableId = null;
   let isDirty = false;
+  let currentZoom = 1.0;
+  let isFitMode = false;
 
   const floorCanvas = document.getElementById('floorCanvas');
   const floorSelector = document.getElementById('floorSelector');
+  const floorSelectorSidebar = document.getElementById('floorSelectorSidebar');
   const canvasWidthInput = document.getElementById('canvasWidthInput');
   const canvasHeightInput = document.getElementById('canvasHeightInput');
+  const canvasWidthInputMobile = document.getElementById('canvasWidthInputMobile');
+  const canvasHeightInputMobile = document.getElementById('canvasHeightInputMobile');
   const inspectorPanel = document.getElementById('inspectorPanel');
   const inspectName = document.getElementById('inspectName');
   const inspectCap = document.getElementById('inspectCap');
@@ -749,18 +1274,29 @@
 
         // Populate sections
         sectionsData = {};
-        floorSelector.innerHTML = '';
+        if (floorSelector) floorSelector.innerHTML = '';
+        if (floorSelectorSidebar) floorSelectorSidebar.innerHTML = '';
+
         (data.sections || []).forEach(sec => {
           sectionsData[sec.name] = sec;
-          const opt = document.createElement('option');
-          opt.value = sec.name;
-          opt.textContent = sec.name;
-          floorSelector.appendChild(opt);
+          if (floorSelector) {
+            const opt = document.createElement('option');
+            opt.value = sec.name;
+            opt.textContent = sec.name;
+            floorSelector.appendChild(opt);
+          }
+          if (floorSelectorSidebar) {
+            const optSide = document.createElement('option');
+            optSide.value = sec.name;
+            optSide.textContent = sec.name;
+            floorSelectorSidebar.appendChild(optSide);
+          }
         });
 
         if (data.sections && data.sections.length > 0) {
           currentSection = data.sections[0].name;
-          floorSelector.value = currentSection;
+          if (floorSelector) floorSelector.value = currentSection;
+          if (floorSelectorSidebar) floorSelectorSidebar.value = currentSection;
         }
 
         allTables = data.tables || [];
@@ -778,37 +1314,63 @@
   window.switchSection = async function(secName) {
     if (isDirty) {
       if (!await ui.confirm('Unsaved Changes', 'You have unsaved changes. Switch floor anyway?', 'Switch Floor')) {
-        floorSelector.value = currentSection;
+        if (floorSelector) floorSelector.value = currentSection;
+        if (floorSelectorSidebar) floorSelectorSidebar.value = currentSection;
         return;
       }
     }
     currentSection = secName;
+    if (floorSelector) floorSelector.value = secName;
+    if (floorSelectorSidebar) floorSelectorSidebar.value = secName;
+
     deselectTable();
     applySection(currentSection);
   };
 
   function applySection(secName) {
     const sec = sectionsData[secName] || { width: 900, height: 500, grid_size: 40 };
-    canvasWidthInput.value = sec.width || 900;
-    canvasHeightInput.value = sec.height || 500;
-    floorCanvas.style.width = (sec.width || 900) + 'px';
-    floorCanvas.style.height = (sec.height || 500) + 'px';
+    const w = sec.width || 900;
+    const h = sec.height || 500;
+
+    if (canvasWidthInput) canvasWidthInput.value = w;
+    if (canvasHeightInput) canvasHeightInput.value = h;
+    if (canvasWidthInputMobile) canvasWidthInputMobile.value = w;
+    if (canvasHeightInputMobile) canvasHeightInputMobile.value = h;
+
+    if (floorCanvas) {
+      floorCanvas.style.width = w + 'px';
+      floorCanvas.style.height = h + 'px';
+    }
 
     renderCanvasItems();
     setDirty(false);
+
+    // On mobile, auto-fit canvas on initial load so full floor is visible
+    if (window.innerWidth < 768 && !isFitMode) {
+      setTimeout(() => {
+        toggleFitZoom();
+      }, 100);
+    }
   }
 
   // ── Update Canvas Dimensions ──────────────────────────────────────────────
   window.updateCanvasDimensions = function() {
-    let w = parseInt(canvasWidthInput.value) || 900;
-    let h = parseInt(canvasHeightInput.value) || 500;
+    let w = parseInt(canvasWidthInput ? canvasWidthInput.value : 900) || 900;
+    let h = parseInt(canvasHeightInput ? canvasHeightInput.value : 500) || 500;
+
     // Snap to grid
     w = Math.max(400, Math.round(w / GRID_SIZE) * GRID_SIZE);
     h = Math.max(300, Math.round(h / GRID_SIZE) * GRID_SIZE);
-    canvasWidthInput.value = w;
-    canvasHeightInput.value = h;
-    floorCanvas.style.width = w + 'px';
-    floorCanvas.style.height = h + 'px';
+
+    if (canvasWidthInput) canvasWidthInput.value = w;
+    if (canvasHeightInput) canvasHeightInput.value = h;
+    if (canvasWidthInputMobile) canvasWidthInputMobile.value = w;
+    if (canvasHeightInputMobile) canvasHeightInputMobile.value = h;
+
+    if (floorCanvas) {
+      floorCanvas.style.width = w + 'px';
+      floorCanvas.style.height = h + 'px';
+    }
 
     if (!sectionsData[currentSection]) {
       sectionsData[currentSection] = { name: currentSection };
@@ -816,6 +1378,20 @@
     sectionsData[currentSection].width = w;
     sectionsData[currentSection].height = h;
     setDirty(true);
+  };
+
+  window.applyDimensionsFromMobile = function() {
+    const wMobile = document.getElementById('canvasWidthInputMobile');
+    const hMobile = document.getElementById('canvasHeightInputMobile');
+    if (wMobile && canvasWidthInput) canvasWidthInput.value = wMobile.value;
+    if (hMobile && canvasHeightInput) canvasHeightInput.value = hMobile.value;
+    updateCanvasDimensions();
+    const modalEl = document.getElementById('dimensionsModal');
+    if (modalEl) {
+      const modal = bootstrap.Modal.getInstance(modalEl);
+      if (modal) modal.hide();
+    }
+    ui.toast('Canvas dimensions updated', 'success');
   };
 
   // ── Add New Section Prompt ────────────────────────────────────────────────
@@ -832,12 +1408,22 @@
         const newSec = res.value.trim();
         if (!sectionsData[newSec]) {
           sectionsData[newSec] = { name: newSec, width: 900, height: 500, grid_size: 40 };
-          const opt = document.createElement('option');
-          opt.value = newSec;
-          opt.textContent = newSec;
-          floorSelector.appendChild(opt);
+
+          if (floorSelector) {
+            const opt = document.createElement('option');
+            opt.value = newSec;
+            opt.textContent = newSec;
+            floorSelector.appendChild(opt);
+          }
+          if (floorSelectorSidebar) {
+            const optSide = document.createElement('option');
+            optSide.value = newSec;
+            optSide.textContent = newSec;
+            floorSelectorSidebar.appendChild(optSide);
+          }
         }
-        floorSelector.value = newSec;
+        if (floorSelector) floorSelector.value = newSec;
+        if (floorSelectorSidebar) floorSelectorSidebar.value = newSec;
         switchSection(newSec);
       }
     });
@@ -845,6 +1431,7 @@
 
   // ── Render Tables on Canvas ────────────────────────────────────────────────
   function renderCanvasItems() {
+    if (!floorCanvas) return;
     floorCanvas.innerHTML = '';
 
     const currentTables = allTables.filter(t => (t.section || 'Main Hall') === currentSection);
@@ -861,6 +1448,9 @@
       const itemEl = createTableElement(t);
       floorCanvas.appendChild(itemEl);
     });
+
+    const badge = document.getElementById('tableCountBadge');
+    if (badge) badge.textContent = currentTables.length + ' Tables';
   }
 
   function createTableElement(t) {
@@ -925,8 +1515,9 @@
 
     el.addEventListener('pointermove', (e) => {
       if (!isDragging) return;
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
+      // Account for zoom scale so touch drag coordinates track 1:1 on screen
+      const dx = (e.clientX - startX) / currentZoom;
+      const dy = (e.clientY - startY) / currentZoom;
 
       let newLeft = initialLeft + dx;
       let newTop = initialTop + dy;
@@ -981,25 +1572,73 @@
 
     const t = allTables.find(x => x.id === tableId);
     if (t) {
-      inspectorPanel.classList.add('active');
-      inspectName.value = t.name || '';
-      inspectCap.value = t.capacity || 4;
-      inspectShape.value = t.shape || 'square';
+      // Desktop inspector
+      if (inspectorPanel) inspectorPanel.classList.add('active');
+      if (inspectName) inspectName.value = t.name || '';
+      if (inspectCap) inspectCap.value = t.capacity || 4;
+      if (inspectShape) inspectShape.value = t.shape || 'square';
+
+      // Mobile inspector bottom sheet
+      const mSheet = document.getElementById('mobileInspectorSheet');
+      const mQuick = document.getElementById('mobileQuickShapesBar');
+      if (mSheet) {
+        mSheet.classList.add('active');
+        const mName = document.getElementById('inspectNameMobile');
+        const mCap = document.getElementById('inspectCapMobile');
+        const mShape = document.getElementById('inspectShapeMobile');
+        const mTitle = document.getElementById('mobileInspectTitle');
+        const mSec = document.getElementById('mobileInspectSection');
+
+        if (mName) mName.value = t.name || '';
+        if (mCap) mCap.value = t.capacity || 4;
+        if (mShape) mShape.value = t.shape || 'square';
+        if (mTitle) mTitle.textContent = t.name ? 'Table ' + t.name : 'Selected Item';
+        if (mSec) mSec.textContent = t.section || currentSection;
+
+        updateMobileShapeBadge(t.shape || 'square');
+      }
+      if (mQuick) mQuick.style.display = 'none';
     } else {
-      inspectorPanel.classList.remove('active');
+      if (inspectorPanel) inspectorPanel.classList.remove('active');
+      const mSheet = document.getElementById('mobileInspectorSheet');
+      const mQuick = document.getElementById('mobileQuickShapesBar');
+      if (mSheet) mSheet.classList.remove('active');
+      if (mQuick) mQuick.style.display = 'flex';
     }
   };
 
   window.deselectTable = function() {
     selectedTableId = null;
     document.querySelectorAll('.canvas-item').forEach(node => node.classList.remove('selected'));
-    inspectorPanel.classList.remove('active');
+    if (inspectorPanel) inspectorPanel.classList.remove('active');
+    const mSheet = document.getElementById('mobileInspectorSheet');
+    const mQuick = document.getElementById('mobileQuickShapesBar');
+    if (mSheet) mSheet.classList.remove('active');
+    if (mQuick) mQuick.style.display = 'flex';
   };
 
   window.handleCanvasBackgroundClick = function(e) {
     if (e.target === floorCanvas || e.target.id === 'canvasViewport') {
       deselectTable();
     }
+  };
+
+  function updateMobileShapeBadge(shape) {
+    const badge = document.getElementById('mobileInspectShapeBadge');
+    if (!badge) return;
+    if (shape === 'round') badge.innerHTML = '<span class="shape-icon-sm shape-round-sm" style="width:16px;height:16px;"></span>';
+    else if (shape === 'rect') badge.innerHTML = '<span class="shape-icon-sm shape-rect-sm" style="width:20px;height:14px;"></span>';
+    else if (shape === 'wall') badge.innerHTML = '<span class="shape-icon-sm shape-wall-sm" style="width:20px;height:6px;"></span>';
+    else badge.innerHTML = '<span class="shape-icon-sm shape-square-sm" style="width:16px;height:16px;"></span>';
+  }
+
+  window.stepCapacityMobile = function(delta) {
+    if (!selectedTableId) return;
+    const input = document.getElementById('inspectCapMobile');
+    if (!input) return;
+    let val = Math.max(0, Math.min(50, (parseInt(input.value) || 0) + delta));
+    input.value = val;
+    updateSelectedTableField('capacity', val);
   };
 
   window.updateSelectedTableField = function(field, val) {
@@ -1009,6 +1648,24 @@
 
     t[field] = val;
     setDirty(true);
+
+    // Sync desktop inputs
+    if (field === 'name') {
+      if (inspectName && inspectName.value !== val) inspectName.value = val;
+      const mName = document.getElementById('inspectNameMobile');
+      if (mName && mName.value !== val) mName.value = val;
+      const mTitle = document.getElementById('mobileInspectTitle');
+      if (mTitle) mTitle.textContent = val ? 'Table ' + val : 'Table';
+    } else if (field === 'capacity') {
+      if (inspectCap && parseInt(inspectCap.value) !== val) inspectCap.value = val;
+      const mCap = document.getElementById('inspectCapMobile');
+      if (mCap && parseInt(mCap.value) !== val) mCap.value = val;
+    } else if (field === 'shape') {
+      if (inspectShape && inspectShape.value !== val) inspectShape.value = val;
+      const mShape = document.getElementById('inspectShapeMobile');
+      if (mShape && mShape.value !== val) mShape.value = val;
+      updateMobileShapeBadge(val);
+    }
 
     // Re-render single node
     const node = document.getElementById('tableNode_' + selectedTableId);
@@ -1043,6 +1700,12 @@
       if (node) node.remove();
       deselectTable();
       setDirty(true);
+
+      const badge = document.getElementById('tableCountBadge');
+      if (badge) {
+        const currentTables = allTables.filter(x => (x.section || 'Main Hall') === currentSection);
+        badge.textContent = currentTables.length + ' Tables';
+      }
     }
   };
 
@@ -1064,8 +1727,8 @@
     if (!shape) return;
 
     const rect = floorCanvas.getBoundingClientRect();
-    let dropX = e.clientX - rect.left - 40;
-    let dropY = e.clientY - rect.top - 40;
+    let dropX = (e.clientX - rect.left - 40) / currentZoom;
+    let dropY = (e.clientY - rect.top - 40) / currentZoom;
 
     dropX = Math.max(0, Math.round(dropX / GRID_SIZE) * GRID_SIZE);
     dropY = Math.max(0, Math.round(dropY / GRID_SIZE) * GRID_SIZE);
@@ -1075,11 +1738,31 @@
   };
 
   window.addTableFromPalette = function(shape) {
-    // Add in center of floor
-    const w = floorCanvas.clientWidth;
-    const h = floorCanvas.clientHeight;
-    let posX = Math.round((w / 2 - 40) / GRID_SIZE) * GRID_SIZE;
-    let posY = Math.round((h / 2 - 40) / GRID_SIZE) * GRID_SIZE;
+    const viewport = document.getElementById('canvasViewport');
+    let posX, posY;
+
+    if (viewport && floorCanvas) {
+      const viewW = viewport.clientWidth;
+      const viewH = viewport.clientHeight;
+      const rect = floorCanvas.getBoundingClientRect();
+      const viewRect = viewport.getBoundingClientRect();
+
+      // Center in canvas coordinate space relative to current viewport view
+      const centerCanvasX = ((viewRect.left + viewW / 2) - rect.left) / currentZoom;
+      const centerCanvasY = ((viewRect.top + viewH / 2) - rect.top) / currentZoom;
+
+      posX = Math.max(0, Math.round((centerCanvasX - 40) / GRID_SIZE) * GRID_SIZE);
+      posY = Math.max(0, Math.round((centerCanvasY - 40) / GRID_SIZE) * GRID_SIZE);
+
+      posX = Math.min(posX, Math.max(0, floorCanvas.clientWidth - 80));
+      posY = Math.min(posY, Math.max(0, floorCanvas.clientHeight - 80));
+    } else {
+      const w = floorCanvas ? floorCanvas.clientWidth : 900;
+      const h = floorCanvas ? floorCanvas.clientHeight : 500;
+      posX = Math.round((w / 2 - 40) / GRID_SIZE) * GRID_SIZE;
+      posY = Math.round((h / 2 - 40) / GRID_SIZE) * GRID_SIZE;
+    }
+
     addTable(shape, posX, posY);
   };
 
@@ -1100,10 +1783,54 @@
 
     allTables.push(newT);
     const el = createTableElement(newT);
-    floorCanvas.appendChild(el);
+    if (floorCanvas) floorCanvas.appendChild(el);
     selectTable(tempId);
     setDirty(true);
+
+    const badge = document.getElementById('tableCountBadge');
+    if (badge) {
+      const currentTables = allTables.filter(x => (x.section || 'Main Hall') === currentSection);
+      badge.textContent = currentTables.length + ' Tables';
+    }
   }
+
+  // ── Zoom & Fit Controls ───────────────────────────────────────────────────
+  window.setZoom = function(scale) {
+    currentZoom = Math.max(0.25, Math.min(2.5, scale));
+    if (floorCanvas) {
+      floorCanvas.style.transform = `scale(${currentZoom})`;
+    }
+    const label = document.getElementById('zoomLevelLabel');
+    if (label) label.textContent = Math.round(currentZoom * 100) + '%';
+  };
+
+  window.resetCanvasZoom = function() {
+    setZoom(1.0);
+    isFitMode = false;
+    const textEl = document.getElementById('fitZoomText');
+    if (textEl) textEl.textContent = 'Fit';
+  };
+
+  window.toggleFitZoom = function() {
+    const viewport = document.getElementById('canvasViewport');
+    if (!viewport || !floorCanvas) return;
+
+    if (isFitMode) {
+      resetCanvasZoom();
+    } else {
+      const pad = window.innerWidth < 768 ? 20 : 60;
+      const availW = viewport.clientWidth - pad;
+      const availH = viewport.clientHeight - pad;
+      const canvasW = parseInt(floorCanvas.style.width) || 900;
+      const canvasH = parseInt(floorCanvas.style.height) || 500;
+      const scale = Math.min(availW / canvasW, availH / canvasH, 1.0);
+
+      setZoom(scale);
+      isFitMode = true;
+      const textEl = document.getElementById('fitZoomText');
+      if (textEl) textEl.textContent = '100%';
+    }
+  };
 
   // ── Dirty State & Save ─────────────────────────────────────────────────────
   function setDirty(state) {
@@ -1116,8 +1843,8 @@
     const btn = document.getElementById('btnSaveTop');
     if (btn) btn.disabled = true;
 
-    const w = parseInt(canvasWidthInput.value) || 900;
-    const h = parseInt(canvasHeightInput.value) || 500;
+    const w = parseInt(canvasWidthInput ? canvasWidthInput.value : 900) || 900;
+    const h = parseInt(canvasHeightInput ? canvasHeightInput.value : 500) || 500;
 
     // Tables on current floor
     const payload = {
@@ -1168,7 +1895,23 @@
   // ── Simulation Actions ─────────────────────────────────────────────────────
   window.toggleSimCard = function() {
     const card = document.getElementById('simCard');
-    if (card) card.classList.toggle('collapsed');
+    if (card) {
+      card.classList.toggle('collapsed');
+      const isCollapsed = card.classList.contains('collapsed');
+      const chevron = document.getElementById('simChevron');
+      if (chevron) {
+        chevron.className = isCollapsed ? 'bi bi-chevron-down' : 'bi bi-chevron-up';
+      }
+    }
+  };
+
+  window.runSimActionAndClose = function(actionType) {
+    const modalEl = document.getElementById('simModal');
+    if (modalEl) {
+      const modal = bootstrap.Modal.getInstance(modalEl);
+      if (modal) modal.hide();
+    }
+    simulateAction(actionType);
   };
 
   window.simulateAction = function(actionType) {

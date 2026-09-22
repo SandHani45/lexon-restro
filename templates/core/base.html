@@ -1343,6 +1343,36 @@
             white-space: nowrap;
         }
 
+        /* ── Universal Subbar Navigation Pill Button ─────── */
+        .btn-subbar-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.35rem 0.85rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: var(--font-main, 'Outfit', sans-serif);
+            border-radius: 999px;
+            border: 1px solid var(--border-color);
+            background: var(--surface-2, var(--panel-bg));
+            color: var(--text-main);
+            text-decoration: none !important;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            white-space: nowrap;
+            line-height: 1.25;
+            min-height: 32px;
+        }
+        .btn-subbar-pill:hover {
+            border-color: var(--pos-red, var(--accent-gold));
+            color: var(--pos-red, var(--accent-gold));
+            background: var(--surface-3, var(--panel-bg));
+            transform: translateY(-1px);
+        }
+        .btn-subbar-pill:active {
+            transform: translateY(0);
+        }
+
         /* ── Main Content Area ────────────────────────────── */
         #pos-main {
             flex: 1;
@@ -1567,8 +1597,8 @@
                 </a>
                 {% endif %}
 
-                {# Live Floor Plan #}
-                {% if request.user.role != "chef" and request.user.role != "kitchen" %}
+                {# Live Floor Plan & Tables (only if floor_plan feature enabled) #}
+                {% if 'floor_plan' in tenant_features and request.user.role != "chef" and request.user.role != "kitchen" %}
                 <a href="/tables/live/"
                    class="sidebar-item {% if '/tables/live' in p or '/tables/all' in p %}active{% endif %}"
                    data-label="Live Floor">
@@ -1582,7 +1612,7 @@
                    data-label="Tables">
                     <span class="notif-wrapper">
                         <i class="bi bi-grid-3x3-gap"></i>
-                        {% if 'qr_menu' in tenant_features and 'floor_plan' in tenant_features %}
+                        {% if 'qr_menu' in tenant_features %}
                         <span class="notif-badge hidden" id="notif-badge-qr"></span>
                         {% endif %}
                     </span>
@@ -1743,12 +1773,14 @@
                 </a>
 
                 {# Floor Editor #}
+                {% if 'floor_plan' in tenant_features %}
                 <a href="/floor-editor/"
                    class="sidebar-item {% if '/floor-editor' in p %}active{% endif %}"
                    data-label="Floor Editor">
                     <i class="bi bi-grid-1x2"></i>
                     <span class="sidebar-label">Floor Editor</span>
                 </a>
+                {% endif %}
 
                 {# Finance / Expenses #}
                 <a href="/finance/"
@@ -1840,6 +1872,16 @@
                     <span class="sidebar-label">Full Screen</span>
                 </button>
 
+                {# Dark / Light Mode Toggle #}
+                <button class="sidebar-item"
+                        onclick="themeManager.toggle()"
+                        data-label="Toggle Theme"
+                        id="theme-sidebar-btn"
+                        title="Toggle Dark / Light Mode">
+                    <i class="bi bi-moon theme-toggle-icon" id="themeIcon"></i>
+                    <span class="sidebar-label" id="themeLabelText">Dark Mode</span>
+                </button>
+
                 {# Logout #}
                 <a href="/logout/"
                    class="sidebar-item"
@@ -1867,7 +1909,7 @@
         <div id="pos-right">
 
             <!-- ── Top bar ── -->
-            <header id="pos-topbar">
+            <header id="pos-topbar" class="pos-header">
                 <!-- Hamburger — mobile only -->
                 <button id="mobile-menu-btn"
                         class="btn-icon"
@@ -1911,9 +1953,6 @@
                             <i class="bi bi-clock-history"></i>
                         </a>
                         {% endif %}
-                        <button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Dark / Light Mode">
-                            <i class="bi bi-moon" id="themeIcon"></i>
-                        </button>
                         {% endblock %}
                     </div>
                     </div><!-- /.topbar-more-wrap -->
@@ -1970,19 +2009,29 @@
         // --- 1. Theme Management (toggles on <html> so html.dark CSS selector works) ---
         const themeManager = {
             init() {
-                // The dark/light class itself is already set by the inline <head>
-                // script (before the theme CSS loads, to prevent a flash of the
-                // wrong theme) - this only syncs the toggle icon, which can't run
-                // until the icon element exists in the DOM.
-                const icon = document.getElementById("themeIcon");
-                if (icon) icon.className = this.isDark() ? "bi bi-sun" : "bi bi-moon";
+                const isDark = this.isDark();
+                this.updateUI(isDark);
             },
             toggle() {
                 const isDark = document.documentElement.classList.toggle("dark");
                 localStorage.setItem("dark", isDark);
-                const icon = document.getElementById("themeIcon");
-                if (icon) icon.className = isDark ? "bi bi-sun" : "bi bi-moon";
+                this.updateUI(isDark);
                 window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: isDark ? "dark" : "light" } }));
+            },
+            updateUI(isDark) {
+                const icons = document.querySelectorAll("#themeIcon, .theme-toggle-icon");
+                icons.forEach(icon => {
+                    icon.className = isDark ? "bi bi-sun theme-toggle-icon" : "bi bi-moon theme-toggle-icon";
+                });
+                const label = document.getElementById("themeLabelText");
+                if (label) {
+                    label.textContent = isDark ? "Light Mode" : "Dark Mode";
+                }
+                const btn = document.getElementById("theme-sidebar-btn");
+                if (btn) {
+                    btn.setAttribute("data-label", isDark ? "Light Mode" : "Dark Mode");
+                    btn.setAttribute("title", isDark ? "Switch to Light Mode" : "Switch to Dark Mode");
+                }
             },
             isDark() { return document.documentElement.classList.contains("dark"); }
         };

@@ -81,17 +81,14 @@
 </div>
 {% endblock %}
 
-{% block header_right %}
-<a href="{% url 'dashboard' %}" class="btn-luxury text-decoration-none d-none d-sm-inline-flex">
-    <i class="bi bi-arrow-left me-1"></i> Dashboard
-</a>
-<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme">
-    <i class="bi bi-moon" id="themeIcon"></i>
-</button>
-{% endblock %}
-
 {% block content %}
 <div class="wrap">
+
+    <div class="mb-3">
+        <a href="{% url 'dashboard' %}" class="btn-subbar-pill text-decoration-none" title="Back to Dashboard">
+            <i class="bi bi-arrow-left me-1"></i> Dashboard
+        </a>
+    </div>
 
     <div class="staff-banner">
         <i class="bi bi-shield-lock-fill"></i>

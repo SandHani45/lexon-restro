@@ -67,7 +67,6 @@
 {% endblock %}
 
 {% block header_right %}
-<a href="{% if 'floor_plan' in tenant_features %}/tables/{% else %}/token/{% endif %}" class="btn-icon" title="Back to POS"><i class="bi bi-arrow-left"></i></a>
 <button onclick="window.print()" class="btn-icon no-print" title="Print"><i class="bi bi-printer"></i></button>
 {{ block.super }}
 {% endblock %}

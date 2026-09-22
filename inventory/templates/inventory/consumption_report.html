@@ -60,13 +60,14 @@
 </div>
 {% endblock %}
 
-{% block header_right %}
-<a href="/inventory/board/" class="btn-luxury text-decoration-none d-none d-sm-inline-flex"><i class="bi bi-arrow-left me-1"></i> Inventory</a>
-<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme"><i class="bi bi-moon" id="themeIcon"></i></button>
-{% endblock %}
-
 {% block content %}
 <div class="page-body">
+
+  <div class="mb-3">
+    <a href="/inventory/board/" class="btn-subbar-pill text-decoration-none" title="Back to Inventory">
+      <i class="bi bi-arrow-left me-1"></i> Inventory Board
+    </a>
+  </div>
 
   <div class="page-eyebrow">Inventory</div>
   <h1 class="page-title">Consumption Report</h1>

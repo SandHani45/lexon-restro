@@ -222,9 +222,6 @@
     <button id="toggle-inhouse" class="btn-luxury" style="padding:0.3rem 0.6rem;font-size:0.7rem;{% if aggregator.inhouse_delivery_enabled %}background:#10b981;color:#fff;border-color:#10b981;{% endif %}" onclick="toggleAggregator('inhouse', {% if aggregator.inhouse_delivery_enabled %}false{% else %}true{% endif %})">Delivery</button>
 </div>
 {% endif %}
-<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Dark / Light Mode">
-    <i class="bi bi-moon" id="themeIcon"></i>
-</button>
 {% endblock %}
 
 {% block content %}

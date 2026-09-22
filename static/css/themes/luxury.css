@@ -19,6 +19,7 @@
     /* Surface */
     --bg-color:          #F7F7F9;
     --panel-bg:          #ffffff;
+    --card-bg:           #ffffff;
     --surface-2:         #F2EDE9;
     --surface-3:         #ECE7E2;
 
@@ -86,6 +87,7 @@ html.dark {
 
     --bg-color:    #0a0a0a;
     --panel-bg:    #121214;
+    --card-bg:     #161922;
     --surface-2:   #18181b;
     --surface-3:   #222226;
     --text-main:   #f4f4f6;

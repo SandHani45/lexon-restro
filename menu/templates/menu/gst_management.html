@@ -115,7 +115,6 @@
 {% block header_left %}
 <div>
     <a href="{% url 'menu_management' %}" class="brand-title" style="font-size:1.2rem;">
-        <i class="bi bi-arrow-left" style="color:var(--text-muted); font-size:0.9rem;"></i>
         <span style="color:var(--accent-gold);">{{ tax_label|default:"GST" }} Rates</span>
     </a>
     <p class="brand-subtitle">{{ request.user.outlet.name }}</p>
@@ -124,6 +123,12 @@
 
 {% block content %}
 <main class="gst-main">
+
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <a href="{% url 'menu_management' %}" class="btn-subbar-pill text-decoration-none">
+            <i class="bi bi-arrow-left me-1"></i> Back to Menu
+        </a>
+    </div>
 
     <div class="info-banner">
         <strong>Set the correct {{ tax_label|default:"GST" }} rate per item.</strong> Changes save instantly — no page reload needed.<br>

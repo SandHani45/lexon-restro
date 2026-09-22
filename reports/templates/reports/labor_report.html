@@ -62,11 +62,6 @@
 <p class="brand-subtitle"><i class="bi bi-geo-alt me-1"></i>{{ request.user.outlet.name }}</p>
 {% endblock %}
 
-{% block header_right %}
-<a href="/dashboard/" class="btn-icon" title="Back to POS"><i class="bi bi-arrow-left"></i></a>
-<button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Dark / Light Mode"><i class="bi bi-moon" id="themeIcon"></i></button>
-{% endblock %}
-
 {% block content %}
 <nav class="report-subnav">
   <div class="report-subnav-left">

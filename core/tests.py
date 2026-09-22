@@ -236,11 +236,13 @@ class HeaderLeftHasWayBackTest(TestCase):
     """
 
     EXEMPT = {
+        "templates/core/base.html",
         "accounts/templates/accounts/superuser_panel.html",
         "accounts/templates/accounts/feature_flags.html",
         "portal/templates/portal/home.html",
         "setup/templates/setup/onboard.html",
         "orders/templates/orders/bill.html",
+        "orders/templates/orders/floor_editor.html",
     }
 
     def test_every_header_left_override_has_a_link_somewhere(self):

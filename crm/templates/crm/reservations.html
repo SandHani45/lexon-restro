@@ -276,9 +276,6 @@
 <button class="btn-subbar-new" data-bs-toggle="modal" data-bs-target="#newBookingModal">
     <i class="bi bi-plus-lg"></i> New Booking
 </button>
-<a href="/dashboard/" class="btn-subbar-pill d-none d-sm-inline-flex">
-    <i class="bi bi-arrow-left"></i> Dashboard
-</a>
 {% endblock %}
 
 {% block content %}
@@ -299,6 +296,10 @@
     </div>
 
     <div class="d-flex align-items-center gap-2 flex-wrap">
+        <a href="/dashboard/" class="btn-subbar-pill text-decoration-none" title="Back to Dashboard">
+            <i class="bi bi-arrow-left me-1"></i> Dashboard
+        </a>
+
         <!-- Date indicator -->
         <div class="btn-subbar-pill" style="cursor:default;">
             <i class="bi bi-calendar3" style="color:var(--pos-red);"></i>

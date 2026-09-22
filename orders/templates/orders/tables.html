@@ -975,6 +975,478 @@
     box-shadow: 0 6px 18px rgba(236, 39, 52, 0.38);
   }
 
+  /* ── Manage Floor Tables Responsive System (Mobile Phone, Tablet, Desktop) ── */
+  .manage-tables-modal-content {
+    background: var(--panel-bg);
+    border-radius: 24px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+    overflow: hidden;
+  }
+  .manage-modal-header {
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.1rem 1.4rem;
+    background: var(--panel-bg);
+  }
+  .manage-modal-icon-badge {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 12px;
+    background: rgba(236, 39, 52, 0.12);
+    color: var(--pos-red);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+  }
+  .manage-modal-subtitle {
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    line-height: 1.3;
+  }
+  .btn-open-editor {
+    font-size: 0.78rem;
+    padding: 6px 12px;
+    white-space: nowrap;
+  }
+
+  /* Toolbar */
+  .manage-tables-toolbar {
+    margin-bottom: 0.6rem;
+  }
+  .manage-tables-search-wrap {
+    position: relative;
+    width: 100%;
+  }
+  .manage-tables-search-wrap .search-icon {
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+  .manage-tables-search-input {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    padding: 0.5rem 2.2rem 0.5rem 2.3rem;
+    font-size: 0.84rem;
+    color: var(--text-main);
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    transition: all 0.15s ease;
+    outline: none;
+  }
+  .manage-tables-search-input:focus {
+    border-color: var(--pos-red);
+    box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.14);
+    background: var(--panel-bg);
+  }
+  .search-clear-btn {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .manage-tables-count-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: var(--surface-2);
+    border: 1px solid var(--border-color);
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+  }
+  .manage-tables-count-badge span {
+    color: var(--pos-red);
+  }
+
+  /* Desktop Header Row */
+  .manage-tables-desktop-header {
+    grid-template-columns: 140px 1fr 125px 145px;
+    gap: 12px;
+    padding: 0.45rem 1rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--border-color);
+    font-family: var(--font-main, 'Outfit', sans-serif);
+  }
+
+  /* Scrollable List */
+  .manage-tables-list {
+    max-height: 48vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0.2rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .manage-tables-list::-webkit-scrollbar {
+    width: 4px;
+  }
+  .manage-tables-list::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 999px;
+  }
+
+  /* Responsive Table Card */
+  .manage-table-card {
+    transition: all 0.18s ease;
+    border: 1px solid var(--border-color);
+    background: var(--surface-2);
+    font-family: var(--font-main, 'Outfit', sans-serif);
+  }
+
+  /* Inputs inside manage cards */
+  .manage-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+  .manage-field-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-left: 2px;
+  }
+  .manage-input-wrapper {
+    position: relative;
+    width: 100%;
+  }
+  .manage-input-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+  .manage-input {
+    width: 100%;
+    background: var(--panel-bg);
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    padding: 0.5rem 0.7rem 0.5rem 2rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-main);
+    font-family: inherit;
+    transition: all 0.15s ease;
+    box-sizing: border-box;
+  }
+  .manage-input:focus {
+    border-color: var(--pos-red);
+    box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.16);
+    outline: none;
+    background: var(--panel-bg);
+  }
+
+  /* Card Action Buttons */
+  .btn-table-qr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: var(--panel-bg);
+    color: var(--text-main);
+    border: 1.5px solid var(--border-color);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-decoration: none !important;
+  }
+  .btn-table-qr:hover {
+    border-color: var(--pos-red);
+    color: var(--pos-red);
+    background: var(--pos-red-soft);
+  }
+  .btn-table-save {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: var(--pos-red);
+    color: #ffffff !important;
+    border: none;
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(236, 39, 52, 0.28);
+    transition: all 0.18s ease;
+  }
+  .btn-table-save:hover {
+    background: var(--pos-red-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(236, 39, 52, 0.4);
+  }
+  .btn-table-save.btn-saved {
+    background: #10b981 !important;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35) !important;
+  }
+  .btn-table-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1.5px solid transparent;
+    border-radius: 999px;
+    width: 36px;
+    height: 36px;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    flex-shrink: 0;
+  }
+  .btn-table-delete:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.2);
+  }
+
+  /* Add Table Card */
+  .add-table-card {
+    background: var(--surface-2);
+    border: 1.5px dashed var(--border-color);
+    border-radius: 18px;
+    padding: 1rem 1.2rem;
+    margin-top: 0.4rem;
+    transition: border-color 0.2s ease;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+  }
+  .add-table-card:focus-within {
+    border-color: var(--pos-red);
+  }
+  .add-table-badge {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    background: var(--pos-red);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    font-weight: 800;
+  }
+  .add-table-title {
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: var(--text-main);
+  }
+  .add-table-hint {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+  .btn-add-table-submit {
+    background: var(--pos-red);
+    color: #ffffff !important;
+    border: none;
+    border-radius: 999px;
+    padding: 0.52rem 1.2rem;
+    font-size: 0.84rem;
+    font-weight: 700;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    box-shadow: 0 3px 12px rgba(236, 39, 52, 0.3);
+    transition: all 0.2s ease;
+    width: 100%;
+    min-height: 38px;
+    white-space: nowrap;
+  }
+  .btn-add-table-submit:hover {
+    background: var(--pos-red-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 16px rgba(236, 39, 52, 0.42);
+  }
+  .add-table-chips {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .chips-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+  }
+  .section-chip-btn {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .section-chip-btn:hover {
+    border-color: var(--pos-red);
+    color: var(--pos-red);
+    background: var(--pos-red-soft);
+  }
+
+  /* QR Modal Preview */
+  .qr-preview-box {
+    background: #ffffff;
+    padding: 16px;
+    border-radius: 18px;
+    display: inline-block;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  /* ── Media Queries for Responsive Breakdown ── */
+  /* Desktop & Tablet Landscape (>= 768px): Clean Grid Layout */
+  @media (min-width: 768px) {
+    .manage-table-card {
+      display: grid;
+      grid-template-columns: 140px 1fr 125px 145px;
+      gap: 12px;
+      align-items: center;
+      padding: 0.55rem 0.85rem;
+      border-radius: 14px;
+    }
+    .manage-table-card:hover {
+      border-color: rgba(236, 39, 52, 0.35);
+      background: var(--panel-bg);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+    }
+    .manage-table-card-fields {
+      display: contents;
+    }
+    .manage-table-card-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+    .add-table-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 10px;
+      align-items: flex-end;
+    }
+    .add-table-field {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+  }
+
+  /* Mobile & Tablet Portrait (< 768px): Native App Card Layout */
+  @media (max-width: 767px) {
+    .manage-tables-modal-content {
+      border-radius: 20px;
+      margin: 0.5rem;
+    }
+    .manage-modal-header {
+      padding: 0.9rem 1rem;
+    }
+    .manage-modal-header .modal-title {
+      font-size: 1.05rem;
+    }
+    .manage-table-card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 0.85rem;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+    .manage-table-card-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .manage-input {
+      font-size: 0.9rem; /* Prevents iOS auto-zoom on input tap */
+      padding: 0.55rem 0.6rem 0.55rem 2rem;
+    }
+    .manage-table-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+    }
+    .btn-table-qr {
+      flex: 1;
+      min-height: 40px;
+      padding: 8px 12px;
+      font-size: 0.82rem;
+    }
+    .btn-table-save {
+      flex: 1;
+      min-height: 40px;
+      padding: 8px 14px;
+      font-size: 0.82rem;
+    }
+    .btn-table-delete {
+      width: 40px;
+      height: 40px;
+      border-color: var(--border-color);
+    }
+    .add-table-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .add-table-field {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .add-table-btn-col {
+      grid-column: 1 / -1;
+      margin-top: 4px;
+    }
+    .btn-add-table-submit {
+      min-height: 44px;
+      font-size: 0.9rem;
+    }
+  }
+
   .toast-minimal {
     position: fixed;
     top: 20px;
@@ -1023,9 +1495,6 @@
   </button>
   <button class="btn-subbar-pill" data-bs-toggle="modal" data-bs-target="#transferModal">
     <i class="bi bi-arrow-left-right me-1"></i> Transfer
-  </button>
-  <button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Theme">
-    <i class="bi bi-moon" id="themeIcon"></i>
   </button>
 </div>
 {% endblock %}
@@ -1264,71 +1733,118 @@
 </div>
 
 <!-- MANAGE TABLES MODAL -->
-<div class="modal fade" id="manageTablesModal">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content">
-      <div class="modal-header d-flex justify-content-between align-items-center">
-        <h5 class="modal-title m-0"><i class="bi bi-gear-wide-connected me-2 text-danger"></i>Manage Floor Tables</h5>
-        <div class="d-flex align-items-center gap-2">
-          <a href="/floor-editor/" class="btn-subbar-pill text-decoration-none">
-            <i class="bi bi-pencil-square me-1"></i> Open Floor Editor
+<div class="modal fade" id="manageTablesModal" tabindex="-1" aria-labelledby="manageTablesModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+    <div class="modal-content manage-tables-modal-content">
+      <div class="modal-header manage-modal-header d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2 min-w-0">
+          <div class="manage-modal-icon-badge">
+            <i class="bi bi-grid-3x3-gap-fill"></i>
+          </div>
+          <div class="min-w-0">
+            <h5 class="modal-title mb-0 text-truncate" id="manageTablesModalLabel">Manage Floor Tables</h5>
+            <span class="manage-modal-subtitle d-none d-sm-block">Configure table names, sections &amp; QR codes</span>
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-shrink-0">
+          <a href="/floor-editor/" class="btn-subbar-pill btn-open-editor text-decoration-none" title="Open Visual Floor Editor">
+            <i class="bi bi-pencil-square"></i>
+            <span class="d-none d-sm-inline ms-1">Floor Editor</span>
           </a>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
       </div>
-      <div class="modal-body d-flex flex-column gap-3">
-        <div class="table-responsive">
-          <table class="table table-borderless align-middle" style="color:var(--text-main);">
-            <thead style="border-bottom:2px solid var(--border-color);">
-              <tr style="font-family:var(--font-main, 'Outfit', sans-serif);font-size:0.78rem;text-transform:uppercase;color:var(--text-muted);letter-spacing:0.8px;">
-                <th>Table Name</th>
-                <th>Section</th>
-                <th>QR Code</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="tblManageList"></tbody>
-          </table>
-        </div>
-        <hr class="my-2" style="border-color:var(--border-color);">
-        <h6 style="font-family:var(--font-main, 'Outfit', sans-serif);font-weight:800;" class="mb-3">Add New Floor Table</h6>
-        <div class="row g-2 align-items-center">
-          <div class="col-12 col-md-5">
-            <input type="text" id="newTableName" class="form-control form-select-luxury m-0" placeholder="Table Name (e.g. T-12)">
-          </div>
-          <div class="col-12 col-md-4">
-            <input type="text" id="newTableSection" class="form-control form-select-luxury m-0" placeholder="Section (e.g. Patio, Hall)">
-          </div>
-          <div class="col-12 col-md-3">
-            <button class="btn-modal-primary m-0" style="padding:0.7rem 1.2rem;" onclick="createTable()">
-              <i class="bi bi-plus-lg me-1"></i> Add Table
+      <div class="modal-body manage-modal-body d-flex flex-column gap-3 p-3 p-sm-4">
+        
+        <!-- Search & Count Toolbar -->
+        <div class="manage-tables-toolbar d-flex align-items-center justify-content-between gap-2">
+          <div class="manage-tables-search-wrap flex-grow-1">
+            <i class="bi bi-search search-icon"></i>
+            <input type="text" id="manageTableSearch" class="manage-tables-search-input" placeholder="Search by table or section..." oninput="filterManageTables(this.value)">
+            <button type="button" class="search-clear-btn" id="manageSearchClear" onclick="clearManageTableSearch()" style="display:none;" title="Clear search">
+              <i class="bi bi-x-circle-fill"></i>
             </button>
           </div>
+          <div class="manage-tables-count-badge">
+            <span id="manageTablesCount">0</span> Tables
+          </div>
         </div>
+
+        <!-- Desktop Header Row (Hidden on Mobile) -->
+        <div class="manage-tables-desktop-header d-none d-md-grid">
+          <div>Table Name</div>
+          <div>Section</div>
+          <div class="text-center">QR Code</div>
+          <div class="text-end">Actions</div>
+        </div>
+
+        <!-- Tables List (Adaptive: Cards on Mobile, Grid Rows on Desktop) -->
+        <div id="tblManageList" class="manage-tables-list">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <!-- Add New Table Card -->
+        <div class="add-table-card">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <div class="d-flex align-items-center gap-2">
+              <span class="add-table-badge"><i class="bi bi-plus"></i></span>
+              <span class="add-table-title">Add New Floor Table</span>
+            </div>
+            <span class="add-table-hint d-none d-sm-inline">Auto-generates digital QR code</span>
+          </div>
+          <div class="add-table-grid">
+            <div class="add-table-field">
+              <label class="manage-field-label">Table Name</label>
+              <div class="manage-input-wrapper">
+                <i class="bi bi-grid-3x3-gap manage-input-icon"></i>
+                <input type="text" id="newTableName" class="manage-input" placeholder="e.g. T-12, Table 5" autocomplete="off">
+              </div>
+            </div>
+            <div class="add-table-field">
+              <label class="manage-field-label">Section</label>
+              <div class="manage-input-wrapper">
+                <i class="bi bi-geo-alt manage-input-icon"></i>
+                <input type="text" id="newTableSection" class="manage-input" placeholder="e.g. Main Hall, Patio" list="sectionsDatalist" autocomplete="off">
+              </div>
+            </div>
+            <div class="add-table-field add-table-btn-col">
+              <button type="button" class="btn-add-table-submit" onclick="createTable()">
+                <i class="bi bi-plus-lg me-1"></i> Add Table
+              </button>
+            </div>
+          </div>
+          <!-- Quick section chips -->
+          <div class="add-table-chips" id="quickSectionChips"></div>
+        </div>
+        <datalist id="sectionsDatalist"></datalist>
+
       </div>
     </div>
   </div>
 </div>
 
 <!-- QR CODE MODAL -->
-<div class="modal fade" id="qrModal">
+<div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-sm">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title m-0" id="qrModalTitle">Table QR Code</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="modal-content manage-tables-modal-content">
+      <div class="modal-header d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2 min-w-0">
+          <i class="bi bi-qr-code text-danger" style="font-size:1.15rem;"></i>
+          <h5 class="modal-title m-0 text-truncate" id="qrModalTitle">Table QR Code</h5>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body text-center p-4">
-        <div style="background:#ffffff;padding:12px;border-radius:14px;display:inline-block;box-shadow:0 4px 14px rgba(0,0,0,0.08);margin-bottom:1rem;">
+        <div class="qr-preview-box">
           <img id="qrImage" src="" alt="QR Code" class="img-fluid rounded" style="width:200px;height:200px;display:block;">
         </div>
         <p class="text-muted small mb-3">Scan this QR code to load the digital self-ordering menu for this table.</p>
-        <div class="d-flex gap-2">
-          <button class="btn-subbar-new flex-1 justify-content-center" id="qrViewBtn">
-            <i class="bi bi-box-arrow-up-right me-1"></i> View Large
+        <div class="d-flex flex-column gap-2">
+          <button class="btn-subbar-new justify-content-center w-100" id="qrViewBtn">
+            <i class="bi bi-box-arrow-up-right me-1"></i> Open Menu Link
           </button>
-          <button class="btn-subbar-pill flex-1 justify-content-center" data-bs-toggle="modal" data-bs-target="#manageTablesModal">
-            Back
+          <button class="btn-subbar-pill justify-content-center w-100" data-bs-toggle="modal" data-bs-target="#manageTablesModal">
+            <i class="bi bi-arrow-left me-1"></i> Back to Tables
           </button>
         </div>
       </div>
@@ -1942,55 +2458,234 @@
     if (tfVal) tf.value = tfVal; if (ttVal) tt.value = ttVal;
 
     if (mList) {
-      mList.innerHTML = tableDataStore.map(t => `
-        <tr style="border-bottom:1px solid var(--border-color);">
-          <td style="padding:0.65rem 0.5rem;"><input type="text" class="form-control form-select-luxury m-0 py-1 px-2" style="font-size:0.85rem;" value="${t.name}" id="editName_${t.id}"></td>
-          <td style="padding:0.65rem 0.5rem;"><input type="text" class="form-control form-select-luxury m-0 py-1 px-2" style="font-size:0.85rem;" value="${t.section || ''}" id="editSec_${t.id}"></td>
-          <td style="padding:0.65rem 0.5rem;"><button class="btn-subbar-pill" style="padding:4px 10px;font-size:0.75rem;" onclick="showQrModal('${t.qr_token}', '${t.name}')"><i class="bi bi-qr-code"></i> View QR</button></td>
-          <td style="padding:0.65rem 0.5rem;"><button class="btn-subbar-new" style="padding:4px 12px;font-size:0.75rem;" onclick="updateTable(${t.id})">Save</button></td>
-        </tr>
-      `).join('');
+      const countEl = document.getElementById("manageTablesCount");
+      if (countEl) countEl.textContent = tableDataStore.length;
+
+      // Populate unique sections for datalist & quick chips
+      const uniqueSections = Array.from(new Set(tableDataStore.map(t => (t.section || '').trim()).filter(Boolean)));
+      const dl = document.getElementById("sectionsDatalist");
+      if (dl) {
+        dl.innerHTML = uniqueSections.map(s => `<option value="${escapeHtml(s)}">`).join('');
+      }
+      const chipsEl = document.getElementById("quickSectionChips");
+      if (chipsEl) {
+        if (uniqueSections.length > 0) {
+          chipsEl.innerHTML = '<span class="chips-label">Quick:</span>' + uniqueSections.map(s => `
+            <button type="button" class="section-chip-btn" onclick="document.getElementById('newTableSection').value='${escapeHtml(s)}'">${escapeHtml(s)}</button>
+          `).join('');
+        } else {
+          chipsEl.innerHTML = '';
+        }
+      }
+
+      if (tableDataStore.length === 0) {
+        mList.innerHTML = `
+          <div class="manage-tables-empty text-center py-4 px-2">
+            <i class="bi bi-grid-3x3-gap d-block mb-2" style="font-size:2.2rem;opacity:0.35;color:var(--text-muted);"></i>
+            <div class="fw-bold" style="color:var(--text-main);font-size:0.92rem;">No tables configured yet</div>
+            <div class="text-muted small mt-1">Use the form below to add your first floor table.</div>
+          </div>
+        `;
+      } else {
+        mList.innerHTML = tableDataStore.map(t => {
+          const escName = escapeHtml(t.name);
+          const escSec = escapeHtml(t.section || '');
+          const isFree = !t.status || t.status === 'free';
+          const statusBadge = !isFree
+            ? `<span class="badge bg-danger-subtle text-danger ms-1" style="font-size:0.62rem;border-radius:999px;">Active</span>`
+            : '';
+          return `
+            <div class="manage-table-card" id="tblRow_${t.id}" data-name="${escName.toLowerCase()}" data-section="${escSec.toLowerCase()}">
+              <div class="manage-table-card-fields">
+                <div class="manage-field-group">
+                  <span class="manage-field-label d-md-none">Table Name ${statusBadge}</span>
+                  <div class="manage-input-wrapper">
+                    <i class="bi bi-grid-3x3-gap manage-input-icon"></i>
+                    <input type="text" class="manage-input" value="${escName}" id="editName_${t.id}" placeholder="e.g. T-1" autocomplete="off">
+                  </div>
+                </div>
+                <div class="manage-field-group">
+                  <span class="manage-field-label d-md-none">Section</span>
+                  <div class="manage-input-wrapper">
+                    <i class="bi bi-geo-alt manage-input-icon"></i>
+                    <input type="text" class="manage-input" value="${escSec}" id="editSec_${t.id}" placeholder="e.g. Main Hall" list="sectionsDatalist" autocomplete="off">
+                  </div>
+                </div>
+              </div>
+              <div class="manage-table-card-actions">
+                <button type="button" class="btn-table-qr" onclick="showQrModal('${t.qr_token}', '${escName}')" title="View & Download QR Code">
+                  <i class="bi bi-qr-code"></i>
+                  <span>View QR</span>
+                </button>
+                <button type="button" class="btn-table-save" id="btnSave_${t.id}" onclick="updateTable(${t.id})" title="Save Changes">
+                  <i class="bi bi-check2"></i>
+                  <span>Save</span>
+                </button>
+                <button type="button" class="btn-table-delete" onclick="deleteTablePrompt(${t.id}, '${escName}')" title="Delete Table">
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Re-apply search filter if user had typed something
+      const searchInput = document.getElementById("manageTableSearch");
+      if (searchInput && searchInput.value) {
+        filterManageTables(searchInput.value);
+      }
     }
   }
 
   function showQrModal(token, name) {
     document.getElementById("qrModalTitle").innerText = `Table QR: ${name}`;
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${window.location.origin}/menu/digital-menu/?table_token=${token}`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(window.location.origin + '/menu/digital-menu/?table_token=' + token)}`;
     document.getElementById("qrImage").src = qrUrl;
     document.getElementById("qrViewBtn").onclick = () => window.open(qrUrl, "_blank");
     new bootstrap.Modal(document.getElementById("qrModal")).show();
   }
 
   function createTable() {
-    const name = document.getElementById("newTableName").value;
-    const section = document.getElementById("newTableSection").value;
-    if (!name) { showToast("Table name is required"); return; }
+    const nameInput = document.getElementById("newTableName");
+    const secInput = document.getElementById("newTableSection");
+    const name = nameInput ? nameInput.value.trim() : "";
+    const section = secInput ? secInput.value.trim() : "";
+    if (!name) {
+      showToast("Table name is required");
+      if (nameInput) nameInput.focus();
+      return;
+    }
     fetch("{% url 'manage-table' %}", {
       method: "POST",
       headers: { "Content-Type": "application/json", "X-CSRFToken": apiClient.getCsrf() },
-      body: JSON.stringify({ action: "create", name: name, section: section })
+      body: JSON.stringify({ action: "create", name: name, section: section || "Main Hall" })
     }).then(r => r.json()).then(d => {
       if (d.success) {
-        showToast("Table Created");
-        document.getElementById("newTableName").value = "";
-        document.getElementById("newTableSection").value = "";
+        showToast(`Table ${name} Created`);
+        if (nameInput) nameInput.value = "";
+        if (secInput) secInput.value = "";
         refreshLayout();
-      } else showToast(d.error || "Failed to create table");
-    });
+      } else {
+        showToast(d.error || "Failed to create table");
+      }
+    }).catch(() => showToast("Network error creating table"));
   }
 
   function updateTable(id) {
-    const name = document.getElementById(`editName_${id}`).value;
-    const section = document.getElementById(`editSec_${id}`).value;
+    const nameEl = document.getElementById(`editName_${id}`);
+    const secEl = document.getElementById(`editSec_${id}`);
+    const btn = document.getElementById(`btnSave_${id}`);
+    if (!nameEl || !secEl) return;
+    const name = nameEl.value.trim();
+    const section = secEl.value.trim();
+    if (!name) {
+      showToast("Table name is required");
+      nameEl.focus();
+      return;
+    }
+
+    const origHtml = btn ? btn.innerHTML : '';
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm" style="width:12px;height:12px;" role="status"></span>';
+    }
+
     fetch("{% url 'manage-table' %}", {
       method: "POST",
       headers: { "Content-Type": "application/json", "X-CSRFToken": apiClient.getCsrf() },
       body: JSON.stringify({ action: "edit", table_id: id, name: name, section: section })
     }).then(r => r.json()).then(d => {
-      if (d.success) { showToast("Table Updated"); refreshLayout(); }
-      else showToast(d.error || "Failed to update table");
+      if (d.success) {
+        if (btn) {
+          btn.innerHTML = '<i class="bi bi-check-lg"></i> Saved!';
+          btn.classList.add("btn-saved");
+          setTimeout(() => {
+            btn.innerHTML = origHtml;
+            btn.classList.remove("btn-saved");
+            btn.disabled = false;
+          }, 1400);
+        }
+        showToast("Table Updated");
+        refreshLayout();
+      } else {
+        if (btn) { btn.innerHTML = origHtml; btn.disabled = false; }
+        showToast(d.error || "Failed to update table");
+      }
+    }).catch(() => {
+      if (btn) { btn.innerHTML = origHtml; btn.disabled = false; }
+      showToast("Network error updating table");
     });
   }
+
+  window.deleteTablePrompt = function(id, name) {
+    const t = tableDataStore.find(x => x.id === id);
+    if (t && t.status && t.status !== "free") {
+      if (window.ui && ui.alert) {
+        ui.alert(`Table "${name}" cannot be deleted while an active order is in progress (${t.status}). Clear the order first.`, "warning", "Active Table");
+      } else {
+        showToast(`Cannot delete active table "${name}"`);
+      }
+      return;
+    }
+    
+    if (window.ui && ui.confirm) {
+      ui.confirm({
+        title: `Delete Table "${name}"?`,
+        text: "This table will be removed from your active floor plan. Past closed orders will be preserved.",
+        confirmButtonText: "Yes, Delete",
+        confirmButtonColor: "#dc2626"
+      }).then(res => {
+        if (res && res.isConfirmed) executeDeleteTable(id, name);
+      });
+    } else {
+      if (confirm(`Delete table "${name}" from floor plan?`)) executeDeleteTable(id, name);
+    }
+  };
+
+  function executeDeleteTable(id, name) {
+    fetch("{% url 'manage-table' %}", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-CSRFToken": apiClient.getCsrf() },
+      body: JSON.stringify({ action: "delete", table_id: id })
+    }).then(r => r.json()).then(d => {
+      if (d.success) {
+        showToast(`Table "${name}" Deleted`);
+        refreshLayout();
+      } else {
+        showToast(d.error || "Failed to delete table");
+      }
+    }).catch(() => showToast("Network error deleting table"));
+  }
+
+  window.filterManageTables = function(query) {
+    const q = (query || '').toLowerCase().trim();
+    const rows = document.querySelectorAll("#tblManageList .manage-table-card");
+    const clearBtn = document.getElementById("manageSearchClear");
+    if (clearBtn) clearBtn.style.display = q ? "inline-flex" : "none";
+    let visibleCount = 0;
+    rows.forEach(r => {
+      const name = r.getAttribute("data-name") || "";
+      const sec = r.getAttribute("data-section") || "";
+      if (!q || name.includes(q) || sec.includes(q)) {
+        r.style.display = "";
+        visibleCount++;
+      } else {
+        r.style.display = "none";
+      }
+    });
+    const countEl = document.getElementById("manageTablesCount");
+    if (countEl) countEl.textContent = visibleCount;
+  };
+
+  window.clearManageTableSearch = function() {
+    const input = document.getElementById("manageTableSearch");
+    if (input) {
+      input.value = "";
+      filterManageTables("");
+      input.focus();
+    }
+  };
 
   let actionModal = null;
   function handleTableClick(tableId) {

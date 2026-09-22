@@ -324,22 +324,15 @@
 {% endblock %}
 
 {% block header_left %}
-<div class="d-flex align-items-center gap-3">
-  <a href="/dashboard/" class="d-flex align-items-center text-decoration-none text-reset" title="Back to Dashboard">
-    <span class="btn-icon" style="width:36px;height:36px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border-color);display:inline-flex;align-items:center;justify-content:center;transition:all 0.2s;">
-      <i class="bi bi-arrow-left" style="font-size:1.05rem;color:var(--pos-red);"></i>
-    </span>
-  </a>
-  <div class="d-flex align-items-center gap-2">
-    <div style="width:34px;height:34px;border-radius:10px;background:rgba(236, 39, 52,0.12);border:1px solid rgba(236, 39, 52,0.3);display:flex;align-items:center;justify-content:center;color:var(--pos-red);flex-shrink:0;">
-      <i class="bi bi-gear-wide-connected" style="font-size:1.05rem;"></i>
-    </div>
-    <div>
-      <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.3px;color:var(--text-main);">Setup Hub</h1>
-      <div class="text-muted" style="font-size:0.72rem;">Outlet Configuration • {{ request.user.outlet.name|default:request.user.tenant.name }}</div>
-    </div>
+<a href="/setup/" class="d-flex align-items-center gap-2 text-decoration-none text-reset">
+  <div style="width:34px;height:34px;border-radius:10px;background:rgba(236, 39, 52,0.12);border:1px solid rgba(236, 39, 52,0.3);display:flex;align-items:center;justify-content:center;color:var(--pos-red);flex-shrink:0;">
+    <i class="bi bi-gear-wide-connected" style="font-size:1.05rem;"></i>
   </div>
-</div>
+  <div>
+    <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.3px;color:var(--text-main);">Setup Hub</h1>
+    <div class="text-muted" style="font-size:0.72rem;">Outlet Configuration • {{ request.user.outlet.name|default:request.user.tenant.name }}</div>
+  </div>
+</a>
 {% endblock %}
 
 {% block header_right %}
@@ -350,9 +343,6 @@
   <a href="/dashboard/" class="btn-luxury text-decoration-none d-none d-md-inline-flex" style="border-radius:999px;">
     <i class="bi bi-speedometer2 me-1"></i> Dashboard
   </a>
-  <button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Dark / Light Theme">
-    <i class="bi bi-moon" id="themeIcon"></i>
-  </button>
 </div>
 {% endblock %}
 
@@ -361,10 +351,15 @@
 
   <!-- ── Subbar Breadcrumbs ── -->
   <div class="setup-subbar">
-    <div class="setup-breadcrumb">
-      <a href="/dashboard/"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
-      <span class="sep">/</span>
-      <span class="active">Setup Hub</span>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <a href="/dashboard/" class="btn-subbar-pill text-decoration-none" title="Back to Dashboard">
+        <i class="bi bi-arrow-left me-1"></i> Dashboard
+      </a>
+      <div class="setup-breadcrumb ms-1">
+        <a href="/dashboard/"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
+        <span class="sep">/</span>
+        <span class="active">Setup Hub</span>
+      </div>
     </div>
     <div class="d-flex align-items-center gap-2">
       <span class="badge" style="background:var(--pos-red-soft);color:var(--pos-red);border:1px solid var(--pos-red-border);border-radius:999px;padding:4px 10px;font-size:0.75rem;">
