@@ -234,7 +234,7 @@
     <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
         <div>
             <h2 class="fw-bold mb-0" style="font-family:var(--font-main,'Outfit',sans-serif);font-size:1.5rem;color:var(--text-main);">Dashboard</h2>
-            <div class="text-muted" style="font-size:0.82rem;margin-top:2px;">
+            <div style="font-size:0.82rem;margin-top:2px;color:var(--text-muted);">
                 <i class="bi bi-calendar-event me-1"></i>{% now "l, F j, Y" %} • <span class="fw-semibold" style="color:var(--accent-gold);">{{ request.user.outlet.name|default:"Riverside Restaurant" }}</span>
             </div>
         </div>
@@ -379,24 +379,17 @@
                     <span class="text-muted" style="font-size:0.72rem;"><i class="bi bi-clock-history"></i> Today</span>
                 </div>
 
+                {% if order_type_total %}
                 <div class="d-flex align-items-center justify-content-between h-100 py-2">
                     <!-- Legend breakdown -->
                     <div class="d-flex flex-column gap-3">
+                        {% for seg in order_type_breakdown %}
                         <div class="d-flex align-items-center gap-2">
-                            <span style="width:10px;height:10px;border-radius:50%;background:#EC2734;"></span>
-                            <span style="font-size:0.78rem;font-weight:600;color:var(--text-main);">Dine-In</span>
-                            <span class="badge rounded-pill ms-auto" style="background:rgba(236,39,52,0.12);color:#EC2734;font-weight:700;">45%</span>
+                            <span style="width:10px;height:10px;border-radius:50%;background:{{ seg.color }};"></span>
+                            <span style="font-size:0.78rem;font-weight:600;color:var(--text-main);">{{ seg.label }}</span>
+                            <span class="badge rounded-pill ms-auto" style="background:{{ seg.color }}1f;color:{{ seg.color }};font-weight:700;">{{ seg.pct }}%</span>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span style="width:10px;height:10px;border-radius:50%;background:#fa7327;"></span>
-                            <span style="font-size:0.78rem;font-weight:600;color:var(--text-main);">Takeaway</span>
-                            <span class="badge rounded-pill ms-auto" style="background:rgba(250,115,39,0.12);color:#fa7327;font-weight:700;">30%</span>
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span style="width:10px;height:10px;border-radius:50%;background:#2b2b36;"></span>
-                            <span style="font-size:0.78rem;font-weight:600;color:var(--text-main);">Delivery</span>
-                            <span class="badge rounded-pill ms-auto" style="background:rgba(0,0,0,0.08);color:var(--text-main);font-weight:700;">25%</span>
-                        </div>
+                        {% endfor %}
                     </div>
 
                     <!-- Clean SVG Donut Chart -->
@@ -404,21 +397,21 @@
                         <svg viewBox="0 0 100 100" style="width:100%;height:100%;transform:rotate(-90deg);">
                             <!-- Background ring -->
                             <circle cx="50" cy="50" r="38" fill="transparent" stroke="var(--surface-2)" stroke-width="14" />
-                            <!-- Dine-In Segment (45% = 107.4) -->
-                            <circle cx="50" cy="50" r="38" fill="transparent" stroke="#EC2734" stroke-width="14"
-                                    stroke-dasharray="107.4 238.7" stroke-dashoffset="0" />
-                            <!-- Takeaway Segment (30% = 71.6) -->
-                            <circle cx="50" cy="50" r="38" fill="transparent" stroke="#fa7327" stroke-width="14"
-                                    stroke-dasharray="71.6 238.7" stroke-dashoffset="-107.4" />
-                            <!-- Delivery Segment (25% = 59.7) -->
-                            <circle cx="50" cy="50" r="38" fill="transparent" stroke="#2b2b36" stroke-width="14"
-                                    stroke-dasharray="59.7 238.7" stroke-dashoffset="-179" />
+                            {% for seg in order_type_breakdown %}
+                            {% if seg.count %}
+                            <circle cx="50" cy="50" r="38" fill="transparent" stroke="{{ seg.color }}" stroke-width="14"
+                                    stroke-dasharray="{{ seg.dash_len }} {{ seg.circumference }}" stroke-dashoffset="{{ seg.dash_offset }}" />
+                            {% endif %}
+                            {% endfor %}
                         </svg>
                         <div style="position:absolute;text-align:center;">
                             <i class="bi bi-pie-chart-fill" style="color:var(--accent-gold);font-size:1.15rem;"></i>
                         </div>
                     </div>
                 </div>
+                {% else %}
+                <div class="text-muted" style="font-size:0.85rem;padding:2rem 0;width:100%;text-align:center;">No orders recorded yet today.</div>
+                {% endif %}
             </div>
         </div>
 
@@ -602,11 +595,11 @@
                 <!-- Chips count -->
                 <div class="d-flex gap-2 mb-3">
                     <div style="flex:1;background:rgba(236,39,52,0.08);border:1px solid rgba(236,39,52,0.2);border-radius:10px;padding:0.4rem 0.6rem;text-align:center;">
-                        <div style="font-size:1.15rem;font-weight:800;color:var(--accent-gold);line-height:1;">{{ today_reservations|length|default:5 }}</div>
+                        <div style="font-size:1.15rem;font-weight:800;color:var(--accent-gold);line-height:1;">{{ today_reservations|length }}</div>
                         <div style="font-size:0.65rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;">Total</div>
                     </div>
                     <div style="flex:1;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:0.4rem 0.6rem;text-align:center;">
-                        <div style="font-size:1.15rem;font-weight:800;color:#f59e0b;line-height:1;">{{ res_confirmed_count|default:3 }}</div>
+                        <div style="font-size:1.15rem;font-weight:800;color:#f59e0b;line-height:1;">{{ res_confirmed_count }}</div>
                         <div style="font-size:0.65rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;">Confirmed</div>
                     </div>
                 </div>
@@ -632,35 +625,7 @@
                         </div>
                         {% endfor %}
                     {% else %}
-                        <!-- Sample reservations matching reference screenshot -->
-                        <div class="dash-item-row">
-                            <div class="item-icon-squircle" style="color:#0284c7;background:rgba(14,165,233,0.1);"><i class="bi bi-calendar2-check"></i></div>
-                            <div style="flex:1;min-width:0;">
-                                <div class="d-flex justify-content-between"><span class="fw-semibold">Anderson Party</span><span class="badge rounded-pill bg-light text-dark border" style="font-size:0.65rem;">T-04</span></div>
-                                <div class="text-muted" style="font-size:0.68rem;">12:30 PM • 4 guests</div>
-                            </div>
-                        </div>
-                        <div class="dash-item-row">
-                            <div class="item-icon-squircle" style="color:#0284c7;background:rgba(14,165,233,0.1);"><i class="bi bi-calendar2-check"></i></div>
-                            <div style="flex:1;min-width:0;">
-                                <div class="d-flex justify-content-between"><span class="fw-semibold">Kim & Family</span><span class="badge rounded-pill bg-light text-dark border" style="font-size:0.65rem;">T-01</span></div>
-                                <div class="text-muted" style="font-size:0.68rem;">1:00 PM • 6 guests</div>
-                            </div>
-                        </div>
-                        <div class="dash-item-row">
-                            <div class="item-icon-squircle" style="color:#0284c7;background:rgba(14,165,233,0.1);"><i class="bi bi-calendar2-check"></i></div>
-                            <div style="flex:1;min-width:0;">
-                                <div class="d-flex justify-content-between"><span class="fw-semibold">Business Lunch</span><span class="badge rounded-pill bg-light text-dark border" style="font-size:0.65rem;">T-12</span></div>
-                                <div class="text-muted" style="font-size:0.68rem;">1:30 PM • 2 guests</div>
-                            </div>
-                        </div>
-                        <div class="dash-item-row">
-                            <div class="item-icon-squircle" style="color:#0284c7;background:rgba(14,165,233,0.1);"><i class="bi bi-calendar2-check"></i></div>
-                            <div style="flex:1;min-width:0;">
-                                <div class="d-flex justify-content-between"><span class="fw-semibold">Anniversary Dinner</span><span class="badge rounded-pill bg-light text-dark border" style="font-size:0.65rem;">T-08</span></div>
-                                <div class="text-muted" style="font-size:0.68rem;">7:00 PM • 2 guests</div>
-                            </div>
-                        </div>
+                        <div class="text-muted" style="font-size:0.85rem;padding:2rem 0;width:100%;text-align:center;">No reservations booked for today.</div>
                     {% endif %}
                 </div>
             </div>

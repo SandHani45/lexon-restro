@@ -128,8 +128,8 @@
       <tr>
         <td>{{ item.name }}</td>
         <td class="num">{{ item.qty }}</td>
-        <td class="num">₹{{ item.revenue|floatformat:0 }}</td>
-        <td class="num">{% if item.cogs_known %}₹{{ item.cogs|floatformat:0 }}{% else %}<span style="color:var(--text-muted);">unknown</span>{% endif %}</td>
+        <td class="num">{{ CURRENCY_SYMBOL }}{{ item.revenue|floatformat:0 }}</td>
+        <td class="num">{% if item.cogs_known %}{{ CURRENCY_SYMBOL }}{{ item.cogs|floatformat:0 }}{% else %}<span style="color:var(--text-muted);">unknown</span>{% endif %}</td>
         <td class="num">{% if item.cogs_known %}{{ item.margin_pct }}%{% else %}—{% endif %}</td>
         <td><span class="quadrant-badge quadrant-{{ item.quadrant }}">{{ item.quadrant }}</span></td>
       </tr>

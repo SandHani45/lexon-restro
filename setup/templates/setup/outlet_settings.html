@@ -754,7 +754,7 @@
             </div>
             <div class="choice-desc">
               Menu item prices are base prices. CGST and SGST (or UTGST) are calculated and added on top at checkout.<br>
-              <em>Example: Item ₹100 + 5% GST (₹5) = <strong>Total ₹105</strong>. Standard for dine-in and fine dining.</em>
+              <em>Example: Item {{ outlet.currency_symbol|default:"₹" }}100 + 5% GST ({{ outlet.currency_symbol|default:"₹" }}5) = <strong>Total {{ outlet.currency_symbol|default:"₹" }}105</strong>. Standard for dine-in and fine dining.</em>
             </div>
           </div>
         </label>
@@ -768,7 +768,7 @@
             </div>
             <div class="choice-desc">
               The listed menu price already includes all taxes. The guest pays the exact round figure displayed.<br>
-              <em>Example: Item ₹100 (contains ₹4.76 GST inside) = <strong>Total ₹100</strong>. Ideal for fast checkout counters.</em>
+              <em>Example: Item {{ outlet.currency_symbol|default:"₹" }}100 (contains {{ outlet.currency_symbol|default:"₹" }}4.76 GST inside) = <strong>Total {{ outlet.currency_symbol|default:"₹" }}100</strong>. Ideal for fast checkout counters.</em>
             </div>
           </div>
         </label>
@@ -779,7 +779,7 @@
       <div class="field-row mt-3">
         <label class="field-label" for="parcel_charge_amount">Takeaway / Parcel Packaging Charge</label>
         <div style="display:flex;align-items:center;gap:8px;max-width:180px;">
-          <span style="font-size:1.1rem;font-weight:700;color:var(--text-main);">₹</span>
+          <span style="font-size:1.1rem;font-weight:700;color:var(--text-main);">{{ outlet.currency_symbol|default:"₹" }}</span>
           <input type="number" id="parcel_charge_amount" name="parcel_charge_amount" class="field-input" value="{{ outlet.parcel_charge_amount|default:0 }}" min="0" max="999" step="1">
         </div>
         <div class="field-hint">Default packaging fee added on takeaway orders. Set to 0 to disable.</div>

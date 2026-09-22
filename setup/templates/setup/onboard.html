@@ -409,7 +409,7 @@
                     <input type="text" name="item_{{ forloop.counter }}_name" placeholder="e.g. Veg Burger">
                 </div>
                 <div class="field" style="width:110px;">
-                    <label>Price (₹)</label>
+                    <label>Price ({{ outlet.currency_symbol|default:"₹" }})</label>
                     <input type="number" name="item_{{ forloop.counter }}_price" min="0" step="0.5" placeholder="120">
                 </div>
             </div>

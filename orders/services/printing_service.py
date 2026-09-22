@@ -284,13 +284,35 @@ class PrintingService:
 
         p.text(sep_inner + "\n")
 
+        # UAE VAT-inclusive receipts follow the reference layout: "Total
+        # before VAT" / "VAT @ {rate}%" / "Net Amount" instead of the
+        # generic Subtotal/tax-label/TOTAL wording used everywhere else.
+        # Strictly additive — non-AE (or AE with gst_inclusive=False)
+        # outlets fall through to the unchanged generic wording below.
+        is_uae_vat_bill = gst_inclusive and getattr(order.tenant, 'country', None) == "AE"
+
         # ── SUBTOTALS — centered block, Font A ──────────────────────────
         currency = order.outlet.currency_symbol
         p.set(align="center", bold=False, font='a')
-        p.text(tc("Subtotal", self._currency(order.subtotal, currency)) + "\n")
-        if order.gst_total:
-            tax_word = order.outlet.tax_label
-            label = f"{tax_word} (incl.)" if gst_inclusive else tax_word
+        subtotal_label = "Total before VAT" if is_uae_vat_bill else "Subtotal"
+        p.text(tc(subtotal_label, self._currency(order.subtotal, currency)) + "\n")
+        # A uniformly zero-rated AE VAT order has gst_total == Decimal('0.00')
+        # (falsy), but the "VAT @ 0%" line must still print for compliance —
+        # same reasoning as the `!= None` check in thermal_receipt.html. Only
+        # widens the UAE branch; non-AE bills keep the original `gst_total`-
+        # truthiness gate untouched.
+        show_vat_line = order.gst_total or (is_uae_vat_bill and order.effective_vat_rate is not None)
+        if show_vat_line:
+            if is_uae_vat_bill:
+                vat_rate = order.effective_vat_rate
+                if vat_rate is not None:
+                    rate_str = f"{vat_rate:.2f}".rstrip("0").rstrip(".")
+                    label = f"VAT @ {rate_str}%"
+                else:
+                    label = "VAT"
+            else:
+                tax_word = order.outlet.tax_label
+                label = f"{tax_word} (incl.)" if gst_inclusive else tax_word
             p.text(tc(label, self._currency(order.gst_total, currency)) + "\n")
         if order.discount_total > 0:
             p.text(tc("Discount", f"-{self._currency(order.discount_total, currency)}") + "\n")
@@ -302,7 +324,8 @@ class PrintingService:
 
         # ── TOTAL — centered block, Font A bold ─────────────────────────
         p.set(align="center", bold=True, font='a')
-        p.text(tc("TOTAL", self._currency(order.grand_total, currency)) + "\n")
+        total_label = "Net Amount" if is_uae_vat_bill else "TOTAL"
+        p.text(tc(total_label, self._currency(order.grand_total, currency)) + "\n")
 
         payment = order.payments.order_by("-paid_at").first()
         if payment:
@@ -311,7 +334,10 @@ class PrintingService:
 
         if gst_inclusive:
             p.set(align="center", bold=False, font='a')
-            p.text(f"(prices include {order.outlet.tax_label})\n")
+            if is_uae_vat_bill:
+                p.text("Tax Inclusive - prices include VAT\n")
+            else:
+                p.text(f"(prices include {order.outlet.tax_label})\n")
 
         p.text(sep_inner + "\n")
 

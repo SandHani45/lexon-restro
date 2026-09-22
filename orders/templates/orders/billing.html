@@ -367,6 +367,19 @@
     .pos-items-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   }
 
+  /* The grid item is actually .menu-item-searchable (the search-filter
+     wrapper around this card) -- CSS Grid stretches THAT to the row's
+     tallest card by default, but a plain block child doesn't inherit that
+     stretched height on its own. Without height:100% here, a card with a
+     one-line name stays only as tall as its own content while its
+     neighbour with a two-line (or "Extra Cheese - AED0"-style long) name
+     is taller, so same-row cards end up visibly uneven / jagged, worst on
+     the 2-column phone layout where every row only has one neighbour to
+     mismatch against. */
+  .menu-item-searchable {
+    display: block;
+    height: 100%;
+  }
   .pos-item-card {
     background: var(--panel-bg);
     border: 1.5px solid var(--border-color);
@@ -380,6 +393,7 @@
     box-shadow: 0 2px 10px rgba(0,0,0,0.02);
     position: relative;
     overflow: hidden;
+    height: 100%;
   }
   .pos-item-card:hover {
     transform: translateY(-4px);
@@ -1131,24 +1145,97 @@
     pointer-events: auto;
   }
 
+  /* ── Mobile Page Search (below the "Point of Sale (POS)" title) ── */
+  .pos-mobile-search-wrap {
+    position: relative;
+    width: 100%;
+    margin-top: 0.65rem;
+  }
+  .pos-mobile-search-input {
+    width: 100%;
+    height: 42px;
+    padding: 0 34px 0 38px;
+    background: var(--surface-2);
+    border: 1.5px solid var(--border-color);
+    border-radius: 999px;
+    color: var(--text-main);
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  .pos-mobile-search-input:focus {
+    outline: none;
+    border-color: var(--pos-red);
+    background: var(--panel-bg);
+    box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.1);
+  }
+  .pos-mobile-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    pointer-events: none;
+  }
+  .pos-mobile-search-clear {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    display: none;
+    cursor: pointer;
+    padding: 4px;
+  }
+
   /* ── Responsive Adaptations ── */
   @media (max-width: 991px) {
     .pos-cart-sidebar { display: none; }
     .pos-fab-cart { display: flex; }
     .pos-workspace {
       flex-direction: column;
-      height: 100vh;
+      height: calc(100vh - var(--topbar-height));
       padding-bottom: 80px;
     }
     .pos-menu-scroll-area {
-      overflow-y: visible;
-      padding: 0.5rem 1rem 1rem;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 0.5rem 1rem 2rem;
     }
     .pos-items-grid {
       grid-template-columns: repeat(2, 1fr);
       gap: 10px;
     }
     .cat-nav-btn { display: none; }
+
+    /* Page title / search / breadcrumb take the full row so the search box
+       lands on its own line directly under the title, with the action
+       buttons ("New", "Draft List"...) wrapping to the row below. */
+    .pos-subbar-left { width: 100%; }
+    .pos-subbar,
+    .pos-category-section,
+    .pos-menu-heading-row {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    /* The global #pos-topbar (core/base.html) is a fixed-height, nowrap,
+       overflow:hidden flex row. On phone widths the hamburger + back arrow
+       + title + theme toggle + notification icons + user badge don't all
+       fit and were being silently clipped. Let it scroll horizontally
+       instead of cutting controls off, and keep the right-side controls
+       from shrinking into each other. */
+    #pos-topbar {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    #pos-topbar::-webkit-scrollbar { display: none; }
+    #pos-topbar .topbar-right { flex-shrink: 0; }
   }
 
   @media (max-width: 480px) {
@@ -1164,6 +1251,13 @@
     .pos-cat-icon { font-size: 1.35rem; }
     .pos-cat-name { font-size: 0.72rem; }
     .pos-item-thumb { height: 90px; }
+
+    /* Trim secondary header chrome on very small phones so the essentials
+       (menu, page title, theme toggle, avatar) fit without scrolling. */
+    #pos-topbar { padding: 0 0.65rem; gap: 0.4rem; }
+    #pos-topbar .user-role-badge .user-role-tag,
+    #pos-topbar .user-role-badge .user-name-text { display: none !important; }
+    #pos-topbar .user-role-badge { padding: 0 0.5rem 0 0.35rem; gap: 0; }
   }
 
   @media (min-width: 992px) {
@@ -1258,13 +1352,15 @@
     border-color: #222226;
   }
   html.dark .pos-cart-search-input,
-  html.dark .pos-pill-select {
+  html.dark .pos-pill-select,
+  html.dark .pos-mobile-search-input {
     background: #18181b;
     border-color: #27272a;
     color: #f4f4f6;
   }
   html.dark .pos-cart-search-input:focus,
-  html.dark .pos-pill-select:focus {
+  html.dark .pos-pill-select:focus,
+  html.dark .pos-mobile-search-input:focus {
     border-color: #EC2734;
     background: #121214;
   }
@@ -1439,6 +1535,13 @@
           <a href="/dashboard/">Dashboard</a>
           <span class="sep">&gt;</span>
           <span class="active">POS</span>
+        </div>
+        <!-- Mobile-only page search, directly under the title (desktop keeps
+             its search in the top header, #menuSearch, d-none d-md-flex) -->
+        <div class="pos-mobile-search-wrap d-flex d-md-none">
+          <i class="bi bi-search pos-mobile-search-icon"></i>
+          <input type="text" id="menuSearchMobile" class="pos-mobile-search-input" placeholder="Search menu dishes..." autocomplete="off">
+          <button type="button" id="menuSearchMobileClear" class="pos-mobile-search-clear" onclick="clearMenuSearch()" aria-label="Clear search">✕</button>
         </div>
       </div>
       <div class="pos-subbar-right">
@@ -2047,41 +2150,57 @@
     filterByCategory(id, el);
   }
 
-  /* ── Menu Search Filter with Keyboard Shortcut ── */
+  /* ── Menu Search Filter with Keyboard Shortcut ──
+     Two inputs share this: #menuSearch (desktop, in the top header) and
+     #menuSearchMobile (phone/tablet, below the page title in .pos-subbar).
+     Only one is ever visible at a time (Bootstrap d-none/d-md-flex), but
+     both stay in sync and both filter the same item grid. */
   const searchInput = document.getElementById("menuSearch");
+  const searchInputMobile = document.getElementById("menuSearchMobile");
+  const searchInputs = [searchInput, searchInputMobile].filter(Boolean);
   const searchClear = document.getElementById("menuSearchClear");
+  const searchClearMobile = document.getElementById("menuSearchMobileClear");
 
-  if (searchInput) {
-    searchInput.addEventListener("input", function() {
-      const q = this.value.toLowerCase().trim();
-      if (searchClear) searchClear.style.display = q ? 'block' : 'none';
-
-      document.querySelectorAll(".category-section-block").forEach(sec => {
-        let anyVisible = false;
-        sec.querySelectorAll(".menu-item-searchable").forEach(card => {
-          const name = card.getAttribute('data-item-name') || card.innerText.toLowerCase();
-          const match = !q || name.includes(q);
-          card.style.display = match ? "" : "none";
-          if (match) anyVisible = true;
-        });
-        sec.style.display = anyVisible || !q ? "" : "none";
+  function filterMenuItems(rawQuery) {
+    const q = (rawQuery || "").toLowerCase().trim();
+    document.querySelectorAll(".category-section-block").forEach(sec => {
+      let anyVisible = false;
+      sec.querySelectorAll(".menu-item-searchable").forEach(card => {
+        const name = card.getAttribute('data-item-name') || card.innerText.toLowerCase();
+        const match = !q || name.includes(q);
+        card.style.display = match ? "" : "none";
+        if (match) anyVisible = true;
       });
+      sec.style.display = anyVisible || !q ? "" : "none";
     });
+  }
 
+  searchInputs.forEach(inp => {
+    inp.addEventListener("input", function() {
+      const q = this.value;
+      searchInputs.forEach(other => { if (other !== this) other.value = q; });
+      if (searchClear) searchClear.style.display = q.trim() ? 'block' : 'none';
+      if (searchClearMobile) searchClearMobile.style.display = q.trim() ? 'block' : 'none';
+      filterMenuItems(q);
+    });
+  });
+
+  if (searchInputs.length) {
     document.addEventListener("keydown", (e) => {
-      if (e.key === "/" && document.activeElement !== searchInput && !document.querySelector('.modal.show')) {
+      if (e.key === "/" && !searchInputs.includes(document.activeElement) && !document.querySelector('.modal.show')) {
         e.preventDefault();
-        searchInput.focus();
+        const visible = searchInputs.find(inp => inp.offsetParent !== null) || searchInputs[0];
+        visible.focus();
       }
     });
   }
 
   function clearMenuSearch() {
-    if (searchInput) {
-      searchInput.value = "";
-      searchInput.dispatchEvent(new Event("input"));
-      searchInput.focus();
-    }
+    if (!searchInputs.length) return;
+    searchInputs.forEach(inp => { inp.value = ""; });
+    const primary = searchInputs.find(inp => inp.offsetParent !== null) || searchInputs[0];
+    primary.dispatchEvent(new Event("input"));
+    primary.focus();
   }
 
   /* ── Aggregator & Delivery Settings Sync ── */

@@ -92,7 +92,7 @@
                     <div class="modifier-row">
                         <span class="modifier-name">{{ mod.name }}</span>
                         <div class="d-flex align-items-center gap-2">
-                            <span class="modifier-price">₹{{ mod.price }}</span>
+                            <span class="modifier-price">{{ CURRENCY_SYMBOL }}{{ mod.price }}</span>
                             {% if mod.inventory_links.exists %}
                             <span title="Inventory linked" style="color:var(--accent-gold);font-size:0.7rem;letter-spacing:1px;">
                                 <i class="bi bi-box-seam"></i>

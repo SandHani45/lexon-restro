@@ -62,7 +62,7 @@
             </div>
             <div class="col-md-3">
                 <span class="stat-label">Opening Cash</span>
-                <div class="stat-val">₹{{ active_session.opening_balance }}</div>
+                <div class="stat-val">{{ CURRENCY_SYMBOL }}{{ active_session.opening_balance }}</div>
             </div>
         </div>
     </div>
@@ -81,7 +81,7 @@
                     <td><strong>{{ s.opened_at|date:"M d, Y" }}</strong></td>
                     <td>{{ s.opened_at|date:"H:i" }} ({{ s.opened_by.username }})</td>
                     <td>{{ s.closed_at|date:"H:i"|default:"—" }}</td>
-                    <td>₹{{ s.cash_sales }}</td>
+                    <td>{{ CURRENCY_SYMBOL }}{{ s.cash_sales }}</td>
                     <td>
                         <span class="{% if s.discrepancy < 0 %}discrepancy-neg{% else %}discrepancy-pos{% endif %}">
                             {{ s.discrepancy|floatformat:2 }}

@@ -643,7 +643,7 @@
 
                                 <!-- Price & Station Dropdown -->
                                 <div class="d-flex align-items-center gap-2 mt-1 flex-wrap">
-                                    <span class="item-price">₹{{ item.price }}</span>
+                                    <span class="item-price">{{ CURRENCY_SYMBOL }}{{ item.price }}</span>
                                     <select class="station-select" onchange="updateStation('{{ item.id }}', this.value)" title="Assign kitchen station">
                                         <option value="">Default Kitchen</option>
                                         {% for s in stations %}
@@ -758,7 +758,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label text-muted small text-uppercase fw-bold m-0 mb-1" style="letter-spacing:1px;">Selling Price (₹)</label>
+                    <label class="form-label text-muted small text-uppercase fw-bold m-0 mb-1" style="letter-spacing:1px;">Selling Price ({{ CURRENCY_SYMBOL }})</label>
                     <input id="itemPrice" class="pos-modal-input" placeholder="0.00"/>
                 </div>
 
@@ -799,7 +799,7 @@
 
                 {% if outlet.parcel_charge_amount %}
                 <div class="mb-3">
-                    <label class="form-label text-muted small text-uppercase fw-bold m-0 mb-1" style="letter-spacing:1px;">Parcel Charge for this item (₹)</label>
+                    <label class="form-label text-muted small text-uppercase fw-bold m-0 mb-1" style="letter-spacing:1px;">Parcel Charge for this item ({{ CURRENCY_SYMBOL }})</label>
                     <input id="itemParcelCharge" type="number" min="0" step="0.5" class="pos-modal-input" placeholder="0 = use outlet default"/>
                     <small class="text-muted" style="font-size:0.72rem; display:block; margin-top:3px;">
                         Overrides the outlet-level flat charge when set.

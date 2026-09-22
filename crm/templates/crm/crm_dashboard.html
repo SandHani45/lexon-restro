@@ -492,7 +492,7 @@
       <div class="kpi-card kpi-spend">
         <div class="kpi-info">
           <div class="kpi-label">Lifetime Guest Spend</div>
-          <div class="kpi-val">₹{{ total_spent|floatformat:0 }}</div>
+          <div class="kpi-val">{{ CURRENCY_SYMBOL }}{{ total_spent|floatformat:0 }}</div>
           <div class="kpi-sub">Total revenue from registered guests</div>
         </div>
         <div class="kpi-icon-wrap icon-spend">
@@ -601,7 +601,7 @@
               </span>
             </td>
             <td style="font-weight:800;font-size:0.95rem;color:var(--text-main);">
-              ₹{{ g.total_spent|floatformat:0 }}
+              {{ CURRENCY_SYMBOL }}{{ g.total_spent|floatformat:0 }}
             </td>
             <td>
               <span class="pts-badge">

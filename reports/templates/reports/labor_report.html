@@ -100,7 +100,7 @@
   <div class="stat-row">
     <div class="stat-card">
       <div class="stat-label">Total Labor Cost</div>
-      <div class="stat-value">₹{{ report.total_labor_cost|floatformat:0 }}</div>
+      <div class="stat-value">{{ CURRENCY_SYMBOL }}{{ report.total_labor_cost|floatformat:0 }}</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Labor Cost %</div>
@@ -134,8 +134,8 @@
         <td>{{ row.username }}</td>
         <td>{% if row.pay_type %}<span class="pay-type-badge">{{ row.pay_type }}</span>{% else %}<span style="color:var(--text-muted);font-size:0.78rem;">not set</span>{% endif %}</td>
         <td class="num">{{ row.hours }}</td>
-        <td class="num">₹{{ row.tips|floatformat:0 }}</td>
-        <td class="num">{% if row.cost_known %}₹{{ row.cost|floatformat:0 }}{% else %}<span style="color:var(--text-muted);">unknown</span>{% endif %}</td>
+        <td class="num">{{ CURRENCY_SYMBOL }}{{ row.tips|floatformat:0 }}</td>
+        <td class="num">{% if row.cost_known %}{{ CURRENCY_SYMBOL }}{{ row.cost|floatformat:0 }}{% else %}<span style="color:var(--text-muted);">unknown</span>{% endif %}</td>
       </tr>
       {% empty %}
       <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:3rem 0;">No shifts clocked in this period.</td></tr>

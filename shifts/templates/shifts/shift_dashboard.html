@@ -434,10 +434,10 @@
                         <div class="mb-3 d-flex justify-content-center">
                             <div style="max-width: 260px; width: 100%;">
                                 <label style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; display: block;">
-                                    Tips Earned Today (₹)
+                                    Tips Earned Today ({{ CURRENCY_SYMBOL }})
                                 </label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-white border-end-0 rounded-start-pill text-muted fw-bold">₹</span>
+                                    <span class="input-group-text bg-white border-end-0 rounded-start-pill text-muted fw-bold">{{ CURRENCY_SYMBOL }}</span>
                                     <input type="number"
                                            id="tipsInput"
                                            placeholder="0.00"
@@ -550,7 +550,7 @@
                             {% endif %}
                         </td>
                         <td>
-                            <span class="fw-bold text-success">₹{{ s.tips }}</span>
+                            <span class="fw-bold text-success">{{ CURRENCY_SYMBOL }}{{ s.tips }}</span>
                         </td>
                         <td>
                             {% if s.is_active %}

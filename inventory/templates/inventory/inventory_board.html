@@ -801,7 +801,7 @@
                             <span class="text-muted" style="font-size:0.82rem;">—</span>
                             {% endif %}
                         </td>
-                        <td class="mono-num text-muted">₹{{ item.cost_price }}</td>
+                        <td class="mono-num text-muted">{{ CURRENCY_SYMBOL }}{{ item.cost_price }}</td>
                         <td id="stock{{ item.id }}" class="mono-num fw-bold" style="color:var(--text-main);">
                             {{ item.stock }}
                         </td>
@@ -811,7 +811,7 @@
                             </span>
                         </td>
                         <td class="mono-num" style="color:var(--pos-red);">
-                            ₹{% widthratio item.cost_price 1 item.stock %}
+                            {{ CURRENCY_SYMBOL }}{% widthratio item.cost_price 1 item.stock %}
                         </td>
                         <td>
                             {% if item.is_low_stock %}

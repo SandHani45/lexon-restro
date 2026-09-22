@@ -294,6 +294,24 @@ class Order(TenantScopedModel):
             for row in (self.gst_breakdown_cache or [])
         ]
 
+    @property
+    def effective_vat_rate(self):
+        """Single VAT/GST rate for this order, for display purposes only.
+
+        Looks at gst_percentage on every non-voided item. If all of them
+        share the exact same rate, that Decimal is returned (e.g. for a
+        "VAT @ 5%" line on a UAE receipt). If items have mixed rates (e.g.
+        some 0%, some 5%), returns None — callers must not show a single
+        rate in that case, since it would misrepresent the actual tax
+        applied to the order.
+        """
+        rates = set(
+            self.items.exclude(status="voided").values_list("gst_percentage", flat=True)
+        )
+        if len(rates) == 1:
+            return rates.pop()
+        return None
+
     def _build_gst_breakdown_data(self, items, order_discount_factor, gst_inclusive):
         """Compute GST breakdown given already-calculated order_discount_factor.
 

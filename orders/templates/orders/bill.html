@@ -18,11 +18,12 @@
     .receipt-container {
         background: var(--panel-bg);
         border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg, 20px);
         padding: 2.5rem 2rem;
-        box-shadow: 0 15px 50px rgba(0,0,0,0.12);
+        box-shadow: var(--shadow-card, 0 4px 20px rgba(0,0,0,0.06));
     }
     .r-header  { text-align: center; margin-bottom: 1.5rem; border-bottom: 1px dashed var(--border-color); padding-bottom: 1.5rem; }
-    .r-logo    { font-family: 'DM Serif Display', serif; font-size: 1.8rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 0.4rem; }
+    .r-logo    { font-family: var(--font-display, 'DM Serif Display', serif); font-size: 1.8rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 0.4rem; }
     .r-address { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; }
     .r-gst     { font-size: 0.68rem; letter-spacing: 2px; text-transform: uppercase; margin-top: 8px; font-weight: 600; }
 
@@ -33,12 +34,12 @@
     .item-list { border-bottom: 1px dashed var(--border-color); margin-bottom: 1.25rem; padding-bottom: 0.75rem; }
     .item { display: flex; justify-content: space-between; padding: 0.35rem 0; font-size: 0.85rem; }
     .item-name { flex: 1; padding-right: 1rem; }
-    .item-val  { font-family: 'Space Mono', monospace; font-weight: 600; }
+    .item-val  { font-family: var(--font-mono, 'Space Mono', monospace); font-weight: 600; }
 
     .total-row { display: flex; justify-content: space-between; padding: 0.22rem 0; font-size: 0.85rem; }
     .grand-total {
         display: flex; justify-content: space-between;
-        font-family: 'DM Serif Display', serif;
+        font-family: var(--font-display, 'DM Serif Display', serif);
         font-size: 1.5rem; font-weight: 700; color: var(--accent-gold);
         border-top: 1px solid var(--border-color);
         margin-top: 0.9rem; padding-top: 0.9rem;
@@ -46,35 +47,37 @@
 
     /* ── Balance / status card ────────────────────────────── */
     .balance-card {
-        background: rgba(236, 39, 52,0.07);
+        background: var(--sidebar-active-bg, rgba(236, 39, 52,0.09));
         border: 1px solid var(--border-color);
+        border-radius: var(--radius-md, 14px);
         padding: 1.1rem; text-align: center; margin: 1.25rem 0;
     }
-    .balance-card.fully-paid { background: rgba(16,185,129,0.07); border-color: rgba(16,185,129,0.25); }
+    .balance-card.fully-paid { background: color-mix(in srgb, var(--success, #10b981) 10%, transparent); border-color: color-mix(in srgb, var(--success, #10b981) 30%, transparent); }
     .balance-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 4px; }
-    .balance-val { font-size: 1.2rem; font-weight: 700; font-family: 'Space Mono', monospace; }
+    .balance-val { font-size: 1.2rem; font-weight: 700; font-family: var(--font-mono, 'Space Mono', monospace); }
 
     /* ── Payment UI ───────────────────────────────────────── */
     .pay-area { margin-top: 1.5rem; }
     .input-pay {
         width: 100%; background: transparent;
         border: 1px solid var(--border-color); color: var(--text-main);
+        border-radius: var(--radius-sm, 10px);
         padding: 0.9rem 1rem; font-size: 1.1rem;
-        font-family: 'Space Mono', monospace; text-align: center;
-        outline: none; margin-bottom: 0.75rem; min-height: 52px;
+        font-family: var(--font-mono, 'Space Mono', monospace); text-align: center;
+        outline: none; margin-bottom: 0.75rem; min-height: var(--min-tap-target, 52px);
     }
     .input-pay:focus { border-color: var(--accent-gold); }
 
-    .btn-set { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; padding: 0.6rem; flex: 1; cursor: pointer; min-height: 44px; }
+    .btn-set { background: transparent; border: 1px solid var(--border-color); border-radius: var(--radius-pill, 999px); color: var(--text-muted); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; padding: 0.6rem; flex: 1; cursor: pointer; min-height: var(--min-tap-target, 44px); transition: var(--transition-fast); }
     .btn-set:hover { border-color: var(--accent-gold); color: var(--text-main); }
 
     .pay-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 0.75rem; margin-top: 1.25rem; }
-    .btn-pay { background: var(--panel-bg); border: 1px solid var(--accent-gold); color: var(--accent-gold); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; padding: 1rem; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 72px; }
+    .btn-pay { background: var(--panel-bg); border: 1px solid var(--accent-gold); border-radius: var(--radius-md, 14px); color: var(--accent-gold); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; padding: 1rem; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 72px; transition: var(--transition-fast); }
     .btn-pay i { font-size: 1.2rem; }
-    .btn-pay:hover { background: var(--accent-gold); color: #000; }
+    .btn-pay:hover { background: var(--accent-gold); color: #fff; box-shadow: var(--shadow-hover, 0 8px 32px rgba(236,39,52,0.14)); }
     .btn-pay:active { opacity: 0.85; }
 
-    .btn-action { width: 100%; background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; padding: 1rem; cursor: pointer; margin-top: 1.5rem; min-height: 48px; }
+    .btn-action { width: 100%; background: transparent; border: 1px solid var(--border-color); border-radius: var(--radius-pill, 999px); color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; padding: 1rem; cursor: pointer; margin-top: 1.5rem; min-height: var(--min-tap-target, 48px); transition: var(--transition-fast); }
     .btn-action:hover { border-color: var(--text-main); color: var(--text-main); }
 
     /* ── Back nav ─────────────────────────────────────────── */
@@ -82,28 +85,41 @@
     .nav-back:hover { color: var(--accent-gold); }
 
     /* ── GST breakdown ────────────────────────────────────── */
-    .gst-breakdown { margin: 0.75rem 0; padding: 0.75rem; border: 1px dashed var(--border-color); background: rgba(236, 39, 52,0.03); }
+    .gst-breakdown { margin: 0.75rem 0; padding: 0.75rem; border: 1px dashed var(--border-color); border-radius: var(--radius-sm, 10px); background: color-mix(in srgb, var(--accent-gold) 4%, transparent); }
     .gst-breakdown-title { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 0.6rem; font-weight: 600; }
 
     /* ── Discount section ─────────────────────────────────── */
-    .discount-section { margin: 1.25rem 0; padding: 1.1rem; border: 1px solid var(--border-color); }
+    .discount-section { margin: 1.25rem 0; padding: 1.1rem; border: 1px solid var(--border-color); border-radius: var(--radius-md, 14px); }
     .discount-title { font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0.75rem; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; }
     .field-row { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
     .field-select, .field-num {
-        background: transparent; border: 1px solid var(--border-color); color: var(--text-main);
-        padding: 0.55rem 0.7rem; font-size: 0.85rem; outline: none; flex: 1; min-width: 70px; min-height: 44px;
+        background: transparent; border: 1px solid var(--border-color); border-radius: var(--radius-sm, 10px); color: var(--text-main);
+        padding: 0.55rem 0.7rem; font-size: 0.85rem; outline: none; flex: 1; min-width: 70px; min-height: var(--min-tap-target, 44px);
     }
-    .btn-apply { background: var(--accent-gold); color: #fff; border: none; padding: 0.55rem 1.1rem; font-size: 0.75rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; flex: 1.5; white-space: nowrap; min-height: 44px; }
-    .btn-remove { background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 0.55rem 1rem; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; flex: 1.5; white-space: nowrap; min-height: 44px; }
+    .btn-apply { background: var(--accent-gold); color: #fff; border: none; border-radius: var(--radius-pill, 999px); padding: 0.55rem 1.1rem; font-size: 0.75rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; flex: 1.5; white-space: nowrap; min-height: var(--min-tap-target, 44px); }
+    .btn-remove { background: transparent; border: 1px solid var(--danger, #ef4444); border-radius: var(--radius-pill, 999px); color: var(--danger, #ef4444); padding: 0.55rem 1rem; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; flex: 1.5; white-space: nowrap; min-height: var(--min-tap-target, 44px); }
 
     /* ── Loyalty points section ───────────────────────────── */
-    .loyalty-section { border: 1px dashed var(--border-color); padding: 1.1rem; margin-top: 1.25rem; }
+    .loyalty-section { border: 1px dashed var(--border-color); border-radius: var(--radius-md, 14px); padding: 1.1rem; margin-top: 1.25rem; }
     .loyalty-title { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 0.75rem; font-weight: 600; }
-    .loyalty-info { font-size: 0.8rem; color: var(--text-muted); margin: 0.4rem 0 0.6rem; padding: 0.5rem; border: 1px solid var(--border-color); }
+    .loyalty-info { font-size: 0.8rem; color: var(--text-muted); margin: 0.4rem 0 0.6rem; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm, 10px); }
     .loyalty-msg { display: none; margin-top: 0.6rem; font-size: 0.75rem; text-align: center; letter-spacing: 1px; }
 
     /* ── GST print block (hidden on screen, shown on print) ── */
     .print-gst { display: none; }
+
+    /* ── Responsive: tighten up the receipt card on small screens ── */
+    @media (max-width: 480px) {
+        .bill-page { padding: 1rem 0.6rem 3rem; }
+        .receipt-container { padding: 1.5rem 1.25rem; border-radius: var(--radius-md, 14px); }
+        .r-logo { font-size: 1.5rem; }
+        .grand-total { font-size: 1.25rem; }
+        .balance-val { font-size: 1.05rem; }
+        #change-amount { font-size: 2.1rem !important; }
+        .pay-grid { grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); gap: 0.5rem; }
+        .btn-pay { padding: 0.75rem; min-height: 64px; }
+        .field-row { gap: 0.4rem; }
+    }
 
     /* ── Print styles ─────────────────────────────────────── */
     /* @page sets physical paper dimensions — browser routes to built-in
@@ -125,7 +141,7 @@
         body, html { background: #fff !important; color: #000 !important; }
         .bill-page { padding: 0; min-height: 0; }
         .bill-wrap { max-width: 100% !important; }
-        .receipt-container { box-shadow: none; border: none; padding: 0; }
+        .receipt-container { box-shadow: none; border: none; border-radius: 0; padding: 0; }
         .item-val, .grand-total, .r-logo, .total-row { color: #000 !important; }
         * { border-color: #000 !important; }
     }
@@ -225,7 +241,7 @@
         <div class="total-row"><span>Subtotal</span><span>{{ order.outlet.currency_symbol }}{{ order.subtotal }}</span></div>
         {% endif %}
         {% if order.discount_total > 0 %}
-        <div class="total-row" style="color:#ef4444"><span>Discount</span><span>−{{ order.outlet.currency_symbol }}{{ order.discount_total }}</span></div>
+        <div class="total-row" style="color:var(--danger, #ef4444)"><span>Discount</span><span>−{{ order.outlet.currency_symbol }}{{ order.discount_total }}</span></div>
         {% endif %}
 
         {% if order.parcel_surcharge %}
@@ -313,7 +329,7 @@
                 Scan &amp; Pay  ·  {{ order.outlet.currency_symbol }}{{ remaining }}
             </div>
             <div id="upi-qr-canvas" style="display:inline-block;"></div>
-            <div id="upi-qr-fallback" style="display:none;font-size:0.78rem;color:#dc2626;margin-top:0.4rem;">
+            <div id="upi-qr-fallback" style="display:none;font-size:0.78rem;color:var(--danger, #dc2626);margin-top:0.4rem;">
                 Couldn't load the QR — have the customer pay directly to the UPI ID below in any UPI app.
             </div>
             <div style="font-size:0.72rem;color:var(--text-muted);margin-top:0.6rem;">
@@ -337,7 +353,7 @@
             <div class="discount-title">Apply Discount</div>
             <div style="margin-bottom:0.75rem;">
                 <select id="promo-select" onchange="applyPromo(this)"
-                        style="width:100%;background:transparent;border:1px solid var(--border-color);color:var(--text-main);padding:0.6rem;font-size:0.82rem;outline:none;">
+                        style="width:100%;background:transparent;border:1px solid var(--border-color);border-radius:var(--radius-sm, 10px);color:var(--text-main);padding:0.6rem;font-size:0.82rem;outline:none;">
                     <option value="">Select a promo…</option>
                 </select>
             </div>
@@ -367,7 +383,7 @@
                 <input type="number" id="payAmount" class="input-pay" value="{{ remaining }}" placeholder="Enter amount…"
                        oninput="updateChange(this.value)">
                 <!-- Change-to-give — appears only when cashier enters more than balance -->
-                <div id="change-display" style="display:none;background:#dc2626;color:#fff;text-align:center;padding:0.9rem 1rem;margin-bottom:0.75rem;">
+                <div id="change-display" style="display:none;background:var(--accent-gold);border-radius:var(--radius-md, 14px);color:#fff;text-align:center;padding:0.9rem 1rem;margin-bottom:0.75rem;">
                     <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:3px;opacity:.85;margin-bottom:0.2rem;">Change to Give Back</div>
                     <div id="change-amount" style="font-family:'DM Serif Display',serif;font-size:2.8rem;font-weight:700;line-height:1.1;">{{ order.outlet.currency_symbol }}0</div>
                 </div>
@@ -385,7 +401,7 @@
                 {% if request.user.role in "owner,manager" %}
                 <div style="margin-top:0.85rem;text-align:center;">
                     <button type="button" onclick="confirmBypass({{ order.id }})"
-                            style="background:transparent;border:1px dashed rgba(239,68,68,0.35);color:#ef4444;font-size:0.68rem;letter-spacing:1px;text-transform:uppercase;padding:0.4rem 0.8rem;cursor:pointer;">
+                            style="background:transparent;border:1px dashed color-mix(in srgb, var(--danger, #ef4444) 35%, transparent);border-radius:var(--radius-pill, 999px);color:var(--danger, #ef4444);font-size:0.68rem;letter-spacing:1px;text-transform:uppercase;padding:0.4rem 0.8rem;cursor:pointer;">
                         <i class="bi bi-shield-exclamation me-1"></i>Admin: Bypass Payment Gate
                     </button>
                 </div>
@@ -395,7 +411,7 @@
                     <i class="bi bi-check-circle"></i>Close Zero-Total Order
                 </button>
                 {% else %}
-                <div style="text-align:center;padding:1rem;color:#10b981;font-weight:700;letter-spacing:2px;font-size:0.75rem;">
+                <div style="text-align:center;padding:1rem;color:var(--success, #10b981);font-weight:700;letter-spacing:2px;font-size:0.75rem;">
                     <i class="bi bi-patch-check-fill me-2"></i>PAYMENT COMPLETE
                 </div>
                 {% endif %}
@@ -470,7 +486,7 @@
 
 {% if razorpay_feature_enabled and config.razorpay_enabled %}
 <div id="razorpay-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center;">
-    <div id="razorpay-modal-card" style="background:var(--panel-bg);border:1px solid var(--border-color);padding:2.5rem;max-width:420px;width:92%;text-align:center;transition:background 0.25s;">
+    <div id="razorpay-modal-card" style="background:var(--panel-bg);border:1px solid var(--border-color);border-radius:var(--radius-lg, 20px);box-shadow:var(--shadow-float, 0 4px 16px rgba(0,0,0,0.14));padding:2.5rem;max-width:420px;width:92%;text-align:center;transition:background 0.25s;">
         <div id="razorpay-qr-header" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:1.2rem;">Scan with any UPI app</div>
         <div id="razorpay-qr-area" style="min-height:280px;display:flex;align-items:center;justify-content:center;">
             <span style="color:var(--text-muted);font-size:0.85rem;">Generating QR…</span>
@@ -544,9 +560,9 @@ renderUpiQR({{ remaining }});
         const status = document.getElementById('razorpay-qr-status');
         const btns   = document.getElementById('razorpay-modal-buttons');
         if (kind === 'paid') {
-            card.style.background = 'rgba(34,197,94,0.10)';
+            card.style.background = 'color-mix(in srgb, var(--success, #10b981) 10%, transparent)';
             header.style.display = 'none';
-            status.style.color = '#16a34a';
+            status.style.color = 'var(--success, #16a34a)';
             status.style.fontSize = '1.3rem';
             status.textContent = 'PAID ✓';
             btns.style.display = 'none';
@@ -592,7 +608,7 @@ renderUpiQR({{ remaining }});
                         clearInterval(_razorpayPollTimer); _razorpayPollTimer = null;
                         // Replace the QR with a big green checkmark — held on
                         // screen for 2s so it's actually seen, not just flashed.
-                        area.innerHTML = `<div style="width:90px;height:90px;border-radius:50%;background:#16a34a;display:flex;align-items:center;justify-content:center;">
+                        area.innerHTML = `<div style="width:90px;height:90px;border-radius:50%;background:var(--success, #16a34a);display:flex;align-items:center;justify-content:center;">
                             <span style="color:#fff;font-size:3rem;line-height:1;">✓</span>
                         </div>`;
                         razorpaySetState('paid');
@@ -605,7 +621,7 @@ renderUpiQR({{ remaining }});
                 } catch (e) { /* keep polling — a transient network blip shouldn't stop it */ }
             }, 3000);
         } catch (e) {
-            area.innerHTML = '<span style="color:#dc2626;font-size:0.85rem;">Could not generate QR</span>';
+            area.innerHTML = '<span style="color:var(--danger, #dc2626);font-size:0.85rem;">Could not generate QR</span>';
             status.textContent = 'Tap Regenerate to try again';
         }
     }
@@ -1028,12 +1044,12 @@ renderUpiQR({{ remaining }});
             const d = await apiClient.post('/crm/link/{{ order.id }}/', { phone, name, redeem_points: redeem });
             msg.style.display = 'block';
             if (d.success) {
-                msg.style.color = '#10b981';
+                msg.style.color = 'var(--success, #10b981)';
                 msg.textContent = `+${d.points_earned} pts earned! Balance: ${d.total_points} pts`;
             } else {
-                msg.style.color = '#ef4444'; msg.textContent = d.error;
+                msg.style.color = 'var(--danger, #ef4444)'; msg.textContent = d.error;
             }
-        } catch(e) { msg.style.display='block'; msg.style.color='#ef4444'; msg.textContent='Failed'; }
+        } catch(e) { msg.style.display='block'; msg.style.color='var(--danger, #ef4444)'; msg.textContent='Failed'; }
     }
 
     async function sendToWhatsApp() {
@@ -1050,7 +1066,7 @@ renderUpiQR({{ remaining }});
             const d = await apiClient.post("{% url 'send-whatsapp-bill' order.id %}", { phone });
             if (msg) {
                 msg.style.display = 'block';
-                msg.style.color = '#10b981';
+                msg.style.color = 'var(--success, #10b981)';
                 msg.textContent = `Sent to ${d.phone}`;
             }
             ui.toast('Bill sent to WhatsApp!', 'success');
@@ -1058,7 +1074,7 @@ renderUpiQR({{ remaining }});
             // apiClient.post already toasted the specific error (invalid
             // number, feature disabled, WhatsApp unreachable, etc.) — just
             // leave an inline trace for anyone who missed the toast.
-            if (msg) { msg.style.display = 'block'; msg.style.color = '#ef4444'; msg.textContent = e.message || 'Could not send.'; }
+            if (msg) { msg.style.display = 'block'; msg.style.color = 'var(--danger, #ef4444)'; msg.textContent = e.message || 'Could not send.'; }
         } finally {
             btn.disabled = false;
             btn.innerHTML = originalHtml;

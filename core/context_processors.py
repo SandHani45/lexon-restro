@@ -4,6 +4,18 @@ from django.conf import settings
 def base_url(request):
     return {'BASE_URL': settings.BASE_URL}
 
+def currency(request):
+    """
+    Tenant-aware currency symbol for every operational template (₹ for
+    India, AED for UAE, etc.) — see tenants/tax_regimes.py, the single
+    source of truth this reads from via Outlet.currency_symbol. Falls back
+    to India's ₹ for logged-out/no-outlet requests (public bill links,
+    login page) since that's this app's default market.
+    """
+    outlet = getattr(getattr(request, 'user', None), 'outlet', None)
+    symbol = outlet.currency_symbol if outlet else "₹"
+    return {'CURRENCY_SYMBOL': symbol}
+
 def tenant_features(request):
     if not hasattr(request, 'user') or not request.user.is_authenticated:
         return {'tenant_features': [], 'tenant_type': 'fine_dining'}

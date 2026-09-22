@@ -917,7 +917,7 @@
       <div class="kpi-card kpi-revenue">
         <div class="kpi-info">
           <div class="kpi-label">Total Revenue</div>
-          <div class="kpi-val">₹{{ total_revenue|floatformat:0 }}</div>
+          <div class="kpi-val">{{ request.user.outlet.currency_symbol|default:"₹" }}{{ total_revenue|floatformat:0 }}</div>
           <div class="kpi-sub">Net revenue collected</div>
         </div>
         <div class="kpi-icon-wrap icon-revenue">
@@ -931,9 +931,9 @@
           <div class="kpi-label">Avg Ticket Size</div>
           <div class="kpi-val">
             {% if total_orders > 0 %}
-              ₹{% widthratio total_revenue total_orders 1 %}
+              {{ request.user.outlet.currency_symbol|default:"₹" }}{% widthratio total_revenue total_orders 1 %}
             {% else %}
-              ₹0
+              {{ request.user.outlet.currency_symbol|default:"₹" }}0
             {% endif %}
           </div>
           <div class="kpi-sub">Average value per bill</div>
@@ -950,15 +950,15 @@
           <div class="d-flex flex-column gap-1">
             <div class="d-flex justify-content-between align-items-center" style="font-size:0.75rem;">
               <span class="d-flex align-items-center gap-1.5"><span class="dot-badge" style="background:#10b981;"></span> Cash</span>
-              <strong>₹{{ pay_map.cash|default:0|floatformat:0 }}</strong>
+              <strong>{{ request.user.outlet.currency_symbol|default:"₹" }}{{ pay_map.cash|default:0|floatformat:0 }}</strong>
             </div>
             <div class="d-flex justify-content-between align-items-center" style="font-size:0.75rem;">
               <span class="d-flex align-items-center gap-1.5"><span class="dot-badge" style="background:#3b82f6;"></span> UPI</span>
-              <strong>₹{{ pay_map.upi|default:0|floatformat:0 }}</strong>
+              <strong>{{ request.user.outlet.currency_symbol|default:"₹" }}{{ pay_map.upi|default:0|floatformat:0 }}</strong>
             </div>
             <div class="d-flex justify-content-between align-items-center" style="font-size:0.75rem;">
               <span class="d-flex align-items-center gap-1.5"><span class="dot-badge" style="background:#a855f7;"></span> Card</span>
-              <strong>₹{{ pay_map.card|default:0|floatformat:0 }}</strong>
+              <strong>{{ request.user.outlet.currency_symbol|default:"₹" }}{{ pay_map.card|default:0|floatformat:0 }}</strong>
             </div>
           </div>
         </div>
@@ -1112,7 +1112,7 @@
               </span>
             </td>
             <td style="text-align:right;font-weight:800;font-size:0.95rem;color:var(--text-main);">
-              ₹{{ order.grand_total|floatformat:0 }}
+              {{ CURRENCY_SYMBOL }}{{ order.grand_total|floatformat:0 }}
             </td>
             <td>
               {% for p in order.payments.all %}
@@ -1188,7 +1188,7 @@
     <label>Max Refundable Amount</label>
     <div id="refundMaxAmt" style="font-size:1.2rem;font-weight:800;color:var(--pos-red);margin-bottom:0.75rem;"></div>
     
-    <label>Refund Amount (₹)</label>
+    <label>Refund Amount ({{ CURRENCY_SYMBOL }})</label>
     <input type="number" id="refundAmount" min="1" step="0.01" placeholder="Enter amount to refund">
     
     <label>Customer Complaint <span style="color:var(--text-muted);font-weight:400;font-size:0.75rem;">(optional)</span></label>
@@ -1222,6 +1222,7 @@
 
 {% block extra_js %}
 <script>
+const CURRENCY_SYMBOL = "{{ request.user.outlet.currency_symbol|default:'₹'|escapejs }}";
 function getCookie(name) {
   const v = document.cookie.match("(^|;) ?" + name + "=([^;]*)(;|$)");
   return v ? v[2] : null;
@@ -1290,7 +1291,7 @@ function renderDetail(o) {
         : "";
       const voidNote = item.void_reason
         ? `<span class="void-reason">Reason: ${item.void_reason}</span>` : "";
-      const price = item.is_complimentary ? "₹0" : `₹${item.total.toFixed(0)}`;
+      const price = item.is_complimentary ? `${CURRENCY_SYMBOL}0` : `${CURRENCY_SYMBOL}${item.total.toFixed(0)}`;
       html += `<div class="detail-row ${cls}">
         <span class="name">
           <span style="font-weight:700;color:var(--pos-red);background:var(--pos-red-soft);padding:1px 6px;border-radius:6px;font-size:0.75rem;">${item.quantity}×</span>
@@ -1304,12 +1305,12 @@ function renderDetail(o) {
 
   // Totals
   html += `<div class="detail-section"><div class="detail-section-title"><i class="bi bi-calculator me-1"></i>Bill Summary</div>
-    <div class="detail-row"><span class="name">Subtotal</span><span class="amt">₹${o.subtotal.toFixed(0)}</span></div>
-    <div class="detail-row"><span class="name">GST Tax</span><span class="amt">₹${o.gst_total.toFixed(0)}</span></div>`;
+    <div class="detail-row"><span class="name">Subtotal</span><span class="amt">${CURRENCY_SYMBOL}${o.subtotal.toFixed(0)}</span></div>
+    <div class="detail-row"><span class="name">GST Tax</span><span class="amt">${CURRENCY_SYMBOL}${o.gst_total.toFixed(0)}</span></div>`;
   if (o.discount_total > 0) {
-    html += `<div class="detail-row"><span class="name">Discount Applied</span><span class="amt" style="color:#10b981;">-₹${o.discount_total.toFixed(0)}</span></div>`;
+    html += `<div class="detail-row"><span class="name">Discount Applied</span><span class="amt" style="color:#10b981;">-${CURRENCY_SYMBOL}${o.discount_total.toFixed(0)}</span></div>`;
   }
-  html += `<div class="detail-row total-row"><span class="name">Grand Total</span><span class="amt">₹${o.grand_total.toFixed(0)}</span></div></div>`;
+  html += `<div class="detail-row total-row"><span class="name">Grand Total</span><span class="amt">${CURRENCY_SYMBOL}${o.grand_total.toFixed(0)}</span></div></div>`;
 
   // Payments + refund UI
   if (o.payments.length) {
@@ -1318,7 +1319,7 @@ function renderDetail(o) {
       if (p.is_refund) {
         html += `<div class="detail-row refund-row">
           <span class="name"><i class="bi bi-arrow-return-left text-danger me-1"></i>${p.method.toUpperCase()}${p.reference ? ` · ${p.reference}` : ""}</span>
-          <span class="amt">-₹${Math.abs(p.amount).toFixed(0)} <span style="color:var(--text-muted);font-size:0.72rem;font-weight:400;">(${p.paid_at})</span></span>
+          <span class="amt">-${CURRENCY_SYMBOL}${Math.abs(p.amount).toFixed(0)} <span style="color:var(--text-muted);font-size:0.72rem;font-weight:400;">(${p.paid_at})</span></span>
         </div>`;
         return;
       }
@@ -1331,7 +1332,7 @@ function renderDetail(o) {
         : "";
       html += `<div class="detail-row">
         <span class="name">${p.method.toUpperCase()}${p.reference ? ` · ${p.reference}` : ""}${refundBtn}</span>
-        <span class="amt">₹${p.amount.toFixed(0)} <span style="color:var(--text-muted);font-size:0.72rem;font-weight:400;">(${p.paid_at})</span></span>
+        <span class="amt">${CURRENCY_SYMBOL}${p.amount.toFixed(0)} <span style="color:var(--text-muted);font-size:0.72rem;font-weight:400;">(${p.paid_at})</span></span>
       </div>`;
       // Show existing refunds for this payment
       p.refunds.forEach(r => {
@@ -1341,7 +1342,7 @@ function renderDetail(o) {
              <button type="button" class="btn-reject"  onclick="rejectRefund(${r.id})">Reject</button>`
           : "";
         html += `<div class="refund-entry">
-          <span>₹${r.amount.toFixed(0)} · ${r.reason || "No reason"} <span style="color:var(--text-muted);font-size:0.7rem;">by ${r.by}</span></span>
+          <span>${CURRENCY_SYMBOL}${r.amount.toFixed(0)} · ${r.reason || "No reason"} <span style="color:var(--text-muted);font-size:0.7rem;">by ${r.by}</span></span>
           <span style="display:flex;align-items:center;gap:6px;">
             <span class="refund-status ${stCls}">${r.status}</span>
             ${approveReject}
@@ -1385,7 +1386,7 @@ let _activePaymentId = null;
 
 function openRefundModal(paymentId, maxAmount) {
   _activePaymentId = paymentId;
-  document.getElementById("refundMaxAmt").textContent = "₹" + parseFloat(maxAmount).toFixed(2);
+  document.getElementById("refundMaxAmt").textContent = CURRENCY_SYMBOL + parseFloat(maxAmount).toFixed(2);
   document.getElementById("refundAmount").value = "";
   document.getElementById("refundAmount").max = maxAmount;
   document.getElementById("refundCustomerComplaint").value = "";

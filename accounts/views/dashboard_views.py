@@ -31,12 +31,21 @@ def owner_dashboard(request):
     from core.features import has_feature
     direct_billing_mode = is_qsr and has_feature(tenant, "direct_billing_mode")
 
+    from core.utils import get_business_date, get_business_date_range
+    from django.utils import timezone
+
+    # Business date, not calendar date -- a restaurant day can run past
+    # midnight, so "today" for every "today"-scoped panel below (top
+    # items, order-type mix, reservations) has to line up with the same
+    # cutoff-hour convention already used for the Z-report and the
+    # dashboard metric cards (reports/services/dashboard_metrics.py),
+    # not a naive created_at__date= filter.
+    today = get_business_date(timezone.now(), request.user.outlet)
+    business_start, business_end = get_business_date_range(today, request.user.outlet)
+
     active_token_count = 0
     if is_qsr:
         from tokens.models import TokenOrder
-        from core.utils import get_business_date
-        from django.utils import timezone
-        today = get_business_date(timezone.now(), request.user.outlet)
         active_token_count = TokenOrder.objects.filter(
             outlet=request.user.outlet, date=today,
             order__status__in=["open", "billing"],
@@ -53,8 +62,7 @@ def owner_dashboard(request):
     ).exists():
         return redirect("/setup/onboard/")
 
-    from orders.models import Order, OrderItem
-    from django.db.models import Sum
+    from orders.models import Order
 
     recent_orders = list(
         Order.objects.filter(tenant=tenant, outlet=request.user.outlet)
@@ -62,18 +70,74 @@ def owner_dashboard(request):
         .order_by("-created_at")[:6]
     )
 
-    from django.db.models import F
+    from django.db.models import Count
+    from reports.services.item_reports import top_items as top_items_report
 
-    top_items = list(
-        OrderItem.objects.filter(
-            order__tenant=tenant,
-            order__outlet=request.user.outlet,
-            menu_item__isnull=False,
+    # Reuse the same query the full Reports > Top Items page runs (paid/closed
+    # orders only, complimentary and voided items excluded) so this panel's
+    # numbers match what "View all" shows instead of drifting from its own
+    # looser query, which used to also count open/billing/cancelled orders
+    # and freebies as "sold".
+    top_items = [
+        {"item_name": row["menu_item__name"], "total_qty": row["total"]}
+        for row in top_items_report(
+            tenant, outlet=request.user.outlet, start_date=today, end_date=today
+        )[:5]
+    ]
+
+    # Order-type donut: bucket the real SOURCE_CHOICES on Order into the
+    # three groups the panel displays. "counter" (QSR token orders) reads
+    # as a pickup-at-counter flow like takeaway; every aggregator/webstore
+    # source (web, zomato, swiggy, uber_eats) plus in-house "delivery"
+    # reads as delivery. Cancelled orders are excluded -- they were never
+    # actually served as any type.
+    SOURCE_TO_BUCKET = {
+        "dine_in":   "dine_in",
+        "takeaway":  "takeaway",
+        "counter":   "takeaway",
+        "delivery":  "delivery",
+        "web":       "delivery",
+        "zomato":    "delivery",
+        "swiggy":    "delivery",
+        "uber_eats": "delivery",
+    }
+    order_type_counts_qs = (
+        Order.objects.filter(
+            tenant=tenant, outlet=request.user.outlet,
+            created_at__gte=business_start, created_at__lt=business_end,
         )
-        .values(item_name=F("menu_item__name"))
-        .annotate(total_qty=Sum("quantity"))
-        .order_by("-total_qty")[:5]
+        .exclude(status="cancelled")
+        .values("source")
+        .annotate(count=Count("id"))
     )
+    bucket_counts = {"dine_in": 0, "takeaway": 0, "delivery": 0}
+    for row in order_type_counts_qs:
+        bucket_counts[SOURCE_TO_BUCKET.get(row["source"], "delivery")] += row["count"]
+
+    order_type_total = sum(bucket_counts.values())
+    order_type_breakdown = []
+    if order_type_total:
+        import math
+        circumference = round(2 * math.pi * 38, 1)  # SVG donut ring: r=38
+        cumulative = 0.0
+        for key, label, color in (
+            ("dine_in",  "Dine-In",  "#EC2734"),
+            ("takeaway", "Takeaway", "#fa7327"),
+            ("delivery", "Delivery", "#2b2b36"),
+        ):
+            count = bucket_counts[key]
+            dash_len = round(count / order_type_total * circumference, 1)
+            order_type_breakdown.append({
+                "key":         key,
+                "label":       label,
+                "color":       color,
+                "count":       count,
+                "pct":         round(count / order_type_total * 100),
+                "dash_len":    dash_len,
+                "dash_offset": round(-cumulative, 1),
+                "circumference": circumference,
+            })
+            cumulative += dash_len
 
     today_reservations = []
     res_confirmed_count = 0
@@ -81,7 +145,8 @@ def owner_dashboard(request):
         from crm.models import Reservation
         today_reservations = list(
             Reservation.objects.filter(
-                tenant=tenant, outlet=request.user.outlet
+                tenant=tenant, outlet=request.user.outlet,
+                reservation_time__gte=business_start, reservation_time__lt=business_end,
             ).select_related("guest", "table").order_by("-reservation_time")[:5]
         )
         res_confirmed_count = sum(1 for r in today_reservations if r.status == "confirmed")
@@ -100,6 +165,8 @@ def owner_dashboard(request):
         "is_cashier":          is_cashier,
         "recent_orders":       recent_orders,
         "top_items":           top_items,
+        "order_type_breakdown": order_type_breakdown,
+        "order_type_total":    order_type_total,
         "today_reservations":  today_reservations,
         "res_confirmed_count": res_confirmed_count,
     })

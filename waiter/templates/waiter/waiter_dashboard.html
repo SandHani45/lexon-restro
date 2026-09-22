@@ -8,22 +8,27 @@
     /* ══════════════════════════════════════════════════════════════
        KIMIPOS LUXURY WAITER DASHBOARD DESIGN SYSTEM
        ══════════════════════════════════════════════════════════════ */
+    /* Aliased to the live theme tokens (luxury.css) instead of a frozen
+       hex copy -- this page used to carry its own --pos-* palette that
+       silently stopped matching the rest of the app whenever the theme
+       changed. Names kept as-is below so the whole file doesn't need
+       touching, only what they point to. */
     :root {
-        --pos-red: #EC2734;
-        --pos-red-hover: #d81f2f;
-        --pos-red-soft: rgba(236, 39, 52, 0.08);
-        --pos-red-border: rgba(236, 39, 52, 0.22);
-        --pos-green: #10b981;
+        --pos-red: var(--accent-gold, #EC2734);
+        --pos-red-hover: var(--accent-hover, #d81f2f);
+        --pos-red-soft: color-mix(in srgb, var(--accent-gold, #EC2734) 8%, transparent);
+        --pos-red-border: color-mix(in srgb, var(--accent-gold, #EC2734) 22%, transparent);
+        --pos-green: var(--success, #10b981);
         --pos-green-hover: #059669;
-        --pos-green-soft: rgba(16, 185, 129, 0.10);
-        --pos-green-border: rgba(16, 185, 129, 0.25);
-        --pos-amber: #f59e0b;
+        --pos-green-soft: color-mix(in srgb, var(--success, #10b981) 10%, transparent);
+        --pos-green-border: color-mix(in srgb, var(--success, #10b981) 25%, transparent);
+        --pos-amber: var(--warning, #f59e0b);
         --pos-amber-hover: #d97706;
-        --pos-amber-soft: rgba(245, 158, 11, 0.10);
-        --pos-amber-border: rgba(245, 158, 11, 0.25);
-        --pos-blue: #3b82f6;
-        --pos-blue-soft: rgba(59, 130, 246, 0.10);
-        --pos-blue-border: rgba(59, 130, 246, 0.25);
+        --pos-amber-soft: color-mix(in srgb, var(--warning, #f59e0b) 10%, transparent);
+        --pos-amber-border: color-mix(in srgb, var(--warning, #f59e0b) 25%, transparent);
+        --pos-blue: var(--info, #3b82f6);
+        --pos-blue-soft: color-mix(in srgb, var(--info, #3b82f6) 10%, transparent);
+        --pos-blue-border: color-mix(in srgb, var(--info, #3b82f6) 25%, transparent);
     }
 
     body {
@@ -101,6 +106,21 @@
         border-color: var(--pos-red-border);
         background: var(--pos-red-soft);
         color: var(--pos-red) !important;
+        transform: translateY(-1px);
+    }
+    /* Primary action pill -- same filled-red treatment as the main
+       Dashboard's "Open POS" button (.btn-luxury-primary), so the
+       highest-priority action reads the same way on both pages. */
+    .btn-subbar-pill-primary {
+        background: var(--pos-red);
+        border-color: var(--pos-red);
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px color-mix(in srgb, var(--pos-red) 35%, transparent);
+    }
+    .btn-subbar-pill-primary:hover {
+        background: var(--pos-red-hover);
+        border-color: var(--pos-red-hover);
+        color: #ffffff !important;
         transform: translateY(-1px);
     }
 
@@ -211,7 +231,13 @@
         padding: 4px;
         border-radius: 999px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
     }
+    .filter-pills-wrap::-webkit-scrollbar { display: none; }
+    .filter-pill { white-space: nowrap; }
     .filter-pill {
         background: transparent;
         border: none;
@@ -233,7 +259,7 @@
     .filter-pill.active {
         background: var(--pos-red);
         color: #ffffff;
-        box-shadow: 0 2px 8px rgba(236, 39, 52, 0.3);
+        box-shadow: 0 2px 8px color-mix(in srgb, var(--pos-red) 30%, transparent);
     }
     .filter-count {
         font-size: 0.68rem;
@@ -276,6 +302,13 @@
         grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
         gap: 20px;
     }
+    @media (max-width: 480px) {
+        .pos-subbar { padding: 0.75rem 1rem 0.5rem; }
+        .waiter-wrap { padding: 0.5rem 1rem 4rem; }
+        .alerts-grid { grid-template-columns: 1fr; gap: 14px; }
+        .call-table-title { font-size: 1.4rem; }
+        .empty-state-card { padding: 2.5rem 1.25rem; }
+    }
 
     .alert-card {
         background: var(--panel-bg);
@@ -306,14 +339,14 @@
         border-radius: 999px;
     }
     .alert-card.card-service {
-        border-color: rgba(236, 39, 52, 0.35);
+        border-color: color-mix(in srgb, var(--pos-red) 35%, transparent);
         animation: pulse-service 2.5s infinite;
     }
     .alert-card.card-service::before {
         background: linear-gradient(90deg, transparent, var(--pos-red), transparent);
     }
     .alert-card.card-kitchen {
-        border-color: rgba(245, 158, 11, 0.35);
+        border-color: color-mix(in srgb, var(--pos-amber) 35%, transparent);
         animation: pulse-kitchen 2.5s infinite;
     }
     .alert-card.card-kitchen::before {
@@ -321,14 +354,14 @@
     }
 
     @keyframes pulse-service {
-        0%   { box-shadow: 0 4px 18px rgba(236, 39, 52, 0.04); }
-        50%  { box-shadow: 0 6px 24px rgba(236, 39, 52, 0.12); }
-        100% { box-shadow: 0 4px 18px rgba(236, 39, 52, 0.04); }
+        0%   { box-shadow: 0 4px 18px color-mix(in srgb, var(--pos-red) 4%, transparent); }
+        50%  { box-shadow: 0 6px 24px color-mix(in srgb, var(--pos-red) 12%, transparent); }
+        100% { box-shadow: 0 4px 18px color-mix(in srgb, var(--pos-red) 4%, transparent); }
     }
     @keyframes pulse-kitchen {
-        0%   { box-shadow: 0 4px 18px rgba(245, 158, 11, 0.04); }
-        50%  { box-shadow: 0 6px 24px rgba(245, 158, 11, 0.12); }
-        100% { box-shadow: 0 4px 18px rgba(245, 158, 11, 0.04); }
+        0%   { box-shadow: 0 4px 18px color-mix(in srgb, var(--pos-amber) 4%, transparent); }
+        50%  { box-shadow: 0 6px 24px color-mix(in srgb, var(--pos-amber) 12%, transparent); }
+        100% { box-shadow: 0 4px 18px color-mix(in srgb, var(--pos-amber) 4%, transparent); }
     }
 
     /* Card Elements */
@@ -420,7 +453,7 @@
         align-items: center;
         justify-content: center;
         gap: 6px;
-        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.28);
+        box-shadow: 0 4px 14px color-mix(in srgb, var(--pos-green) 28%, transparent);
         transition: all 0.2s ease;
         cursor: pointer;
         text-decoration: none !important;
@@ -428,7 +461,7 @@
     .btn-resolve-success:hover {
         background: var(--pos-green-hover);
         transform: translateY(-1.5px);
-        box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4);
+        box-shadow: 0 6px 18px color-mix(in srgb, var(--pos-green) 40%, transparent);
     }
     .btn-resolve-success:active {
         transform: translateY(0);
@@ -448,7 +481,7 @@
         align-items: center;
         justify-content: center;
         gap: 6px;
-        box-shadow: 0 4px 14px rgba(245, 158, 11, 0.28);
+        box-shadow: 0 4px 14px color-mix(in srgb, var(--pos-amber) 28%, transparent);
         transition: all 0.2s ease;
         cursor: pointer;
         text-decoration: none !important;
@@ -456,7 +489,7 @@
     .btn-resolve-amber:hover {
         background: var(--pos-amber-hover);
         transform: translateY(-1.5px);
-        box-shadow: 0 6px 18px rgba(245, 158, 11, 0.4);
+        box-shadow: 0 6px 18px color-mix(in srgb, var(--pos-amber) 40%, transparent);
     }
     .btn-resolve-amber:active {
         transform: translateY(0);
@@ -505,15 +538,15 @@
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background: #10b981;
+        background: var(--pos-green);
         display: inline-block;
-        box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+        box-shadow: 0 0 0 2px var(--pos-green-border);
         animation: pulse-dot 1.8s infinite;
     }
     @keyframes pulse-dot {
-        0%   { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-        70%  { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--pos-green) 40%, transparent); }
+        70%  { box-shadow: 0 0 0 6px color-mix(in srgb, var(--pos-green) 0%, transparent); }
+        100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--pos-green) 0%, transparent); }
     }
 </style>
 {% endblock %}
@@ -538,7 +571,7 @@
         <a href="/tables/" class="btn-subbar-pill">
             <i class="bi bi-grid-3x3-gap"></i> Tables
         </a>
-        <a href="/billing/" class="btn-subbar-pill">
+        <a href="/billing/" class="btn-subbar-pill btn-subbar-pill-primary">
             <i class="bi bi-laptop"></i> POS Billing
         </a>
         <a href="/kitchen/" class="btn-subbar-pill">
@@ -703,7 +736,7 @@
                 <a href="/tables/live/" class="btn-subbar-pill">
                     <i class="bi bi-broadcast-pin text-warning"></i> View Live Floor
                 </a>
-                <a href="/billing/" class="btn-subbar-pill">
+                <a href="/billing/" class="btn-subbar-pill btn-subbar-pill-primary">
                     <i class="bi bi-laptop text-danger"></i> Open POS Billing
                 </a>
             </div>
@@ -900,7 +933,7 @@
                             <a href="/tables/live/" class="btn-subbar-pill">
                                 <i class="bi bi-broadcast-pin text-warning"></i> View Live Floor
                             </a>
-                            <a href="/billing/" class="btn-subbar-pill">
+                            <a href="/billing/" class="btn-subbar-pill btn-subbar-pill-primary">
                                 <i class="bi bi-laptop text-danger"></i> Open POS Billing
                             </a>
                         </div>
