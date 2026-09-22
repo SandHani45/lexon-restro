@@ -82,6 +82,103 @@
     padding: 0.85rem 1.5rem 0.35rem;
     background: var(--bg-color);
   }
+  .pos-subbar-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 2px;
+  }
+  .pos-subbar-title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+  .pos-subbar-back-btn {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    background: var(--panel-bg, #ffffff);
+    border: 1.5px solid var(--border-color, #ECE7E2);
+    color: var(--text-main, #2C170E);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 1.05rem;
+    font-weight: 700;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    flex-shrink: 0;
+  }
+  .pos-subbar-back-btn:hover {
+    background: var(--pos-red-soft, #FFF4F4);
+    border-color: var(--pos-red, #EC2734);
+    color: var(--pos-red, #EC2734);
+    transform: translateX(-2px);
+    box-shadow: 0 4px 12px rgba(236, 39, 52, 0.18);
+  }
+  html.dark .pos-subbar-back-btn {
+    background: #18181b;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #f4f4f6;
+  }
+  html.dark .pos-subbar-back-btn:hover {
+    background: rgba(236, 39, 52, 0.15);
+    border-color: var(--pos-red, #EC2734);
+    color: #ff6b75;
+  }
+  .pos-subbar-headings {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .pos-subbar-clock {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--panel-bg, #ffffff);
+    border: 1.5px solid var(--border-color, #ECE7E2);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-main, #2C170E);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    user-select: none;
+    flex-shrink: 0;
+    letter-spacing: 0.2px;
+  }
+  html.dark .pos-subbar-clock {
+    background: #18181b;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #f4f4f6;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  .pos-subbar-clock i {
+    color: var(--pos-red, #EC2734);
+    font-size: 0.9rem;
+  }
+  .pos-subbar-clock .pos-clock-time {
+    font-family: var(--font-mono, monospace);
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+  }
+  .pos-subbar-clock .pos-clock-date {
+    color: var(--text-muted, #8a7d74);
+    font-weight: 500;
+    font-size: 0.76rem;
+    padding-left: 6px;
+    border-left: 1px solid var(--border-color, #ECE7E2);
+  }
+  html.dark .pos-subbar-clock .pos-clock-date {
+    color: #9ca3af;
+    border-left-color: rgba(255, 255, 255, 0.12);
+  }
   .pos-subbar-title {
     font-size: 1.35rem;
     font-weight: 800;
@@ -89,6 +186,7 @@
     margin: 0;
     letter-spacing: -0.4px;
     font-family: var(--font-display);
+    line-height: 1.15;
   }
   .pos-subbar-breadcrumb {
     font-size: 0.78rem;
@@ -1224,11 +1322,11 @@
     }
 
     /* The global #pos-topbar (core/base.html) is a fixed-height, nowrap,
-       overflow:hidden flex row. On phone widths the hamburger + back arrow
-       + title + theme toggle + notification icons + user badge don't all
-       fit and were being silently clipped. Let it scroll horizontally
-       instead of cutting controls off, and keep the right-side controls
-       from shrinking into each other. */
+       overflow:hidden flex row. Hide the 3-dots "more" button on mobile for
+       billing so the top bar is clean and uncluttered. */
+    #pos-topbar .topbar-more-wrap {
+      display: none !important;
+    }
     #pos-topbar {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
@@ -1236,6 +1334,28 @@
     }
     #pos-topbar::-webkit-scrollbar { display: none; }
     #pos-topbar .topbar-right { flex-shrink: 0; }
+
+    /* Mobile subbar header row with back button, title, and clock */
+    .pos-subbar-header-row {
+      margin-bottom: 8px;
+    }
+    .pos-subbar-title {
+      font-size: 1.15rem;
+    }
+    .pos-subbar-back-btn {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      font-size: 0.95rem;
+    }
+    .pos-subbar-clock {
+      padding: 4px 10px;
+      font-size: 0.76rem;
+      gap: 5px;
+    }
+    .pos-subbar-clock .pos-clock-time {
+      font-size: 0.8rem;
+    }
   }
 
   @media (max-width: 480px) {
@@ -1474,22 +1594,18 @@
 
 {% block header_left %}
 <div class="d-flex align-items-center gap-3">
-  <a href="/billing/" class="d-flex align-items-center gap-2 text-decoration-none text-reset">
+  <a href="/billing/" class="d-flex align-items-center gap-2 text-decoration-none text-reset" title="POS Billing">
     <div style="width:34px;height:34px;border-radius:10px;background:rgba(236,39,52,0.12);border:1px solid rgba(236,39,52,0.3);display:flex;align-items:center;justify-content:center;color:var(--pos-red);flex-shrink:0;">
       <i class="bi bi-calculator" style="font-size:1.05rem;"></i>
     </div>
     <div class="d-none d-lg-block">
-      <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.3px;color:var(--text-main);font-family:var(--font-main, 'Outfit', sans-serif);">POS Billing</h1>
-      <div class="text-muted" style="font-size:0.72rem;letter-spacing:0.3px;">{{ request.user.outlet.name }}</div>
+      <div class="text-muted fw-semibold" style="font-size:0.75rem;letter-spacing:0.3px;">{{ request.user.outlet.name }}</div>
     </div>
   </a>
   <div class="d-none d-md-flex align-items-center position-relative" style="width:280px;">
     <i class="bi bi-search" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.88rem;pointer-events:none;"></i>
     <input type="text" id="menuSearch" class="form-control" placeholder="Search menu dishes... (Press /)" autocomplete="off" style="padding-left:36px;padding-right:30px;height:38px;border-radius:999px;background:var(--surface-2);border:1.5px solid var(--border-color);font-size:0.82rem;color:var(--text-main);">
     <button type="button" id="menuSearchClear" onclick="clearMenuSearch()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);font-size:0.85rem;display:none;cursor:pointer;">✕</button>
-  </div>
-  <div class="d-md-none">
-    <h1 class="brand-title mb-0" style="font-size:1.05rem;font-weight:800;">POS Billing</h1>
   </div>
 </div>
 {% endblock %}
@@ -1531,14 +1647,26 @@
     <!-- Sub-Header Bar: Breadcrumb + Action Buttons -->
     <div class="pos-subbar">
       <div class="pos-subbar-left">
-        <a href="/dashboard/" class="btn-subbar-pill text-decoration-none me-2" title="Back to Dashboard">
-          <i class="bi bi-arrow-left me-1"></i> <span class="d-none d-sm-inline">Dashboard</span>
-        </a>
-        <h1 class="pos-subbar-title">Point of Sale (POS)</h1>
-        <div class="pos-subbar-breadcrumb">
-          <a href="/dashboard/">Dashboard</a>
-          <span class="sep">&gt;</span>
-          <span class="active">POS</span>
+        <div class="pos-subbar-header-row">
+          <div class="pos-subbar-title-group">
+            <a href="/dashboard/" class="pos-subbar-back-btn" title="Back to Dashboard">
+              <i class="bi bi-arrow-left"></i>
+            </a>
+            <div class="pos-subbar-headings">
+              <h1 class="pos-subbar-title">Point of Sale (POS)</h1>
+              <div class="pos-subbar-breadcrumb">
+                <a href="/dashboard/">Dashboard</a>
+                <span class="sep">&gt;</span>
+                <span class="active">POS</span>
+              </div>
+            </div>
+          </div>
+          <!-- Live Clock Badge -->
+          <div class="pos-subbar-clock" id="posLiveClock" title="Current Time">
+            <i class="bi bi-clock"></i>
+            <span class="pos-clock-time" id="posClockTime">--:--</span>
+            <span class="pos-clock-date" id="posClockDate">---</span>
+          </div>
         </div>
         <!-- Mobile-only page search, directly under the title (desktop keeps
              its search in the top header, #menuSearch, d-none d-md-flex) -->
@@ -2121,6 +2249,21 @@
       navigator.serviceWorker.register('/sw.js').catch(() => {});
     });
   }
+
+  /* ── Live POS Digital Clock ── */
+  function updatePOSLiveClock() {
+    const now = new Date();
+    const timeEl = document.getElementById('posClockTime');
+    const dateEl = document.getElementById('posClockDate');
+    if (timeEl) {
+      timeEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    }
+    if (dateEl) {
+      dateEl.textContent = now.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' });
+    }
+  }
+  updatePOSLiveClock();
+  setInterval(updatePOSLiveClock, 1000);
 
   /* ── Category Scrolling & Filtering ── */
   function scrollCategoryNav(delta) {
