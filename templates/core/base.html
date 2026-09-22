@@ -1080,6 +1080,36 @@
             text-overflow: ellipsis;
             font-family: var(--font-main, 'Outfit', sans-serif);
         }
+        /* Every page fills header_left with its own markup (icon + title,
+           title + subtitle, etc.) and none of it had any width limit or
+           truncation of its own -- on a narrow screen a long title just
+           wraps instead of ellipsizing, which grows #pos-topbar past its
+           fixed height and breaks the layout below it (confirmed on the
+           Tables page's two-line title+subtitle). This is a single,
+           shared guard so no individual page's header_left markup has to
+           be touched: it caps the slot to one line's worth of height and
+           forces the common text-bearing tags inside it to truncate. */
+        .topbar-left-slot {
+            display: flex;
+            align-items: center;
+            min-width: 0;
+            flex-shrink: 1;
+            overflow: hidden;
+            height: 100%;
+        }
+        .topbar-left-slot,
+        .topbar-left-slot * {
+            min-width: 0;
+        }
+        .topbar-left-slot h1, .topbar-left-slot h2, .topbar-left-slot h3,
+        .topbar-left-slot h4, .topbar-left-slot h5, .topbar-left-slot h6,
+        .topbar-left-slot p, .topbar-left-slot span, .topbar-left-slot small,
+        .topbar-left-slot .text-muted {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
         .topbar-right {
             flex-shrink: 0;
             display: flex;
@@ -1088,36 +1118,88 @@
             flex-wrap: nowrap;
             height: 100%;
         }
-        /* On narrow screens the title + icon row + role badge can add up
-           to more than the viewport width. #pos-topbar's overflow:hidden
-           was silently clipping whatever fell past the edge (usually the
-           role badge, since it's last) with no way to reach it. Make the
-           icon row itself horizontally scrollable instead, so every icon
-           and the role badge stay reachable by swiping -- nothing is ever
-           permanently invisible. Desktop is untouched. */
+        /* ── Overflow "more" menu ─────────────────────────────────
+           On narrow screens the icon row + role badge together can
+           exceed the viewport width. Rather than scroll (previous
+           approach -- worked, but hid content behind a swipe gesture
+           with no strong visual cue) or let #pos-topbar's overflow:hidden
+           silently clip whatever falls past the edge, the secondary
+           icons collapse into a single "more" button that opens a small
+           floating panel. The user avatar/role badge is deliberately
+           kept OUTSIDE this menu, always visible in the row itself --
+           it's the one thing that should never require an extra tap.
+           Desktop is unaffected: .topbar-more-menu uses display:contents
+           there, so header_right/header_notifications render exactly as
+           direct children of .topbar-right, identical to before this
+           wrapper existed. */
+        .topbar-more-wrap {
+            display: contents;
+        }
+        /* #pos-topbar .btn-icon (below, later in source) sets
+           display:inline-flex at the same ID+class specificity as a
+           single-class-prefixed override -- on a tie the later rule
+           wins, so this needs a two-class selector (ID + 2 classes) to
+           unambiguously outrank it regardless of source order. */
+        #pos-topbar .btn-icon.topbar-more-btn {
+            display: none;
+        }
+        .topbar-more-menu {
+            display: contents;
+        }
         @media (max-width: 767px) {
             .topbar-right {
-                /* Base rule sets flex-shrink:0, which kept this item at
-                   its full intrinsic width in #pos-topbar's flex layout
-                   even with overflow-x:auto below -- it never actually
-                   shrank to the space available, so content stayed
-                   clipped by the topbar's own overflow:hidden no matter
-                   how far this row was scrolled. It must be allowed to
-                   shrink for the internal scroll to have any effect. */
-                flex-shrink: 1;
-                min-width: 0;
-                max-width: 100%;
-                overflow-x: auto;
-                overflow-y: hidden;
-                -webkit-overflow-scrolling: touch;
-                overscroll-behavior-x: contain;
-                scrollbar-width: none;
-                -ms-overflow-style: none;
-                padding-right: 22px;
-                mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent 100%);
-                -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent 100%);
+                position: relative;
             }
-            .topbar-right::-webkit-scrollbar { display: none; }
+            .topbar-more-wrap {
+                display: block;
+                position: relative;
+                flex-shrink: 0;
+            }
+            #pos-topbar .btn-icon.topbar-more-btn {
+                display: inline-flex;
+            }
+            .topbar-more-btn[aria-expanded="true"] {
+                background: var(--sidebar-active-bg);
+                color: var(--pos-red);
+            }
+            .topbar-more-menu {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 0.5rem;
+                position: absolute;
+                top: calc(100% + 10px);
+                right: 0;
+                width: max-content;
+                max-width: min(260px, calc(100vw - 24px));
+                background: var(--panel-bg);
+                border: 1px solid var(--border-color);
+                border-radius: 16px;
+                box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+                padding: 0.6rem;
+                z-index: 300;
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(-6px) scale(0.97);
+                transform-origin: top right;
+                transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s;
+            }
+            .topbar-more-menu.open {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0) scale(1);
+            }
+            /* Slightly larger tap targets inside the panel than the
+               34px row icons use -- there's room here, and a floating
+               menu on a touch screen deserves comfortable targets.
+               #pos-topbar-prefixed to outrank #pos-topbar .btn-icon's
+               34px sizing (ID beats a two-class selector). */
+            #pos-topbar .topbar-more-menu .btn-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
         }
 
         #pos-topbar .btn-icon {
@@ -1776,32 +1858,48 @@
                 </button>
 
                 <!-- header_left block (outlet name by default; child templates may override) -->
-                {% block header_left %}
-                <a href="/dashboard/" class="d-flex flex-column justify-content-center text-decoration-none" style="overflow:hidden;color:inherit;">
-                    <span class="topbar-page-title">{{ request.user.outlet.name|default:"Dashboard" }}</span>
-                </a>
-                {% endblock %}
+                <div class="topbar-left-slot">
+                {% block header_left %}{% endblock %}
+                </div>
 
                 <!-- Flex spacer -->
                 <div style="flex:1;min-width:0;"></div>
 
                 <!-- Right-side controls -->
                 <div class="topbar-right d-flex align-items-center gap-2 flex-nowrap ms-auto">
-                    {% block header_right %}
-                    <!-- Default topbar-right buttons -->
-                    {% if request.user.role != "chef" and request.user.is_authenticated %}
-                    <a href="{% url 'order-history' %}" class="btn-icon" title="Order History">
-                        <i class="bi bi-clock-history"></i>
-                    </a>
-                    {% endif %}
-                    <button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Dark / Light Mode">
-                        <i class="bi bi-moon" id="themeIcon"></i>
+                    <!-- Overflow menu: on desktop this renders inline exactly as
+                         before (the trigger button below is hidden). On mobile
+                         it becomes a toggled dropdown instead of a horizontally
+                         scrolling row, so nothing is ever clipped or overlaps --
+                         everything stays reachable through one clearly-visible
+                         "more" button instead. Applies to every page: the
+                         header_right/header_notifications blocks below are the
+                         same ones each page already overrides, only their
+                         container changed. -->
+                    <div class="topbar-more-wrap">
+                    <button class="btn-icon topbar-more-btn" id="topbarMoreBtn"
+                            onclick="toggleTopbarMore(event)"
+                            title="More options" aria-haspopup="true" aria-expanded="false">
+                        <i class="bi bi-three-dots"></i>
                     </button>
-                    {% endblock %}
+                    <div class="topbar-more-menu" id="topbarMoreMenu">
+                        {% block header_right %}
+                        <!-- Default topbar-right buttons -->
+                        {% if request.user.role != "chef" and request.user.is_authenticated %}
+                        <a href="{% url 'order-history' %}" class="btn-icon" title="Order History">
+                            <i class="bi bi-clock-history"></i>
+                        </a>
+                        {% endif %}
+                        <button class="btn-icon" onclick="themeManager.toggle()" title="Toggle Dark / Light Mode">
+                            <i class="bi bi-moon" id="themeIcon"></i>
+                        </button>
+                        {% endblock %}
 
-                    {% block header_notifications %}
-                    {% include "core/_notif_badges.html" %}
-                    {% endblock %}
+                        {% block header_notifications %}
+                        {% include "core/_notif_badges.html" %}
+                        {% endblock %}
+                    </div>
+                    </div><!-- /.topbar-more-wrap -->
 
                     {% if request.user.is_authenticated %}
                     <!-- User Avatar + Role Badge (Always Top Right Last) -->
@@ -1912,6 +2010,34 @@
                 }
             }
         }
+
+        // ── Topbar "more" menu (mobile only -- see .topbar-more-menu) ──
+        function toggleTopbarMore(e) {
+            if (e) e.stopPropagation();
+            const menu = document.getElementById("topbarMoreMenu");
+            const btn = document.getElementById("topbarMoreBtn");
+            if (!menu || !btn) return;
+            const isOpen = menu.classList.toggle("open");
+            btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        }
+        document.addEventListener("click", function(e) {
+            const menu = document.getElementById("topbarMoreMenu");
+            const btn = document.getElementById("topbarMoreBtn");
+            if (!menu || !btn || !menu.classList.contains("open")) return;
+            if (!menu.contains(e.target) && !btn.contains(e.target)) {
+                menu.classList.remove("open");
+                btn.setAttribute("aria-expanded", "false");
+            }
+        });
+        document.addEventListener("keydown", function(e) {
+            if (e.key !== "Escape") return;
+            const menu = document.getElementById("topbarMoreMenu");
+            const btn = document.getElementById("topbarMoreBtn");
+            if (menu && menu.classList.contains("open")) {
+                menu.classList.remove("open");
+                if (btn) btn.setAttribute("aria-expanded", "false");
+            }
+        });
 
         // Collapsed-sidebar hover tooltip -- see #sidebar-tooltip CSS above
         // for why this is JS-positioned rather than a per-item ::after.
