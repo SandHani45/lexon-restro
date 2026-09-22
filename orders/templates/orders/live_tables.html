@@ -662,31 +662,43 @@
       const frameW = canvasEl.clientWidth || 460;
       const frameH = canvasEl.clientHeight || 320;
 
+      // Raw (unscaled) position for every table -- either its saved
+      // floor-editor coordinates, or an auto-arranged grid slot for
+      // tables that don't have one yet. Computed up front so both kinds
+      // share one bounding box and one scale factor: previously
+      // auto-arranged tables were placed with fixed pixel coordinates
+      // that never shrank to fit a narrow frame at all, only the
+      // floor-editor-positioned ones did.
+      const cols = 4;
+      const rawPositions = tables.map((t, idx) => {
+        if (t.pos_x != null && t.pos_y != null) {
+          return { x: t.pos_x, y: t.pos_y };
+        }
+        const col = idx % cols;
+        const row = Math.floor(idx / cols);
+        return { x: 40 + col * 95, y: 35 + row * 85 };
+      });
+
       // Find max x and y to normalize/scale if tables are placed further
       let maxX = 600, maxY = 400;
-      tables.forEach(t => {
-        if (t.pos_x && t.pos_x > maxX) maxX = t.pos_x + 120;
-        if (t.pos_y && t.pos_y > maxY) maxY = t.pos_y + 120;
+      rawPositions.forEach(p => {
+        if (p.x + 120 > maxX) maxX = p.x + 120;
+        if (p.y + 120 > maxY) maxY = p.y + 120;
       });
 
       const scaleX = (frameW - 80) / maxX;
       const scaleY = (frameH - 80) / maxY;
-      const scale = Math.min(Math.max(scaleX, scaleY), 1.0);
+      // Must fit BOTH axes, so use whichever scale is more restrictive
+      // (smaller) -- picking the larger one (the previous Math.max bug)
+      // under-shrank the tighter axis, letting tables overflow past the
+      // frame's edge on narrow screens where frameW shrinks a lot more
+      // than the fixed-height frameH does.
+      const scale = Math.min(scaleX, scaleY, 1.0);
 
       tables.forEach((t, idx) => {
-        let x = t.pos_x;
-        let y = t.pos_y;
-        if (x == null || y == null) {
-          // Auto-arrange if coordinates not yet configured in floor editor
-          const cols = 4;
-          const col = idx % cols;
-          const row = Math.floor(idx / cols);
-          x = 40 + col * 95;
-          y = 35 + row * 85;
-        } else {
-          x = Math.round(x * scale) + 20;
-          y = Math.round(y * scale) + 20;
-        }
+        const raw = rawPositions[idx];
+        const x = Math.round(raw.x * scale) + 20;
+        const y = Math.round(raw.y * scale) + 20;
 
         const isBusy = (t.status && t.status !== 'free' && t.status !== 'cleaning' && t.status !== 'merged');
         const elapsedSec = t.elapsed_seconds || ((t.elapsed || 0) * 60);
