@@ -142,20 +142,20 @@
                     <ul class="item-list">
                     {% for line in po.items.all %}
                         <li>
-                            {{ line.item.name }} — {{ line.quantity }} {{ line.item.unit }} @ ₹{{ line.unit_price }}
+                            {{ line.item.name }} — {{ line.quantity }} {{ line.item.unit }} @ {{ CURRENCY_SYMBOL }}{{ line.unit_price }}
                             {% if line.quantity_received > 0 and line.quantity_received < line.quantity %}
                                 <span style="color:var(--amber);">({{ line.quantity_received }} received)</span>
                             {% endif %}
                             {% if line.price_variance %}
-                                <span style="color:var(--red);" title="Invoiced at ₹{{ line.invoiced_price }}, ordered at ₹{{ line.unit_price }}">
-                                    (₹{{ line.price_variance }} price variance)
+                                <span style="color:var(--red);" title="Invoiced at {{ CURRENCY_SYMBOL }}{{ line.invoiced_price }}, ordered at {{ CURRENCY_SYMBOL }}{{ line.unit_price }}">
+                                    ({{ CURRENCY_SYMBOL }}{{ line.price_variance }} price variance)
                                 </span>
                             {% endif %}
                         </li>
                     {% endfor %}
                     </ul>
                 </td>
-                <td style="font-weight:600;">₹{{ po.total_amount }}</td>
+                <td style="font-weight:600;">{{ CURRENCY_SYMBOL }}{{ po.total_amount }}</td>
                 <td><span class="pill pill-{{ po.status }}">{{ po.status }}</span></td>
                 <td style="font-size:0.8rem; color:var(--muted);">
                     {{ po.created_at|date:"d M Y" }}
@@ -243,7 +243,7 @@
         <div style="display:grid; grid-template-columns:1fr 90px 90px 28px; gap:0.5rem; margin-bottom:0.3rem;">
             <span class="line-label">Item</span>
             <span class="line-label">Qty</span>
-            <span class="line-label">Unit ₹</span>
+            <span class="line-label">Unit {{ CURRENCY_SYMBOL }}</span>
             <span></span>
         </div>
         <div id="lineItems"></div>
@@ -254,7 +254,7 @@
     </button>
 
     <div style="font-size:0.78rem; color:var(--muted); margin-bottom:1rem;">
-        Total: ₹<span id="poTotal">0.00</span>
+        Total: {{ CURRENCY_SYMBOL }}<span id="poTotal">0.00</span>
     </div>
 
     <button class="btn-luxury w-100" id="submitPoBtn" onclick="submitPO()">
@@ -370,7 +370,7 @@ function addLineItem(prefill) {
     row.innerHTML = `
         <select class="item-sel" onchange="autofillPrice(this)"><option value="">— item —</option>${options}</select>
         <input type="number" class="line-qty" placeholder="Qty" min="0.001" step="0.001" oninput="recalcTotal()">
-        <input type="number" class="line-price" placeholder="₹" min="0" step="0.01" oninput="recalcTotal()">
+        <input type="number" class="line-price" placeholder="{{ CURRENCY_SYMBOL }}" min="0" step="0.01" oninput="recalcTotal()">
         <button class="btn-icon" style="padding:0;" onclick="document.getElementById('${id}').remove(); recalcTotal();">
             <i class="bi bi-x" style="font-size:1rem;"></i>
         </button>`;
@@ -474,7 +474,7 @@ function openReceiveModal(poId) {
                     <input type="number" class="recv-qty" min="0" step="0.001" value="${remaining.toFixed(3)}">
                 </div>
                 <div>
-                    <div class="line-label">Price invoiced (₹)</div>
+                    <div class="line-label">Price invoiced ({{ CURRENCY_SYMBOL }})</div>
                     <input type="number" class="recv-price" min="0" step="0.01" value="${line.ordered_price.toFixed(2)}">
                 </div>
             </div>`;

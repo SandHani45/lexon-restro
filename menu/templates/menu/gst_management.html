@@ -1,6 +1,6 @@
 {% extends 'core/base.html' %}
 
-{% block title %}GST Rates — {{ request.user.tenant.name }}{% endblock %}
+{% block title %}{{ tax_label|default:"GST" }} Rates — {{ request.user.tenant.name }}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -116,7 +116,7 @@
 <div>
     <a href="{% url 'menu_management' %}" class="brand-title" style="font-size:1.2rem;">
         <i class="bi bi-arrow-left" style="color:var(--text-muted); font-size:0.9rem;"></i>
-        <span style="color:var(--accent-gold);">GST Rates</span>
+        <span style="color:var(--accent-gold);">{{ tax_label|default:"GST" }} Rates</span>
     </a>
     <p class="brand-subtitle">{{ request.user.outlet.name }}</p>
 </div>
@@ -126,18 +126,14 @@
 <main class="gst-main">
 
     <div class="info-banner">
-        <strong>Set the correct GST rate per item.</strong> Changes save instantly — no page reload needed.<br>
-        Non-AC restaurant: <strong>5%</strong> &nbsp;·&nbsp;
-        AC restaurant / liquor license: <strong>18%</strong> &nbsp;·&nbsp;
-        Packaged / takeaway food: <strong>12%</strong> &nbsp;·&nbsp;
-        Exempt items: <strong>0%</strong>
+        <strong>Set the correct {{ tax_label|default:"GST" }} rate per item.</strong> Changes save instantly — no page reload needed.<br>
+        {% for rate in gst_rates %}{{ rate.label }}{% if not forloop.last %} &nbsp;·&nbsp; {% endif %}{% endfor %}
     </div>
 
     <div class="rate-legend">
-        <span class="rate-chip chip-0"><i class="bi bi-circle"></i> 0% Exempt</span>
-        <span class="rate-chip chip-5"><i class="bi bi-circle-fill"></i> 5% Non-AC</span>
-        <span class="rate-chip chip-12"><i class="bi bi-circle-fill"></i> 12% Packaged</span>
-        <span class="rate-chip chip-18"><i class="bi bi-circle-fill"></i> 18% AC/Liquor</span>
+        {% for rate in gst_rates %}
+        <span class="rate-chip chip-{{ rate.value|floatformat:0 }}"><i class="bi bi-circle{% if rate.value != '0.00' %}-fill{% endif %}"></i> {{ rate.label }}</span>
+        {% endfor %}
     </div>
 
     {% if categories %}
@@ -165,7 +161,7 @@
                 <div class="item-row">
                     <div class="item-info">
                         <div class="item-name">{{ item.name }}</div>
-                        <div class="item-price">₹{{ item.price }}</div>
+                        <div class="item-price">{{ request.user.outlet.currency_symbol }}{{ item.price }}</div>
                     </div>
                     <div class="item-gst-control">
                         <select class="gst-select" id="gst-{{ item.id }}" onchange="updateItemGST({{ item.id }}, this.value)">

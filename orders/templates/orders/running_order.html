@@ -142,15 +142,18 @@
 
             <!-- TOTALS -->
             <div class="totals-block">
-                <div class="total-row"><span>Subtotal</span><span id="subtotal">₹0.00</span></div>
-                <div class="total-row"><span>GST (Tax)</span><span id="gst">₹0.00</span></div>
-                <div class="total-row final"><span>Total</span><span id="total">₹0.00</span></div>
+                <div class="total-row"><span>Subtotal</span><span id="subtotal">{{ CURRENCY_SYMBOL }}0.00</span></div>
+                <div class="total-row"><span>GST (Tax)</span><span id="gst">{{ CURRENCY_SYMBOL }}0.00</span></div>
+                <div class="total-row final"><span>Total</span><span id="total">{{ CURRENCY_SYMBOL }}0.00</span></div>
             </div>
         </div>
     </div>
 
 
 <script>
+    /* Regime-aware currency symbol ("₹" for India, "AED" for UAE, etc.) */
+    const CURRENCY_SYMBOL = "{{ CURRENCY_SYMBOL|escapejs }}";
+
     /* THEME MANAGEMENT */
     let isDark = localStorage.getItem("dark") === "true";
     function updateIcons() {
@@ -228,9 +231,9 @@
         .then(res => res.json())
         .then(data => {
 
-            document.getElementById("subtotal").innerText = "₹" + data.subtotal.toFixed(2);
-            document.getElementById("gst").innerText = "₹" + data.gst.toFixed(2);
-            document.getElementById("total").innerText = "₹" + data.total.toFixed(2);
+            document.getElementById("subtotal").innerText = CURRENCY_SYMBOL + data.subtotal.toFixed(2);
+            document.getElementById("gst").innerText = CURRENCY_SYMBOL + data.gst.toFixed(2);
+            document.getElementById("total").innerText = CURRENCY_SYMBOL + data.total.toFixed(2);
 
             let container = document.getElementById("items");
             let fullHtml = "";

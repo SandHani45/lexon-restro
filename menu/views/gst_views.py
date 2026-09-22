@@ -12,6 +12,9 @@ from menu.models import MenuCategory, MenuItem
 
 logger = logging.getLogger("pos.menu")
 
+# Fallback India rates, used if request.user.outlet is somehow unavailable
+# (should never happen behind @tenant_required, but keeps this file's own
+# defaults working exactly as before if that ever changes).
 _VALID_GST = [Decimal("0"), Decimal("5"), Decimal("12"), Decimal("18"), Decimal("28")]
 _GST_RATES = [
     {"value": "0.00",  "label": "0% — Exempt"},
@@ -22,6 +25,19 @@ _GST_RATES = [
 ]
 
 
+def _rates_for(outlet):
+    """(valid_decimals, [{value,label}, ...]) for this outlet's tax regime
+    (tenants/tax_regimes.py) -- e.g. flat 0/5% VAT for a UAE outlet instead
+    of India's 0/5/12/18/28% GST slabs."""
+    try:
+        options = outlet.tax_rate_options
+    except Exception:
+        options = list(zip(_VALID_GST, [r["label"] for r in _GST_RATES]))
+    valid = [rate for rate, _label in options]
+    rates = [{"value": f"{rate:.2f}", "label": label} for rate, label in options]
+    return valid, rates
+
+
 @login_required
 @tenant_required
 def gst_management(request):
@@ -30,8 +46,10 @@ def gst_management(request):
     categories = MenuCategory.objects.filter(
         tenant=request.user.tenant, outlet=request.user.outlet, is_active=True
     ).prefetch_related("items")
+    _valid, gst_rates = _rates_for(request.user.outlet)
     return render(request, "menu/gst_management.html", {
-        "categories": categories, "gst_rates": _GST_RATES,
+        "categories": categories, "gst_rates": gst_rates,
+        "tax_label": getattr(request.user.outlet, "tax_label", "GST"),
     })
 
 
@@ -47,7 +65,8 @@ def update_item_gst(request, item_id):
     try:
         data = json.loads(request.body)
         gst  = Decimal(str(data.get("gst_percentage", "5.00")))
-        if gst not in _VALID_GST:
+        valid, _rates = _rates_for(request.user.outlet)
+        if gst not in valid:
             return JsonResponse({"error": "Invalid GST rate"}, status=400)
         item.gst_percentage = gst
         item.save(update_fields=["gst_percentage"])
@@ -73,7 +92,8 @@ def update_category_gst(request, category_id):
     try:
         data    = json.loads(request.body)
         gst     = Decimal(str(data.get("gst_percentage", "5.00")))
-        if gst not in _VALID_GST:
+        valid, _rates = _rates_for(request.user.outlet)
+        if gst not in valid:
             return JsonResponse({"error": "Invalid GST rate"}, status=400)
         updated = category.items.filter(
             tenant=request.user.tenant, outlet=request.user.outlet

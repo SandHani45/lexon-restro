@@ -1023,6 +1023,7 @@ def outlet_settings(request):
         whatsapp_no = request.POST.get("whatsapp_no", "").strip()
         email = request.POST.get("email", "").strip()
         gst_no        = request.POST.get("gst_no",   "").strip().upper()
+        trn_no        = request.POST.get("trn_no",   "").strip().upper()
         fssai_no      = request.POST.get("fssai_no", "").strip()
         sac_code      = request.POST.get("sac_code", "996331").strip() or "996331"
         gst_inclusive = request.POST.get("gst_inclusive") == "true"
@@ -1033,6 +1034,7 @@ def outlet_settings(request):
         outlet.phone        = phone
         outlet.email        = email
         outlet.gst_no       = gst_no
+        outlet.trn_no       = trn_no
         outlet.fssai_no     = fssai_no
         outlet.sac_code     = sac_code
         outlet.gst_inclusive = gst_inclusive

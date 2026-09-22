@@ -541,10 +541,10 @@
         <div class="kpi-info">
           <div class="kpi-label">Tax Compliance</div>
           <div class="kpi-val">
-            {% if outlet.gst_no %}{{ outlet.gst_no|slice:":7" }}…{% else %}Setup Needed{% endif %}
+            {% if outlet.tax_reg_number %}{{ outlet.tax_reg_number|slice:":7" }}…{% else %}Setup Needed{% endif %}
           </div>
           <div class="kpi-sub">
-            {% if outlet.gst_no %}GSTIN registered{% else %}Add GSTIN below{% endif %}
+            {% if outlet.tax_reg_number %}{{ outlet.tax_reg_label }} registered{% else %}Add {{ outlet.tax_reg_label }} below{% endif %}
           </div>
         </div>
         <div class="kpi-icon-wrap icon-legal">
@@ -691,30 +691,45 @@
         </div>
         <div>
           <h2 class="settings-card-title">Legal &amp; Tax Compliance</h2>
-          <div class="settings-card-subtitle">Statutory registration numbers and Indian GST billing rules</div>
+          <div class="settings-card-subtitle">Statutory registration numbers and {{ outlet.tax_label }} billing rules</div>
         </div>
       </div>
 
       <div class="compliance-alert">
         <i class="bi bi-info-circle-fill text-warning mt-1" style="font-size:1.1rem;"></i>
         <div>
-          <strong>Essential for GST Invoicing:</strong> GSTIN and FSSAI license numbers appear on every printed customer receipt. Correct details ensure full compliance under Indian restaurant tax regulations.
+          {% if outlet.tax_regime_supports_hsn_sac %}
+          <strong>Essential for {{ outlet.tax_label }} Invoicing:</strong> {{ outlet.tax_reg_label }} and FSSAI license numbers appear on every printed customer receipt. Correct details ensure full compliance under Indian restaurant tax regulations.
+          {% else %}
+          <strong>Essential for {{ outlet.tax_label }} Invoicing:</strong> Your {{ outlet.tax_reg_label }} appears on every printed customer receipt. Correct details ensure full compliance under UAE Federal Tax Authority regulations.
+          {% endif %}
         </div>
       </div>
 
       <div class="two-col">
+        {% if outlet.tax_reg_label == "GSTIN" %}
         <div class="field-row">
           <label class="field-label" for="gst_no">GST Identification Number (GSTIN)</label>
           <input type="text" id="gst_no" name="gst_no" class="field-input field-mono" value="{{ outlet.gst_no|default:'' }}" maxlength="15" placeholder="27AABCU9603R1ZX" oninput="this.value = this.value.toUpperCase()">
           <div class="field-hint">15-character alphanumeric GSTIN.</div>
         </div>
+        {% else %}
+        <div class="field-row">
+          <label class="field-label" for="trn_no">Tax Registration Number (TRN)</label>
+          <input type="text" id="trn_no" name="trn_no" class="field-input field-mono" value="{{ outlet.trn_no|default:'' }}" maxlength="15" placeholder="100000000000003" oninput="this.value = this.value.toUpperCase()">
+          <div class="field-hint">15-digit FTA-issued Tax Registration Number.</div>
+        </div>
+        {% endif %}
+        {% if outlet.tax_regime_supports_hsn_sac %}
         <div class="field-row">
           <label class="field-label" for="fssai_no">FSSAI Food License Number</label>
           <input type="text" id="fssai_no" name="fssai_no" class="field-input field-mono" value="{{ outlet.fssai_no|default:'' }}" maxlength="14" placeholder="12345678901234">
           <div class="field-hint">14-digit state/central food safety license.</div>
         </div>
+        {% endif %}
       </div>
 
+      {% if outlet.tax_regime_supports_hsn_sac %}
       <div class="field-row">
         <label class="field-label" for="sac_code">Services Accounting Code (SAC)</label>
         <input type="text" id="sac_code" name="sac_code" class="field-input field-mono" value="{{ outlet.sac_code|default:'996331' }}" maxlength="8" placeholder="996331">
@@ -724,6 +739,7 @@
           <strong>996334</strong> (Catering). Keep <strong>996331</strong> unless your tax advisor advises otherwise.
         </div>
       </div>
+      {% endif %}
 
       <!-- GST Pricing Mode -->
       <div class="field-row mt-4">
@@ -738,7 +754,7 @@
             </div>
             <div class="choice-desc">
               Menu item prices are base prices. CGST and SGST (or UTGST) are calculated and added on top at checkout.<br>
-              <em>Example: Item ₹100 + 5% GST (₹5) = <strong>Total ₹105</strong>. Standard for dine-in and fine dining.</em>
+              <em>Example: Item {{ outlet.currency_symbol|default:"₹" }}100 + 5% GST ({{ outlet.currency_symbol|default:"₹" }}5) = <strong>Total {{ outlet.currency_symbol|default:"₹" }}105</strong>. Standard for dine-in and fine dining.</em>
             </div>
           </div>
         </label>
@@ -752,7 +768,7 @@
             </div>
             <div class="choice-desc">
               The listed menu price already includes all taxes. The guest pays the exact round figure displayed.<br>
-              <em>Example: Item ₹100 (contains ₹4.76 GST inside) = <strong>Total ₹100</strong>. Ideal for fast checkout counters.</em>
+              <em>Example: Item {{ outlet.currency_symbol|default:"₹" }}100 (contains {{ outlet.currency_symbol|default:"₹" }}4.76 GST inside) = <strong>Total {{ outlet.currency_symbol|default:"₹" }}100</strong>. Ideal for fast checkout counters.</em>
             </div>
           </div>
         </label>
@@ -763,7 +779,7 @@
       <div class="field-row mt-3">
         <label class="field-label" for="parcel_charge_amount">Takeaway / Parcel Packaging Charge</label>
         <div style="display:flex;align-items:center;gap:8px;max-width:180px;">
-          <span style="font-size:1.1rem;font-weight:700;color:var(--text-main);">₹</span>
+          <span style="font-size:1.1rem;font-weight:700;color:var(--text-main);">{{ outlet.currency_symbol|default:"₹" }}</span>
           <input type="number" id="parcel_charge_amount" name="parcel_charge_amount" class="field-input" value="{{ outlet.parcel_charge_amount|default:0 }}" min="0" max="999" step="1">
         </div>
         <div class="field-hint">Default packaging fee added on takeaway orders. Set to 0 to disable.</div>
@@ -793,7 +809,7 @@
         </label>
       </div>
 
-      {% if 'composition_scheme' in tenant_features %}
+      {% if 'composition_scheme' in tenant_features and outlet.tax_regime_supports_composition %}
       <div class="field-row mt-3">
         <label class="choice-card" id="comp-scheme-box">
           <input type="checkbox" name="is_composition_scheme" value="true" class="choice-input" {% if outlet.is_composition_scheme %}checked{% endif %} onchange="toggleCompScheme(this)">
@@ -808,6 +824,7 @@
       </div>
       {% endif %}
 
+      {% if outlet.tax_regime_supports_composition %}
       <!-- Union Territory -->
       <div class="field-row mt-3">
         {% if outlet.uses_utgst and outlet.gst_no %}
@@ -828,6 +845,7 @@
         </label>
         {% endif %}
       </div>
+      {% endif %}
 
       {% if 'counter_billing' in tenant_features %}
       <div class="field-row mt-3">

@@ -1257,12 +1257,12 @@ async function editPayRate(userId, username) {
             <div style="text-align:left; margin-bottom: 12px;">
                 <label style="font-size:0.75rem; font-weight:700; text-transform:uppercase; color:#71717a; margin-bottom:4px; display:block;">Compensation Schedule</label>
                 <select id="swal-pay-type" class="pos-select swal2-select" style="display:block;width:100%;border-radius:12px;padding:8px 12px;">
-                    <option value="monthly">Monthly Salary (₹)</option>
-                    <option value="hourly">Hourly Rate (₹)</option>
+                    <option value="monthly">Monthly Salary ({{ CURRENCY_SYMBOL }})</option>
+                    <option value="hourly">Hourly Rate ({{ CURRENCY_SYMBOL }})</option>
                 </select>
             </div>
             <div style="text-align:left;">
-                <label style="font-size:0.75rem; font-weight:700; text-transform:uppercase; color:#71717a; margin-bottom:4px; display:block;">Amount (₹)</label>
+                <label style="font-size:0.75rem; font-weight:700; text-transform:uppercase; color:#71717a; margin-bottom:4px; display:block;">Amount ({{ CURRENCY_SYMBOL }})</label>
                 <input id="swal-pay-amount" type="number" min="0.01" step="0.01" class="pos-input swal2-input" placeholder="e.g. 18000" style="margin:0;width:100%;border-radius:12px;padding:8px 12px;">
             </div>
         `,

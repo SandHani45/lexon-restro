@@ -621,7 +621,7 @@
                                 {% else %}<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;margin-right:5px;vertical-align:middle;flex-shrink:0;"></span>{% endif %}
                                 {{ item.name }}
                             </div>
-                            <div class="item-price">₹{{ item.price|floatformat:0 }}</div>
+                            <div class="item-price">{{ CURRENCY_SYMBOL }}{{ item.price|floatformat:0 }}</div>
                         </div>
                     </div>
                     {% endfor %}
@@ -641,7 +641,7 @@
                                 {% else %}<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;margin-right:5px;vertical-align:middle;flex-shrink:0;"></span>{% endif %}
                                 {{ item.name }}
                             </div>
-                            <div class="item-price">₹{{ item.price|floatformat:0 }}</div>
+                            <div class="item-price">{{ CURRENCY_SYMBOL }}{{ item.price|floatformat:0 }}</div>
                         </div>
                     </div>
                     {% endfor %}
@@ -685,7 +685,7 @@
                 <a href="/bill/{{ order.id }}/"
                    class="btn-checkout d-flex align-items-center justify-content-center text-decoration-none mb-2"
                    style="background:#10b981;min-height:52px;">
-                    <i class="bi bi-credit-card me-2"></i>Pay Now · ₹{{ remaining|floatformat:0 }}
+                    <i class="bi bi-credit-card me-2"></i>Pay Now · {{ CURRENCY_SYMBOL }}{{ remaining|floatformat:0 }}
                 </a>
                 {% elif order.status == 'paid' or order.status == 'closed' %}
                 <button class="btn-luxury w-100 mb-2"
@@ -713,7 +713,7 @@
                         <div class="aoi-customer">{{ t.order.created_at|date:"g:i A" }}</div>
                     </div>
                     <div style="text-align:right;">
-                        <div class="aoi-amount">{% if t.order.grand_total %}₹{{ t.order.grand_total|floatformat:0 }}{% else %}—{% endif %}</div>
+                        <div class="aoi-amount">{% if t.order.grand_total %}{{ CURRENCY_SYMBOL }}{{ t.order.grand_total|floatformat:0 }}{% else %}—{% endif %}</div>
                         {% if t.order.status == 'billing' %}
                         <div class="aoi-badge" style="background:rgba(16,185,129,0.12);color:#10b981;">Pay</div>
                         {% elif t.order.status == 'paid' or t.order.status == 'closed' %}
@@ -740,7 +740,7 @@
                         <div class="aoi-customer">{{ t.order.created_at|date:"g:i A" }} · {{ t.order.aggregator_order_id|default:"-" }}</div>
                     </div>
                     <div>
-                        <div class="aoi-amount">{% if t.order.grand_total %}₹{{ t.order.grand_total|floatformat:0 }}{% else %}—{% endif %}</div>
+                        <div class="aoi-amount">{% if t.order.grand_total %}{{ CURRENCY_SYMBOL }}{{ t.order.grand_total|floatformat:0 }}{% else %}—{% endif %}</div>
                         <div class="aoi-badge online">Online</div>
                     </div>
                 </a>
@@ -765,11 +765,11 @@
                     maxlength="10" inputmode="numeric">
             </div>
             {% endif %}
-            <div class="summary-row"><span>Subtotal</span><span class="view-subtotal">₹0</span></div>
-            <div class="summary-row"><span>GST</span><span class="view-gst">₹0</span></div>
+            <div class="summary-row"><span>Subtotal</span><span class="view-subtotal">{{ CURRENCY_SYMBOL }}0</span></div>
+            <div class="summary-row"><span>GST</span><span class="view-gst">{{ CURRENCY_SYMBOL }}0</span></div>
             {% if request.user.outlet.parcel_charge_amount %}
             <div class="summary-row parcel-row" style="display:none;font-size:0.82rem;color:var(--text-muted);justify-content:space-between;margin-bottom:0.3rem;">
-                <span>Parcel Charge</span><span>₹{{ request.user.outlet.parcel_charge_amount|floatformat:0 }}</span>
+                <span>Parcel Charge</span><span>{{ CURRENCY_SYMBOL }}{{ request.user.outlet.parcel_charge_amount|floatformat:0 }}</span>
             </div>
             <button class="parcel-btn" onclick="toggleParcel()"
                 style="width:100%;padding:0.55rem;margin-bottom:0.5rem;border:1.5px dashed var(--border-color);border-radius:999px;
@@ -777,10 +777,10 @@
                        letter-spacing:1.5px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;
                        justify-content:center;gap:0.5rem;font-family:inherit;">
                 <i class="bi bi-bag"></i>
-                <span class="parcel-btn-text">Add Parcel {% if request.user.outlet.parcel_charge_per_item %}₹{{ request.user.outlet.parcel_charge_amount|floatformat:0 }}/item{% else %}₹{{ request.user.outlet.parcel_charge_amount|floatformat:0 }} flat{% endif %}</span>
+                <span class="parcel-btn-text">Add Parcel {% if request.user.outlet.parcel_charge_per_item %}{{ CURRENCY_SYMBOL }}{{ request.user.outlet.parcel_charge_amount|floatformat:0 }}/item{% else %}{{ CURRENCY_SYMBOL }}{{ request.user.outlet.parcel_charge_amount|floatformat:0 }} flat{% endif %}</span>
             </button>
             {% endif %}
-            <div class="summary-total"><span>Total</span><span class="view-total">₹0</span></div>
+            <div class="summary-total"><span>Total</span><span class="view-total">{{ CURRENCY_SYMBOL }}0</span></div>
             <button class="btn-checkout send-btn" onclick="submitOrder()">
                 Checkout <i class="bi bi-arrow-right ms-1"></i>
             </button>
@@ -796,7 +796,7 @@
     <span id="fabBadge" style="display:none;background:#fff;color:var(--accent-gold);font-size:0.7rem;font-weight:700;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">0</span>
     <span style="flex:1;text-align:center;">
         <i class="bi bi-bag me-1"></i>
-        View Order &nbsp;·&nbsp; <span class="view-total">₹0</span>
+        View Order &nbsp;·&nbsp; <span class="view-total">{{ CURRENCY_SYMBOL }}0</span>
     </span>
 </button>
 
@@ -836,7 +836,7 @@
                 <a href="/bill/{{ order.id }}/"
                    class="btn-checkout d-flex align-items-center justify-content-center text-decoration-none mb-2"
                    style="background:#10b981;min-height:52px;">
-                    <i class="bi bi-credit-card me-2"></i>Pay Now · ₹{{ remaining|floatformat:0 }}
+                    <i class="bi bi-credit-card me-2"></i>Pay Now · {{ CURRENCY_SYMBOL }}{{ remaining|floatformat:0 }}
                 </a>
                 {% elif order.status == 'paid' or order.status == 'closed' %}
                 <button class="btn-luxury w-100 mb-2"
@@ -894,11 +894,11 @@
                     maxlength="10" inputmode="numeric">
             </div>
             {% endif %}
-            <div class="summary-row"><span>Subtotal</span><span class="view-subtotal">₹0</span></div>
-            <div class="summary-row"><span>GST</span><span class="view-gst">₹0</span></div>
+            <div class="summary-row"><span>Subtotal</span><span class="view-subtotal">{{ CURRENCY_SYMBOL }}0</span></div>
+            <div class="summary-row"><span>GST</span><span class="view-gst">{{ CURRENCY_SYMBOL }}0</span></div>
             {% if request.user.outlet.parcel_charge_amount %}
             <div class="summary-row parcel-row" style="display:none;font-size:0.82rem;color:var(--text-muted);justify-content:space-between;margin-bottom:0.3rem;">
-                <span>Parcel Charge</span><span>₹{{ request.user.outlet.parcel_charge_amount|floatformat:0 }}</span>
+                <span>Parcel Charge</span><span>{{ CURRENCY_SYMBOL }}{{ request.user.outlet.parcel_charge_amount|floatformat:0 }}</span>
             </div>
             <button class="parcel-btn" onclick="toggleParcel()"
                 style="width:100%;padding:0.55rem;margin-bottom:0.5rem;border:1.5px dashed var(--border-color);border-radius:999px;
@@ -906,10 +906,10 @@
                        letter-spacing:1.5px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;
                        justify-content:center;gap:0.5rem;font-family:inherit;">
                 <i class="bi bi-bag"></i>
-                <span class="parcel-btn-text">Add Parcel {% if request.user.outlet.parcel_charge_per_item %}₹{{ request.user.outlet.parcel_charge_amount|floatformat:0 }}/item{% else %}₹{{ request.user.outlet.parcel_charge_amount|floatformat:0 }} flat{% endif %}</span>
+                <span class="parcel-btn-text">Add Parcel {% if request.user.outlet.parcel_charge_per_item %}{{ CURRENCY_SYMBOL }}{{ request.user.outlet.parcel_charge_amount|floatformat:0 }}/item{% else %}{{ CURRENCY_SYMBOL }}{{ request.user.outlet.parcel_charge_amount|floatformat:0 }} flat{% endif %}</span>
             </button>
             {% endif %}
-            <div class="summary-total"><span>Total</span><span class="view-total">₹0</span></div>
+            <div class="summary-total"><span>Total</span><span class="view-total">{{ CURRENCY_SYMBOL }}0</span></div>
             <button class="btn-checkout send-btn mb-2" onclick="submitOrder()">
                 Checkout <i class="bi bi-arrow-right ms-1"></i>
             </button>
@@ -947,6 +947,9 @@
 
 {% block extra_js %}
 <script>
+    /* Regime-aware currency symbol ("₹" for India, "AED" for UAE, etc.) */
+    const CURRENCY_SYMBOL = "{{ CURRENCY_SYMBOL|escapejs }}";
+
     /* ── Resizable 3-panel layout (desktop only) ───────────────────────
        Two drag handles: category-sidebar|menu-area and menu-area|context-
        sidebar. menu-area itself is never given an explicit width -- it
@@ -1110,7 +1113,7 @@
                             return `<div class="form-check">
                                 <input class="form-check-input modifier-check" type="${type}" name="${nm}" value="${m.name}" data-price="${m.price}" id="mod_${m.id}">
                                 <label class="form-check-label d-flex justify-content-between w-100" for="mod_${m.id}">
-                                    <span>${m.name}</span><span class="text-muted">+₹${m.price}</span>
+                                    <span>${m.name}</span><span class="text-muted">+${CURRENCY_SYMBOL}${m.price}</span>
                                 </label>
                             </div>`;
                         }).join('')}
@@ -1175,7 +1178,7 @@
                             <span class="qty-value">${i.quantity}</span>
                             <button class="qty-btn" onclick="inc(${idx})"><i class="bi bi-plus"></i></button>
                         </div>
-                        <div class="cart-item-price">₹${total}</div>
+                        <div class="cart-item-price">${CURRENCY_SYMBOL}${total}</div>
                     </div>
                 </div>`;
             }).join('');
@@ -1188,14 +1191,14 @@
         // Total shown actually matches what checkout will charge once
         // parcel is toggled on (see toggleParcel/_syncParcelUI).
         const grandTotal = (GST_INCLUSIVE ? subtotal : subtotal + gst) + (_parcelOn ? _parcelChargeAmount : 0);
-        document.querySelectorAll('.view-subtotal').forEach(e => e.textContent = '₹' + subtotal);
+        document.querySelectorAll('.view-subtotal').forEach(e => e.textContent = CURRENCY_SYMBOL + subtotal);
         document.querySelectorAll('.view-gst').forEach(e => {
-            e.textContent = '₹' + gst;
+            e.textContent = CURRENCY_SYMBOL + gst;
             // Show label hint so cashier knows it's included, not added
             const label = e.closest('.summary-row')?.querySelector('span:first-child');
             if (label) label.textContent = GST_INCLUSIVE ? 'GST (incl.)' : 'GST';
         });
-        document.querySelectorAll('.view-total').forEach(e => e.textContent = '₹' + grandTotal);
+        document.querySelectorAll('.view-total').forEach(e => e.textContent = CURRENCY_SYMBOL + grandTotal);
 
         // FAB badge — total item count
         const totalQty = cart.reduce((s, i) => s + i.quantity, 0);
@@ -1248,7 +1251,7 @@
         let html = '';
         if (status === 'billing') {
             html = `<a href="/bill/${orderId}/" class="btn-checkout d-flex align-items-center justify-content-center text-decoration-none mb-2" style="background:#10b981;min-height:52px;">
-                <i class="bi bi-credit-card me-2"></i>Pay Now · ₹${Math.round(remaining || 0)}
+                <i class="bi bi-credit-card me-2"></i>Pay Now · ${CURRENCY_SYMBOL}${Math.round(remaining || 0)}
             </a>`;
         } else if (status === 'paid' || status === 'closed') {
             html = `<button class="btn-luxury w-100 mb-2" onclick="printReceipt(${orderId})" style="min-height:52px;">
@@ -1331,7 +1334,7 @@
                         return `<div class="running-row d-flex flex-column">
                             <div class="d-flex justify-content-between align-items-center w-100" style="gap:10px;">
                                 <span style="font-family:'DM Serif Display',serif;flex:1;">${i.quantity} × ${i.name}</span>
-                                <span style="color:var(--text-muted);font-size:0.85rem;flex-shrink:0;">₹${i.total}</span>
+                                <span style="color:var(--text-muted);font-size:0.85rem;flex-shrink:0;">${CURRENCY_SYMBOL}${i.total}</span>
                                 ${statusCell}
                             </div>
                             ${i.modifiers && i.modifiers.length ? `<div style="font-size:0.7rem;color:var(--accent-gold);font-style:italic;">+ ${i.modifiers.join(', ')}</div>` : ''}
@@ -1556,7 +1559,7 @@
         document.querySelectorAll('.parcel-row').forEach(el => {
             el.style.display = _parcelOn ? 'flex' : 'none';
             const amountEl = el.querySelector('span:last-child');
-            if (amountEl) amountEl.textContent = '₹' + _parcelChargeAmount;
+            if (amountEl) amountEl.textContent = CURRENCY_SYMBOL + _parcelChargeAmount;
         });
         document.querySelectorAll('.parcel-btn').forEach(btn => {
             btn.style.borderColor = _parcelOn ? 'var(--accent-gold)' : 'var(--border-color)';
@@ -1566,7 +1569,7 @@
         document.querySelectorAll('.parcel-btn-text').forEach(el => {
             el.textContent = _parcelOn
                 ? 'Parcel Added ✓ (tap to remove)'
-                : `Add Parcel +₹${_parcelChargeAmount}`;
+                : `Add Parcel +${CURRENCY_SYMBOL}${_parcelChargeAmount}`;
         });
         // The parcel charge isn't part of the local `cart` array renderCart()
         // sums -- without this, the Total shown here wouldn't match what

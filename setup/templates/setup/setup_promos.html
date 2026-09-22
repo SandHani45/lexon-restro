@@ -196,10 +196,10 @@
                             {% if p.discount_type == "percentage" %}
                                 <span class="badge badge-pct">{{ p.discount_value }}% off</span>
                             {% else %}
-                                <span class="badge badge-flat">₹{{ p.discount_value }} off</span>
+                                <span class="badge badge-flat">{{ CURRENCY_SYMBOL }}{{ p.discount_value }} off</span>
                             {% endif %}
                             {% if p.min_order_value > 0 %}
-                                <div style="font-size:.65rem;color:var(--muted);margin-top:3px;">Min ₹{{ p.min_order_value }}</div>
+                                <div style="font-size:.65rem;color:var(--muted);margin-top:3px;">Min {{ CURRENCY_SYMBOL }}{{ p.min_order_value }}</div>
                             {% endif %}
                         </td>
                         <td>
@@ -303,7 +303,7 @@
                         <label>Type *</label>
                         <select id="f-type">
                             <option value="percentage">% Off</option>
-                            <option value="amount">₹ Flat Off</option>
+                            <option value="amount">{{ CURRENCY_SYMBOL }} Flat Off</option>
                         </select>
                     </div>
                     <div class="field">
@@ -313,7 +313,7 @@
                 </div>
 
                 <div class="field">
-                    <label>Min. Order Value <span style="color:var(--muted);font-size:.6rem;">(₹, 0 = none)</span></label>
+                    <label>Min. Order Value <span style="color:var(--muted);font-size:.6rem;">({{ CURRENCY_SYMBOL }}, 0 = none)</span></label>
                     <input type="number" id="f-min" min="0" step="1" placeholder="0" value="0">
                 </div>
 

@@ -175,7 +175,7 @@
         <div class="stat-card">
             <div class="stat-icon-badge"><i class="bi bi-cash-stack"></i></div>
             <div class="stat-label">Revenue</div>
-            <div class="stat-value">₹{{ today_revenue|floatformat:0 }}</div>
+            <div class="stat-value">{{ CURRENCY_SYMBOL }}{{ today_revenue|floatformat:0 }}</div>
         </div>
         <div class="stat-card{% if cancelled_tokens > 0 %} stat-card--ring{% endif %}">
             <div class="stat-icon-badge"><i class="bi bi-x-circle"></i></div>
@@ -201,7 +201,7 @@
                class="token-card status-{{ token.order.status }}"
                id="token-card-{{ token.order.id }}">
                 <div class="token-number" style="color:var(--accent-gold);">{{ token.token_number }}</div>
-                <div class="token-amount">{% if token.order.grand_total %}₹{{ token.order.grand_total|floatformat:0 }}{% else %}—{% endif %}</div>
+                <div class="token-amount">{% if token.order.grand_total %}{{ CURRENCY_SYMBOL }}{{ token.order.grand_total|floatformat:0 }}{% else %}—{% endif %}</div>
                 <div class="token-badge {% if token.order.status == 'billing' %}billing{% elif token.order.status == 'closed' %}paid{% endif %}">
                     {{ token.order.get_status_display }}
                 </div>
@@ -273,7 +273,7 @@
                    class="token-card is-online status-{{ token.order.status }}"
                    id="token-card-{{ token.order.id }}">
                     <div class="token-number" style="color:var(--online);">O-{{ token.token_number }}</div>
-                    <div class="token-amount">{% if token.order.grand_total %}₹{{ token.order.grand_total|floatformat:0 }}{% else %}—{% endif %}</div>
+                    <div class="token-amount">{% if token.order.grand_total %}{{ CURRENCY_SYMBOL }}{{ token.order.grand_total|floatformat:0 }}{% else %}—{% endif %}</div>
                     <div class="token-badge platform {% if token.order.source == 'zomato' %}zomato{% elif token.order.source == 'swiggy' %}swiggy{% else %}web{% endif %}">
                         {{ token.order.get_source_display }}
                     </div>

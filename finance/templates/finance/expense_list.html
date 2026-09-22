@@ -75,7 +75,7 @@
                 {% endfor %}
             </select>
 
-            <label class="form-label">Amount (₹)</label>
+            <label class="form-label">Amount ({{ CURRENCY_SYMBOL }})</label>
             <input type="number" id="exp-amount" class="setup-input" step="0.01" min="0.01" placeholder="0.00">
 
             <label class="form-label">Date</label>
@@ -119,7 +119,7 @@
                     <td style="color:var(--text-muted);font-size:0.8rem;">{{ e.expense_date|date:"d M Y" }}</td>
                     <td><span class="category-badge">{{ e.get_category_display }}</span></td>
                     <td style="color:var(--text-muted);font-size:0.8rem;">{{ e.outlet.name|default:"All outlets" }}</td>
-                    <td>₹{{ e.amount }}</td>
+                    <td>{{ CURRENCY_SYMBOL }}{{ e.amount }}</td>
                     <td><button class="btn-del" onclick="deleteExpense({{ e.id }})">Delete</button></td>
                 </tr>
                 {% empty %}

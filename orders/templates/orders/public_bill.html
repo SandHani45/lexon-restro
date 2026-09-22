@@ -77,25 +77,31 @@
     {% for item in order.items.all %}{% if item.status != 'voided' %}
     <div class="item">
       <div class="item-name">{{ item.menu_item.name }} <span style="color:#a0958c;">&times; {{ item.quantity }}</span></div>
-      <div class="item-val">&#8377;{{ item.total_price }}</div>
+      <div class="item-val">{{ outlet.currency_symbol }}{{ item.total_price }}</div>
     </div>
     {% endif %}{% endfor %}
   </div>
 
-  <div class="total-row"><span>Subtotal</span><span>&#8377;{{ order.subtotal }}</span></div>
+  <div class="total-row"><span>Subtotal</span><span>{{ outlet.currency_symbol }}{{ order.subtotal }}</span></div>
   {% if order.gst_total %}
-  <div class="total-row"><span>CGST</span><span>&#8377;{{ order.cgst_total }}</span></div>
-  <div class="total-row"><span>SGST</span><span>&#8377;{{ order.sgst_total }}</span></div>
+  {% if outlet.tax_regime_supports_split %}
+  <div class="total-row"><span>CGST</span><span>{{ outlet.currency_symbol }}{{ order.cgst_total }}</span></div>
+  <div class="total-row"><span>SGST</span><span>{{ outlet.currency_symbol }}{{ order.sgst_total }}</span></div>
+  {% else %}
+  {% for gst in order.gst_breakdown %}
+  <div class="total-row"><span>{{ outlet.tax_label }} @ {{ gst.rate }}%</span><span>{{ outlet.currency_symbol }}{{ gst.tax_amount }}</span></div>
+  {% endfor %}
+  {% endif %}
   {% endif %}
   {% if order.round_off %}
-  <div class="total-row"><span>Round Off</span><span>{% if order.round_off > 0 %}+{% endif %}&#8377;{{ order.round_off }}</span></div>
+  <div class="total-row"><span>Round Off</span><span>{% if order.round_off > 0 %}+{% endif %}{{ outlet.currency_symbol }}{{ order.round_off }}</span></div>
   {% endif %}
-  <div class="grand-total"><span>Total</span><span>&#8377;{{ order.grand_total }}</span></div>
+  <div class="grand-total"><span>Total</span><span>{{ outlet.currency_symbol }}{{ order.grand_total }}</span></div>
 
   {% if remaining > 0 %}
   <div class="balance">
     <div class="lbl">Balance Due</div>
-    <div class="val">&#8377;{{ remaining }}</div>
+    <div class="val">{{ outlet.currency_symbol }}{{ remaining }}</div>
   </div>
   {% else %}
   <div class="balance paid">

@@ -150,11 +150,19 @@
                     <label>Phone Number</label>
                     <input type="tel" name="phone" value="{{ outlet.phone|default:'' }}" placeholder="9876543210">
                 </div>
+                {% if outlet.tax_reg_label == "GSTIN" %}
                 <div class="field">
                     <label>GSTIN</label>
                     <input type="text" name="gst_no" value="{{ outlet.gst_no|default:'' }}" maxlength="15" placeholder="27AAAAA0000A1Z5">
                     <div class="field-hint">15-character GST number. Leave blank if not registered.</div>
                 </div>
+                {% else %}
+                <div class="field">
+                    <label>TRN</label>
+                    <input type="text" name="trn_no" value="{{ outlet.trn_no|default:'' }}" maxlength="15" placeholder="100000000000003">
+                    <div class="field-hint">15-digit FTA Tax Registration Number. Leave blank if not registered.</div>
+                </div>
+                {% endif %}
             </div>
 
             <div class="field">
@@ -168,21 +176,21 @@
             </div>
 
             <div class="field">
-                <label>GST Pricing Mode</label>
+                <label>{{ outlet.tax_label|default:"GST" }} Pricing Mode</label>
                 <div class="gst-seg" style="margin-top:0.5rem;">
                     <label class="gst-seg-opt" id="gst-seg-excl">
                         <input type="radio" name="gst_inclusive" value="false"
                                {% if not outlet.gst_inclusive %}checked{% endif %}
                                onchange="syncGstSeg()">
                         <span class="gst-seg-name">Exclusive</span>
-                        <span class="gst-seg-sub">+ GST on top · ₹24 + ₹1</span>
+                        <span class="gst-seg-sub">+ tax on top · {{ outlet.currency_symbol|default:"₹" }}24 + {{ outlet.currency_symbol|default:"₹" }}1</span>
                     </label>
                     <label class="gst-seg-opt" id="gst-seg-incl">
                         <input type="radio" name="gst_inclusive" value="true"
                                {% if outlet.gst_inclusive %}checked{% endif %}
                                onchange="syncGstSeg()">
                         <span class="gst-seg-name">Inclusive <span class="gst-seg-badge">QSR</span></span>
-                        <span class="gst-seg-sub">GST included · ₹25 = ₹25</span>
+                        <span class="gst-seg-sub">tax included · {{ outlet.currency_symbol|default:"₹" }}25 = {{ outlet.currency_symbol|default:"₹" }}25</span>
                     </label>
                 </div>
                 <style>
@@ -401,7 +409,7 @@
                     <input type="text" name="item_{{ forloop.counter }}_name" placeholder="e.g. Veg Burger">
                 </div>
                 <div class="field" style="width:110px;">
-                    <label>Price (₹)</label>
+                    <label>Price ({{ outlet.currency_symbol|default:"₹" }})</label>
                     <input type="number" name="item_{{ forloop.counter }}_price" min="0" step="0.5" placeholder="120">
                 </div>
             </div>

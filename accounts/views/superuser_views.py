@@ -88,6 +88,7 @@ def create_restaurant(request):
 
     name          = request.POST.get("name", "").strip()
     tenant_type   = request.POST.get("tenant_type", "franchise")
+    country       = request.POST.get("country", "IN")
     outlet_name   = request.POST.get("outlet_name", "").strip() or "Main Branch"
     phone         = request.POST.get("phone", "").strip()
     gst_no        = request.POST.get("gst_no", "").strip().upper()
@@ -102,7 +103,7 @@ def create_restaurant(request):
 
     try:
         with transaction.atomic():
-            tenant = Tenant.objects.create(name=name, tenant_type=tenant_type)
+            tenant = Tenant.objects.create(name=name, tenant_type=tenant_type, country=country)
 
             outlet = Outlet.objects.create(
                 tenant=tenant,
@@ -184,6 +185,17 @@ def tenant_config(request, tenant_id):
 
         if action == "update_outlet":
             tcs.update_outlet_from_post(outlet, request.POST)
+            return redirect("superuser_tenant", tenant_id=tenant_id)
+
+        if action == "update_country":
+            # Manual override for reverting a mistaken UAE selection (or any
+            # direct country change) without re-running the uae_vat preset's
+            # feature-disable side effects -- just the Tenant.country field.
+            new_country = request.POST.get("country")
+            if new_country in dict(Tenant.Country.choices):
+                tenant.country = new_country
+                tenant.save(update_fields=["country"])
+                logger.info("SU %s set country=%s for tenant %s", request.user.username, new_country, tenant.name)
             return redirect("superuser_tenant", tenant_id=tenant_id)
 
         if action == "update_subscription":

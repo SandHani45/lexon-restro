@@ -319,7 +319,13 @@ def inspection_report(request):
     order_count = agg["count"]     or 0
     net         = gross - gst
 
-    # GST breakdown by rate — read from each order's stored cache
+    # GST/VAT breakdown by rate — read from each order's stored cache.
+    # Shape of each row depends on outlet.tax_regime_supports_split (see
+    # Order._build_gst_breakdown_data in orders/models.py): India rows carry
+    # cgst_amount/sgst_amount, UAE (no CGST/SGST-style split) rows carry a
+    # single tax_amount instead. Branch on it here so this never KeyErrors
+    # for a UAE outlet's orders.
+    supports_split = getattr(outlet, "tax_regime_supports_split", True)
     gst_by_rate = {}
     for order in orders:
         for row in (order.gst_breakdown or []):
@@ -330,11 +336,15 @@ def inspection_report(request):
                     "taxable": Decimal("0"),
                     "cgst":    Decimal("0"),
                     "sgst":    Decimal("0"),
+                    "tax":     Decimal("0"),
                 }
-            gst_by_rate[rate]["cgst"] += row["cgst_amount"]
-            gst_by_rate[rate]["sgst"] += row["sgst_amount"]
+            if supports_split:
+                gst_by_rate[rate]["cgst"] += row["cgst_amount"]
+                gst_by_rate[rate]["sgst"] += row["sgst_amount"]
+            else:
+                gst_by_rate[rate]["tax"] += row["tax_amount"]
     for r in gst_by_rate.values():
-        r["taxable"] = r["cgst"] + r["sgst"]
+        r["taxable"] = r["cgst"] + r["sgst"] + r["tax"]
 
     items_today = top_items(tenant, outlet, start_date=today, end_date=today)[:10]
 
@@ -521,6 +531,14 @@ def export_reports(request):
         return response
         
     elif export_type == "gstr1":
+        # GSTR-1 is an India GST-portal-format export (state codes, HSN/SAC,
+        # CGST/SGST columns) -- there's no UAE VAT equivalent built here (a
+        # real FTA VAT201 e-filing export is a separate, larger piece of
+        # work). Gate on country explicitly rather than reusing an unrelated
+        # flag, so a UAE tenant gets a clear rejection instead of an
+        # India-shaped file.
+        if tenant.country != "IN":
+            return JsonResponse({"error": "GSTR-1 export is only available for India tenants."}, status=400)
         excel_data = generate_gstr1_excel(tenant, outlet, start_date, end_date)
         response = HttpResponse(excel_data, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = f'attachment; filename="gstr1_b2cs_{start_date}_to_{end_date}.xlsx"'

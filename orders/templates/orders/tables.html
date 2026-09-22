@@ -1326,6 +1326,9 @@
 
 {% block extra_js %}
 <script>
+  /* Regime-aware currency symbol ("₹" for India, "AED" for UAE, etc.) */
+  const CURRENCY_SYMBOL = "{{ CURRENCY_SYMBOL|escapejs }}";
+
   function showToast(msg) {
     const box = document.getElementById("toastBox");
     if (!box) return;
@@ -1630,7 +1633,7 @@
                   <span class="order-item-qty">${it.quantity}</span>
                   <span class="order-item-name" title="${escapeHtml(it.name)}">${escapeHtml(it.name)}</span>
                 </div>
-                <span class="order-item-price">&#8377;${it.total_price.toFixed(2)}</span>
+                <span class="order-item-price">${CURRENCY_SYMBOL}${it.total_price.toFixed(2)}</span>
               </div>
             `;
           });
@@ -1690,15 +1693,15 @@
               <div class="order-summary-box">
                 <div class="order-summary-line">
                   <span>Subtotal</span>
-                  <strong>&#8377;${subtotalStr}</strong>
+                  <strong>${CURRENCY_SYMBOL}${subtotalStr}</strong>
                 </div>
                 <div class="order-summary-line">
                   <span>GST (5%)</span>
-                  <strong>&#8377;${gstStr}</strong>
+                  <strong>${CURRENCY_SYMBOL}${gstStr}</strong>
                 </div>
                 <div class="order-total-line">
                   <span class="order-total-label">TOTAL BILL</span>
-                  <span class="order-total-val">&#8377;${totalStr}</span>
+                  <span class="order-total-val">${CURRENCY_SYMBOL}${totalStr}</span>
                 </div>
               </div>
 

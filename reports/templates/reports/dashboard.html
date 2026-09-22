@@ -236,9 +236,11 @@
         <li><a class="dropdown-item" href="#" onclick="triggerExport('audit')">Discount/Void Audit</a></li>
         <li><a class="dropdown-item" href="#" onclick="triggerExport('crm_analytics')">CRM Analytics</a></li>
         {% endif %}
+        {% if request.user.tenant.country == 'IN' %}
         <li><hr class="dropdown-divider"></li>
         <li><h6 class="dropdown-header" style="font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;">Compliance</h6></li>
         <li><a class="dropdown-item" href="#" onclick="triggerExport('gstr1')"><i class="bi bi-file-earmark-excel me-2" style="color:#107c41;"></i>GSTR-1 B2CS</a></li>
+        {% endif %}
       </ul>
     </div>
 
@@ -273,7 +275,7 @@
     </strong>
     {% if gst_inclusive %}
     <span class="ms-3" style="font-size:0.65rem;font-weight:700;background:rgba(16,185,129,.12);color:#10b981;padding:3px 10px;border-radius:var(--radius-pill, 999px);letter-spacing:1px;text-transform:uppercase;">
-      GST Inclusive Pricing
+      {{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }} Inclusive Pricing
     </span>
     {% endif %}
     {% if is_limited_view %}
@@ -284,10 +286,10 @@
   {% if gst_inclusive %}
   <div style="background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-left:3px solid #10b981;padding:0.6rem 1rem;margin-bottom:1.5rem;font-size:0.78rem;color:var(--text-muted);">
     <i class="bi bi-info-circle me-1" style="color:#10b981;"></i>
-    <strong style="color:var(--text-main);">GST-Inclusive Mode:</strong>
-    Revenue figures show the total collected from customers (GST inside).
-    <em>Net Revenue</em> = grand total − GST back-calculated from each order.
-    <em>GST</em> = amount embedded in customer prices, not added on top.
+    <strong style="color:var(--text-main);">{{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }}-Inclusive Mode:</strong>
+    Revenue figures show the total collected from customers ({{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }} inside).
+    <em>Net Revenue</em> = grand total − {{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }} back-calculated from each order.
+    <em>{{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }}</em> = amount embedded in customer prices, not added on top.
     <a href="/setup/outlet/" style="color:#10b981;margin-left:6px;">Change pricing mode →</a>
   </div>
   {% endif %}
@@ -297,12 +299,12 @@
     <div class="col-12 col-md-6 col-xl-3">
       <div class="kpi-tile t1">
         <div class="kpi-icon-badge"><i class="bi bi-currency-rupee"></i></div>
-        <p class="kpi-val mb-0">₹{{ sales.total_sales|floatformat:0 }}</p>
+        <p class="kpi-val mb-0">{{ current_outlet.currency_symbol|default:request.user.outlet.currency_symbol|default:"₹" }}{{ sales.total_sales|floatformat:0 }}</p>
         <span class="kpi-label">
-          {% if gst_inclusive %}Revenue (incl. GST){% else %}Net Sales Revenue{% endif %}
+          {% if gst_inclusive %}Revenue (incl. {{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }}){% else %}Net Sales Revenue{% endif %}
         </span>
         {% if gst_inclusive %}
-        <div class="kpi-sub">GST inside: ₹{{ sales.gst_total|floatformat:0 }}</div>
+        <div class="kpi-sub">{{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }} inside: {{ current_outlet.currency_symbol|default:request.user.outlet.currency_symbol|default:"₹" }}{{ sales.gst_total|floatformat:0 }}</div>
         {% endif %}
       </div>
     </div>
@@ -317,7 +319,7 @@
     <div class="col-12 col-md-6 col-xl-3">
       <div class="kpi-tile t3">
         <div class="kpi-icon-badge"><i class="bi bi-graph-up-arrow"></i></div>
-        <p class="kpi-val mb-0">₹{{ sales.avg_order_value|floatformat:0 }}</p>
+        <p class="kpi-val mb-0">{{ current_outlet.currency_symbol|default:request.user.outlet.currency_symbol|default:"₹" }}{{ sales.avg_order_value|floatformat:0 }}</p>
         <span class="kpi-label">Average Order Value</span>
       </div>
     </div>
@@ -351,8 +353,8 @@
       <!-- Revenue -->
       <div style="border:1px solid var(--border-color);padding:1rem;text-align:center;">
         <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:0.4rem;">Revenue</div>
-        <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;">₹{{ c.revenue|floatformat:0 }}</div>
-        <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.3rem;">vs ₹{{ p.revenue|floatformat:0 }}</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;">{{ current_outlet.currency_symbol|default:request.user.outlet.currency_symbol|default:"₹" }}{{ c.revenue|floatformat:0 }}</div>
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.3rem;">vs {{ current_outlet.currency_symbol|default:request.user.outlet.currency_symbol|default:"₹" }}{{ p.revenue|floatformat:0 }}</div>
         {% if d.revenue is not None %}
           {% if d.revenue >= 0 %}
             <span style="color:#10b981;font-size:0.78rem;font-weight:700;">↑ {{ d.revenue }}%</span>
@@ -379,8 +381,8 @@
       <!-- Avg Order Value -->
       <div style="border:1px solid var(--border-color);padding:1rem;text-align:center;">
         <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:0.4rem;">Avg Order</div>
-        <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;">₹{{ c.avg_order|floatformat:0 }}</div>
-        <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.3rem;">vs ₹{{ p.avg_order|floatformat:0 }}</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;">{{ current_outlet.currency_symbol|default:request.user.outlet.currency_symbol|default:"₹" }}{{ c.avg_order|floatformat:0 }}</div>
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.3rem;">vs {{ current_outlet.currency_symbol|default:request.user.outlet.currency_symbol|default:"₹" }}{{ p.avg_order|floatformat:0 }}</div>
         {% if d.avg_order is not None %}
           {% if d.avg_order >= 0 %}
             <span style="color:#10b981;font-size:0.78rem;font-weight:700;">↑ {{ d.avg_order }}%</span>
@@ -394,9 +396,9 @@
       <div style="border:1px solid var(--border-color);padding:1rem;text-align:center;">
         <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:0.4rem;">Discounts Given</div>
         <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;color:{% if c.discounts > p.discounts %}#ef4444{% else %}#10b981{% endif %};">
-          ₹{{ c.discounts|floatformat:0 }}
+          {{ current_outlet.currency_symbol|default:request.user.outlet.currency_symbol|default:"₹" }}{{ c.discounts|floatformat:0 }}
         </div>
-        <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.3rem;">vs ₹{{ p.discounts|floatformat:0 }}</div>
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.3rem;">vs {{ current_outlet.currency_symbol|default:request.user.outlet.currency_symbol|default:"₹" }}{{ p.discounts|floatformat:0 }}</div>
         {% if d.discounts is not None %}
           {% if d.discounts <= 0 %}
             <span style="color:#10b981;font-size:0.78rem;font-weight:700;">↓ {{ d.discounts|slice:"1:" }}% better</span>
@@ -419,17 +421,17 @@
 
       <div style="padding:0.75rem;border-left:3px solid var(--accent-gold);">
         <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);">
-          {% if gst_inclusive %}Revenue (incl. GST){% else %}Gross Revenue{% endif %}
+          {% if gst_inclusive %}Revenue (incl. {{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }}){% else %}Gross Revenue{% endif %}
         </div>
-        <div style="font-family:'DM Serif Display',serif;font-size:1.3rem;">₹{{ pl.gross_revenue|floatformat:0 }}</div>
-        {% if gst_inclusive %}<div style="font-size:0.65rem;color:var(--text-muted);">GST inside the price</div>{% endif %}
+        <div style="font-family:'DM Serif Display',serif;font-size:1.3rem;">{{ current_outlet.currency_symbol|default:request.user.outlet.currency_symbol|default:"₹" }}{{ pl.gross_revenue|floatformat:0 }}</div>
+        {% if gst_inclusive %}<div style="font-size:0.65rem;color:var(--text-muted);">{{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }} inside the price</div>{% endif %}
       </div>
 
       <div style="padding:0.75rem;border-left:3px solid var(--border-color);">
         <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);">
-          {% if gst_inclusive %}GST (back-calculated){% else %}GST Collected{% endif %}
+          {% if gst_inclusive %}{{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }} (back-calculated){% else %}{{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }} Collected{% endif %}
         </div>
-        <div style="font-family:'DM Serif Display',serif;font-size:1.3rem;color:var(--text-muted);">₹{{ pl.gst_collected|floatformat:0 }}</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:1.3rem;color:var(--text-muted);">{{ current_outlet.currency_symbol|default:request.user.outlet.currency_symbol|default:"₹" }}{{ pl.gst_collected|floatformat:0 }}</div>
         <div style="font-size:0.65rem;color:var(--text-muted);">
           {% if gst_inclusive %}embedded in your prices{% else %}not your income{% endif %}
         </div>
@@ -437,26 +439,26 @@
 
       <div style="padding:0.75rem;border-left:3px solid #3b82f6;">
         <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);">
-          {% if gst_inclusive %}Your Income (excl. GST){% else %}Net Revenue (excl. GST){% endif %}
+          {% if gst_inclusive %}Your Income (excl. {{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }}){% else %}Net Revenue (excl. {{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }}){% endif %}
         </div>
-        <div style="font-family:'DM Serif Display',serif;font-size:1.3rem;color:#3b82f6;">₹{{ pl.net_revenue|floatformat:0 }}</div>
-        {% if gst_inclusive %}<div style="font-size:0.65rem;color:var(--text-muted);">= Revenue − back-calc GST</div>{% endif %}
+        <div style="font-family:'DM Serif Display',serif;font-size:1.3rem;color:#3b82f6;">{{ current_outlet.currency_symbol|default:request.user.outlet.currency_symbol|default:"₹" }}{{ pl.net_revenue|floatformat:0 }}</div>
+        {% if gst_inclusive %}<div style="font-size:0.65rem;color:var(--text-muted);">= Revenue − back-calc {{ current_outlet.tax_label|default:request.user.outlet.tax_label|default:"GST" }}</div>{% endif %}
       </div>
 
       <div style="padding:0.75rem;border-left:3px solid var(--border-color);">
         <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);">Discounts Given</div>
-        <div style="font-family:'DM Serif Display',serif;font-size:1.3rem;color:#f97316;">₹{{ pl.discounts|floatformat:0 }}</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:1.3rem;color:#f97316;">{{ current_outlet.currency_symbol|default:request.user.outlet.currency_symbol|default:"₹" }}{{ pl.discounts|floatformat:0 }}</div>
       </div>
 
       {% if pl.cogs > 0 %}
       <div style="padding:0.75rem;border-left:3px solid var(--border-color);">
         <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);">Cost of Goods Sold</div>
-        <div style="font-family:'DM Serif Display',serif;font-size:1.3rem;color:#ef4444;">₹{{ pl.cogs|floatformat:0 }}</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:1.3rem;color:#ef4444;">{{ current_outlet.currency_symbol|default:request.user.outlet.currency_symbol|default:"₹" }}{{ pl.cogs|floatformat:0 }}</div>
       </div>
 
       <div style="padding:0.75rem;border-left:3px solid #10b981;">
         <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);">Gross Profit</div>
-        <div style="font-family:'DM Serif Display',serif;font-size:1.3rem;color:#10b981;">₹{{ pl.gross_profit|floatformat:0 }}</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:1.3rem;color:#10b981;">{{ current_outlet.currency_symbol|default:request.user.outlet.currency_symbol|default:"₹" }}{{ pl.gross_profit|floatformat:0 }}</div>
       </div>
 
       <div style="padding:0.75rem;border-left:3px solid #10b981;background:rgba(16,185,129,0.05);">
@@ -487,11 +489,11 @@
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.75rem;">
         <div style="padding:0.75rem;border-left:3px solid #f97316;">
           <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);">Operating Expenses</div>
-          <div style="font-family:'DM Serif Display',serif;font-size:1.3rem;color:#f97316;">₹{{ net_pl.operating_expenses|floatformat:0 }}</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:1.3rem;color:#f97316;">{{ current_outlet.currency_symbol|default:request.user.outlet.currency_symbol|default:"₹" }}{{ net_pl.operating_expenses|floatformat:0 }}</div>
         </div>
         <div style="padding:0.75rem;border-left:3px solid {% if net_pl.net_profit >= 0 %}#10b981{% else %}#ef4444{% endif %};background:{% if net_pl.net_profit >= 0 %}rgba(16,185,129,0.05){% else %}rgba(239,68,68,0.05){% endif %};">
           <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);">Net Profit</div>
-          <div style="font-family:'DM Serif Display',serif;font-size:1.6rem;font-weight:700;color:{% if net_pl.net_profit >= 0 %}#10b981{% else %}#ef4444{% endif %};">₹{{ net_pl.net_profit|floatformat:0 }}</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:1.6rem;font-weight:700;color:{% if net_pl.net_profit >= 0 %}#10b981{% else %}#ef4444{% endif %};">{{ current_outlet.currency_symbol|default:request.user.outlet.currency_symbol|default:"₹" }}{{ net_pl.net_profit|floatformat:0 }}</div>
         </div>
         <div style="padding:0.75rem;border-left:3px solid var(--border-color);">
           <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);">Net Margin</div>
@@ -500,7 +502,7 @@
       </div>
       {% if net_pl.expense_breakdown %}
       <div style="font-size:0.72rem;color:var(--text-muted);margin-top:0.75rem;">
-        {% for row in net_pl.expense_breakdown %}<span style="margin-right:1rem;">{{ row.category|capfirst }}: ₹{{ row.total|floatformat:0 }}</span>{% endfor %}
+        {% for row in net_pl.expense_breakdown %}<span style="margin-right:1rem;">{{ row.category|capfirst }}: {{ current_outlet.currency_symbol|default:request.user.outlet.currency_symbol|default:"₹" }}{{ row.total|floatformat:0 }}</span>{% endfor %}
       </div>
       {% endif %}
       <div style="font-size:0.7rem;color:var(--text-muted);margin-top:0.75rem;">
@@ -561,7 +563,7 @@
           <thead><tr><th>Classification</th><th class="text-end">Revenue</th></tr></thead>
           <tbody>
             {% for c in categories %}
-            <tr><td>{{ c.menu_item__category__name }}</td><td class="text-end text-value">₹{{ c.revenue|floatformat:0 }}</td></tr>
+            <tr><td>{{ c.menu_item__category__name }}</td><td class="text-end text-value">{{ current_outlet.currency_symbol|default:request.user.outlet.currency_symbol|default:"₹" }}{{ c.revenue|floatformat:0 }}</td></tr>
             {% empty %}
             <tr><td colspan="2" class="text-center py-4" style="color:var(--text-muted)">No data available</td></tr>
             {% endfor %}
@@ -648,6 +650,7 @@
 {% block extra_js %}
 <script>
 (function () {
+  const CURRENCY_SYMBOL = "{{ current_outlet.currency_symbol|default:request.user.outlet.currency_symbol|default:'₹'|escapejs }}";
   const dark = themeManager.isDark();
   let chartTextColor = dark ? '#888888' : '#737373';
   let chartGridColor = dark ? '#262626' : '#eaeaea';
@@ -735,7 +738,7 @@
             padding: 12,
             displayColors: false,
             cornerRadius: 0,
-            callbacks: { label: ctx => '₹' + ctx.parsed.y }
+            callbacks: { label: ctx => CURRENCY_SYMBOL + ctx.parsed.y }
           }
         },
         scales: {

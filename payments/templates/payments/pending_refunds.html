@@ -55,7 +55,7 @@
       {% for r in refunds %}
       <tr>
         <td><span class="order-num">{{ r.order.order_number|default:r.order.id }}</span></td>
-        <td><span class="amount">₹{{ r.amount|floatformat:0 }}</span></td>
+        <td><span class="amount">{{ CURRENCY_SYMBOL }}{{ r.amount|floatformat:0 }}</span></td>
         <td>
           {% if r.customer_complaint %}
             <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:3px;"><i class="bi bi-person me-1"></i>{{ r.customer_complaint }}</div>

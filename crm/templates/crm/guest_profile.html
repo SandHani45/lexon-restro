@@ -356,7 +356,7 @@
         <div class="hero-stat-label">Dining Visits</div>
       </div>
       <div class="hero-stat-card">
-        <div class="hero-stat-val">₹{{ guest.total_spent|floatformat:0 }}</div>
+        <div class="hero-stat-val">{{ CURRENCY_SYMBOL }}{{ guest.total_spent|floatformat:0 }}</div>
         <div class="hero-stat-label">Lifetime Spend</div>
       </div>
       <div class="hero-stat-card">

@@ -238,23 +238,23 @@
                         {{ item.menu_item.name }}
                         <span style="color:var(--muted)">× {{ item.quantity }}</span>
                     </span>
-                    <span class="item-val">₹{{ item.discounted_price|default:item.total_price }}</span>
+                    <span class="item-val">{{ order.outlet.currency_symbol }}{{ item.discounted_price|default:item.total_price }}</span>
                 </div>
                 {% endif %}
                 {% endfor %}
             </div>
 
-            <div class="total-row"><span>Subtotal</span><span>₹{{ order.subtotal }}</span></div>
+            <div class="total-row"><span>Subtotal</span><span>{{ order.outlet.currency_symbol }}{{ order.subtotal }}</span></div>
             {% if order.discount_total > 0 %}
-            <div class="total-row" style="color:#ef4444"><span>Discount</span><span>- ₹{{ order.discount_total }}</span></div>
+            <div class="total-row" style="color:#ef4444"><span>Discount</span><span>- {{ order.outlet.currency_symbol }}{{ order.discount_total }}</span></div>
             {% endif %}
             {% if order.gst_total > 0 %}
-            <div class="total-row"><span>GST</span><span>₹{{ order.gst_total }}</span></div>
+            <div class="total-row"><span>{{ order.outlet.tax_label }}</span><span>{{ order.outlet.currency_symbol }}{{ order.gst_total }}</span></div>
             {% endif %}
-            
+
             <div class="grand-total serif">
                 <span>TOTAL</span>
-                <span>₹{{ order.grand_total }}</span>
+                <span>{{ order.outlet.currency_symbol }}{{ order.grand_total }}</span>
             </div>
 
             {% if remaining > 0 %}
@@ -277,7 +277,7 @@
 
             <div class="balance-card {% if remaining <= 0 %}fully-paid{% endif %} no-print">
                 <div class="balance-label">{% if remaining <= 0 %}Status{% else %}Balance Due{% endif %}</div>
-                <div class="balance-val">{% if remaining <= 0 %}FULLY PAID{% else %}₹{{ remaining }}{% endif %}</div>
+                <div class="balance-val">{% if remaining <= 0 %}FULLY PAID{% else %}{{ order.outlet.currency_symbol }}{{ remaining }}{% endif %}</div>
             </div>
 
             <div class="pay-area no-print">
@@ -375,7 +375,7 @@
                 if (data.success) {
                     if (data.change_due && data.change_due > 0) {
                         document.getElementById('toast').style.display = 'none';
-                        document.getElementById('changeDueAmount').innerText = '₹ ' + parseFloat(data.change_due).toFixed(2);
+                        document.getElementById('changeDueAmount').innerText = '{{ order.outlet.currency_symbol }} ' + parseFloat(data.change_due).toFixed(2);
                         document.getElementById('changeModal').style.display = 'flex';
                         document.body.style.overflow = 'hidden';
                     } else {
@@ -478,7 +478,7 @@
             <div style="padding:2.5rem 1.5rem; text-align:center;">
                 <i class="bi bi-cash-coin" style="font-size:3rem; color:var(--gold); display:block; margin-bottom:1rem;"></i>
                 <h2 style="font-family:'Outfit', sans-serif; color:var(--muted); text-transform:uppercase; letter-spacing:2px; font-size:1rem; margin-bottom:0.5rem; font-weight:500;">Change Due</h2>
-                <div id="changeDueAmount" style="font-size:3.5rem; font-weight:700; color:var(--success); font-family:'DM Serif Display', serif; margin:1rem 0; line-height:1;">₹ 0.00</div>
+                <div id="changeDueAmount" style="font-size:3.5rem; font-weight:700; color:var(--success); font-family:'DM Serif Display', serif; margin:1rem 0; line-height:1;">{{ order.outlet.currency_symbol }} 0.00</div>
                 <p style="color:var(--muted); font-size:0.9rem; margin-bottom:0;">Please hand this exact amount back to the customer.</p>
             </div>
 

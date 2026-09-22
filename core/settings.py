@@ -172,6 +172,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
 		'core.context_processors.base_url',
                 'core.context_processors.tenant_features',
+                'core.context_processors.currency',
             ],
             **({} if DEBUG else {
                 'loaders': [
@@ -285,6 +286,14 @@ _static_backend = (
     else "whitenoise.storage.CompressedManifestStaticFilesStorage"
 )
 WHITENOISE_MANIFEST_STRICT = False
+# django-cloudinary-storage's own `collectstatic` override (it must load
+# before django.contrib.staticfiles, per its docs, so it's the command
+# Django always runs) reads settings.STATICFILES_STORAGE directly -- the
+# pre-4.2 setting name, removed from Django itself in 5.1+ in favor of
+# STORAGES below. Django no longer looks at this attribute for its own
+# behavior, but keeping it defined (in sync with STORAGES["staticfiles"])
+# stops that third-party check from raising AttributeError during deploy.
+STATICFILES_STORAGE = _static_backend
 
 _CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME", "")
 _AWS_BUCKET            = os.getenv("AWS_STORAGE_BUCKET_NAME", "")

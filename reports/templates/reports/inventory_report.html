@@ -207,7 +207,7 @@
     </div>
     <div class="stat-card tint-red">
       <div class="stat-label">Consumption Cost</div>
-      <div class="stat-value mono">₹{{ total_cost|floatformat:2 }}</div>
+      <div class="stat-value mono">{{ CURRENCY_SYMBOL }}{{ total_cost|floatformat:2 }}</div>
       <div class="stat-unit">at cost price</div>
     </div>
     <div class="stat-card">
@@ -346,15 +346,15 @@
             <tr>
               <td>{{ row.item__name }}</td>
               <td class="text-end mono">{{ row.total_qty|floatformat:3 }} <span style="font-size:0.75rem;color:var(--text-muted);">{{ row.item__unit }}</span></td>
-              <td class="text-end mono">₹{{ row.item__cost_price|floatformat:2 }}</td>
-              <td class="text-end mono text-gold">₹{{ row.total_cost|floatformat:2 }}</td>
+              <td class="text-end mono">{{ CURRENCY_SYMBOL }}{{ row.item__cost_price|floatformat:2 }}</td>
+              <td class="text-end mono text-gold">{{ CURRENCY_SYMBOL }}{{ row.total_cost|floatformat:2 }}</td>
             </tr>
             {% endfor %}
           </tbody>
           <tfoot>
             <tr style="border-top:2px solid var(--border-color);">
               <td colspan="3" style="text-align:right; padding:0.7rem 0.8rem; font-weight:600; color:var(--text-muted); font-size:0.8rem; text-transform:uppercase;">Total Consumption Cost</td>
-              <td class="text-end mono text-gold" style="font-weight:700; font-size:1rem; padding:0.7rem 0.8rem;">₹{{ total_cost|floatformat:2 }}</td>
+              <td class="text-end mono text-gold" style="font-weight:700; font-size:1rem; padding:0.7rem 0.8rem;">{{ CURRENCY_SYMBOL }}{{ total_cost|floatformat:2 }}</td>
             </tr>
           </tfoot>
         </table>

@@ -443,8 +443,8 @@
                         <th style="width:38px">#</th>
                         <th>Item Description</th>
                         <th class="r">Qty</th>
-                        <th class="r">Unit Price (₹)</th>
-                        <th class="r">Amount (₹)</th>
+                        <th class="r">Unit Price ({{ CURRENCY_SYMBOL }})</th>
+                        <th class="r">Amount ({{ CURRENCY_SYMBOL }})</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -468,7 +468,7 @@
                 <tfoot>
                     <tr>
                         <td colspan="4" class="label-cell" style="font-size:12px;">Sub-Total</td>
-                        <td>₹ {{ po.total_amount }}</td>
+                        <td>{{ CURRENCY_SYMBOL }} {{ po.total_amount }}</td>
                     </tr>
                     <tr>
                         <td colspan="4" class="label-cell" style="font-size:12px;color:#aaa;">Tax / GST</td>
@@ -476,7 +476,7 @@
                     </tr>
                     <tr class="grand-total">
                         <td colspan="4" class="label-cell">Grand Total</td>
-                        <td>₹ {{ po.total_amount }}</td>
+                        <td>{{ CURRENCY_SYMBOL }} {{ po.total_amount }}</td>
                     </tr>
                 </tfoot>
             </table>

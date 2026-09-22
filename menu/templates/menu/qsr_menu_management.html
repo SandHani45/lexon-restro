@@ -170,7 +170,7 @@
                                     <span class="luxury-badge badge-disabled ms-2" id="badge-{{item.id}}" style="display:none;">Offline</span>
                                     {% endif %}
                                 </span>
-                                <span class="item-price mt-1" onclick="openItemModal({id:'{{item.id}}', name:'{{item.name|escapejs}}', price:'{{item.price}}', category:'{{item.category.id}}', isVeg:'{{item.is_veg|lower}}'})">₹{{item.price}}</span>
+                                <span class="item-price mt-1" onclick="openItemModal({id:'{{item.id}}', name:'{{item.name|escapejs}}', price:'{{item.price}}', category:'{{item.category.id}}', isVeg:'{{item.is_veg|lower}}'})">{{ CURRENCY_SYMBOL }}{{item.price}}</span>
                                 {% if stations|length > 1 %}
                                 <select class="qsr-station-select mt-1" onchange="updateStation('{{item.id}}', this.value)" title="Kitchen station">
                                     <option value="">🔥 Default Station</option>
@@ -264,7 +264,7 @@
                     <input id="itemName" class="form-control form-input-luxury" placeholder="Classic Burger"/>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label text-muted small text-uppercase fw-bold m-0" style="letter-spacing:1px;">Price (₹)</label>
+                    <label class="form-label text-muted small text-uppercase fw-bold m-0" style="letter-spacing:1px;">Price ({{ CURRENCY_SYMBOL }})</label>
                     <input id="itemPrice" class="form-control form-input-luxury" placeholder="0.00"/>
                 </div>
                 <div class="mb-3">

@@ -294,6 +294,24 @@ class Order(TenantScopedModel):
             for row in (self.gst_breakdown_cache or [])
         ]
 
+    @property
+    def effective_vat_rate(self):
+        """Single VAT/GST rate for this order, for display purposes only.
+
+        Looks at gst_percentage on every non-voided item. If all of them
+        share the exact same rate, that Decimal is returned (e.g. for a
+        "VAT @ 5%" line on a UAE receipt). If items have mixed rates (e.g.
+        some 0%, some 5%), returns None — callers must not show a single
+        rate in that case, since it would misrepresent the actual tax
+        applied to the order.
+        """
+        rates = set(
+            self.items.exclude(status="voided").values_list("gst_percentage", flat=True)
+        )
+        if len(rates) == 1:
+            return rates.pop()
+        return None
+
     def _build_gst_breakdown_data(self, items, order_discount_factor, gst_inclusive):
         """Compute GST breakdown given already-calculated order_discount_factor.
 
@@ -316,21 +334,40 @@ class Order(TenantScopedModel):
                 item_gst = (item_taxable * rate / Decimal("100")).quantize(Decimal("0.01"))
             breakdown[rate] += item_gst
 
-        from orders.services.tax_service import split_cgst_sgst
+        # CGST/SGST is an India-GST-only concept -- UAE VAT (and any future
+        # flat-rate regime) has no such split, so this cache takes on a
+        # different, simpler shape per tenant.tax_regime_supports_split
+        # (tenants/tax_regimes.py) rather than always faking a 50/50 split
+        # that would have no legal meaning outside India.
+        supports_split = True
+        try:
+            supports_split = self.outlet.tax_regime_supports_split
+        except Exception:
+            pass  # outlet missing/unset -- fall back to the original India shape
 
         result = []
-        for rate, amount in sorted(breakdown.items()):
-            if amount <= 0:
-                continue
-            half_rate = (rate / 2).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-            cgst_amt, sgst_amt = split_cgst_sgst(amount)
-            result.append({
-                "rate":        str(rate),
-                "cgst_rate":   str(half_rate),
-                "sgst_rate":   str(half_rate),
-                "cgst_amount": str(cgst_amt),
-                "sgst_amount": str(sgst_amt),
-            })
+        if supports_split:
+            from orders.services.tax_service import split_cgst_sgst
+            for rate, amount in sorted(breakdown.items()):
+                if amount <= 0:
+                    continue
+                half_rate = (rate / 2).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+                cgst_amt, sgst_amt = split_cgst_sgst(amount)
+                result.append({
+                    "rate":        str(rate),
+                    "cgst_rate":   str(half_rate),
+                    "sgst_rate":   str(half_rate),
+                    "cgst_amount": str(cgst_amt),
+                    "sgst_amount": str(sgst_amt),
+                })
+        else:
+            for rate, amount in sorted(breakdown.items()):
+                if amount <= 0:
+                    continue
+                result.append({
+                    "rate":       str(rate),
+                    "tax_amount": str(amount),
+                })
         return result
 
     # -------------------------------------------------
