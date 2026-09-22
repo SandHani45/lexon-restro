@@ -18,8 +18,8 @@ fi
 
 echo "=== Pulling latest code ==="
 OLD_REV=$(git rev-parse HEAD 2>/dev/null || echo "none")
-git fetch origin qsr
-git reset --hard origin/qsr
+git fetch origin main
+git reset --hard origin/main
 NEW_REV=$(git rev-parse HEAD)
 CHANGED=$(git diff --name-only "$OLD_REV" "$NEW_REV" 2>/dev/null || echo "ALL")
 

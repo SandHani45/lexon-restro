@@ -144,7 +144,7 @@ jobs:
     # red test run from blocking deploy. Re-add `needs: test` the next
     # time this is touched, unless explicitly told to keep it off.
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/qsr' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
       - name: Deploy to EC2
@@ -159,6 +159,6 @@ jobs:
           script: |
             # Set git credentials so fetch works
             cd /home/ubuntu/lexnorax
-            git remote set-url origin https://${{ secrets.GH_PAT }}@github.com/Rajathtuesday/restaurant-pos.git
+            git remote set-url origin https://${{ secrets.GH_PAT }}@github.com/SandHani45/lexon-restro.git
             # Run the deploy script — setsid handles celery detachment
             bash /home/ubuntu/lexnorax/deploy.sh
