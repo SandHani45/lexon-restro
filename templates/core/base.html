@@ -1072,6 +1072,37 @@
             flex-wrap: nowrap;
             height: 100%;
         }
+        /* On narrow screens the title + icon row + role badge can add up
+           to more than the viewport width. #pos-topbar's overflow:hidden
+           was silently clipping whatever fell past the edge (usually the
+           role badge, since it's last) with no way to reach it. Make the
+           icon row itself horizontally scrollable instead, so every icon
+           and the role badge stay reachable by swiping -- nothing is ever
+           permanently invisible. Desktop is untouched. */
+        @media (max-width: 767px) {
+            .topbar-right {
+                /* Base rule sets flex-shrink:0, which kept this item at
+                   its full intrinsic width in #pos-topbar's flex layout
+                   even with overflow-x:auto below -- it never actually
+                   shrank to the space available, so content stayed
+                   clipped by the topbar's own overflow:hidden no matter
+                   how far this row was scrolled. It must be allowed to
+                   shrink for the internal scroll to have any effect. */
+                flex-shrink: 1;
+                min-width: 0;
+                max-width: 100%;
+                overflow-x: auto;
+                overflow-y: hidden;
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior-x: contain;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                padding-right: 22px;
+                mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent 100%);
+                -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent 100%);
+            }
+            .topbar-right::-webkit-scrollbar { display: none; }
+        }
 
         #pos-topbar .btn-icon {
             width: 34px;
