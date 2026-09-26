@@ -11,12 +11,15 @@ Covers:
 
 Run: python manage.py test setup.test_security_fixes
 """
-from django.test import TestCase, Client
+import uuid
+
+from django.test import TestCase, Client, override_settings
 from django.test.utils import CaptureQueriesContext
 from django.db import connection
 from django.urls import reverse
 
 from accounts.models import User
+from orders.models import Table
 from tenants.models import Tenant, Outlet
 
 
@@ -76,6 +79,51 @@ class QrCodesRoleGateTest(_Base):
         client.force_login(self.owner)
         resp = client.get(reverse("setup_qr_codes"))
         self.assertEqual(resp.status_code, 200)
+
+    @override_settings(
+        ALLOWED_HOSTS=["tenant.easybillbro.com"],
+        BASE_URL="http://localhost:8000",
+        SECURE_PROXY_SSL_HEADER=("HTTP_X_FORWARDED_PROTO", "https"),
+    )
+    def test_qr_urls_use_current_public_request_host(self):
+        table = Table.objects.create(
+            tenant=self.tenant, outlet=self.outlet, name="T1"
+        )
+        client = Client()
+        client.force_login(self.owner)
+
+        resp = client.get(
+            reverse("setup_qr_codes"),
+            HTTP_HOST="tenant.easybillbro.com",
+            HTTP_X_FORWARDED_PROTO="https",
+        )
+
+        self.assertEqual(resp.status_code, 200)
+        expected = f"https://tenant.easybillbro.com/menu/{table.qr_token}/"
+        self.assertEqual(resp.context["tables_data"][0]["url"], expected)
+        self.assertContains(resp, expected)
+        self.assertNotContains(resp, "http://localhost:8000/menu/")
+
+    def test_server_qr_fallback_returns_png(self):
+        table = Table.objects.create(
+            tenant=self.tenant, outlet=self.outlet, name="T1"
+        )
+        client = Client()
+        client.force_login(self.owner)
+
+        resp = client.get(reverse("setup_qr_image", args=[table.qr_token]))
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp["Content-Type"], "image/png")
+        self.assertTrue(resp.content.startswith(b"\x89PNG\r\n\x1a\n"))
+        self.assertIn("private", resp["Cache-Control"])
+        self.assertIn("no-store", resp["Cache-Control"])
+
+    def test_server_qr_fallback_rejects_foreign_token(self):
+        client = Client()
+        client.force_login(self.owner)
+        resp = client.get(reverse("setup_qr_image", args=[uuid.uuid4()]))
+        self.assertEqual(resp.status_code, 404)
 
 
 class StaffRoleValidationTest(_Base):

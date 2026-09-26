@@ -561,6 +561,23 @@
     color: #ffffff !important;
   }
 
+  /* ── BACK BUTTON (matches Token Billing's .token-pos-back so it looks
+     the same everywhere in the app) ────────────────────────────── */
+  .editor-back-btn {
+    width: 38px; height: 38px; min-width: 38px; border-radius: 12px;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--editor-text-main); background: var(--editor-panel);
+    border: 1px solid var(--editor-border); text-decoration: none;
+    font-size: 1.02rem;
+    transition: all .18s ease;
+    flex-shrink: 0;
+  }
+  .editor-back-btn:hover {
+    color: var(--editor-accent);
+    border-color: var(--editor-accent);
+    transform: translateX(-2px);
+  }
+
   /* ── CANVAS VIEWPORT ENHANCEMENTS ────────────────────────── */
   .canvas-viewport {
     align-items: safe center;
@@ -881,6 +898,98 @@
     #pos-main {
       height: calc(100dvh - var(--topbar-height, 56px));
     }
+
+    /* Safe-area padding so the floating "Add shape" pill and the table
+       inspector sheet never sit under an iOS home indicator. Sizing is
+       also tightened here so all 4 shape buttons fit one row on real
+       phone widths (~360-430px) without relying on the horizontal scroll
+       -- that scroll still works as a fallback on the narrowest devices,
+       but its scrollbar is intentionally hidden, so content getting cut
+       off at the edge with no visible affordance just looked broken. */
+    .mobile-quick-shapes-bar {
+      bottom: calc(12px + env(safe-area-inset-bottom));
+      gap: 4px;
+      padding: 5px 8px;
+    }
+    .quick-add-label {
+      font-size: 0.66rem;
+      padding-right: 2px;
+    }
+    .quick-shape-btn {
+      padding: 4px 8px;
+      font-size: 0.7rem;
+      gap: 4px;
+    }
+    .mobile-inspector-sheet {
+      padding-bottom: calc(1.1rem + env(safe-area-inset-bottom));
+    }
+
+    /* Toasts default to the bottom-right corner, which sits directly on
+       top of the floating "Add shape" pill bar and, when a table is
+       selected, the full-width inspector sheet -- both live at the
+       bottom of .editor-shell on mobile. Move toasts fired from this
+       page to the top instead (same approach already used for the
+       kitchen-dispatch toast elsewhere), clear of both. */
+    /* Requires BOTH the toast-only class and our page-specific one, so this
+       can never match (and block clicks on) an ordinary dialog -- like the
+       "Add Floor" prompt -- even if SweetAlert2 ever leaves a stale custom
+       container class behind between calls. */
+    body .lux-toast-container.editor-toast-container.swal2-container {
+      padding: calc(var(--topbar-height, 56px) + 10px + env(safe-area-inset-top)) 12px 0 !important;
+      align-items: flex-start !important;
+      justify-content: center !important;
+      justify-items: center !important;
+      pointer-events: none !important;
+    }
+    body .lux-toast-container.editor-toast-container .lux-toast.swal2-popup {
+      width: min(380px, calc(100vw - 24px)) !important;
+      margin: 0 auto !important;
+      justify-self: center !important;
+      pointer-events: auto !important;
+    }
+  }
+
+  /* Smallest phones: drop the "ADD:" text and keep just its icon so the
+     4 shape buttons never need the (undiscoverable, scrollbar-hidden)
+     horizontal scroll at all. */
+  @media (max-width: 380px) {
+    .quick-add-label-text {
+      display: none;
+    }
+    .mobile-quick-shapes-bar {
+      gap: 3px;
+      padding: 5px 6px;
+    }
+    .quick-shape-btn {
+      padding: 4px 7px;
+      font-size: 0.66rem;
+    }
+  }
+
+  /* "New Floor / Section" prompt: the app's shared modal stacks Confirm/
+     Cancel full-width on mobile (one per row) -- for this quick single-field
+     prompt that's unnecessary height, so keep them side by side in one row
+     instead, matching the desktop layout. Scoped to .editor-add-floor-modal
+     only, so every other confirm/delete dialog in the app keeps the safer
+     stacked layout. */
+  @media (max-width: 576px) {
+    /* Matches the global rule's selector shape (.lux-modal.swal2-popup
+       .swal2-actions / .swal2-confirm / .swal2-cancel), each 3 classes deep,
+       so this genuinely outranks it on specificity instead of just hoping
+       to win on source order. */
+    .editor-add-floor-modal .lux-modal-actions,
+    .editor-add-floor-modal.swal2-popup .swal2-actions {
+      flex-direction: row !important;
+    }
+    .editor-add-floor-modal .lux-btn-confirm-danger,
+    .editor-add-floor-modal .lux-btn-cancel,
+    .editor-add-floor-modal.swal2-popup .swal2-confirm,
+    .editor-add-floor-modal.swal2-popup .swal2-cancel {
+      width: auto !important;
+      max-width: none !important;
+      flex: 1 !important;
+      min-height: 44px !important;
+    }
   }
 
   /* Unsaved badge */
@@ -896,19 +1005,6 @@
 </style>
 {% endblock %}
 
-{% block header_left %}
-<div class="d-flex align-items-center gap-2" style="min-width:0;overflow:hidden;">
-  <a href="/tables/" class="d-flex align-items-center gap-2 text-decoration-none text-reset" style="min-width:0;">
-    <div style="width:34px;height:34px;border-radius:10px;background:rgba(236,39,52,0.12);border:1px solid rgba(236,39,52,0.3);display:flex;align-items:center;justify-content:center;color:var(--editor-accent);flex-shrink:0;">
-      <i class="bi bi-pencil-square" style="font-size:1.05rem;"></i>
-    </div>
-    <div style="min-width:0;overflow:hidden;">
-      <h1 class="h6 mb-0 fw-bold text-truncate" style="letter-spacing:0.3px;color:var(--editor-text-main);font-family:var(--font-main, 'Outfit', sans-serif);">Floor Editor</h1>
-      <div class="text-muted text-truncate d-none d-sm-block" style="font-size:0.72rem;letter-spacing:0.3px;font-family:var(--font-main, 'Outfit', sans-serif);">{{ request.user.outlet.name }}</div>
-    </div>
-  </a>
-</div>
-{% endblock %}
 
 {% block header_right %}
 <div class="action-group d-none d-md-flex align-items-center flex-wrap gap-2">
@@ -929,9 +1025,9 @@
   <!-- Primary Row: Back, Floor selector, and Prominent Save button -->
   <div class="editor-subbar-primary d-flex align-items-center justify-content-between gap-2" style="min-width:0;">
     <div class="d-flex align-items-center gap-2" style="min-width:0;">
-      <!-- Back to Floor Plan Button (Inside Screen) -->
-      <a href="/tables/" class="btn-subbar-pill text-decoration-none" title="Back to Floor Plan">
-        <i class="bi bi-arrow-left me-1"></i> <span class="d-none d-sm-inline">Back to Floor Plan</span><span class="d-inline d-sm-none">Back</span>
+      <!-- Back to Floor Plan Button (matches billing page's compact icon back button) -->
+      <a href="/tables/" class="editor-back-btn" title="Back to Floor Plan" aria-label="Back to Floor Plan">
+        <i class="bi bi-arrow-left" aria-hidden="true"></i>
       </a>
 
       <!-- Floor selector pill -->
@@ -977,9 +1073,6 @@
         <span id="zoomLevelLabel">100%</span>
       </button>
     </div>
-
-    <!-- Mobile Version Indicator -->
-    <span class="badge bg-secondary-subtle text-secondary d-md-none ms-auto" style="font-family:'Space Mono',monospace;font-size:0.65rem;" title="Floor Editor Build Version">v{{ APP_VERSION }}</span>
   </div>
 </div>
 
@@ -1161,7 +1254,7 @@
 
   <!-- ══════════════ MOBILE QUICK SHAPES BAR (MOBILE ONLY) ══════════════ -->
   <div class="mobile-quick-shapes-bar d-flex d-md-none" id="mobileQuickShapesBar">
-    <span class="quick-add-label"><i class="bi bi-plus-circle-fill text-danger me-1"></i>ADD:</span>
+    <span class="quick-add-label"><i class="bi bi-plus-circle-fill text-danger me-1"></i><span class="quick-add-label-text">ADD:</span></span>
     <button class="quick-shape-btn" onclick="addTableFromPalette('square')">
       <span class="shape-icon-sm shape-square-sm"></span> Square
     </button>
@@ -1478,42 +1571,55 @@
       const modal = bootstrap.Modal.getInstance(modalEl);
       if (modal) modal.hide();
     }
-    ui.toast('Canvas dimensions updated', 'success');
+    ui.toast('Canvas dimensions updated', 'success', { containerClass: 'editor-toast-container' });
   };
 
   // ── Add New Section Prompt ────────────────────────────────────────────────
-  window.promptAddSection = function() {
-    Swal.fire({
-      title: 'New Floor / Section',
-      input: 'text',
-      inputPlaceholder: 'e.g. Patio, 1st Floor, Terrace',
-      showCancelButton: true,
-      confirmButtonText: 'Add Floor',
-      confirmButtonColor: '#EC2734',
-    }).then(res => {
-      if (res.isConfirmed && res.value && res.value.trim()) {
-        const newSec = res.value.trim();
-        if (!sectionsData[newSec]) {
-          sectionsData[newSec] = { name: newSec, width: 900, height: 500, grid_size: 40 };
+  // Uses the shared ui.prompt() helper (same one already driving the
+  // discount/float/refund-reason prompts elsewhere) instead of a hand-rolled
+  // Swal.fire, so this gets the exact same proven premium styling and
+  // mobile behavior with no risk of divergence.
+  window.promptAddSection = async function() {
+    try {
+      const value = await ui.prompt('New Floor / Section', '', '', {
+        confirmText: 'Add Floor',
+        placeholder: 'e.g. Patio, 1st Floor, Terrace',
+        popupClass: 'editor-add-floor-modal'
+      });
+      if (!value || !value.trim()) return;
 
-          if (floorSelector) {
-            const opt = document.createElement('option');
-            opt.value = newSec;
-            opt.textContent = newSec;
-            floorSelector.appendChild(opt);
-          }
-          if (floorSelectorSidebar) {
-            const optSide = document.createElement('option');
-            optSide.value = newSec;
-            optSide.textContent = newSec;
-            floorSelectorSidebar.appendChild(optSide);
-          }
+      const newSec = value.trim();
+      const alreadyExists = !!sectionsData[newSec];
+
+      if (!alreadyExists) {
+        sectionsData[newSec] = { name: newSec, width: 900, height: 500, grid_size: 40 };
+
+        if (floorSelector && !floorSelector.querySelector(`option[value="${CSS.escape(newSec)}"]`)) {
+          const opt = document.createElement('option');
+          opt.value = newSec;
+          opt.textContent = newSec;
+          floorSelector.appendChild(opt);
         }
-        if (floorSelector) floorSelector.value = newSec;
-        if (floorSelectorSidebar) floorSelectorSidebar.value = newSec;
-        switchSection(newSec);
+        if (floorSelectorSidebar && !floorSelectorSidebar.querySelector(`option[value="${CSS.escape(newSec)}"]`)) {
+          const optSide = document.createElement('option');
+          optSide.value = newSec;
+          optSide.textContent = newSec;
+          floorSelectorSidebar.appendChild(optSide);
+        }
       }
-    });
+      if (floorSelector) floorSelector.value = newSec;
+      if (floorSelectorSidebar) floorSelectorSidebar.value = newSec;
+      await switchSection(newSec);
+
+      ui.toast(
+        alreadyExists ? `Switched to "${newSec}"` : `Floor "${newSec}" added — remember to Save`,
+        'success',
+        { containerClass: 'editor-toast-container' }
+      );
+    } catch (err) {
+      console.error('promptAddSection failed:', err);
+      ui.toast('Could not add floor: ' + err.message, 'error', { containerClass: 'editor-toast-container' });
+    }
   };
 
   // ── Render Tables on Canvas ────────────────────────────────────────────────
@@ -1983,7 +2089,7 @@
             }
           });
         }
-        ui.toast('Floor layout saved!', 'success');
+        ui.toast('Floor layout saved!', 'success', { containerClass: 'editor-toast-container' });
       } else {
         Swal.fire('Error', res.error || 'Could not save floor layout', 'error');
       }
@@ -2020,7 +2126,7 @@
   window.simulateAction = function(actionType) {
     const currentTables = allTables.filter(t => (t.section || 'Main Hall') === currentSection && t.shape !== 'wall');
     if (currentTables.length === 0) {
-      ui.toast('No tables available on this floor to simulate', 'warning');
+      ui.toast('No tables available on this floor to simulate', 'warning', { containerClass: 'editor-toast-container' });
       return;
     }
 
@@ -2030,12 +2136,12 @@
       if (targetTable.qr_token) {
         window.open(`/menu/digital-menu/?table_token=${targetTable.qr_token}`, '_blank');
       } else {
-        ui.toast('Table token not found. Save layout first.', 'info');
+        ui.toast('Table token not found. Save layout first.', 'info', { containerClass: 'editor-toast-container' });
       }
     } else if (actionType === 'upi_delivery' || actionType === 'cod_delivery' || actionType === 'takeaway') {
       window.location.href = `/billing/?source=${actionType.includes('delivery') ? 'delivery' : 'takeaway'}`;
     } else if (actionType === 'waiter_call') {
-      ui.toast(`Simulated: Waiter called from Table ${targetTable.name}`, 'info');
+      ui.toast(`Simulated: Waiter called from Table ${targetTable.name}`, 'info', { containerClass: 'editor-toast-container' });
     }
   };
 

@@ -32,6 +32,11 @@
         overflow-x: hidden;
     }
 
+    /* Kitchen uses direct actions, so the global overflow trigger is unnecessary. */
+    #pos-topbar .topbar-more-btn { display: none !important; }
+    #pos-topbar .topbar-more-wrap,
+    #pos-topbar .topbar-more-menu { display: contents !important; }
+
     /* ── Sub-Header Bar (KimiPoS POS Layout) ──────────────────── */
     .pos-subbar {
         display: flex;
@@ -42,6 +47,15 @@
         padding: 0.9rem 1.5rem 0.5rem;
         background: var(--bg-color);
     }
+    .kds-page-heading { min-width: 0; }
+    .kds-page-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    .kds-mobile-tools { display: contents; }
     .pos-subbar-title {
         font-size: 1.35rem;
         font-weight: 800;
@@ -126,6 +140,16 @@
         background: var(--pos-red-soft);
         color: var(--pos-red);
         transform: translateY(-1px);
+    }
+    .kds-pill-btn.danger {
+        color: var(--pos-red);
+        border-color: var(--pos-red-border);
+        background: var(--pos-red-soft);
+    }
+    .kds-pill-btn.danger:hover {
+        color: #fff;
+        background: var(--pos-red);
+        border-color: var(--pos-red);
     }
 
     /* ── Station tabs ─────────────────────────────────── */
@@ -481,49 +505,114 @@
 
     /* ── Mobile ──────────────────────────────────────── */
     @media (max-width: 576px) {
-        .pos-subbar { padding: 0.75rem 1rem 0.25rem; }
-        .kds-station-container { padding: 0 1rem; }
-        .orders-grid { padding: 0.75rem 1rem 2rem; }
-        .item-row { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
-        .action-cell { margin-left: 0; width: 100%; }
-        .btn-status, .badge-done { padding: 0.8rem; font-size: 0.88rem; min-height: 44px; }
+        .pos-subbar {
+            padding: 0.65rem 0.75rem 0.35rem;
+            align-items: stretch;
+            gap: 8px;
+        }
+        .kds-page-heading { width: 100%; }
+        .pos-subbar-title { font-size: 1.08rem; letter-spacing: -0.25px; }
+        .pos-breadcrumbs {
+            flex-wrap: wrap;
+            row-gap: 2px;
+            font-size: 0.66rem;
+        }
+        .kds-page-actions {
+            width: 100%;
+            display: block;
+        }
+        .kds-page-actions .kds-status-pill {
+            width: 100%;
+            min-height: 38px;
+            justify-content: center;
+            padding: 5px 10px;
+            font-size: 0.72rem;
+        }
+        .kds-mobile-tools {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 7px;
+            padding: 1px 1px 4px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x proximity;
+        }
+        .kds-mobile-tools::-webkit-scrollbar { display: none; }
+        .kds-mobile-tools .kds-pill-btn {
+            flex: 0 0 auto;
+            min-height: 38px;
+            justify-content: center;
+            padding: 6px 8px;
+            font-size: 0.7rem;
+            box-shadow: none;
+            scroll-snap-align: start;
+        }
+        #kdsFullscreenBtn { display: none !important; }
+        .kds-pill-btn:hover,
+        .order-card:hover { transform: none; }
+        .kds-station-container { padding: 0 0.75rem; margin-top: 0.1rem; }
+        .station-tabs { gap: 0.4rem; border-radius: 13px; padding: 0.38rem; }
+        .station-btn {
+            min-height: 36px;
+            padding: 0.38rem 0.75rem;
+            font-size: 0.7rem;
+            gap: 3px;
+        }
+        .orders-grid { padding: 0.55rem 0.75rem 4rem; }
+        #orders { --bs-gutter-x: 0.7rem; --bs-gutter-y: 0.7rem; }
+        .order-card { border-radius: 15px; box-shadow: 0 3px 14px rgba(0, 0, 0, 0.055); }
+        .order-header { padding: 0.72rem 0.78rem; gap: 8px; }
+        .table-name { font-size: 1.08rem; letter-spacing: -0.25px; }
+        .kot-num { font-size: 0.62rem; padding: 2px 6px; }
+        .timer { font-size: 0.7rem; padding: 0.3rem 0.55rem; }
+        .items-container { padding: 0.7rem 0.78rem; gap: 0.55rem; }
+        .item-row {
+            flex-direction: row;
+            align-items: center;
+            gap: 0.45rem;
+            padding-bottom: 0.55rem;
+        }
+        .item-row > .d-flex { min-width: 0; flex: 1 1 auto; }
+        .item-qty-badge {
+            min-width: 28px;
+            width: 28px;
+            height: 28px;
+            margin-right: 8px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+        }
+        .item-name { font-size: 0.82rem; line-height: 1.2; }
+        .item-note { font-size: 0.66rem; padding: 2px 6px; margin-top: 3px; }
+        .action-cell { margin-left: 0.25rem; width: auto; min-width: 88px; }
+        .btn-status, .badge-done {
+            padding: 0.4rem 0.55rem;
+            font-size: 0.68rem;
+            min-height: 38px;
+            letter-spacing: 0.25px;
+        }
+        .btn-bump { min-height: 46px; padding: 0.7rem; font-size: 0.78rem; border-radius: 0 0 14px 14px; }
+        .btn-bump-all-done { padding: 0.65rem; font-size: 0.72rem; border-radius: 0 0 14px 14px; }
+        .empty-state, .loading-state { padding: 3rem 1rem; }
+    }
+
+    @media (max-width: 380px) {
+        .pos-breadcrumbs .separator { display: none; }
+        .pos-breadcrumbs { gap: 8px; }
+        .action-cell { min-width: 80px; }
+        .btn-status, .badge-done { font-size: 0.64rem; padding-inline: 0.42rem; }
     }
 </style>
 {% endblock %}
 
-{% block header_left %}
-<div class="d-flex align-items-center gap-2">
-  <a href="/dashboard/" class="d-flex align-items-center gap-2 text-decoration-none" style="color:inherit;">
-    <span class="topbar-page-title d-flex align-items-center gap-2">
-      <i class="bi bi-fire" style="color:var(--pos-red, #EC2734);"></i>
-      <span>Kitchen Display</span>
-    </span>
-  </a>
-  <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle ms-1 d-none d-sm-inline-flex" style="font-size:0.68rem; font-weight:700; padding:2px 8px;">KDS LIVE</span>
-</div>
-{% endblock %}
-
-{% block header_right %}
-{% if request.user.role == 'owner' or request.user.role == 'manager' %}
-<button class="btn-subbar-pill text-danger border-danger-subtle d-none d-sm-inline-flex" onclick="clearAllKitchen()" title="Clear every ticket off this screen">
-    <i class="bi bi-trash3"></i> Clear All
-</button>
-<button class="btn-icon text-danger d-sm-none" onclick="clearAllKitchen()" title="Clear All"><i class="bi bi-trash3"></i></button>
-{% endif %}
-
-<button class="btn-icon" onclick="toggleKitchenSound()" title="Toggle Sound Alerts" id="kdsSoundBtn">
-    <i class="bi bi-volume-up-fill" id="kdsSoundIcon" style="color:var(--pos-green, #10b981);"></i>
-</button>
-
-<button class="btn-icon" onclick="posToggleFullScreen()" title="Fullscreen Mode" id="kdsFullscreenBtn">
-    <i class="bi bi-fullscreen"></i>
-</button>
-{% endblock %}
+{% block header_left %}{% endblock %}
+{% block header_right %}{% endblock %}
 
 {% block content %}
 <!-- Sub-Header Bar (KDS Controls) -->
 <div class="pos-subbar">
-    <div class="d-flex flex-column">
+    <div class="d-flex flex-column kds-page-heading">
         <h1 class="pos-subbar-title d-flex align-items-center gap-2">
             <i class="bi bi-egg-fried" style="color:var(--pos-red, #EC2734);"></i>
             <span>Kitchen Display System</span>
@@ -537,24 +626,38 @@
         </div>
     </div>
 
-    <div class="d-flex align-items-center gap-2 flex-wrap">
+    <div class="kds-page-actions">
         <!-- Active Tickets Pill -->
         <div class="kds-status-pill" id="activeTicketsBadge">
             <span class="pulse-dot"></span>
             <span id="activeTicketCountText">0 Active Tickets</span>
         </div>
 
-        <!-- Sound Toggle Pill -->
-        <button class="kds-pill-btn" onclick="toggleKitchenSound()" id="kdsSoundPill">
-            <i class="bi bi-volume-up-fill text-success" id="kdsSoundPillIcon"></i>
-            <span id="kdsSoundPillText">Sound On</span>
-        </button>
+        <div class="kds-mobile-tools" aria-label="Kitchen tools">
+            <!-- Sound Toggle Pill -->
+            <button class="kds-pill-btn" onclick="toggleKitchenSound()" id="kdsSoundPill">
+                <i class="bi bi-volume-up-fill text-success" id="kdsSoundPillIcon"></i>
+                <span id="kdsSoundPillText">Sound On</span>
+            </button>
 
-        <!-- Live Sync status -->
-        <button class="kds-pill-btn" onclick="loadKitchen(true)" title="Tap to refresh now">
-            <i class="bi bi-arrow-repeat" id="syncSpinner"></i>
-            <span id="syncText">Sync Now</span>
-        </button>
+            <!-- Live Sync status -->
+            <button class="kds-pill-btn" onclick="loadKitchen(true)" title="Tap to refresh now">
+                <i class="bi bi-arrow-repeat" id="syncSpinner"></i>
+                <span id="syncText">Sync Now</span>
+            </button>
+
+            <button class="kds-pill-btn" onclick="posToggleFullScreen()" title="Fullscreen Mode" id="kdsFullscreenBtn">
+                <i class="bi bi-fullscreen"></i>
+                <span>Fullscreen</span>
+            </button>
+
+            {% if request.user.role == 'owner' or request.user.role == 'manager' %}
+            <button class="kds-pill-btn danger" onclick="clearAllKitchen()" title="Clear every ticket off this screen">
+                <i class="bi bi-trash3"></i>
+                <span>Clear All</span>
+            </button>
+            {% endif %}
+        </div>
     </div>
 </div>
 

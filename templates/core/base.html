@@ -226,16 +226,95 @@
         .lux-toast-success .swal2-icon.swal2-success { border-color: #16a34a !important; color: #16a34a !important; }
         .lux-toast-success .swal2-icon.swal2-success [class^="swal2-success-line"] { background-color: #16a34a !important; }
         .lux-toast-success .swal2-icon.swal2-success .swal2-success-ring { border-color: rgba(22,163,74,0.3) !important; }
+        .lux-toast-success .swal2-timer-progress-bar { background: #16a34a !important; }
+
+        /* Kitchen dispatch gets a small status eyebrow so the confirmation is
+           instantly recognisable during a busy service without making the
+           mobile toast taller or wider than the available viewport. */
+        .lux-toast-kitchen.swal2-popup {
+            border: 1px solid rgba(22, 163, 74, 0.22) !important;
+            border-left: 4px solid #16a34a !important;
+            background:
+                linear-gradient(135deg, rgba(22, 163, 74, 0.075), transparent 52%),
+                var(--panel-bg) !important;
+            box-shadow: 0 16px 38px rgba(15, 23, 42, 0.2), 0 5px 14px rgba(22, 163, 74, 0.1) !important;
+        }
+        .lux-toast-kitchen .swal2-title::before {
+            content: "KITCHEN UPDATED";
+            display: block;
+            margin-bottom: 0.08rem;
+            color: #15803d;
+            font-size: 0.61rem;
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: 0.1em;
+        }
+        .lux-toast-kitchen.lux-toast-acknowledged .swal2-title::before {
+            content: "ALERT ACKNOWLEDGED";
+        }
+        /* SweetAlert's success artwork is built for its large modal icon and
+           becomes distorted when compressed into a compact toast. Use a
+           purpose-built check badge for a crisp result at every pixel ratio. */
+        .lux-toast-kitchen .swal2-icon.swal2-success {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 32px !important;
+            height: 32px !important;
+            min-width: 32px !important;
+            margin: 0 !important;
+            border: 0 !important;
+            border-radius: 11px !important;
+            background: rgba(22, 163, 74, 0.13) !important;
+            color: #15803d !important;
+        }
+        .lux-toast-kitchen .swal2-icon.swal2-success > * {
+            display: none !important;
+        }
+        .lux-toast-kitchen .swal2-icon.swal2-success::before {
+            content: "\2713";
+            display: block;
+            font-family: Arial, sans-serif;
+            font-size: 1.05rem;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        @media (max-width: 991px) {
+            /* Kitchen confirmations live below the app header on phones and
+               tablets. This keeps them completely clear of the mobile cart,
+               its action buttons, and the persistent View Order bar. */
+            body .lux-toast-kitchen-container.swal2-container {
+                padding: calc(10px + env(safe-area-inset-top)) 12px 0 !important;
+                align-items: flex-start !important;
+                justify-content: center !important;
+                justify-items: center !important;
+                pointer-events: none !important;
+            }
+            body .lux-toast-kitchen.swal2-popup {
+                width: min(420px, calc(100vw - 24px)) !important;
+                min-height: 62px !important;
+                margin: 0 auto !important;
+                justify-self: center !important;
+                border: 1px solid rgba(22, 163, 74, 0.28) !important;
+                border-radius: 18px !important;
+                box-shadow: 0 18px 42px rgba(15, 23, 42, 0.2), 0 6px 16px rgba(22, 163, 74, 0.13) !important;
+                pointer-events: auto !important;
+            }
+        }
 
         .lux-toast-error { border-left-color: #dc2626; }
         .lux-toast-error .swal2-icon.swal2-error { border-color: #dc2626 !important; color: #dc2626 !important; }
         .lux-toast-error .swal2-icon.swal2-error [class^="swal2-x-mark-line"] { background-color: #dc2626 !important; }
+        .lux-toast-error .swal2-timer-progress-bar { background: #dc2626 !important; }
 
-        .lux-toast-warning { border-left-color: var(--accent-gold); }
-        .lux-toast-warning .swal2-icon.swal2-warning { border-color: var(--accent-gold) !important; color: var(--accent-gold) !important; }
+        .lux-toast-warning { border-left-color: #f59e0b; }
+        .lux-toast-warning .swal2-icon.swal2-warning { border-color: #f59e0b !important; color: #f59e0b !important; }
+        .lux-toast-warning .swal2-timer-progress-bar { background: #f59e0b !important; }
 
         .lux-toast-info { border-left-color: #3b82f6; }
         .lux-toast-info .swal2-icon.swal2-info { border-color: #3b82f6 !important; color: #3b82f6 !important; }
+        .lux-toast-info .swal2-timer-progress-bar { background: #3b82f6 !important; }
 
         /* Slides in from bottom-end (where ui.toast places it) instead of
            SweetAlert2's default fade+shrink, and reverses on close. */
@@ -253,8 +332,65 @@
             from { transform: translateX(0);    opacity: 1; }
             to   { transform: translateX(120%); opacity: 0; }
         }
-        @media (max-width: 480px) {
-            .lux-toast.swal2-popup { min-width: 0; max-width: calc(100vw - 2rem); }
+        @media (max-width: 576px) {
+            .lux-toast-container.swal2-container {
+                padding: 0 12px calc(12px + env(safe-area-inset-bottom)) !important;
+            }
+            .lux-toast.swal2-popup {
+                width: calc(100vw - 24px) !important;
+                min-width: 0 !important;
+                max-width: none !important;
+                min-height: 58px !important;
+                gap: 0.65rem !important;
+                padding: 0.68rem 0.85rem 0.68rem 0.72rem !important;
+                border: 1px solid var(--border-color) !important;
+                border-left-width: 4px !important;
+                border-radius: 17px !important;
+                box-shadow: 0 16px 38px rgba(15, 18, 26, 0.22), 0 4px 12px rgba(15, 18, 26, 0.1) !important;
+                backdrop-filter: blur(16px) saturate(145%);
+                -webkit-backdrop-filter: blur(16px) saturate(145%);
+            }
+            .lux-toast.lux-toast-success { border-left-color: #16a34a !important; }
+            .lux-toast.lux-toast-error   { border-left-color: #dc2626 !important; }
+            .lux-toast.lux-toast-warning { border-left-color: #f59e0b !important; }
+            .lux-toast.lux-toast-info    { border-left-color: #3b82f6 !important; }
+            .lux-toast .swal2-title {
+                font-size: 0.8rem !important;
+                font-weight: 650 !important;
+                line-height: 1.32 !important;
+                letter-spacing: 0 !important;
+            }
+            .lux-toast .swal2-icon {
+                width: 28px !important;
+                height: 28px !important;
+                min-width: 28px !important;
+                border-width: 1.5px !important;
+            }
+            .lux-toast .swal2-icon-content { font-size: 0.92rem !important; }
+            .lux-toast .swal2-timer-progress-bar {
+                height: 3px !important;
+                border-radius: 999px !important;
+            }
+            .lux-toast-in.swal2-show {
+                animation: luxToastMobileIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+            }
+            .lux-toast-out.swal2-hide {
+                animation: luxToastMobileOut 0.2s ease-in both !important;
+            }
+            @keyframes luxToastMobileIn {
+                from { transform: translateY(120%) scale(0.97); opacity: 0; }
+                to   { transform: translateY(0) scale(1); opacity: 1; }
+            }
+            @keyframes luxToastMobileOut {
+                from { transform: translateY(0) scale(1); opacity: 1; }
+                to   { transform: translateY(50%) scale(0.98); opacity: 0; }
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .lux-toast-in.swal2-show,
+            .lux-toast-out.swal2-hide {
+                animation: none !important;
+            }
         }
 
         /* ===================================================
@@ -986,6 +1122,7 @@
 
         /* ── Sidebar Promo / Summary Card ────────────────── */
         .sidebar-promo-card {
+            display: block;
             margin: 0.45rem 0.75rem 0.55rem;
             padding: 0.75rem;
             background: linear-gradient(135deg, rgba(236,39,52,0.08) 0%, rgba(250,115,39,0.06) 100%);
@@ -993,6 +1130,18 @@
             border-radius: 12px;
             flex-shrink: 0;
             overflow: hidden;
+            color: inherit;
+            text-decoration: none;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+        }
+        .sidebar-promo-card:hover {
+            border-color: rgba(236,39,52,0.32);
+            box-shadow: 0 7px 20px rgba(236,39,52,0.09);
+            transform: translateY(-1px);
+        }
+        .sidebar-promo-card:focus-visible {
+            outline: 3px solid rgba(236,39,52,0.22);
+            outline-offset: 2px;
         }
         .sidebar-promo-card .promo-title {
             font-size: 0.72rem;
@@ -1159,8 +1308,8 @@
            any page-specific action buttons) collapse into a single "more"
            button that opens a small floating panel. Two things are
            deliberately kept OUTSIDE this menu, always visible in the row
-           itself: the user avatar/role badge (shouldn't need an extra tap
-           to confirm who's logged in), and header_notifications (.topbar-
+           itself: the shared role badge (shouldn't need an extra tap to
+           confirm the active access level), and header_notifications (.topbar-
            notif-slot below) -- those carry live unread counts (calls, QR
            orders, low stock), so burying them would mean silently missing
            something that needs attention. Desktop is unaffected:
@@ -1308,14 +1457,14 @@
             justify-content: center !important;
         }
 
-        /* ── User Avatar / Role Badge in Header ──────────── */
+        /* ── Shared Role Badge in Header ─────────────────── */
         .user-role-badge {
             display: inline-flex;
             align-items: center;
-            gap: 0.4rem;
+            gap: 0;
             height: 34px;
             box-sizing: border-box;
-            padding: 0 0.7rem 0 0.35rem;
+            padding: 0 0.3rem;
             background: var(--surface-2);
             border: 1px solid var(--border-color);
             border-radius: 999px;
@@ -1328,20 +1477,6 @@
         .user-role-badge:hover {
             border-color: rgba(236, 39, 52, 0.3);
             background: var(--sidebar-active-bg);
-        }
-        .user-avatar-circle {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: var(--accent-gold);
-            color: #ffffff;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.62rem;
-            font-weight: 800;
-            flex-shrink: 0;
-            text-transform: uppercase;
         }
         .user-role-tag {
             display: inline-flex;
@@ -1363,17 +1498,6 @@
         .user-role-tag.role-waiter   { background: rgba(245, 158, 11, 0.12); color: #b45309; border: 1px solid rgba(245, 158, 11, 0.3); }
         .user-role-tag.role-chef,
         .user-role-tag.role-kitchen  { background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3); }
-
-        .user-name-text {
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: var(--text-main);
-            max-width: 100px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
         /* ── Universal Subbar Navigation Pill Button ─────── */
         .btn-subbar-pill {
             display: inline-flex;
@@ -1449,12 +1573,50 @@
             }
             #pos-sidebar .sidebar-outlet-card,
             #pos-sidebar .sidebar-search-wrap,
-            #pos-sidebar .sidebar-section-title,
-            #pos-sidebar .sidebar-promo-card {
+            #pos-sidebar .sidebar-section-title {
                 display: flex !important;
                 opacity: 1 !important;
                 pointer-events: auto !important;
             }
+            #pos-sidebar .sidebar-promo-card {
+                display: grid !important;
+                grid-template-columns: minmax(0, 1fr) 38px;
+                grid-template-rows: auto auto;
+                align-items: center;
+                column-gap: 0.7rem;
+                margin: 0.45rem 0.6rem 0.55rem;
+                padding: 0.72rem 0.75rem;
+                min-height: 72px;
+                border-radius: 16px;
+                opacity: 1 !important;
+                pointer-events: auto !important;
+            }
+            #pos-sidebar .sidebar-promo-card .promo-title {
+                grid-column: 1;
+                grid-row: 1;
+                margin: 0 0 0.16rem;
+                font-size: 0.72rem;
+                line-height: 1.2;
+            }
+            #pos-sidebar .sidebar-promo-card .promo-sub {
+                grid-column: 1;
+                grid-row: 2;
+                margin: 0;
+                font-size: 0.6rem;
+                line-height: 1.3;
+            }
+            #pos-sidebar .sidebar-promo-card .promo-btn {
+                grid-column: 2;
+                grid-row: 1 / 3;
+                width: 38px;
+                height: 38px;
+                padding: 0;
+                border-radius: 12px;
+                justify-content: center;
+                font-size: 0.78rem;
+                box-shadow: 0 5px 14px rgba(236, 39, 52, 0.22);
+            }
+            #pos-sidebar .sidebar-promo-card .promo-btn-label { display: none; }
             #pos-sidebar .sidebar-item {
                 justify-content: flex-start !important;
                 padding-left: 0.8rem !important;
@@ -1600,11 +1762,11 @@
 
                 {# Dashboard — owners / managers / superuser #}
                 {% if request.user.role in "owner,manager" or request.user.is_superuser %}
-                <a href="/dashboard/"
-                   class="sidebar-item {% if p == '/dashboard/' or p == '/dashboard' %}active{% endif %}"
-                   data-label="Dashboard">
+                <a href="{% if request.user.is_superuser %}{% url 'portal:home' %}{% else %}/dashboard/{% endif %}"
+                   class="sidebar-item {% if request.user.is_superuser and '/portal' in p %}active{% elif p == '/dashboard/' or p == '/dashboard' %}active{% endif %}"
+                   data-label="{% if request.user.is_superuser %}Superuser Home{% else %}Dashboard{% endif %}">
                     <i class="bi bi-speedometer2"></i>
-                    <span class="sidebar-label">Dashboard</span>
+                    <span class="sidebar-label">{% if request.user.is_superuser %}Superuser Home{% else %}Dashboard{% endif %}</span>
                 </a>
                 {% endif %}
 
@@ -1738,7 +1900,7 @@
 
                 {# Inventory #}
                 {% if request.user.role in "owner,manager,chef" or request.user.is_superuser %}
-                <a href="/inventory/"
+                <a href="{% url 'inventory_board' %}"
                    class="sidebar-item {% if '/inventory' in p %}active{% endif %}"
                    data-label="Inventory">
                     <i class="bi bi-boxes"></i>
@@ -1869,13 +2031,13 @@
 
                 <!-- Revenue summary mini card (inside scroll area so it doesn't block viewport) -->
                 {% if request.user.role in "owner,manager" or request.user.is_superuser %}
-                <div class="sidebar-promo-card">
+                <a href="/reports/dashboard/" class="sidebar-promo-card" aria-label="Open today's revenue and performance report">
                     <div class="promo-title">📊 Today's Summary</div>
                     <div class="promo-sub">View your full revenue & performance report.</div>
-                    <a href="/reports/dashboard/" class="promo-btn">
-                        <i class="bi bi-bar-chart-fill"></i> View Report
-                    </a>
-                </div>
+                    <span class="promo-btn" aria-hidden="true">
+                        <i class="bi bi-bar-chart-fill"></i><span class="promo-btn-label">View Report</span>
+                    </span>
+                </a>
                 {% endif %}
 
                 {% endwith %}
@@ -1961,9 +2123,6 @@
 
                 <!-- Right-side controls -->
                 <div class="topbar-right d-flex align-items-center gap-2 flex-nowrap ms-auto">
-                    <!-- Build version badge (live confirmation on every page/mobile) -->
-                    <span class="topbar-version-badge" title="Build version {{ APP_VERSION }}">v{{ APP_VERSION }}</span>
-
                     <!-- Overflow menu: on desktop this renders inline exactly as
                          before (the trigger button below is hidden). On mobile
                          it becomes a toggled dropdown instead of a horizontally
@@ -2003,24 +2162,8 @@
                     {% endblock %}
                     </div>
 
-                    {% if request.user.is_authenticated %}
-                    <!-- User Avatar + Role Badge (Always Top Right Last) -->
-                    <div class="user-role-badge" title="Logged in as {{ request.user.username }} ({{ request.user.get_role_display|default:request.user.role }})">
-                        <span class="user-avatar-circle">{{ request.user.username|slice:":2"|upper }}</span>
-                        <span class="user-role-tag role-{{ request.user.role }}">
-                            {% if request.user.role == 'owner' %}<i class="bi bi-shield-shaded me-1"></i>Owner
-                            {% elif request.user.role == 'manager' %}<i class="bi bi-person-gear me-1"></i>Manager
-                            {% elif request.user.role == 'cashier' %}<i class="bi bi-cash me-1"></i>Cashier
-                            {% elif request.user.role == 'captain' %}<i class="bi bi-award me-1"></i>Captain
-                            {% elif request.user.role == 'waiter' %}<i class="bi bi-bell me-1"></i>Waiter
-                            {% elif request.user.role == 'chef' %}<i class="bi bi-egg-fried me-1"></i>Chef
-                            {% elif request.user.role == 'kitchen' %}<i class="bi bi-fire me-1"></i>Kitchen
-                            {% else %}<i class="bi bi-person me-1"></i>{{ request.user.role|title }}
-                            {% endif %}
-                        </span>
-                        <span class="user-name-text d-none d-md-inline">{{ request.user.username }}</span>
-                    </div>
-                    {% endif %}
+                    <!-- Shared role-only identity (Always Top Right Last) -->
+                    {% include "core/_user_role_badge.html" %}
                 </div>
             </header><!-- /#pos-topbar -->
 
@@ -2280,16 +2423,18 @@
 
         // --- 3. Global UI Helpers (KimiPoS Luxury Component System) ---
         const ui = {
-            toast(message, icon = 'info') {
+            toast(message, icon = 'info', options = {}) {
+                const extraClass = options.className ? ` ${options.className}` : '';
+                const containerClass = options.containerClass ? ` ${options.containerClass}` : '';
                 const Toast = Swal.mixin({
                     toast: true,
-                    position: "bottom-end",
+                    position: options.position || "bottom-end",
                     showConfirmButton: false,
-                    timer: 3500,
+                    timer: options.timer || 3500,
                     timerProgressBar: true,
                     showClass: { popup: 'lux-toast-in' },
                     hideClass: { popup: 'lux-toast-out' },
-                    customClass: { popup: `lux-toast lux-toast-${icon}`, container: 'lux-toast-container' },
+                    customClass: { popup: `lux-toast lux-toast-${icon}${extraClass}`, container: `lux-toast-container${containerClass}` },
                     didOpen: (toast) => {
                         toast.onmouseenter = Swal.stopTimer;
                         toast.onmouseleave = Swal.resumeTimer;
@@ -2376,15 +2521,16 @@
                 return Boolean(swalRes.isConfirmed);
             },
 
-            async prompt(title, text = '', defaultValue = '') {
+            async prompt(title, text = '', defaultValue = '', options = {}) {
                 const isDark = typeof themeManager !== 'undefined' ? themeManager.isDark() : document.documentElement.classList.contains('dark');
                 const swalRes = await Swal.fire({
                     title: title,
                     text: text,
                     input: 'text',
                     inputValue: defaultValue,
+                    inputPlaceholder: options.placeholder || undefined,
                     showCancelButton: true,
-                    confirmButtonText: 'Submit',
+                    confirmButtonText: options.confirmText || 'Submit',
                     cancelButtonText: 'Cancel',
                     buttonsStyling: false,
                     showCloseButton: true,
@@ -2392,7 +2538,7 @@
                     color: isDark ? '#ffffff' : '#0f172a',
                     customClass: {
                         container: 'lux-confirm-backdrop',
-                        popup: 'lux-modal swal2-popup',
+                        popup: `lux-modal swal2-popup${options.popupClass ? ' ' + options.popupClass : ''}`,
                         title: 'lux-modal-title',
                         htmlContainer: 'lux-modal-text',
                         actions: 'lux-modal-actions',
@@ -2999,7 +3145,7 @@
         // postMessage listener to wire up here).
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
+                navigator.serviceWorker.register('/sw.js?v=6', { scope: '/' }).catch(() => {});
             });
         }
 

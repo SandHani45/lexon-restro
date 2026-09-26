@@ -40,6 +40,19 @@ def ai_import_menu(self, tenant_id, outlet_id, text, image_b64, mime_type):
             text=text, image_bytes=image_bytes, mime_type=mime_type
         )
 
+        has_readable_items = any(
+            (item.get("name") or "").strip()
+            for entry in structured_data
+            for item in entry.get("items", [])
+        )
+        if not has_readable_items:
+            cache.set(cache_key, {
+                "status": "error",
+                "error": "No menu items could be read from this image. Use a clear, "
+                         "well-lit photo with the item names and prices in focus.",
+            }, CACHE_TTL)
+            return
+
         imported_count = 0
         _cat_cache = {}
 

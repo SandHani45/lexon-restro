@@ -165,11 +165,19 @@ def order_history_view(request):
     qs, is_restricted = _base_queryset(request)
     qs = _apply_filters(qs, request.GET, is_restricted)
 
-    # Summary stats for the filtered set (before pagination)
+    # Summary stats for the filtered set (before pagination).
+    # Deliberately does NOT aggregate Count("items") alongside these --
+    # combining a related-table Count with Count("id")/Sum() in one
+    # aggregate() call makes Django JOIN to OrderItem, and the resulting
+    # row fan-out multiplies total_orders and total_revenue by each
+    # order's item count (a well-known Django ORM gotcha). That's exactly
+    # why these were inflated/wrong -- a 3-item order was counted as 3
+    # orders with revenue counted 3x. total_items was never even used
+    # (not passed to the template), so it's dropped rather than "fixed
+    # with distinct=True", which wouldn't have saved the Sum() anyway.
     summary = qs.exclude(status="cancelled").aggregate(
         total_orders  = Count("id"),
         total_revenue = Sum("grand_total"),
-        total_items   = Count("items"),
     )
     total_revenue = summary["total_revenue"] or 0
     total_orders  = summary["total_orders"]  or 0

@@ -590,6 +590,295 @@
         color: #ffffff;
         transform: translateY(-1px);
     }
+
+    /* ── Mobile app layout ──────────────────────────────────────
+       Desktop keeps the full operations table. On phones each row becomes a
+       self-contained stock card so quantities and actions stay touch friendly
+       without horizontal page scrolling. */
+    @media (max-width: 767.98px) {
+        .pos-subbar {
+            display: block;
+            padding: 0.85rem 0.85rem 0.35rem;
+            overflow: hidden;
+        }
+        .pos-subbar-title {
+            gap: 7px;
+            font-size: 1.08rem;
+            letter-spacing: -0.25px;
+        }
+        .pos-subbar-title i { font-size: 1rem; }
+        .pos-breadcrumbs {
+            margin-top: 3px;
+            font-size: 0.68rem;
+        }
+        .pos-subbar > .d-flex {
+            flex-wrap: nowrap !important;
+            gap: 7px !important;
+            margin: 0.75rem -0.85rem 0;
+            padding: 0 0.85rem 0.45rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+            scroll-snap-type: x proximity;
+            -webkit-overflow-scrolling: touch;
+        }
+        .pos-subbar > .d-flex::-webkit-scrollbar { display: none; }
+        .btn-subbar-primary,
+        .btn-subbar-pill {
+            min-height: 38px;
+            flex: 0 0 auto;
+            padding: 0.45rem 0.78rem;
+            font-size: 0.72rem;
+            scroll-snap-align: start;
+            box-shadow: none;
+        }
+
+        .inventory-wrap {
+            padding: 0.55rem 0.75rem calc(5rem + env(safe-area-inset-bottom));
+        }
+        .inventory-wrap > .row {
+            --bs-gutter-x: 0.55rem;
+            --bs-gutter-y: 0.55rem;
+            margin-bottom: 0.85rem !important;
+        }
+        .kpi-card {
+            min-height: 88px;
+            padding: 0.78rem;
+            gap: 0.45rem;
+            border-radius: 16px;
+            box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+        }
+        .kpi-card:hover { transform: none; }
+        .kpi-label {
+            font-size: 0.58rem;
+            letter-spacing: 0.55px;
+        }
+        .kpi-value { font-size: 1.2rem; }
+        .kpi-sub {
+            max-width: 90px;
+            font-size: 0.62rem;
+        }
+        .kpi-badge-icon {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+        }
+
+        .inventory-alert-banner {
+            align-items: stretch;
+            padding: 0.85rem;
+            margin-bottom: 0.85rem;
+            border-radius: 16px;
+        }
+        .inventory-alert-banner > .d-flex { align-items: flex-start !important; }
+        .alert-icon-wrap {
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+        }
+        .inventory-alert-banner .btn-inventory-primary {
+            width: 100%;
+            min-height: 40px;
+            justify-content: center;
+        }
+
+        .inventory-toolbar {
+            display: block;
+            margin-bottom: 0.75rem;
+        }
+        .inventory-search-wrap {
+            max-width: none;
+            min-width: 0;
+            margin-bottom: 0.55rem;
+        }
+        .inventory-search-input {
+            height: 42px;
+            padding: 0.52rem 0.9rem 0.52rem 2.35rem;
+            font-size: 0.8rem;
+        }
+        .category-strip {
+            min-width: 0;
+            width: calc(100% + 0.75rem);
+            margin-right: -0.75rem;
+            padding: 0 0.75rem 0.35rem 0;
+            gap: 7px;
+            scrollbar-width: none;
+        }
+        .category-strip::-webkit-scrollbar { display: none; }
+        .category-pill {
+            min-height: 35px;
+            padding: 0.38rem 0.8rem;
+            font-size: 0.7rem;
+        }
+
+        .squircle-card {
+            background: transparent;
+            border: 0;
+            border-radius: 0;
+            box-shadow: none;
+            overflow: visible;
+        }
+        .table-responsive { overflow: visible; }
+        .table-modern,
+        .table-modern tbody { display: block; width: 100%; }
+        .table-modern thead { display: none; }
+        .table-modern tbody tr[data-item-row="true"] {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.65rem 0.9rem;
+            margin-bottom: 0.7rem;
+            padding: 0.9rem;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            box-shadow: 0 5px 18px rgba(15, 23, 42, 0.055);
+        }
+        .table-modern tbody tr[data-item-row="true"] td {
+            display: flex;
+            min-width: 0;
+            padding: 0;
+            border: 0;
+            background: transparent !important;
+        }
+        .table-modern tbody tr[data-item-row="true"] td:nth-child(1) {
+            grid-column: 1 / 3;
+            grid-row: 1;
+            display: block;
+            align-self: center;
+        }
+        .table-modern tbody tr[data-item-row="true"] td:nth-child(2) {
+            grid-column: 1 / 3;
+            grid-row: 2;
+            align-items: center;
+        }
+        .table-modern tbody tr[data-item-row="true"] td:nth-child(7) {
+            grid-column: 3;
+            grid-row: 1;
+            align-items: flex-start;
+            justify-content: flex-end;
+        }
+        .table-modern tbody tr[data-item-row="true"] td:nth-child(3),
+        .table-modern tbody tr[data-item-row="true"] td:nth-child(4),
+        .table-modern tbody tr[data-item-row="true"] td:nth-child(5),
+        .table-modern tbody tr[data-item-row="true"] td:nth-child(6) {
+            grid-row: 3;
+            flex-direction: column;
+            gap: 2px;
+            padding: 0.62rem 0.42rem;
+            background: var(--surface-2) !important;
+            border-radius: 11px;
+            text-align: center;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.76rem;
+        }
+        .table-modern tbody tr[data-item-row="true"] td:nth-child(3) { grid-column: 1; }
+        .table-modern tbody tr[data-item-row="true"] td:nth-child(4) { grid-column: 2; }
+        .table-modern tbody tr[data-item-row="true"] td:nth-child(5) { display: none; }
+        .table-modern tbody tr[data-item-row="true"] td:nth-child(6) { grid-column: 3; }
+        .table-modern tbody tr[data-item-row="true"] td:nth-child(3)::before,
+        .table-modern tbody tr[data-item-row="true"] td:nth-child(4)::before,
+        .table-modern tbody tr[data-item-row="true"] td:nth-child(6)::before {
+            content: attr(data-label);
+            color: var(--text-muted);
+            font-family: var(--font-main, 'Outfit', sans-serif);
+            font-size: 0.55rem;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: 0.55px;
+            text-transform: uppercase;
+        }
+        .table-modern tbody tr[data-item-row="true"] td:nth-child(4)::after {
+            content: " " attr(data-unit);
+            color: var(--text-muted);
+            font-family: var(--font-main, 'Outfit', sans-serif);
+            font-size: 0.65rem;
+            font-weight: 700;
+        }
+        .table-modern tbody tr[data-item-row="true"] td:nth-child(8) {
+            grid-column: 1 / -1;
+            grid-row: 4;
+            padding-top: 0.1rem;
+        }
+        .table-modern tbody tr[data-item-row="true"] td:nth-child(8) > .d-flex {
+            display: grid !important;
+            grid-template-columns: 68px repeat(3, minmax(0, 1fr));
+            width: 100%;
+            gap: 6px !important;
+        }
+        .qty-input {
+            width: 100%;
+            min-width: 0;
+            height: 38px;
+            padding: 0.3rem 0.45rem;
+            border-radius: 11px;
+            text-align: center;
+            font-size: 0.72rem;
+        }
+        .btn-table-action {
+            min-width: 0;
+            min-height: 38px;
+            justify-content: center;
+            padding: 0.35rem 0.3rem;
+            border-radius: 11px;
+            font-size: 0.66rem;
+        }
+        .table-modern tbody tr[data-item-row="true"] td:nth-child(9) {
+            grid-column: 3;
+            grid-row: 2;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .badge-status {
+            padding: 4px 7px;
+            font-size: 0.58rem;
+            letter-spacing: 0.25px;
+        }
+        .inventory-empty-row { display: block; }
+        .inventory-empty-row td {
+            display: block;
+            padding: 2.25rem 1rem !important;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color) !important;
+            border-radius: 18px;
+        }
+
+        .modal-dialog {
+            display: flex;
+            align-items: flex-end;
+            min-height: calc(100% - 0.5rem);
+            margin: 0.5rem 0 0;
+        }
+        .modal-content {
+            max-height: calc(100dvh - 0.5rem);
+            border-radius: 24px 24px 0 0 !important;
+        }
+        .modal-header {
+            padding: 1rem 1rem 0.85rem !important;
+        }
+        .modal-title { font-size: 1.02rem !important; }
+        .modal-body {
+            padding: 1rem !important;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+        .modal-footer {
+            padding: 0.8rem 1rem calc(0.8rem + env(safe-area-inset-bottom)) !important;
+        }
+        .modal .form-control,
+        .modal .form-select { min-height: 44px; }
+    }
+
+    @media (max-width: 374.98px) {
+        .inventory-wrap { padding-inline: 0.6rem; }
+        .kpi-card { padding: 0.66rem; }
+        .kpi-badge-icon { display: none; }
+        .btn-table-action { font-size: 0; }
+        .btn-table-action i { font-size: 0.82rem; }
+    }
 </style>
 {% endblock %}
 
@@ -801,8 +1090,8 @@
                             <span class="text-muted" style="font-size:0.82rem;">—</span>
                             {% endif %}
                         </td>
-                        <td class="mono-num text-muted">{{ CURRENCY_SYMBOL }}{{ item.cost_price }}</td>
-                        <td id="stock{{ item.id }}" class="mono-num fw-bold" style="color:var(--text-main);">
+                        <td class="mono-num text-muted" data-label="Cost / unit">{{ CURRENCY_SYMBOL }}{{ item.cost_price }}</td>
+                        <td id="stock{{ item.id }}" class="mono-num fw-bold" data-label="In stock" data-unit="{{ item.unit }}" style="color:var(--text-main);">
                             {{ item.stock }}
                         </td>
                         <td>
@@ -810,7 +1099,7 @@
                                 {{ item.unit }}
                             </span>
                         </td>
-                        <td class="mono-num" style="color:var(--pos-red);">
+                        <td class="mono-num" data-label="Stock value" style="color:var(--pos-red);">
                             {{ CURRENCY_SYMBOL }}{% widthratio item.cost_price 1 item.stock %}
                         </td>
                         <td>
@@ -845,7 +1134,7 @@
                         </td>
                     </tr>
                     {% empty %}
-                    <tr>
+                    <tr class="inventory-empty-row">
                         <td colspan="9" class="text-center py-5 text-muted">
                             <div class="py-4">
                                 <i class="bi bi-inboxes display-5 d-block mb-3 text-muted opacity-50"></i>
@@ -1117,11 +1406,7 @@ function restock(id) {
     const qtyInput = document.getElementById('add' + id);
     const qty = qtyInput ? qtyInput.value : '';
     if (!qty || parseFloat(qty) <= 0) {
-        if (window.ui && ui.toast) {
-            ui.toast('Please enter a valid quantity.', 'warning');
-        } else {
-            alert('Please enter a valid quantity.');
-        }
+        ui.toast('Please enter a valid quantity.', 'warning');
         return;
     }
     fetch(`/inventory/restock/${id}/`, {
@@ -1137,7 +1422,7 @@ function restock(id) {
             if (qtyInput) qtyInput.value = '';
             location.reload();
         } else {
-            alert('Restock failed');
+            ui.toast('Restock failed', 'error');
         }
     });
 }
@@ -1154,7 +1439,7 @@ function generatePurchaseOrders() {
     .then(r => r.json())
     .then(data => {
         if (!data.success) {
-            alert('Could not generate purchase orders.');
+            ui.toast('Could not generate purchase orders.', 'error');
             if (btn) btn.disabled = false;
             return;
         }
@@ -1182,7 +1467,7 @@ function generatePurchaseOrders() {
         if (btn) btn.remove();
     })
     .catch(() => {
-        alert('Could not generate purchase orders.');
+        ui.toast('Could not generate purchase orders.', 'error');
         if (btn) btn.disabled = false;
     });
 }
@@ -1199,7 +1484,7 @@ function createInventoryItem() {
     const threshold = document.getElementById('invThreshold').value;
     const costPrice = document.getElementById('invCostPrice').value;
     if (!name) {
-        alert('Please enter an ingredient name.');
+        ui.toast('Please enter an ingredient name.', 'warning');
         return;
     }
     fetch('/inventory/create/', {
@@ -1219,7 +1504,7 @@ function createInventoryItem() {
         if (data.success) {
             location.reload();
         } else {
-            alert(data.error || 'Failed to create ingredient.');
+            ui.toast(data.error || 'Failed to create ingredient.', 'error');
         }
     });
 }
@@ -1244,7 +1529,7 @@ function updateInventoryItem() {
     const reorderQty = document.getElementById('editReorderQty').value;
     const supplierId = document.getElementById('editSupplier').value;
     if (!name) {
-        alert('Please enter an ingredient name.');
+        ui.toast('Please enter an ingredient name.', 'warning');
         return;
     }
     fetch(`/inventory/update/${id}/`, {
@@ -1264,7 +1549,7 @@ function updateInventoryItem() {
         if (data.success) {
             location.reload();
         } else {
-            alert(data.error || 'Failed to update ingredient.');
+            ui.toast(data.error || 'Failed to update ingredient.', 'error');
         }
     });
 }
@@ -1285,7 +1570,7 @@ function submitWastage() {
     const reason = document.getElementById('wastageReason').value;
     const notes  = document.getElementById('wastageNotes').value;
     if (!qty || parseFloat(qty) <= 0) {
-        alert('Enter a valid quantity.');
+        ui.toast('Enter a valid quantity.', 'warning');
         return;
     }
     fetch(`/inventory/wastage/${id}/`, {
@@ -1301,7 +1586,7 @@ function submitWastage() {
             if (stockEl) stockEl.innerText = parseFloat(data.new_stock).toFixed(3);
             location.reload();
         } else {
-            alert(data.error || 'Failed to log wastage');
+            ui.toast(data.error || 'Failed to log wastage', 'error');
         }
     });
 }
@@ -1321,11 +1606,11 @@ function submitAdjust() {
     const newCount = document.getElementById('adjustNewCount').value;
     const reason = document.getElementById('adjustReason').value.trim();
     if (newCount === '' || parseFloat(newCount) < 0) {
-        alert('Enter what you actually counted.');
+        ui.toast('Enter what you actually counted.', 'warning');
         return;
     }
     if (!reason) {
-        alert('A reason is required for a manual adjustment.');
+        ui.toast('A reason is required for a manual adjustment.', 'warning');
         return;
     }
     fetch(`/inventory/adjust/${id}/`, {
@@ -1339,7 +1624,7 @@ function submitAdjust() {
             bootstrap.Modal.getInstance(document.getElementById('adjustModal')).hide();
             location.reload();
         } else {
-            alert(data.error || 'Failed to apply the adjustment');
+            ui.toast(data.error || 'Failed to apply the adjustment', 'error');
         }
     });
 }

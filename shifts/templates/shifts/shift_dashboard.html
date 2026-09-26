@@ -617,11 +617,7 @@ async function clockIn() {
         if (data.success) {
             location.reload();
         } else {
-            if (typeof ui !== 'undefined' && ui.toast) {
-                ui.toast(data.error || 'Clock in failed', 'error');
-            } else {
-                alert(data.error || 'Clock in failed');
-            }
+            ui.toast(data.error || 'Clock in failed', 'error');
         }
     } catch (e) {
         // apiClient notifies on error
@@ -635,11 +631,7 @@ async function clockOut() {
         if (data.success) {
             location.reload();
         } else {
-            if (typeof ui !== 'undefined' && ui.toast) {
-                ui.toast(data.error || 'Clock out failed', 'error');
-            } else {
-                alert(data.error || 'Clock out failed');
-            }
+            ui.toast(data.error || 'Clock out failed', 'error');
         }
     } catch (e) {
         // apiClient notifies on error
@@ -652,13 +644,9 @@ async function updateTips(shiftId, btn) {
         const data = await apiClient.post(`/shifts/${shiftId}/tips/`, { tips });
         if (data.success) {
             btn.innerHTML = '<i class="bi bi-check2-all text-success"></i>';
-            if (typeof ui !== 'undefined' && ui.toast) {
-                ui.toast('Tips updated successfully.', 'success');
-            }
+            ui.toast('Tips updated successfully.', 'success');
         } else {
-            if (typeof ui !== 'undefined' && ui.toast) {
-                ui.toast(data.error || 'Failed to save tips', 'error');
-            }
+            ui.toast(data.error || 'Failed to save tips', 'error');
         }
     } catch (e) {
         // apiClient notifies on error

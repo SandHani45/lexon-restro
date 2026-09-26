@@ -346,7 +346,7 @@ function saveInventoryLink() {
     const inventory_item_id = document.getElementById('invItemSelect').value;
     const quantity = document.getElementById('invQty').value;
     const unit = document.getElementById('invUnit').value;
-    if (!inventory_item_id || !quantity) { alert('Select an ingredient and enter a quantity.'); return; }
+    if (!inventory_item_id || !quantity) { ui.toast('Select an ingredient and enter a quantity.', 'warning'); return; }
     fetch(`/menu/modifiers/${_currentModifierId}/inventory/add/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken2') },
@@ -355,7 +355,7 @@ function saveInventoryLink() {
     .then(r => r.json())
     .then(data => {
         if (data.success) location.reload();
-        else alert(data.error || 'Failed to save link');
+        else ui.toast(data.error || 'Failed to save link', 'error');
     });
 }
 

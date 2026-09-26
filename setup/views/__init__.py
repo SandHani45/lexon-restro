@@ -23,6 +23,7 @@ from .core_views import (
     printer_setup,
     printer_test_print,
     setup_qr_codes,
+    setup_qr_image,
 )
 
 from .promo_views import (
@@ -73,6 +74,7 @@ __all__ = [
     "printer_setup",
     "printer_test_print",
     "setup_qr_codes",
+    "setup_qr_image",
     # promos
     "setup_promos",
     "promo_create",

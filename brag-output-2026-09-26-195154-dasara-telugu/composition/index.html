@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="te">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>EasyBillBro Dasara Offer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@500;700;800;900&family=Outfit:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="assets/music/audio-data.js"></script>
+    <style>
+      :root {
+        --bg: #0a0a0a;
+        --surface: #18181b;
+        --border: #27272a;
+        --text: #f4f4f6;
+        --muted: #a1a1aa;
+        --red: #ec2734;
+        --gold: #fbbf24;
+        --marigold: #f59e0b;
+        --green: #22c55e;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: var(--bg); color: var(--text); font-family: "Outfit", "Noto Sans Telugu", sans-serif; overflow: hidden; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); }
+      .te { font-family: "Noto Sans Telugu", "Outfit", sans-serif; }
+      .red { color: var(--red); }
+      .gold { color: var(--gold); }
+      .muted { color: var(--muted); }
+      .clip { position: absolute; inset: 0; }
+      .fill { position: absolute; inset: 0; }
+      .center { position: absolute; left: 60px; right: 60px; text-align: center; }
+
+      #bg-grid { position: absolute; inset: 0;
+        background-image: linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+        background-size: 60px 60px;
+        -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 100%);
+        mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 100%); }
+      #glow-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+      #glow { width: 1400px; height: 1400px; border-radius: 50%; background: radial-gradient(circle, rgba(236,39,52,0.20) 0%, rgba(245,158,11,0.07) 40%, transparent 70%); }
+
+      /* Festive thoranam (marigold + mango-leaf garland) across the top */
+      #thoran { position: absolute; top: 0; left: 0; right: 0; height: 150px; }
+      #thoran-rope { position: absolute; top: 18px; left: 0; right: 0; height: 6px; background: #7c2d12; }
+      .flower { position: absolute; top: 4px; width: 38px; height: 38px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fde68a 0%, #f59e0b 45%, #c2410c 100%); box-shadow: 0 3px 8px rgba(0,0,0,0.5); }
+      .leaf { position: absolute; top: 30px; width: 26px; height: 70px; border-radius: 0 0 50% 50% / 0 0 100% 100%; background: linear-gradient(180deg, #16a34a, #14532d); }
+
+      .chip { display: inline-flex; align-items: center; gap: 12px; padding: 18px 30px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); font-size: 38px; font-weight: 700; color: var(--text); white-space: nowrap; }
+      .chip-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 22px; }
+
+      .browser { position: absolute; border-radius: 18px; overflow: hidden; background: #0d0d0e; border: 1px solid #2a2a2e; box-shadow: 0 40px 100px rgba(0,0,0,0.7); }
+      .browser-bar { height: 36px; display: flex; align-items: center; gap: 8px; padding: 0 16px; background: #161618; border-bottom: 1px solid #26262a; }
+      .browser-bar i { display: block; width: 11px; height: 11px; border-radius: 50%; }
+      .browser-bar i:nth-child(1) { background: #ff5f57; } .browser-bar i:nth-child(2) { background: #febc2e; } .browser-bar i:nth-child(3) { background: #28c840; }
+
+      .phone { position: absolute; width: 420px; height: 918px; border-radius: 60px; padding: 15px; background: linear-gradient(160deg, #2c2c31, #111113); box-shadow: 0 50px 110px rgba(0,0,0,0.75), inset 0 0 0 2px #3a3a40; }
+      .phone-screen { width: 100%; height: 100%; border-radius: 46px; overflow: hidden; background: #000; position: relative; }
+      .phone-screen img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+      .phone-notch { position: absolute; top: 12px; left: 50%; margin-left: -50px; width: 100px; height: 28px; border-radius: 14px; background: #000; z-index: 2; }
+
+      /* Offer pill shown during the feature scenes */
+      #offer-pill { position: absolute; top: 170px; left: 0; right: 0; display: flex; justify-content: center; }
+      #offer-pill-in { padding: 14px 34px; border-radius: 999px; background: linear-gradient(90deg, #b45309, #f59e0b); color: #1c0f02; font-size: 34px; font-weight: 800; box-shadow: 0 12px 30px rgba(245,158,11,0.35); }
+
+      /* S1 */
+      #s1-pad { position: absolute; left: 230px; top: 330px; width: 620px; height: 760px; border-radius: 10px; background: #f3ecd9; box-shadow: 0 40px 90px rgba(0,0,0,0.6); padding: 56px 54px; color: #2a2419;
+        background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 61px, rgba(60,90,170,0.22) 61px, rgba(60,90,170,0.22) 63px); background-position: 0 118px; }
+      #s1-pad h4 { font-family: "DM Serif Display", serif; font-size: 46px; font-weight: 400; margin-bottom: 30px; font-style: italic; }
+      .pad-row { display: flex; justify-content: space-between; font-family: "DM Serif Display", serif; font-style: italic; font-size: 40px; height: 63px; align-items: flex-end; padding-bottom: 6px; }
+      .pad-row.cut span { text-decoration: line-through; text-decoration-color: #c0392b; text-decoration-thickness: 4px; }
+      .pad-total { margin-top: 26px; font-size: 50px; color: #c0392b; }
+      #s1-h { top: 1230px; font-size: 92px; font-weight: 800; line-height: 1.35; }
+      #s1-sub { top: 1520px; font-size: 44px; font-weight: 600; }
+
+      /* S2 */
+      #s2-logo { position: absolute; top: 250px; left: 0; right: 0; display: flex; justify-content: center; }
+      #s2-logo img { height: 190px; }
+      #s2-kick { top: 590px; font-size: 52px; font-weight: 800; letter-spacing: 1px; }
+      #s2-big { top: 700px; font-size: 150px; font-weight: 900; line-height: 1.3; }
+      #s2-en { top: 1140px; font-size: 64px; font-weight: 800; letter-spacing: 2px; }
+      #s2-burst { position: absolute; left: 540px; top: 900px; width: 0; height: 0; }
+      .petal { position: absolute; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fde68a 0%, #f59e0b 50%, #c2410c 100%); opacity: 0; }
+      #s2-diya { top: 1380px; font-size: 130px; }
+
+      /* S3 */
+      #s3-h { top: 290px; font-size: 84px; font-weight: 800; line-height: 1.3; }
+      #s3-frame { left: 40px; top: 470px; width: 1000px; }
+      #s3-canvas { position: relative; width: 1000px; height: 490px; overflow: hidden; }
+      #s3-cam { transform-origin: 0 0; }
+      #s3-native { position: absolute; left: 0; top: 0; width: 1914px; height: 938px; transform: scale(0.52247); transform-origin: 0 0; }
+      #s3-native > img { width: 1914px; height: 938px; display: block; }
+      .ripple { position: absolute; width: 170px; height: 170px; border-radius: 50%; border: 8px solid #fff; background: rgba(255,255,255,0.25); opacity: 0; }
+      #s3-finger { position: absolute; width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.92); box-shadow: 0 8px 24px rgba(0,0,0,0.5); opacity: 0; left: 0; top: 0; }
+      #s3-cart { position: absolute; left: 1540px; top: 228px; width: 362px; height: 260px; background: #0f0f11; padding: 14px 10px; }
+      .cart-row { display: flex; justify-content: space-between; padding: 16px; margin-bottom: 12px; border-radius: 14px; background: #1a1a1d; border: 1px solid #2a2a2e; font-size: 24px; font-weight: 600; opacity: 0; }
+      .cart-row b { color: var(--red); }
+      #s3-total { position: absolute; left: 1790px; top: 776px; width: 118px; height: 44px; background: #0f0f11; color: var(--red); font-size: 34px; font-weight: 800; text-align: right; opacity: 0; }
+      #s3-steps { position: absolute; left: 90px; top: 1040px; width: 900px; }
+      .step { display: flex; align-items: center; gap: 30px; margin-bottom: 34px; }
+      .step-num { flex: 0 0 104px; width: 104px; height: 104px; border-radius: 30px; background: var(--surface); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 56px; font-weight: 800; color: var(--muted); }
+      .step-txt { font-size: 58px; font-weight: 800; line-height: 1.3; }
+      #s3-receipt { position: absolute; left: 600px; top: 600px; width: 400px; padding: 28px 30px 32px; background: #fbfaf6; color: #1b1b1b; border-radius: 6px; box-shadow: 0 30px 70px rgba(0,0,0,0.6); font-family: "Courier New", monospace; font-size: 22px; opacity: 0; }
+      #s3-receipt h5 { font-family: "Outfit", sans-serif; font-size: 28px; font-weight: 800; text-align: center; margin-bottom: 12px; }
+      .rr { display: flex; justify-content: space-between; margin: 6px 0; }
+      .rr.tot { font-weight: 700; font-size: 28px; border-top: 2px dashed #999; padding-top: 12px; margin-top: 14px; }
+      #s3-paid { margin-top: 14px; text-align: center; font-family: "Outfit", sans-serif; font-weight: 800; color: #15803d; font-size: 26px; }
+      #s3-line { top: 1500px; font-size: 56px; font-weight: 800; line-height: 1.4; }
+
+      /* S4 */
+      #s4-h { top: 290px; font-size: 92px; font-weight: 800; line-height: 1.3; }
+      #s4-p1 { left: 75px; top: 470px; }
+      #s4-p2 { left: 585px; top: 470px; }
+      #s4-chips { position: absolute; left: 40px; right: 40px; top: 1450px; }
+
+      /* S5 */
+      #s5-wrap { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 60px; }
+      #s5-free { padding: 26px 46px; border-radius: 30px; background: linear-gradient(135deg, #b45309, #f59e0b); color: #1c0f02; font-size: 64px; font-weight: 900; line-height: 1.35; box-shadow: 0 24px 60px rgba(245,158,11,0.35); }
+      #s5-then { margin-top: 70px; font-size: 56px; font-weight: 700; }
+      #s5-price { margin-top: 6px; display: flex; align-items: baseline; justify-content: center; gap: 14px; }
+      #s5-amt { font-family: "DM Serif Display", serif; font-size: 220px; line-height: 1.2; }
+      #s5-per { font-size: 64px; font-weight: 700; }
+      #s5-chips { margin-top: 60px; flex-direction: column; align-items: center; }
+
+      /* S6 */
+      #s6-wrap { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 50px; }
+      #s6-logo { height: 230px; }
+      #s6-for { margin-top: 44px; font-size: 50px; font-weight: 700; line-height: 1.35; }
+      #s6-call { margin-top: 70px; font-size: 44px; font-weight: 700; }
+      #s6-phone { margin-top: 10px; padding: 24px 50px; border-radius: 28px; background: var(--red); color: #fff; font-size: 104px; font-weight: 800; letter-spacing: 2px; box-shadow: 0 24px 60px rgba(236,39,52,0.4); }
+      #s6-web { margin-top: 40px; font-size: 46px; font-weight: 600; }
+      #s6-offer { margin-top: 70px; font-size: 44px; font-weight: 800; }
+      #s6-wish { margin-top: 26px; font-size: 64px; font-weight: 900; line-height: 1.35; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="easybillbro-dasara" data-width="1080" data-height="1920" data-duration="44">
+      <div id="bg-grid"></div>
+      <div id="glow-wrap"><div id="glow"></div></div>
+      <div id="thoran"><div id="thoran-rope"></div></div>
+
+      <!-- Scene 1: Hook -->
+      <section class="clip" id="scene-1" data-start="0" data-duration="4" data-track-index="1">
+        <div class="fill" id="s1-inner">
+          <div id="s1-pad">
+            <h4>Sri Lakshmi Dhaba</h4>
+            <div class="pad-row"><span>2 × Tea</span><span>30</span></div>
+            <div class="pad-row cut"><span>Biryani</span><span>180</span></div>
+            <div class="pad-row"><span>Chicken Biryani</span><span>220</span></div>
+            <div class="pad-row"><span>4 × Roti</span><span>40</span></div>
+            <div class="pad-row cut"><span>Paneer</span><span>160</span></div>
+            <div class="pad-row"><span>Paneer Tikka</span><span>180</span></div>
+            <div class="pad-row pad-total"><span>Total</span><span>4?0 ??</span></div>
+          </div>
+          <div class="center te" id="s1-h">ఇంకా చేతితో బిల్లులు <span class="red">రాస్తున్నారా?</span></div>
+        </div>
+      </section>
+
+      <!-- Scene 2: Dasara offer reveal -->
+      <section class="clip" id="scene-2" data-start="4" data-duration="5" data-track-index="1">
+        <div class="fill" id="s2-inner">
+          <div id="s2-logo"><img id="s2-logo-img" src="assets/brand/easybillbro_logo_white.png" alt="EasyBillBro" /></div>
+          <div class="center te gold" id="s2-kick">🪔 దసరా ఆఫర్ 🪔</div>
+          <div id="s2-burst"></div>
+          <div class="center te" id="s2-big"><div id="s2-l1">మొదటి నెల</div><div id="s2-l2" class="gold">ఉచితం!</div></div>
+          <div class="center" id="s2-en">1st MONTH <span class="gold">FREE</span></div>
+        </div>
+      </section>
+
+      <!-- Offer pill across feature scenes -->
+      <div class="clip" id="pill-clip" data-start="9" data-duration="16.5" data-track-index="2">
+        <div id="offer-pill"><div id="offer-pill-in" class="te">🪔 దసరా ఆఫర్ · 1st month FREE</div></div>
+      </div>
+
+      <!-- Scene 3: Tap, tap, bill -->
+      <section class="clip" id="scene-3" data-start="9" data-duration="10.5" data-track-index="1">
+        <div class="fill" id="s3-inner">
+          <div class="center te" id="s3-h">3 టచ్‌లలో <span class="red">బిల్!</span></div>
+          <div class="browser" id="s3-frame">
+            <div class="browser-bar"><i></i><i></i><i></i></div>
+            <div id="s3-canvas">
+              <div id="s3-cam" class="fill">
+                <div id="s3-native">
+                  <img src="assets/shots/3.png" alt="POS billing screen" />
+                  <div id="s3-cart">
+                    <div class="cart-row" id="s3-c1"><span>Paneer Tikka ×1</span><b>₹180</b></div>
+                    <div class="cart-row" id="s3-c2"><span>Dal Makhani ×1</span><b>₹180</b></div>
+                  </div>
+                  <div id="s3-total">₹378</div>
+                  <div class="ripple" id="s3-r1" style="left: 618px; top: 432px"></div>
+                  <div class="ripple" id="s3-r2" style="left: 364px; top: 700px"></div>
+                  <div class="ripple" id="s3-r3" style="left: 1728px; top: 819px"></div>
+                  <div id="s3-finger"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="s3-steps">
+            <div class="step" id="s3-st1"><div class="step-num" id="s3-n1">1</div><div class="step-txt te">డిష్ టచ్ చేయండి</div></div>
+            <div class="step" id="s3-st2"><div class="step-num" id="s3-n2">2</div><div class="step-txt te">బిల్ టచ్ చేయండి</div></div>
+            <div class="step" id="s3-st3"><div class="step-num" id="s3-n3">3</div><div class="step-txt te">అంతే! ✓</div></div>
+          </div>
+          <div id="s3-receipt">
+            <h5>Sri Lakshmi Dhaba</h5>
+            <div class="rr"><span>Paneer Tikka</span><span>180.00</span></div>
+            <div class="rr"><span>Dal Makhani</span><span>180.00</span></div>
+            <div class="rr"><span>GST 5%</span><span>18.00</span></div>
+            <div class="rr tot"><span>TOTAL</span><span>₹378.00</span></div>
+            <div id="s3-paid">✓ PAID · UPI</div>
+          </div>
+          <div class="center te" id="s3-line">వాట్సాప్ వాడగలిగితే, <span class="red">EasyBillBro</span> కూడా వాడగలరు.</div>
+        </div>
+      </section>
+
+      <!-- Scene 4: Everything on your phone -->
+      <section class="clip" id="scene-4" data-start="19.5" data-duration="6" data-track-index="1">
+        <div class="fill" id="s4-inner">
+          <div class="center te" id="s4-h">అన్నీ మీ <span class="red">ఫోన్‌లోనే</span></div>
+          <div class="phone" id="s4-p1"><div class="phone-screen"><div class="phone-notch"></div><img src="assets/shots/8.png" alt="Tables on phone" /></div></div>
+          <div class="phone" id="s4-p2"><div class="phone-screen"><div class="phone-notch"></div><img src="assets/shots/11.png" alt="Orders on phone" /></div></div>
+          <div id="s4-chips" class="chip-row te">
+            <div class="chip" id="s4-c1">🍽️ టేబుల్స్</div>
+            <div class="chip" id="s4-c2">🍳 కిచెన్ ఆర్డర్స్</div>
+            <div class="chip" id="s4-c3">💰 రోజు సంపాదన</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 5: Price -->
+      <section class="clip" id="scene-5" data-start="25.5" data-duration="7.5" data-track-index="1">
+        <div id="s5-wrap">
+          <div id="s5-free" class="te">🪔 మొదటి నెల ఉచితం</div>
+          <div id="s5-then" class="te muted">తర్వాత నెలకు కేవలం</div>
+          <div id="s5-price"><span id="s5-amt">₹999</span><span id="s5-per" class="te muted">/ నెల</span></div>
+          <div id="s5-chips" class="chip-row te">
+            <div class="chip" id="s5-c1">✅ ₹0 సెటప్ ఫీజు</div>
+            <div class="chip" id="s5-c2">✅ కాంట్రాక్ట్ లేదు</div>
+            <div class="chip" id="s5-c3">✅ ఏ Android ఫోన్ అయినా</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 6: Call to action -->
+      <section class="clip" id="scene-6" data-start="33" data-duration="11" data-track-index="1">
+        <div id="s6-wrap">
+          <img id="s6-logo" src="assets/brand/easybillbro_logo_white.png" alt="EasyBillBro" />
+          <div id="s6-for" class="te">దాబాలు · హోటల్స్ · <span class="red">రెస్టారెంట్లు</span></div>
+          <div id="s6-call" class="te muted">ఇప్పుడే కాల్ చేయండి</div>
+          <div id="s6-phone">📞 77801 81920</div>
+          <div id="s6-web" class="muted">easybillbro.lexonit.com</div>
+          <div id="s6-offer" class="te gold">🪔 దసరా ఆఫర్ · మొదటి నెల ఉచితం</div>
+          <div id="s6-wish" class="te">దసరా <span class="gold">శుభాకాంక్షలు!</span></div>
+        </div>
+      </section>
+
+      <audio id="bg-music" src="assets/music/music-ducked.mp3" data-start="0" data-duration="44" data-track-index="10" data-volume="0.42"></audio>
+
+      <audio id="vo-1" src="assets/voice/vo1.mp3" data-start="0.4" data-duration="2.256" data-track-index="3" data-volume="1"></audio>
+      <audio id="vo-2" src="assets/voice/vo2.mp3" data-start="4.3" data-duration="3.888" data-track-index="4" data-volume="1"></audio>
+      <audio id="vo-3" src="assets/voice/vo3.mp3" data-start="9.3" data-duration="9.504" data-track-index="5" data-volume="1"></audio>
+      <audio id="vo-4" src="assets/voice/vo4.mp3" data-start="19.8" data-duration="5.352" data-track-index="6" data-volume="1"></audio>
+      <audio id="vo-5" src="assets/voice/vo5.mp3" data-start="25.8" data-duration="7.008" data-track-index="7" data-volume="1"></audio>
+      <audio id="vo-6" src="assets/voice/vo6.mp3" data-start="33.3" data-duration="8.736" data-track-index="8" data-volume="1"></audio>
+
+      <audio id="sfx-pad" src="assets/sfx/drop_001.ogg" data-start="0.2" data-duration="0.5" data-track-index="20" data-volume="0.55"></audio>
+      <audio id="sfx-offer" src="assets/sfx/impactBell_heavy_000.ogg" data-start="4.9" data-duration="2" data-track-index="21" data-volume="0.45"></audio>
+      <audio id="sfx-tap1" src="assets/sfx/click_002.ogg" data-start="10.3" data-duration="0.3" data-track-index="22" data-volume="0.7"></audio>
+      <audio id="sfx-tap2" src="assets/sfx/click_002.ogg" data-start="10.9" data-duration="0.3" data-track-index="23" data-volume="0.7"></audio>
+      <audio id="sfx-tap3" src="assets/sfx/click_002.ogg" data-start="12.3" data-duration="0.3" data-track-index="24" data-volume="0.75"></audio>
+      <audio id="sfx-receipt" src="assets/sfx/drop_001.ogg" data-start="13.2" data-duration="0.5" data-track-index="25" data-volume="0.55"></audio>
+      <audio id="sfx-price" src="assets/sfx/chips-collide-1.ogg" data-start="25.6" data-duration="0.8" data-track-index="26" data-volume="0.5"></audio>
+      <audio id="sfx-logo" src="assets/sfx/impactSoft_medium_002.ogg" data-start="33.15" data-duration="0.5" data-track-index="27" data-volume="0.55"></audio>
+    </div>
+
+    <script>
+      window.addEventListener("load", function () {
+        // Build the thoranam garland and marigold burst (static, deterministic DOM)
+        var th = document.getElementById("thoran");
+        for (var i = 0; i < 24; i++) {
+          var f = document.createElement("div");
+          f.className = "flower";
+          f.style.left = 6 + i * 45 + "px";
+          th.appendChild(f);
+          if (i % 3 === 1) {
+            var l = document.createElement("div");
+            l.className = "leaf";
+            l.style.left = 12 + i * 45 + "px";
+            th.appendChild(l);
+          }
+        }
+        var burst = document.getElementById("s2-burst");
+        for (var p = 0; p < 16; p++) {
+          var d = document.createElement("div");
+          d.className = "petal";
+          d.id = "petal-" + p;
+          burst.appendChild(d);
+        }
+
+        var tl = gsap.timeline({ paused: true });
+        var up = function (sel, t, d, y) {
+          tl.fromTo(sel, { y: y == null ? 30 : y, opacity: 0 }, { y: 0, opacity: 1, duration: d || 0.6, ease: "power3.out" }, t);
+        };
+        var out = function (sel, t) { tl.to(sel, { opacity: 0, duration: 0.4, ease: "power2.in" }, t); };
+
+        // Garland drops in and sways gently
+        tl.fromTo("#thoran", { y: -160 }, { y: 0, duration: 0.8, ease: "back.out(1.4)" }, 0.1);
+        tl.to("#thoran", { y: 6, duration: 2, ease: "sine.inOut", yoyo: true, repeat: 20 }, 1);
+
+        // ── S1 Hook (0–4) ──
+        tl.fromTo("#s1-pad", { y: 80, rotation: -8, opacity: 0 }, { y: 0, rotation: -3, opacity: 1, duration: 0.8, ease: "power3.out" }, 0.15);
+        up("#s1-h", 0.5, 0.6);
+        tl.to("#s1-pad", { x: -1000, rotation: -18, duration: 0.7, ease: "power3.in" }, 3.3);
+        out("#s1-h", 3.55);
+
+        // ── S2 Dasara offer (4–9) ──
+        tl.fromTo("#s2-logo-img", { scale: 0.85, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" }, 4.05);
+        up("#s2-kick", 4.3, 0.5);
+        tl.fromTo("#s2-l1", { scale: 0.7, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, ease: "back.out(1.6)" }, 4.7);
+        tl.fromTo("#s2-l2", { scale: 0.5, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.7, ease: "back.out(2)" }, 5.0);
+        for (var q = 0; q < 16; q++) {
+          var ang = (q / 16) * Math.PI * 2;
+          var rad = 380 + (q % 3) * 70;
+          tl.fromTo("#petal-" + q, { x: 0, y: 0, scale: 0.4, opacity: 1 }, { x: Math.cos(ang) * rad, y: Math.sin(ang) * rad * 0.8, scale: 1, opacity: 0, duration: 1.4, ease: "power2.out" }, 5.0);
+        }
+        up("#s2-en", 5.8, 0.5, 20);
+        out("#s2-inner", 8.6);
+
+        // ── Offer pill ──
+        tl.fromTo("#offer-pill-in", { y: -30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 9.1);
+        tl.to("#offer-pill-in", { opacity: 0, duration: 0.3 }, 25.1);
+
+        // ── S3 Tap, tap, bill (9–19.5) ──
+        up("#s3-h", 9.1, 0.6);
+        tl.fromTo("#s3-frame", { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 9.2);
+        up("#s3-st1", 9.5, 0.5, 20);
+        up("#s3-st2", 9.65, 0.5, 20);
+        up("#s3-st3", 9.8, 0.5, 20);
+        // camera: punch into menu grid, then to the bill buttons, then back out
+        tl.fromTo("#s3-cam", { scale: 1, x: 0, y: 0 }, { scale: 1.6, x: 15, y: -224, duration: 0.9, ease: "power2.inOut" }, 9.4);
+        tl.to("#s3-cam", { x: -600, y: -294, duration: 0.8, ease: "power2.inOut" }, 11.2);
+        tl.to("#s3-cam", { scale: 1, x: 0, y: 0, duration: 1, ease: "power2.inOut" }, 14.6);
+        var tap = function (n, fx, fy, t) {
+          tl.fromTo("#s3-finger", { x: fx - 40, y: fy, opacity: 0 }, { x: fx - 40, y: fy - 40, opacity: 1, duration: 0.25, ease: "power2.out" }, t - 0.25);
+          tl.fromTo("#s3-r" + n, { scale: 0.3, opacity: 1 }, { scale: 1.6, opacity: 0, duration: 0.6, ease: "power2.out" }, t);
+          tl.to("#s3-finger", { opacity: 0, duration: 0.15 }, t + 0.25);
+        };
+        tap(1, 703, 517, 10.3);
+        tl.to("#s3-n1", { backgroundColor: "#ec2734", borderColor: "#ec2734", color: "#ffffff", duration: 0.2 }, 10.3);
+        tl.fromTo("#s3-c1", { x: 30, opacity: 0 }, { x: 0, opacity: 1, duration: 0.35 }, 10.4);
+        tap(2, 449, 785, 10.9);
+        tl.fromTo("#s3-c2", { x: 30, opacity: 0 }, { x: 0, opacity: 1, duration: 0.35 }, 11.0);
+        tl.to("#s3-total", { opacity: 1, duration: 0.2 }, 11.0);
+        tap(3, 1813, 904, 12.3);
+        tl.to("#s3-n2", { backgroundColor: "#ec2734", borderColor: "#ec2734", color: "#ffffff", duration: 0.2 }, 12.3);
+        tl.fromTo("#s3-receipt", { y: 120, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "back.out(1.4)" }, 13.2);
+        tl.to("#s3-n3", { backgroundColor: "#15803d", borderColor: "#15803d", color: "#ffffff", duration: 0.2 }, 13.2);
+        tl.to("#s3-receipt", { opacity: 0, y: 40, duration: 0.4 }, 15.2);
+        tl.to("#s3-steps", { opacity: 0.25, duration: 0.4 }, 15.2);
+        up("#s3-line", 15.4, 0.6, 20);
+        out("#s3-inner", 19.1);
+
+        // ── S4 Phones (19.5–25.5) ──
+        up("#s4-h", 19.6, 0.6);
+        tl.fromTo("#s4-p1", { y: 600, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, ease: "power4.out" }, 19.7);
+        tl.fromTo("#s4-p2", { y: 600, opacity: 0 }, { y: 30, opacity: 1, duration: 0.9, ease: "power4.out" }, 19.95);
+        up("#s4-c1", 20.3, 0.45, 20);  // "టేబుల్స్"
+        up("#s4-c2", 21.1, 0.45, 20);  // "కిచెన్ ఆర్డర్స్"
+        up("#s4-c3", 22.0, 0.45, 20);  // "రోజు సంపాదన"
+        tl.to("#s4-p1", { y: -16, duration: 4, ease: "sine.inOut" }, 20.6);
+        tl.to("#s4-p2", { y: 14, duration: 4, ease: "sine.inOut" }, 20.85);
+        out("#s4-inner", 25.1);
+
+        // ── S5 Price (25.5–33) ──
+        tl.fromTo("#s5-free", { scale: 0.7, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, ease: "back.out(1.8)" }, 25.6);
+        up("#s5-then", 26.0, 0.5);
+        tl.fromTo("#s5-price", { scale: 0.75, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.7, ease: "back.out(1.5)" }, 26.3);
+        up("#s5-c1", 28.5, 0.5, 24);
+        up("#s5-c2", 29.4, 0.5, 24);
+        up("#s5-c3", 30.3, 0.5, 24);
+        out("#s5-wrap", 32.6);
+
+        // ── S6 CTA (33–44) ──
+        tl.fromTo("#s6-logo", { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.7, ease: "power3.out" }, 33.1);
+        up("#s6-for", 33.6, 0.6);
+        up("#s6-call", 34.0, 0.5, 20);
+        tl.fromTo("#s6-phone", { scale: 0.7, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, ease: "back.out(1.8)" }, 34.3);
+        tl.to("#s6-phone", { scale: 1.05, duration: 0.5, ease: "sine.inOut", yoyo: true, repeat: 5 }, 35.5);
+        up("#s6-web", 35.0, 0.5, 20);
+        up("#s6-offer", 36.2, 0.5, 20);
+        up("#s6-wish", 39.6, 0.7, 24);
+
+        // Audio-reactive glow
+        if (typeof AUDIO_RMS !== "undefined") {
+          AUDIO_RMS.rms.forEach(function (r, i) {
+            tl.set("#glow", { opacity: 0.55 + r * 0.45, scale: 0.96 + r * 0.08 }, i / AUDIO_RMS.fps);
+          });
+        }
+
+        tl.set({}, {}, 44);
+        window.__timelines["easybillbro-dasara"] = tl;
+      });
+    </script>
+  </body>
+</html>

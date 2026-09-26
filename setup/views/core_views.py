@@ -1,12 +1,14 @@
 # setup/views/core_views.py
 import json
+from io import BytesIO
 import logging
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db import transaction
-from django.http import JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
@@ -1095,9 +1097,6 @@ def setup_qr_codes(request):
     """Generate and print beautiful luxury QR codes for all tables."""
     if request.user.role not in ["owner", "manager"] and not request.user.is_superuser:
         return redirect("/setup/")
-    import json
-    from django.conf import settings
-
     outlet = request.user.outlet
     tenant = request.user.tenant
 
@@ -1105,12 +1104,15 @@ def setup_qr_codes(request):
         tenant=tenant, outlet=outlet
     ).order_by("name")
 
-    base_url = getattr(settings, "BASE_URL", request.build_absolute_uri("/"))
-    if not base_url.endswith("/"):
-        base_url += "/"
-    menu_base_url = f"{base_url}menu/"
+    # Build public links from the host that is serving this page. This keeps
+    # localhost, tenant domains, and reverse-proxy deployments in sync without
+    # relying on a BASE_URL environment variable that can become stale.
+    menu_base_url = request.build_absolute_uri(reverse("menu_management"))
 
-    counter_qr_url = f"{menu_base_url}{outlet.qr_token}/" if outlet and outlet.qr_token else None
+    counter_qr_url = (
+        request.build_absolute_uri(reverse("menu_view", args=[outlet.qr_token]))
+        if outlet and outlet.qr_token else None
+    )
 
     tables_data = [
         {
@@ -1119,16 +1121,15 @@ def setup_qr_codes(request):
             "section": t.section or "Main Hall",
             "capacity": t.capacity,
             "qr_token": str(t.qr_token),
-            "url": f"{menu_base_url}{t.qr_token}/",
+            "url": request.build_absolute_uri(reverse("menu_view", args=[t.qr_token])),
         }
         for t in tables
     ]
 
     display_board_url = None
     if tenant.tenant_type in ["franchise", "cafe"] and outlet and getattr(outlet, "display_token", None):
-        from django.urls import reverse
-        display_board_url = base_url.rstrip("/") + reverse(
-            "display-board", args=[outlet.display_token]
+        display_board_url = request.build_absolute_uri(
+            reverse("display-board", args=[outlet.display_token])
         )
 
     return render(request, "setup/setup_qr_codes.html", {
@@ -1141,3 +1142,38 @@ def setup_qr_codes(request):
         "display_board_url": display_board_url,
         "counter_qr_url": counter_qr_url,
     })
+
+
+@login_required
+@tenant_required
+def setup_qr_image(request, qr_token):
+    """Return a reliable PNG fallback for the QR preview.
+
+    The destination is built from this request's public host, so the encoded
+    URL remains correct after deployment. Access is limited to QR tokens owned
+    by the signed-in user's current tenant and outlet.
+    """
+    if request.user.role not in ["owner", "manager"] and not request.user.is_superuser:
+        raise Http404
+
+    outlet = request.user.outlet
+    belongs_to_outlet = bool(outlet and outlet.qr_token == qr_token)
+    belongs_to_table = Table.objects.filter(
+        tenant=request.user.tenant,
+        outlet=outlet,
+        qr_token=qr_token,
+    ).exists()
+    if not belongs_to_outlet and not belongs_to_table:
+        raise Http404
+
+    import qrcode
+
+    destination = request.build_absolute_uri(reverse("menu_view", args=[qr_token]))
+    image = qrcode.make(destination)
+    output = BytesIO()
+    image.save(output, format="PNG")
+
+    response = HttpResponse(output.getvalue(), content_type="image/png")
+    # A cached image from one hostname could encode the wrong deployment URL.
+    response["Cache-Control"] = "private, no-store"
+    return response

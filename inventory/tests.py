@@ -561,6 +561,11 @@ class InventoryAccessControlTests(TestCase):
         response = self.client.get(reverse("inventory_board"))
         self.assertEqual(response.status_code, 200)
 
+    def test_inventory_home_redirects_to_inventory_board(self):
+        self.client.force_login(self.owner)
+        response = self.client.get(reverse("inventory_home"))
+        self.assertRedirects(response, reverse("inventory_board"), fetch_redirect_response=False)
+
     def test_waiter_cannot_access_inventory_board(self):
         self.client.force_login(self.waiter)
         response = self.client.get(reverse("inventory_board"))

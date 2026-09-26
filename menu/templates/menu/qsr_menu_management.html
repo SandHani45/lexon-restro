@@ -92,10 +92,6 @@
     .dropdown-item:hover { background-color: rgba(236, 39, 52, 0.1); color: var(--accent-gold); }
     .dropdown-item.text-danger:hover { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; }
 
-    #qsr-toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: var(--text-main); color: var(--bg-color); padding: 0.75rem 1.5rem; font-size: 0.85rem; letter-spacing: 0.5px; z-index: 9999; display: none; white-space: nowrap; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
-    #qsr-toast.error { background: #ef4444; color: #fff; }
-    #qsr-toast.success { background: #22c55e; color: #fff; }
-
     .qsr-station-select {
         background: transparent; border: none; border-bottom: 1px dashed var(--border-color);
         color: var(--text-muted); font-size: 0.7rem; font-family: inherit;
@@ -346,7 +342,6 @@
 </div>
 {% endif %}
 
-<div id="qsr-toast"></div>
 {% endblock %}
 
 {% block extra_js %}
@@ -362,21 +357,14 @@
         return val;
     }
 
-    function showToast(msg, type = '', duration = 2500) {
-        const el = document.getElementById('qsr-toast');
-        el.textContent = msg; el.className = type; el.style.display = 'block';
-        clearTimeout(el._timer);
-        el._timer = setTimeout(() => { el.style.display = 'none'; }, duration);
-    }
-
     function updateStation(itemId, stationId) {
         fetch("{% url 'update_station' 0 %}".replace('/0/', '/' + itemId + '/'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken2') },
             body: JSON.stringify({ station: stationId })
         }).then(r => r.json()).then(d => {
-            showToast(d.success ? (stationId ? 'KOT routed to ' + (d.station_name || 'station') : 'Routed to default station') : (d.error || 'Failed'), d.success ? 'success' : 'error');
-        }).catch(() => showToast('Network error', 'error'));
+            ui.toast(d.success ? (stationId ? 'KOT routed to ' + (d.station_name || 'station') : 'Routed to default station') : (d.error || 'Failed'), d.success ? 'success' : 'error');
+        }).catch(() => ui.toast('Network error', 'error'));
     }
 
     document.getElementById("menuManagementSearch")?.addEventListener("input", function () {
@@ -441,7 +429,7 @@
         const url = id ? `/menu/update-item/${id}/` : "{% url 'create_menu_item' %}";
         fetch(url, { method: "POST", headers: { "X-CSRFToken": getCookie("csrftoken2") }, body: fd })
             .then(r => r.json())
-            .then(d => { if (d.success) location.reload(); else showToast(d.error || "Failed to save item.", 'error'); })
+            .then(d => { if (d.success) location.reload(); else ui.toast(d.error || "Failed to save item.", 'error'); })
             .catch(() => location.reload());
     }
 
@@ -468,26 +456,26 @@
         }).then(res => res.json()).then(data => {
             if (data.success) {
                 badge.style.display = isAvailable ? 'none' : 'inline-block';
-                showToast(isAvailable ? 'Item set to Available' : 'Item set to Offline', isAvailable ? 'success' : 'error');
+                ui.toast(isAvailable ? 'Item set to Available' : 'Item set to Offline', isAvailable ? 'success' : 'error');
             } else {
                 checkbox.checked = !isAvailable;
-                showToast('Failed to toggle', 'error');
+                ui.toast('Failed to toggle', 'error');
             }
-        }).catch(() => { checkbox.checked = !isAvailable; showToast('Network error', 'error'); });
+        }).catch(() => { checkbox.checked = !isAvailable; ui.toast('Network error', 'error'); });
     }
 
     function createRecipe() {
         const inventory = document.getElementById("inventorySelect").value;
         const qty = document.getElementById("recipeQty").value;
-        if (!inventory || !qty) { showToast("Please select an ingredient and enter a quantity.", "error"); return; }
+        if (!inventory || !qty) { ui.toast("Please select an ingredient and enter a quantity.", "error"); return; }
         fetch("{% url 'add_recipe' %}", {
             method: "POST",
             headers: { "Content-Type": "application/json", "X-CSRFToken": getCookie("csrftoken2") },
             body: JSON.stringify({ menu_item: currentMenuItem, inventory_item: inventory, quantity: qty })
         }).then(r => r.json()).then(data => {
-            if (data.success) { showToast("Ingredient added to recipe.", "success"); location.reload(); }
-            else showToast(data.error || "Failed to add ingredient.", "error");
-        }).catch(() => showToast("Network error", "error"));
+            if (data.success) { ui.toast("Ingredient added to recipe.", "success"); location.reload(); }
+            else ui.toast(data.error || "Failed to add ingredient.", "error");
+        }).catch(() => ui.toast("Network error", "error"));
     }
 
     let recipeImportItemId = null;
@@ -504,7 +492,7 @@
         const text = document.getElementById("recipeImportText").value;
         const fileInput = document.getElementById("recipeImportFile");
         const btn = document.getElementById("recipeImportBtn");
-        if (!text.trim() && !fileInput.files[0]) { showToast("Please provide text or upload a file.", "error"); return; }
+        if (!text.trim() && !fileInput.files[0]) { ui.toast("Please provide text or upload a file.", "error"); return; }
 
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading…';
@@ -518,14 +506,14 @@
             method: "POST", headers: { "X-CSRFToken": getCookie("csrftoken2") }, body: fd
         }).then(r => r.json()).then(data => {
             if (data.error) {
-                showToast(data.error, "error");
+                ui.toast(data.error, "error");
                 btn.disabled = false; btn.innerText = "Extract Ingredients";
                 return;
             }
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>AI is reading the recipe…';
             pollRecipeImport(data.job_id, btn);
         }).catch(() => {
-            showToast("Error connecting to AI service", "error");
+            ui.toast("Error connecting to AI service", "error");
             btn.disabled = false; btn.innerText = "Extract Ingredients";
         });
     }
@@ -540,7 +528,7 @@
                         window.location.href = `/inventory/recipe-import/${jobId}/review/`;
                     } else if (data.status === "failed") {
                         clearInterval(interval);
-                        showToast("Recipe import failed: " + (data.error || "unknown error"), "error");
+                        ui.toast("Recipe import failed: " + (data.error || "unknown error"), "error");
                         btn.disabled = false; btn.innerText = "Extract Ingredients";
                     }
                     // still "processing" — keep polling
@@ -551,13 +539,13 @@
 
     async function syncMenu() {
         if (!await ui.confirm("Sync Menu Across Branches?", "Push this menu to all branches? This will instantly sync all categories, items, prices, and recipe ingredients.", "Sync Branches")) return;
-        showToast("Syncing across branches...", "");
+        ui.toast("Syncing across branches...", "info");
         fetch("{% url 'sync_menu_to_outlets' %}", {
             method: "POST", headers: { "X-CSRFToken": getCookie("csrftoken2") }
         }).then(res => res.json()).then(data => {
             if (data.success) ui.alert("Sync Complete", `Categories: ${data.stats.categories_created}, Items: ${data.stats.items_created}, Recipes: ${data.stats.recipes_created} across ${data.stats.outlets_updated} branches.`, "success");
-            else showToast(data.error || "Sync failed", "error");
-        }).catch(() => showToast("Network error", "error"));
+            else ui.toast(data.error || "Sync failed", "error");
+        }).catch(() => ui.toast("Network error", "error"));
     }
 
     // Category tab scroll-spy — highlights the pill for whichever category

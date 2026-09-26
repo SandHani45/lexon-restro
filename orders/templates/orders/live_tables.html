@@ -3,6 +3,38 @@
 
 {% block extra_css %}
 <style>
+  /* Top bar: only the History icon lives in the default overflow menu, so
+     there's no reason to hide it behind a "..." tap on mobile -- expose it
+     directly instead, same as Dashboard/Orders. This is the shared
+     #pos-topbar from base.html, separate from this page's own
+     .live-header/.live-close-btn below. */
+  #pos-topbar .topbar-more-btn {
+    display: none !important;
+  }
+  #pos-topbar .topbar-more-wrap,
+  #pos-topbar .topbar-more-menu {
+    display: contents !important;
+  }
+  @media (max-width: 767px) {
+    #pos-topbar .topbar-more-menu {
+      position: static !important;
+      width: auto !important;
+      max-width: none !important;
+      padding: 0 !important;
+      border: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      transform: none !important;
+    }
+    #pos-topbar .topbar-more-menu .btn-icon {
+      width: 34px;
+      height: 34px;
+      font-size: 1.1rem;
+    }
+  }
+
   /* ── DUAL-MODE TOKENS (LIGHT & DARK) ── */
   :root {
     --live-bg: var(--bg-color, #F7F7F9);
@@ -96,56 +128,11 @@
     margin-top: 2px;
   }
 
-  /* Right controls: Party size + Close */
   .live-header-right {
     display: flex;
     align-items: center;
     gap: 0.85rem;
   }
-  .party-filter-box {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: var(--live-control-bg);
-    border: 1px solid var(--live-control-border);
-    color: var(--live-text-main);
-    border-radius: 999px;
-    padding: 0.4rem 0.85rem;
-    transition: border-color 0.15s, background 0.15s;
-  }
-  .party-filter-box:focus-within {
-    border-color: var(--live-accent-amber);
-    background: rgba(236, 39, 52, 0.05);
-  }
-  .party-filter-box svg, .party-filter-box i {
-    color: var(--live-text-muted);
-    font-size: 1rem;
-    flex-shrink: 0;
-  }
-  .party-filter-box input {
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--live-text-main);
-    font-size: 0.85rem;
-    width: 90px;
-    font-family: inherit;
-  }
-  .party-filter-box input::placeholder {
-    color: var(--live-text-muted);
-  }
-  .party-clear-btn {
-    background: transparent;
-    border: none;
-    color: var(--live-text-muted);
-    cursor: pointer;
-    font-size: 1rem;
-    line-height: 1;
-    padding: 0 2px;
-    display: none;
-  }
-  .party-clear-btn:hover { color: var(--live-text-main); }
-
   .live-close-btn {
     width: 38px;
     height: 38px;
@@ -174,12 +161,202 @@
     gap: 1.5rem;
     margin-bottom: 1.25rem;
   }
-  @media (max-width: 540px) {
-    .floors-grid-container {
-      grid-template-columns: 1fr;
-    }
+  .floor-section-switcher { display: none; }
+  /* ── Mobile: compact, touch-friendly, app-like layout ── */
+  @media (max-width: 767.98px) {
     .live-overview-page {
-      padding: 1rem;
+      padding: 0.85rem 0.75rem calc(1.75rem + env(safe-area-inset-bottom)) 0.75rem;
+    }
+
+    /* App-bar style header */
+    .live-header {
+      margin-bottom: 1.1rem;
+      padding-bottom: 0.85rem;
+    }
+    .live-header-icon {
+      width: 32px;
+      height: 32px;
+      font-size: 1.05rem;
+      border-radius: 9px;
+    }
+    .live-header-titles h1 {
+      font-size: 1.05rem;
+    }
+    .live-header-sub {
+      display: none; /* "Press F3" hint is meaningless on touch */
+    }
+    .live-close-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+
+    /* Floor plans: explicit app-style floor switcher on phones. */
+    .floor-section-switcher {
+      display: block;
+      margin: -0.15rem 0 0.75rem;
+    }
+    .floor-section-switcher-label {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-bottom: 0.4rem;
+      color: var(--live-text-muted);
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+    .floor-section-tabs {
+      display: flex;
+      gap: 0.45rem;
+      margin: 0 -0.75rem;
+      padding: 0 0.75rem 0.35rem;
+      overflow-x: auto;
+      scroll-snap-type: inline proximity;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .floor-section-tabs::-webkit-scrollbar { display: none; }
+    .floor-section-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex: 0 0 auto;
+      min-height: 40px;
+      padding: 0.42rem 0.75rem;
+      border: 1px solid var(--live-control-border);
+      border-radius: 13px;
+      background: var(--live-panel-bg);
+      color: var(--live-text-main);
+      box-shadow: 0 2px 8px rgba(24, 28, 39, 0.04);
+      font-family: inherit;
+      font-size: 0.72rem;
+      font-weight: 750;
+      white-space: nowrap;
+      scroll-snap-align: start;
+    }
+    .floor-section-tab i {
+      color: var(--live-text-muted);
+      font-size: 0.78rem;
+    }
+    .floor-section-tab-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 21px;
+      height: 21px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: var(--live-control-bg);
+      color: var(--live-text-muted);
+      font-size: 0.62rem;
+      font-weight: 800;
+    }
+    .floor-section-tab.active {
+      border-color: var(--live-accent-amber);
+      background: var(--live-accent-amber);
+      color: #fff;
+      box-shadow: 0 4px 13px rgba(236, 39, 52, 0.24);
+    }
+    .floor-section-tab.active i { color: #fff; }
+    .floor-section-tab.active .floor-section-tab-count {
+      background: rgba(255, 255, 255, 0.24);
+      color: #fff;
+    }
+    .floors-grid-container {
+      display: block;
+      margin: 0 0 0.65rem;
+      padding: 0;
+      overflow: visible;
+    }
+    .floor-block {
+      width: 100%;
+    }
+    .floor-block:not(.mobile-active) { display: none; }
+    .floor-block.mobile-active { display: flex; }
+    .floor-canvas-frame {
+      height: 260px;
+      border-radius: 16px;
+    }
+    .floor-block-title {
+      font-size: 0.72rem;
+    }
+    .floor-swipe-hint {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--live-text-muted);
+      margin: 0 0 1.1rem;
+    }
+    .floor-swipe-hint.show {
+      display: none;
+    }
+
+    /* Legend: horizontal pill chips */
+    .live-legend-bar {
+      gap: 0.5rem;
+      margin-bottom: 1.35rem;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .live-legend-bar::-webkit-scrollbar {
+      display: none;
+    }
+    .legend-item {
+      flex-shrink: 0;
+      background: var(--live-control-bg);
+      border: 1px solid var(--live-control-border);
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+    }
+
+    /* All Tables: real grid, big tap targets, app-card feel */
+    .all-tables-heading {
+      font-size: 0.72rem;
+      margin-bottom: 0.75rem;
+    }
+    .all-tables-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+    }
+    .live-table-card {
+      width: auto;
+      min-height: 92px;
+      padding: 0.7rem 0.65rem;
+      border-radius: 14px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+    .live-table-card:hover {
+      transform: none;
+    }
+    .live-table-card:active {
+      transform: scale(0.95);
+    }
+    .live-table-card .card-title {
+      font-size: 1.1rem;
+    }
+    .live-table-card .card-label,
+    .live-table-card .card-meta {
+      font-size: 0.62rem;
+    }
+    .live-table-card.card-occupied .card-badge-occ {
+      font-size: 0.5rem;
+      padding: 1px 4px;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .all-tables-cards-grid {
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 
@@ -337,12 +514,6 @@
     box-shadow: 0 0 16px rgba(239, 68, 68, 0.35), inset 0 0 8px rgba(239, 68, 68, 0.15);
   }
 
-  /* Dimmed state when party size doesn't fit */
-  .canvas-table-node.party-unfit {
-    opacity: 0.22 !important;
-    filter: grayscale(80%);
-  }
-
   /* ── Legend Row ── */
   .live-legend-bar {
     display: flex;
@@ -486,18 +657,6 @@
   html.dark .live-table-card.card-occupied .card-meta {
     color: #fcab7d;
   }
-
-  /* Dimmed card for party size */
-  .live-table-card.party-unfit {
-    opacity: 0.22 !important;
-    filter: grayscale(80%);
-  }
-
-  /* Highlighted party fit card */
-  .live-table-card.party-fit {
-    outline: 2px solid var(--live-accent-amber);
-    outline-offset: 1px;
-  }
 </style>
 {% endblock %}
 
@@ -517,13 +676,6 @@
     </div>
 
     <div class="live-header-right">
-      <!-- Party size filter -->
-      <div class="party-filter-box" title="Filter tables by number of guests">
-        <i class="bi bi-people"></i>
-        <input type="number" id="partySizeInput" placeholder="Party size" min="1" max="50" oninput="filterByPartySize(this.value)">
-        <button class="party-clear-btn" id="btnClearParty" onclick="clearPartySize()">&times;</button>
-      </div>
-
       <!-- Close button -->
       <button class="live-close-btn" onclick="closeLiveOverview()" title="Close (Esc)">
         <i class="bi bi-x-lg"></i>
@@ -532,12 +684,19 @@
   </div>
 
   <!-- ── MULTI-FLOOR VIEW (CANVASES) ── -->
+  <div class="floor-section-switcher" aria-label="Choose a floor">
+    <div class="floor-section-switcher-label"><i class="bi bi-layers-fill"></i> Floors</div>
+    <div class="floor-section-tabs" id="floorSectionTabs" role="tablist" aria-label="Available floors"></div>
+  </div>
   <div class="floors-grid-container" id="floorsGridContainer">
     <!-- Populated by JavaScript with each Floor / Section -->
     <div class="text-center py-5" style="letter-spacing:1px;font-size:0.85rem;color:var(--live-text-muted);">
       <div class="spinner-border spinner-border-sm text-warning me-2" role="status"></div>
       Loading live floor plans...
     </div>
+  </div>
+  <div class="floor-swipe-hint" id="floorSwipeHint">
+    <i class="bi bi-arrow-left-right"></i> Swipe for more floors
   </div>
 
   <!-- ── STATUS LEGEND ── -->
@@ -575,7 +734,7 @@
 (function() {
   let allTablesData = [];
   let floorSections = [];
-  let currentPartyFilter = 0;
+  let activeMobileSection = '';
   let pollInterval = null;
   let timerInterval = null;
   let pollTimeOffset = 0; // ms offset between local client clock and server now
@@ -599,54 +758,6 @@
       window.location.href = '/tables/';
     }
   };
-
-  // ── Party Size Filter ──
-  window.filterByPartySize = function(val) {
-    const num = parseInt(val, 10);
-    currentPartyFilter = (!isNaN(num) && num > 0) ? num : 0;
-    const clearBtn = document.getElementById('btnClearParty');
-    if (clearBtn) clearBtn.style.display = currentPartyFilter > 0 ? 'inline-block' : 'none';
-    applyPartyFilterUI();
-  };
-
-  window.clearPartySize = function() {
-    const inp = document.getElementById('partySizeInput');
-    if (inp) inp.value = '';
-    filterByPartySize('');
-  };
-
-  function applyPartyFilterUI() {
-    // Canvas nodes
-    document.querySelectorAll('.canvas-table-node').forEach(node => {
-      const cap = parseInt(node.getAttribute('data-capacity') || '4', 10);
-      if (currentPartyFilter > 0) {
-        if (cap < currentPartyFilter) {
-          node.classList.add('party-unfit');
-        } else {
-          node.classList.remove('party-unfit');
-        }
-      } else {
-        node.classList.remove('party-unfit');
-      }
-    });
-
-    // Bottom cards
-    document.querySelectorAll('.live-table-card').forEach(card => {
-      const cap = parseInt(card.getAttribute('data-capacity') || '4', 10);
-      if (currentPartyFilter > 0) {
-        if (cap < currentPartyFilter) {
-          card.classList.add('party-unfit');
-          card.classList.remove('party-fit');
-        } else {
-          card.classList.remove('party-unfit');
-          card.classList.add('party-fit');
-        }
-      } else {
-        card.classList.remove('party-unfit');
-        card.classList.remove('party-fit');
-      }
-    });
-  }
 
   // ── Fetch table data ──
   function fetchLiveTablesData() {
@@ -675,7 +786,6 @@
   function renderAll() {
     renderFloorCanvases();
     renderAllTableCards();
-    applyPartyFilterUI();
   }
 
   // ── Render Floor Canvases ──
@@ -693,12 +803,41 @@
 
     const secKeys = Object.keys(secMap).sort();
     if (secKeys.length === 0) secKeys.push('Floor 1');
+    if (!activeMobileSection || !secKeys.includes(activeMobileSection)) {
+      activeMobileSection = secKeys[0];
+    }
+
+    const floorTabs = document.getElementById('floorSectionTabs');
+    if (floorTabs) {
+      floorTabs.innerHTML = secKeys.map((secName, index) => `
+        <button type="button"
+                class="floor-section-tab ${secName === activeMobileSection ? 'active' : ''}"
+                data-floor-index="${index}"
+                role="tab"
+                aria-selected="${secName === activeMobileSection ? 'true' : 'false'}">
+          <i class="bi bi-layers"></i>
+          <span>${escapeHtml(secName)}</span>
+          <span class="floor-section-tab-count">${(secMap[secName] || []).length}</span>
+        </button>
+      `).join('');
+      floorTabs.querySelectorAll('.floor-section-tab').forEach(button => {
+        button.addEventListener('click', () => {
+          const index = Number(button.getAttribute('data-floor-index'));
+          if (!Number.isInteger(index) || !secKeys[index]) return;
+          activeMobileSection = secKeys[index];
+          renderFloorCanvases();
+        });
+      });
+    }
+
+    const swipeHint = document.getElementById('floorSwipeHint');
+    if (swipeHint) swipeHint.classList.toggle('show', secKeys.length > 1);
 
     let html = '';
     secKeys.forEach(secName => {
       const secId = 'canvas-sec-' + encodeURIComponent(secName).replace(/%/g, '_');
       html += `
-        <div class="floor-block">
+        <div class="floor-block ${secName === activeMobileSection ? 'mobile-active' : ''}" data-floor-section="${escapeHtml(secName)}">
           <div class="floor-block-title">
             <i class="bi bi-diagram-3-fill"></i> ${escapeHtml(secName).toUpperCase()}
           </div>

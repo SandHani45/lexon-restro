@@ -531,8 +531,7 @@ async function saveBooking() {
     const guests = document.getElementById('node-pax').value;
 
     if (!phone || !time) {
-        if (window.ui && ui.toast) ui.toast('Please provide guest phone number and reservation time.', 'warning');
-        else alert('Please provide phone number and reservation time.');
+        ui.toast('Please provide guest phone number and reservation time.', 'warning');
         return;
     }
 
@@ -555,15 +554,13 @@ async function saveBooking() {
         });
         const result = await res.json().catch(() => ({}));
         if (res.ok) {
-            if (window.ui && ui.toast) ui.toast('Reservation booked successfully!', 'success');
+            ui.toast('Reservation booked successfully!', 'success');
             setTimeout(() => window.location.reload(), 600);
         } else {
-            if (window.ui && ui.toast) ui.toast(result.error || 'Error saving booking', 'error');
-            else alert(result.error || 'Error saving booking');
+            ui.toast(result.error || 'Error saving booking', 'error');
         }
     } catch (e) {
-        if (window.ui && ui.toast) ui.toast('Network error saving booking', 'error');
-        else alert('Network error saving booking');
+        ui.toast('Network error saving booking', 'error');
     }
 }
 
@@ -578,16 +575,14 @@ async function updateReservationStatus(reservationId, newStatus) {
             body: JSON.stringify({ status: newStatus })
         });
         if (res.ok) {
-            if (window.ui && ui.toast) ui.toast(`Reservation updated to ${newStatus}`, 'success');
+            ui.toast(`Reservation updated to ${newStatus}`, 'success');
             setTimeout(() => window.location.reload(), 500);
         } else {
             const data = await res.json().catch(() => ({}));
-            if (window.ui && ui.toast) ui.toast(data.error || 'Could not update reservation.', 'error');
-            else alert(data.error || 'Could not update reservation.');
+            ui.toast(data.error || 'Could not update reservation.', 'error');
         }
     } catch (e) {
-        if (window.ui && ui.toast) ui.toast('Network error updating reservation', 'error');
-        else alert('Network error updating reservation');
+        ui.toast('Network error updating reservation', 'error');
     }
 }
 

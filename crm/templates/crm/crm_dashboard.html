@@ -408,12 +408,176 @@
     }
 
     @media (max-width: 768px) {
-        .pos-subbar { padding: 0.75rem 1rem; }
-        .crm-wrap { padding: 0.5rem 1rem 4rem; }
-        .guest-table th:nth-child(4),
-        .guest-table td:nth-child(4),
-        .guest-table th:nth-child(6),
-        .guest-table td:nth-child(6) { display: none; }
+        #pos-topbar .topbar-left-slot,
+        #pos-topbar .topbar-more-btn { display: none !important; }
+        #pos-topbar .topbar-more-wrap,
+        #pos-topbar .topbar-more-menu { display: contents !important; }
+
+        .pos-subbar { padding: 0.65rem 0.75rem 0.35rem; gap: 8px; }
+        .pos-subbar-title { font-size: 1.05rem; letter-spacing: -0.3px; gap: 6px; }
+        .pos-breadcrumbs { font-size: 0.66rem; gap: 4px; white-space: nowrap; }
+        .crm-page-actions {
+            width: 100%;
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            gap: 6px !important;
+            overflow-x: auto;
+            padding: 1px 1px 4px;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x proximity;
+        }
+        .crm-page-actions::-webkit-scrollbar { display: none; }
+        .crm-page-actions .btn-subbar-pill {
+            flex: 0 0 auto;
+            min-height: 38px;
+            padding: 6px 10px;
+            font-size: 0.7rem;
+            box-shadow: none;
+            scroll-snap-align: start;
+        }
+        .crm-page-actions .crm-new-order { order: -1; }
+
+        .crm-wrap { padding: 0.35rem 0.75rem 4rem; }
+        .crm-kpi-row {
+            --bs-gutter-x: 0.6rem;
+            --bs-gutter-y: 0.6rem;
+            margin-bottom: 0.75rem !important;
+        }
+        .crm-kpi-row > [class*="col-"] { width: 50%; }
+        .kpi-card {
+            min-height: 102px;
+            padding: 0.72rem;
+            border-radius: 16px;
+            align-items: flex-start;
+            gap: 4px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.035);
+        }
+        .kpi-card:hover { transform: none; }
+        .kpi-info { padding-right: 25px; }
+        .kpi-label { font-size: 0.57rem; letter-spacing: 0.3px; margin-bottom: 0.18rem; }
+        .kpi-val { font-size: 1.28rem; margin-bottom: 0; line-height: 1.05; }
+        .kpi-sub { display: none; }
+        .kpi-icon-wrap {
+            position: absolute;
+            top: 0.7rem;
+            right: 0.65rem;
+            width: 29px;
+            height: 29px;
+            border-radius: 9px;
+            font-size: 0.85rem;
+        }
+
+        .filter-card {
+            padding: 0.65rem;
+            margin-bottom: 0.75rem;
+            border-radius: 16px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.035);
+        }
+        .filter-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 7px;
+            align-items: end;
+        }
+        .search-group { grid-column: 1 / -1; min-width: 0; gap: 3px; }
+        .sort-group { width: auto; min-width: 0; gap: 3px; }
+        .filter-label { font-size: 0.58rem; }
+        .input-pill {
+            min-width: 0;
+            min-height: 41px;
+            padding: 0.45rem 0.65rem;
+            border-radius: 11px;
+            font-size: 0.72rem;
+        }
+        .filter-grid > .d-flex { gap: 5px !important; }
+        .btn-apply, .btn-clear {
+            min-height: 41px;
+            justify-content: center;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.7rem;
+        }
+        .btn-apply { min-width: 82px; }
+        .btn-clear { width: 41px; padding: 0; font-size: 0; }
+        .btn-clear i { font-size: 0.82rem; margin: 0; }
+
+        .table-card { background: transparent; border: 0; box-shadow: none; overflow: visible; }
+        .table-responsive { overflow: visible; }
+        .guest-table thead { display: none; }
+        .guest-table, .guest-table tbody { display: block; width: 100%; }
+        .guest-table tr {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 7px;
+            width: 100%;
+            margin-bottom: 0.65rem;
+            padding: 0.65rem;
+            border: 1px solid var(--border-color);
+            border-radius: 17px;
+            background: var(--panel-bg);
+            box-shadow: 0 3px 14px rgba(0, 0, 0, 0.04);
+        }
+        .guest-table tr:hover td { background: var(--surface-2); }
+        .guest-table td {
+            display: block;
+            width: 100%;
+            min-width: 0;
+            min-height: 54px;
+            padding: 0.5rem 0.55rem;
+            border: 0;
+            border-radius: 11px;
+            background: var(--surface-2);
+            text-align: left !important;
+            font-size: 0.75rem;
+        }
+        .guest-table td::before {
+            content: attr(data-label);
+            display: block;
+            margin-bottom: 3px;
+            color: var(--text-muted);
+            font-size: 0.55rem;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+        .guest-table td[data-label="Guest"] {
+            grid-column: 1 / -1;
+            min-height: 0;
+            padding: 0.15rem 0.1rem 0.65rem;
+            border-radius: 0;
+            border-bottom: 1px solid var(--border-color);
+            background: transparent;
+        }
+        .guest-table td[data-label="Guest"]::before,
+        .guest-table td[data-label="Profile"]::before { display: none; }
+        .guest-table td[data-label="Phone"],
+        .guest-table td[data-label="Profile"] { grid-column: 1 / -1; }
+        .guest-table td[data-label="Phone"] { min-height: 48px; }
+        .guest-table td[data-label="Profile"] { min-height: 0; padding: 0; background: transparent; }
+        .guest-table td[data-label="Spend"] { color: var(--pos-green) !important; font-size: 0.92rem !important; }
+        .guest-avatar { width: 36px; height: 36px; font-size: 0.82rem; }
+        .visits-badge, .pts-badge { font-size: 0.66rem; }
+        .btn-view-profile {
+            width: 100%;
+            min-height: 42px;
+            justify-content: center;
+            border-color: var(--pos-red-border);
+            background: var(--pos-red-soft);
+            color: var(--pos-red);
+            font-size: 0.72rem;
+        }
+        .pag {
+            padding: 0.6rem !important;
+            margin-top: 0.75rem;
+            gap: 6px;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 14px;
+            background: var(--panel-bg);
+            justify-content: center;
+        }
+        .pag > .me-auto { width: 100%; margin: 0 !important; text-align: center; font-size: 0.68rem !important; }
+        .pag a, .pag span { min-height: 36px; padding: 0.4rem 0.7rem; font-size: 0.7rem; }
+        .crm-empty-state { padding: 3rem 1rem !important; border: 1px solid var(--border-color); border-radius: 17px; background: var(--panel-bg); }
     }
 </style>
 {% endblock %}
@@ -459,14 +623,14 @@
       <span class="current">Guests Directory</span>
     </div>
   </div>
-  <div class="d-flex align-items-center gap-2 flex-wrap">
+  <div class="d-flex align-items-center gap-2 flex-wrap crm-page-actions">
     <a href="{% url 'reviews-list' %}" class="btn-subbar-pill no-print">
       <i class="bi bi-star-fill text-warning"></i> Guest Reviews
     </a>
     <a href="{% url 'reservation-list' %}" class="btn-subbar-pill no-print">
       <i class="bi bi-calendar2-week"></i> Table Bookings
     </a>
-    <a href="/billing/" class="btn-subbar-pill no-print" style="background:var(--pos-red);color:#fff !important;border:none;">
+    <a href="/billing/" class="btn-subbar-pill no-print crm-new-order" style="background:var(--pos-red);color:#fff !important;border:none;">
       <i class="bi bi-plus-circle-fill"></i> New Order
     </a>
   </div>
@@ -475,7 +639,7 @@
 <div class="crm-wrap">
 
   <!-- 4 Hero KPI Cards -->
-  <div class="row g-3 mb-4">
+  <div class="row g-3 mb-4 crm-kpi-row">
     <div class="col-12 col-sm-6 col-xl-3">
       <div class="kpi-card kpi-guests">
         <div class="kpi-info">
@@ -575,7 +739,7 @@
         <tbody>
           {% for g in guests %}
           <tr>
-            <td>
+            <td data-label="Guest">
               <div class="d-flex align-items-center gap-3">
                 <div class="guest-avatar">
                   {{ g.name|default:g.phone|slice:":1"|upper }}
@@ -590,28 +754,28 @@
                 </div>
               </div>
             </td>
-            <td>
+            <td data-label="Phone">
               <span style="font-family:'Space Mono', monospace;font-weight:600;font-size:0.85rem;color:var(--text-main);">
                 <i class="bi bi-telephone text-muted me-1"></i>{{ g.phone }}
               </span>
             </td>
-            <td>
+            <td data-label="Visits">
               <span class="visits-badge">
                 <i class="bi bi-cup-hot text-muted me-1"></i>{{ g.visit_count }} visit{{ g.visit_count|pluralize }}
               </span>
             </td>
-            <td style="font-weight:800;font-size:0.95rem;color:var(--text-main);">
+            <td data-label="Spend" style="font-weight:800;font-size:0.95rem;color:var(--text-main);">
               {{ CURRENCY_SYMBOL }}{{ g.total_spent|floatformat:0 }}
             </td>
-            <td>
+            <td data-label="Points">
               <span class="pts-badge">
                 <i class="bi bi-star-fill"></i>{{ g.total_points }} pts
               </span>
             </td>
-            <td style="color:var(--text-muted);font-size:0.82rem;">
+            <td data-label="Member Since" style="color:var(--text-muted);font-size:0.82rem;">
               <i class="bi bi-calendar3 me-1"></i>{{ g.created_at|date:"d M Y" }}
             </td>
-            <td style="text-align:right;">
+            <td data-label="Profile" style="text-align:right;">
               <a href="{% url 'guest-profile' g.id %}" class="btn-view-profile">
                 View Profile <i class="bi bi-arrow-right"></i>
               </a>
@@ -643,7 +807,7 @@
     {% endif %}
 
     {% else %}
-    <div style="text-align:center;padding:5rem 2rem;color:var(--text-muted);">
+    <div class="crm-empty-state" style="text-align:center;padding:5rem 2rem;color:var(--text-muted);">
       <div style="width:72px;height:72px;border-radius:20px;background:var(--pos-red-soft);border:1px solid var(--pos-red-border);display:inline-flex;align-items:center;justify-content:center;color:var(--pos-red);font-size:2rem;margin-bottom:1.25rem;">
         <i class="bi bi-people"></i>
       </div>

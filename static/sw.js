@@ -7,7 +7,7 @@
    from the page itself on 'online'/page-load, not via a sync event.)
    ============================================================ */
 
-const CACHE_VERSION = 'lexnorax-v3';
+const CACHE_VERSION = 'lexnorax-v6';
 const STATIC_CACHE  = `${CACHE_VERSION}-static`;
 const MENU_CACHE    = `${CACHE_VERSION}-menu`;
 
@@ -109,7 +109,11 @@ self.addEventListener('fetch', event => {
     // App pages — network first, cache on success, serve cache when offline
     const isBillingOrKitchen = url.pathname.startsWith('/billing') || url.pathname.startsWith('/kitchen');
     event.respondWith(
-        fetch(request, { credentials: 'include' })
+        // The navigation Request already carries the correct cookie and
+        // credentials mode. Reusing it unchanged avoids browser-specific
+        // failures caused by rebuilding a navigation fetch with overrides,
+        // which could incorrectly fall back to stale cached HTML.
+        fetch(request)
             .then(response => {
                 if (response.ok) {
                     const clone = response.clone();

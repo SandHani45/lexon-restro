@@ -1,0 +1,15 @@
+{% if request.user.is_authenticated %}
+<div class="user-role-badge" title="Logged in as {{ request.user.get_role_display|default:request.user.role }}">
+    <span class="user-role-tag role-{{ request.user.role }}">
+        {% if request.user.role == 'owner' %}<i class="bi bi-shield-shaded me-1"></i>Owner
+        {% elif request.user.role == 'manager' %}<i class="bi bi-person-gear me-1"></i>Manager
+        {% elif request.user.role == 'cashier' %}<i class="bi bi-cash me-1"></i>Cashier
+        {% elif request.user.role == 'captain' %}<i class="bi bi-award me-1"></i>Captain
+        {% elif request.user.role == 'waiter' %}<i class="bi bi-bell me-1"></i>Waiter
+        {% elif request.user.role == 'chef' %}<i class="bi bi-egg-fried me-1"></i>Chef
+        {% elif request.user.role == 'kitchen' %}<i class="bi bi-fire me-1"></i>Kitchen
+        {% else %}<i class="bi bi-person me-1"></i>{{ request.user.role|title }}
+        {% endif %}
+    </span>
+</div>
+{% endif %}

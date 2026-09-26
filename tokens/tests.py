@@ -360,7 +360,7 @@ class TestCreateAndGoToBilling(TestCase, QSRFixtureMixin):
         self.client = Client()
         self.client.login(username="owner1", password="pass")
 
-    def test_creates_token_and_returns_redirect(self):
+    def test_returns_draft_billing_redirect_without_creating_order(self):
         resp = self.client.post(
             reverse("create-and-bill"),
             data=json.dumps({}),
@@ -369,19 +369,38 @@ class TestCreateAndGoToBilling(TestCase, QSRFixtureMixin):
         self.assertEqual(resp.status_code, 200)
         data = resp.json()
         self.assertTrue(data["success"])
-        self.assertIn("/token/", data["redirect"])
-        self.assertIn("/bill/", data["redirect"])
+        self.assertEqual(data["redirect"], reverse("new-token-bill"))
+        self.assertEqual(Order.objects.count(), 0)
+        self.assertEqual(TokenOrder.objects.count(), 0)
 
-    def test_token_number_sequential(self):
-        r1 = self.client.post(reverse("create-and-bill"), data=json.dumps({}), content_type="application/json").json()
-        r2 = self.client.post(reverse("create-and-bill"), data=json.dumps({}), content_type="application/json").json()
-        self.assertEqual(r1["token_number"], 1)
-        self.assertEqual(r2["token_number"], 2)
+    def test_repeated_draft_requests_do_not_allocate_tokens(self):
+        self.client.post(reverse("create-and-bill"), data=json.dumps({}), content_type="application/json")
+        self.client.post(reverse("create-and-bill"), data=json.dumps({}), content_type="application/json")
+        self.assertEqual(Order.objects.count(), 0)
+        self.assertEqual(TokenOrder.objects.count(), 0)
+        self.assertEqual(DailyTokenCounter.objects.count(), 0)
 
-    def test_order_source_is_counter(self):
-        resp = self.client.post(reverse("create-and-bill"), data=json.dumps({}), content_type="application/json").json()
-        order = Order.objects.get(id=resp["order_id"])
-        self.assertEqual(order.source, "counter")
+    def test_draft_billing_screen_does_not_create_order(self):
+        resp = self.client.get(reverse("new-token-bill"))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Empty Order")
+        self.assertEqual(Order.objects.count(), 0)
+        self.assertEqual(TokenOrder.objects.count(), 0)
+
+    def test_first_non_empty_cart_creates_positive_value_order_and_token(self):
+        resp = self.client.post(
+            reverse("create-order"),
+            data=json.dumps({
+                "cart": [{"id": self.item.id, "quantity": 1}],
+                "source": "counter",
+            }),
+            content_type="application/json",
+        )
+
+        self.assertEqual(resp.status_code, 200)
+        order = Order.objects.get(id=resp.json()["order_id"])
+        self.assertGreater(order.grand_total, Decimal("0"))
+        self.assertTrue(TokenOrder.objects.filter(order=order).exists())
 
     def test_waiter_cannot_use_direct_billing(self):
         c = Client()

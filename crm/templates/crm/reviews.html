@@ -453,9 +453,164 @@
     }
 
     @media (max-width: 768px) {
-        .pos-subbar { padding: 0.75rem 1rem; }
-        .reviews-wrap { padding: 0.5rem 1rem 4rem; }
-        .review-card-top { flex-direction: column; align-items: flex-start; }
+        #pos-topbar .topbar-left-slot,
+        #pos-topbar .topbar-more-btn { display: none !important; }
+        #pos-topbar .topbar-more-wrap,
+        #pos-topbar .topbar-more-menu { display: contents !important; }
+
+        .pos-subbar { padding: 0.65rem 0.75rem 0.35rem; gap: 8px; }
+        .pos-subbar-title { font-size: 1.05rem; letter-spacing: -0.3px; gap: 6px; }
+        .pos-breadcrumbs { font-size: 0.66rem; gap: 4px; white-space: nowrap; }
+        .reviews-page-actions {
+            width: 100%;
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            gap: 6px !important;
+            overflow-x: auto;
+            padding: 1px 1px 4px;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .reviews-page-actions::-webkit-scrollbar { display: none; }
+        .reviews-page-actions .btn-subbar-pill {
+            flex: 0 0 auto;
+            min-height: 38px;
+            padding: 6px 10px;
+            font-size: 0.7rem;
+            box-shadow: none;
+        }
+
+        .reviews-wrap { padding: 0.35rem 0.75rem 4rem; }
+        .reviews-kpi-row {
+            --bs-gutter-x: 0.6rem;
+            --bs-gutter-y: 0.6rem;
+            margin-bottom: 0.75rem !important;
+        }
+        .reviews-kpi-row > [class*="col-"] { width: 50%; }
+        .kpi-card {
+            min-height: 102px;
+            padding: 0.72rem;
+            border-radius: 16px;
+            align-items: flex-start;
+            gap: 4px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.035);
+        }
+        .kpi-card:hover { transform: none; }
+        .kpi-info { padding-right: 25px; }
+        .kpi-label { font-size: 0.57rem; letter-spacing: 0.3px; margin-bottom: 0.18rem; }
+        .kpi-val { font-size: 1.28rem; margin-bottom: 0; line-height: 1.05; gap: 4px !important; }
+        .kpi-val > span:last-child { font-size: 0.72rem !important; }
+        .kpi-sub { display: none; }
+        .kpi-icon-wrap {
+            position: absolute;
+            top: 0.7rem;
+            right: 0.65rem;
+            width: 29px;
+            height: 29px;
+            border-radius: 9px;
+            font-size: 0.85rem;
+        }
+
+        .analytics-filter-card {
+            padding: 0.65rem;
+            margin-bottom: 0.75rem;
+            border-radius: 16px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.035);
+        }
+        .analytics-filter-card > .row {
+            --bs-gutter-x: 0;
+            --bs-gutter-y: 0.65rem;
+        }
+        .reviews-search-panel { order: -1; }
+        .reviews-search-panel form > label { font-size: 0.58rem !important; }
+        .reviews-search-panel form > .d-flex { gap: 6px !important; }
+        .search-input-wrap { min-width: 0; }
+        .search-input-wrap input {
+            min-height: 41px;
+            padding: 0.45rem 0.6rem 0.45rem 2rem;
+            border-radius: 11px;
+            font-size: 0.72rem;
+        }
+        .reviews-search-panel .btn-subbar-pill {
+            min-height: 41px;
+            padding: 0.5rem 0.75rem;
+            border-radius: 11px;
+            font-size: 0.7rem;
+        }
+        .rating-distribution-title { display: none; }
+        .rating-distribution-toggle {
+            width: 100%;
+            min-height: 40px;
+            border: 0;
+            border-radius: 11px;
+            padding: 0.45rem 0.55rem;
+            background: var(--surface-2);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-main, 'Outfit', sans-serif);
+            font-size: 0.72rem;
+            font-weight: 750;
+            text-align: left;
+        }
+        .rating-distribution-toggle i:first-child { color: #f59e0b; }
+        .rating-distribution-toggle .distribution-chevron { margin-left: auto; transition: transform 0.2s ease; }
+        .rating-distribution-bars { display: none; padding: 0.65rem 0.35rem 0; }
+        .analytics-filter-card.distribution-open .rating-distribution-bars { display: block; }
+        .analytics-filter-card.distribution-open .distribution-chevron { transform: rotate(180deg); }
+        .star-bar-row { margin-bottom: 5px; font-size: 0.7rem; gap: 7px; }
+        .star-bar-label { width: 35px; }
+        .star-bar-count { width: 28px; }
+
+        .filter-pills-row {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            gap: 6px;
+            margin-top: 0.65rem;
+            padding: 0.65rem 1px 2px;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .filter-pills-row::-webkit-scrollbar { display: none; }
+        .filter-pills-row > span { display: none; }
+        .pill-filter {
+            flex: 0 0 auto;
+            min-height: 36px;
+            padding: 5px 10px;
+            font-size: 0.68rem;
+        }
+
+        .review-card {
+            padding: 0.8rem;
+            margin-bottom: 0.65rem;
+            border-radius: 16px;
+            box-shadow: 0 3px 14px rgba(0, 0, 0, 0.04);
+        }
+        .review-card:hover { transform: none; }
+        .review-card-top { flex-direction: column; align-items: stretch; gap: 8px; margin-bottom: 0.65rem; }
+        .reviewer-meta { gap: 9px; }
+        .reviewer-avatar { width: 36px; height: 36px; font-size: 0.82rem; }
+        .reviewer-name { font-size: 0.84rem; }
+        .review-date { font-size: 0.62rem; }
+        .review-card-top > .d-flex { justify-content: space-between; width: 100%; gap: 8px !important; }
+        .stars-gold { font-size: 0.86rem; letter-spacing: 1px; }
+        .sentiment-badge { font-size: 0.58rem; padding: 3px 7px; }
+        .review-comment { padding: 0.65rem 0.75rem; margin-bottom: 0.65rem; border-radius: 10px; font-size: 0.78rem; line-height: 1.45; }
+        .review-footer { align-items: flex-start; flex-direction: column; gap: 6px; font-size: 0.68rem; }
+        .order-link-pill { font-size: 0.66rem; padding: 3px 7px; }
+        .pag {
+            padding: 0.6rem !important;
+            margin-top: 0.75rem;
+            gap: 6px;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 14px;
+            background: var(--panel-bg);
+            justify-content: center;
+        }
+        .pag > .me-auto { width: 100%; margin: 0 !important; text-align: center; font-size: 0.68rem !important; }
+        .pag a, .pag span { min-height: 36px; padding: 0.4rem 0.7rem; font-size: 0.7rem; }
+        .reviews-empty-state { padding: 3rem 1rem !important; border-radius: 17px; }
     }
 </style>
 {% endblock %}
@@ -501,7 +656,7 @@
       <span class="current">Guest Reviews</span>
     </div>
   </div>
-  <div class="d-flex align-items-center gap-2 flex-wrap">
+  <div class="d-flex align-items-center gap-2 flex-wrap reviews-page-actions">
     <a href="{% url 'crm-dashboard' %}" class="btn-subbar-pill no-print">
       <i class="bi bi-people"></i> Guests Directory
     </a>
@@ -514,7 +669,7 @@
 <div class="reviews-wrap">
 
   <!-- 4 Hero KPI Cards -->
-  <div class="row g-3 mb-4">
+  <div class="row g-3 mb-4 reviews-kpi-row">
     <div class="col-12 col-sm-6 col-xl-3">
       <div class="kpi-card kpi-rating">
         <div class="kpi-info">
@@ -572,11 +727,17 @@
   <div class="analytics-filter-card">
     <div class="row g-4 align-items-center">
       <!-- Star Distribution -->
-      <div class="col-12 col-lg-6">
-        <div style="font-size:0.75rem;font-weight:800;text-transform:uppercase;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:0.75rem;font-family:var(--font-main, 'Outfit', sans-serif);">
+      <div class="col-12 col-lg-6 rating-distribution-panel">
+        <div class="rating-distribution-title" style="font-size:0.75rem;font-weight:800;text-transform:uppercase;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:0.75rem;font-family:var(--font-main, 'Outfit', sans-serif);">
           Rating Distribution
         </div>
-        {% for star in "5,4,3,2,1"|make_list %}
+        <button type="button" class="rating-distribution-toggle d-lg-none" onclick="toggleRatingDistribution(this)" aria-expanded="false">
+          <i class="bi bi-bar-chart-fill"></i>
+          <span>Rating Distribution</span>
+          <i class="bi bi-chevron-down distribution-chevron"></i>
+        </button>
+        <div class="rating-distribution-bars">
+        {% for star in "54321"|make_list %}
         {% with star_num=star|add:0 %}
         <div class="star-bar-row">
           <div class="star-bar-label">{{ star }} ★</div>
@@ -589,10 +750,11 @@
         </div>
         {% endwith %}
         {% endfor %}
+        </div>
       </div>
 
       <!-- Search Input -->
-      <div class="col-12 col-lg-6">
+      <div class="col-12 col-lg-6 reviews-search-panel">
         <form method="get" class="d-flex flex-column gap-2">
           <label style="font-size:0.75rem;font-weight:800;text-transform:uppercase;color:var(--text-muted);letter-spacing:0.5px;font-family:var(--font-main, 'Outfit', sans-serif);">
             Search Comments or Guest Name
@@ -729,7 +891,7 @@
     </div>
 
   {% else %}
-    <div class="analytics-filter-card" style="text-align:center;padding:5rem 2rem;color:var(--text-muted);">
+    <div class="analytics-filter-card reviews-empty-state" style="text-align:center;padding:5rem 2rem;color:var(--text-muted);">
       <div style="width:72px;height:72px;border-radius:20px;background:var(--pos-red-soft);border:1px solid var(--pos-red-border);display:inline-flex;align-items:center;justify-content:center;color:var(--pos-red);font-size:2rem;margin-bottom:1.25rem;">
         <i class="bi bi-star"></i>
       </div>
@@ -744,5 +906,15 @@
   {% endif %}
 
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleRatingDistribution(button) {
+  const card = button.closest('.analytics-filter-card');
+  const isOpen = card.classList.toggle('distribution-open');
+  button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+}
+</script>
 {% endblock %}
 

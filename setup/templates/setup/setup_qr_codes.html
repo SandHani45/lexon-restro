@@ -245,6 +245,9 @@
     .preset-gold { border-color: #EC2734; color: #EC2734; }
     .preset-gold.active { background: rgba(236, 39, 52,0.18); border-color: #EC2734; }
 
+    .preset-basic { border-color: #111827; color: var(--text-main); grid-column: 1 / -1; }
+    .preset-basic.active { background: rgba(107, 114, 128, 0.14); border-color: #111827; }
+
     .preset-blue { border-color: #0ea5e9; color: #38bdf8; }
     .preset-blue.active { background: rgba(14,165,233,0.18); border-color: #0ea5e9; }
 
@@ -622,10 +625,10 @@
                 <label class="form-group-label" for="tableSelect">Select Table</label>
                 <select id="tableSelect" class="qr-select">
                     {% for t in tables %}
-                    <option value="{{ t.id }}" data-name="{{ t.name }}" data-url="{{ menu_base_url }}{{ t.qr_token }}/">Table {{ t.name }}</option>
+                    <option value="{{ t.id }}" data-name="{{ t.name }}" data-url="{{ menu_base_url }}{{ t.qr_token }}/" data-qr-image="{% url 'setup_qr_image' t.qr_token %}">Table {{ t.name }}</option>
                     {% endfor %}
                     {% if counter_qr_url %}
-                    <option value="counter" data-name="Counter" data-url="{{ counter_qr_url }}">Counter / Walk-in</option>
+                    <option value="counter" data-name="Counter" data-url="{{ counter_qr_url }}" data-qr-image="{% url 'setup_qr_image' outlet.qr_token %}">Counter / Walk-in</option>
                     {% endif %}
                 </select>
             </div>
@@ -635,7 +638,8 @@
 
             <div class="form-group-label">Color Presets</div>
             <div class="preset-grid">
-                <div class="preset-btn preset-gold active" onclick="applyPreset('gold')">Classic Gold</div>
+                <div class="preset-btn preset-basic active" onclick="applyPreset('basic')">Basic Black &amp; White</div>
+                <div class="preset-btn preset-gold" onclick="applyPreset('gold')">Classic Red</div>
                 <div class="preset-btn preset-blue" onclick="applyPreset('blue')">Ocean Blue</div>
                 <div class="preset-btn preset-green" onclick="applyPreset('green')">Forest Green</div>
                 <div class="preset-btn preset-purple" onclick="applyPreset('purple')">Royal Purple</div>
@@ -649,11 +653,11 @@
             <div class="mb-3">
                 <label class="form-group-label" for="dotStyle">Dot Style</label>
                 <select id="dotStyle" class="qr-select" onchange="updateQrPreview()">
-                    <option value="rounded" selected>Rounded</option>
+                    <option value="rounded">Rounded</option>
                     <option value="dots">Dots</option>
                     <option value="classy">Classy</option>
                     <option value="classy-rounded">Classy Rounded</option>
-                    <option value="square">Square</option>
+                    <option value="square" selected>Square</option>
                 </select>
             </div>
 
@@ -661,10 +665,10 @@
             <div class="mb-3">
                 <label class="form-group-label" for="cornerStyle">Corner Style</label>
                 <select id="cornerStyle" class="qr-select" onchange="updateQrPreview()">
-                    <option value="extra-rounded" selected>Extra Rounded</option>
+                    <option value="extra-rounded">Extra Rounded</option>
                     <option value="rounded">Rounded</option>
                     <option value="dot">Dot</option>
-                    <option value="square">Square</option>
+                    <option value="square" selected>Square</option>
                 </select>
             </div>
 
@@ -672,10 +676,10 @@
             <div class="mb-2">
                 <label class="form-group-label">QR Color</label>
                 <div class="color-input-row">
-                    <div class="color-swatch-wrapper" id="qrSwatchWrapper" style="background:#EC2734;">
-                        <input type="color" id="qrColorNative" class="color-native-input" value="#EC2734" oninput="onQrColorChange(this.value)">
+                    <div class="color-swatch-wrapper" id="qrSwatchWrapper" style="background:#000000;">
+                        <input type="color" id="qrColorNative" class="color-native-input" value="#000000" oninput="onQrColorChange(this.value)">
                     </div>
-                    <input type="text" id="qrColorHex" class="color-hex-text" value="#EC2734" onchange="onQrColorChange(this.value)">
+                    <input type="text" id="qrColorHex" class="color-hex-text" value="#000000" onchange="onQrColorChange(this.value)">
                 </div>
             </div>
 
@@ -683,10 +687,10 @@
             <div class="mb-3">
                 <label class="form-group-label">Background Color</label>
                 <div class="color-input-row">
-                    <div class="color-swatch-wrapper" id="bgSwatchWrapper" style="background:#1a1a1a;">
-                        <input type="color" id="bgColorNative" class="color-native-input" value="#1a1a1a" oninput="onBgColorChange(this.value)">
+                    <div class="color-swatch-wrapper" id="bgSwatchWrapper" style="background:#ffffff;">
+                        <input type="color" id="bgColorNative" class="color-native-input" value="#ffffff" oninput="onBgColorChange(this.value)">
                     </div>
-                    <input type="text" id="bgColorHex" class="color-hex-text" value="#1a1a1a" onchange="onBgColorChange(this.value)">
+                    <input type="text" id="bgColorHex" class="color-hex-text" value="#FFFFFF" onchange="onBgColorChange(this.value)">
                 </div>
             </div>
 
@@ -776,9 +780,11 @@
     const ALL_TABLES = {{ tables_json|safe }};
     const TENANT_NAME = "{{ tenant.name|escapejs }}";
     const OUTLET_NAME = "{{ outlet.name|escapejs }}";
+    const QR_LOGO_URL = "{% static 'images/easybillbro_symbol_red.png' %}";
 
     // Presets definition
     const PRESETS = {
+        basic:    { qr: '#000000', bg: '#ffffff', dot: 'square', corner: 'square' },
         gold:     { qr: '#EC2734', bg: '#1a1a1a', dot: 'rounded', corner: 'extra-rounded' },
         blue:     { qr: '#0ea5e9', bg: '#0c1929', dot: 'rounded', corner: 'extra-rounded' },
         green:    { qr: '#10b981', bg: '#0a2318', dot: 'rounded', corner: 'extra-rounded' },
@@ -789,30 +795,19 @@
         mint:     { qr: '#14b8a6', bg: '#082320', dot: 'rounded', corner: 'extra-rounded' }
     };
 
-    let currentPreset = 'gold';
-    let currentQrColor = '#EC2734';
-    let currentBgColor = '#1a1a1a';
-    let currentDotStyle = 'rounded';
-    let currentCornerStyle = 'extra-rounded';
+    let currentPreset = 'basic';
+    let currentQrColor = '#000000';
+    let currentBgColor = '#ffffff';
+    let currentDotStyle = 'square';
+    let currentCornerStyle = 'square';
     let isNfcEnabled = false;
     let qrCodeInstance = null;
-
-    // Helper to generate center brand SVG logo
-    function createCenterLogoSvg(text, qrColor, bgColor) {
-        const width = 114;
-        const height = 28;
-        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-            <rect width="${width}" height="${height}" rx="6" fill="${bgColor}"/>
-            <text x="${width / 2}" y="19" font-family="'Outfit', sans-serif" font-weight="900" font-size="11" fill="${qrColor}" text-anchor="middle" letter-spacing="1">${text}</text>
-        </svg>`;
-        return "data:image/svg+xml;base64," + btoa(svg);
-    }
 
     // Initialize UI
     document.addEventListener("DOMContentLoaded", function() {
         // Load saved preferences if any
         try {
-            const saved = localStorage.getItem("pos_qr_settings");
+            const saved = localStorage.getItem("pos_qr_settings_v2");
             if (saved) {
                 const cfg = JSON.parse(saved);
                 if (cfg.qr) currentQrColor = cfg.qr;
@@ -945,7 +940,7 @@
 
     function saveSettingsToLocal() {
         try {
-            localStorage.setItem("pos_qr_settings", JSON.stringify({
+            localStorage.setItem("pos_qr_settings_v2", JSON.stringify({
                 qr: currentQrColor,
                 bg: currentBgColor,
                 dot: currentDotStyle,
@@ -967,14 +962,36 @@
 
         container.innerHTML = "";
 
-        const centerLogo = createCenterLogoSvg("EasyBillBro", currentQrColor, currentBgColor);
+        const selectedOption = document.querySelector("#tableSelect option:checked");
+        const fallbackImageUrl = selectedOption ? selectedOption.getAttribute("data-qr-image") : "";
+        const showServerFallback = () => {
+            container.innerHTML = "";
+            if (!fallbackImageUrl) return;
+            const fallbackImage = document.createElement("img");
+            fallbackImage.src = fallbackImageUrl;
+            fallbackImage.alt = "QR code for " + url;
+            fallbackImage.width = 250;
+            fallbackImage.height = 250;
+            fallbackImage.style.display = "block";
+            fallbackImage.style.background = "#ffffff";
+            fallbackImage.style.borderRadius = "8px";
+            container.appendChild(fallbackImage);
+        };
 
-        qrCodeInstance = new QRCodeStyling({
+        // Keep a server-generated PNG visible when production static assets
+        // are delayed, blocked, or were not collected during deployment.
+        if (typeof QRCodeStyling === "undefined") {
+            showServerFallback();
+            return;
+        }
+
+        try {
+            qrCodeInstance = new QRCodeStyling({
             width: 250,
             height: 250,
             type: "canvas",
             data: url,
-            image: centerLogo,
+            image: QR_LOGO_URL,
             margin: 4,
             qrOptions: {
                 typeNumber: 0,
@@ -1001,20 +1018,20 @@
                 margin: 4,
                 imageSize: 0.35
             }
-        });
+            });
 
-        qrCodeInstance.append(container);
+            qrCodeInstance.append(container);
+        } catch (error) {
+            console.error("QR preview failed; using server-rendered fallback.", error);
+            showServerFallback();
+        }
     }
 
     function copyQrUrl() {
         const input = document.getElementById("qrUrlInput");
         if (!input) return;
         navigator.clipboard.writeText(input.value).then(() => {
-            if (window.ui && ui.toast) {
-                ui.toast("URL copied to clipboard!", "success");
-            } else {
-                alert("URL copied to clipboard!");
-            }
+            ui.toast("URL copied to clipboard!", "success");
         });
     }
 
@@ -1067,13 +1084,12 @@
         ctx.stroke();
 
         // Generate QR code for this specific table
-        const centerLogo = createCenterLogoSvg("EasyBillBro", currentQrColor, currentBgColor);
         const tempQr = new QRCodeStyling({
             width: 250 * scale,
             height: 250 * scale,
             type: "canvas",
             data: tableUrl,
-            image: centerLogo,
+            image: QR_LOGO_URL,
             margin: 4,
             qrOptions: { errorCorrectionLevel: "H" },
             dotsOptions: { color: currentQrColor, type: currentDotStyle },
@@ -1154,10 +1170,10 @@
             a.download = `table-${tableName.replace(/\s+/g, '_')}-qr.png`;
             a.href = canvas.toDataURL("image/png");
             a.click();
-            if (window.ui && ui.toast) ui.toast(`Downloaded QR card for ${tableName}`, "success");
+            ui.toast(`Downloaded QR card for ${tableName}`, "success");
         } catch (e) {
             console.error(e);
-            alert("Failed to export image: " + e.message);
+            ui.toast("Failed to export image: " + e.message, "error");
         } finally {
             btn.innerHTML = origText;
         }
@@ -1166,7 +1182,7 @@
     // ── Download All Cards (ZIP) ──
     async function downloadAllCardsZip() {
         if (typeof JSZip === "undefined") {
-            alert("ZIP generator library not loaded.");
+            ui.toast("ZIP generator library not loaded.", "error");
             return;
         }
 
@@ -1194,10 +1210,10 @@
             a.href = URL.createObjectURL(content);
             a.click();
 
-            if (window.ui && ui.toast) ui.toast("All table QR codes downloaded successfully!", "success");
+            ui.toast("All table QR codes downloaded successfully!", "success");
         } catch (e) {
             console.error(e);
-            alert("Failed to generate ZIP: " + e.message);
+            ui.toast("Failed to generate ZIP: " + e.message, "error");
         } finally {
             btn.innerHTML = origText;
         }
@@ -1240,7 +1256,7 @@
             window.print();
         } catch (e) {
             console.error(e);
-            alert("Failed to prepare print: " + e.message);
+            ui.toast("Failed to prepare print: " + e.message, "error");
         } finally {
             btn.innerHTML = origText;
         }

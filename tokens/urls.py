@@ -11,6 +11,7 @@ urlpatterns = [
     path("token/", views.token_dashboard, name="token-dashboard"),
     path("token/new/", views.create_token_order, name="create-token-order"),
     path("token/go/", views.create_and_go_to_billing, name="create-and-bill"),
+    path("token/new/bill/", views.token_billing, {"order_id": None}, name="new-token-bill"),
     path("token/<int:order_id>/bill/", views.token_billing, name="token-bill"),
 
     # Pickup readiness (QSR "Order Ready" board) -- staff-facing.

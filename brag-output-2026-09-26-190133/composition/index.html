@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>EasyBillBro — Billing Anyone Can Do</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="assets/music/audio-data.js"></script>
+    <style>
+      :root {
+        --bg: #0a0a0a;
+        --panel: #121214;
+        --surface: #18181b;
+        --border: #27272a;
+        --text: #f4f4f6;
+        --muted: #9ca3af;
+        --red: #ec2734;
+        --red-hover: #ff4d5a;
+        --gold: #f59e0b;
+        --green: #22c55e;
+        --orange: #fa7327;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: var(--bg); color: var(--text); font-family: "Outfit", sans-serif; overflow: hidden; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); }
+
+      /* ── Shared background ── */
+      #bg-grid {
+        position: absolute; inset: 0;
+        background-image: linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+        background-size: 64px 64px;
+        -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 30%, transparent 100%);
+        mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 30%, transparent 100%);
+      }
+      #glow-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+      #glow { width: 1300px; height: 1300px; border-radius: 50%; background: radial-gradient(circle, rgba(236, 39, 52, 0.20) 0%, rgba(236, 39, 52, 0.05) 40%, transparent 70%); }
+
+      .clip { position: absolute; inset: 0; }
+      .fill { position: absolute; inset: 0; }
+
+      .serif { font-family: "DM Serif Display", serif; font-weight: 400; }
+      .red { color: var(--red); }
+      .muted { color: var(--muted); }
+      .kicker { margin-bottom: 18px; font-size: 22px; font-weight: 700; letter-spacing: 5px; text-transform: uppercase; color: var(--red); }
+
+      /* Browser-style frame for desktop screenshots */
+      .browser { position: absolute; border-radius: 18px; overflow: hidden; background: #0d0d0e; border: 1px solid #2a2a2e; box-shadow: 0 40px 100px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.03); }
+      .browser-bar { height: 40px; display: flex; align-items: center; gap: 9px; padding: 0 18px; background: #161618; border-bottom: 1px solid #26262a; }
+      .browser-bar i { display: block; width: 12px; height: 12px; border-radius: 50%; background: #3a3a3f; }
+      .browser-bar i:nth-child(1) { background: #ff5f57; }
+      .browser-bar i:nth-child(2) { background: #febc2e; }
+      .browser-bar i:nth-child(3) { background: #28c840; }
+      .browser-url { margin-left: 18px; padding: 5px 16px; border-radius: 8px; background: #0e0e10; color: #8b8b93; font-size: 15px; font-weight: 500; }
+      .browser img { display: block; width: 100%; }
+
+      /* Phone frame for mobile screenshots */
+      .phone { position: absolute; width: 380px; height: 830px; border-radius: 56px; padding: 14px; background: linear-gradient(160deg, #2c2c31, #111113); box-shadow: 0 50px 110px rgba(0, 0, 0, 0.7), inset 0 0 0 2px #3a3a40; }
+      .phone-screen { width: 100%; height: 100%; border-radius: 43px; overflow: hidden; background: #000; position: relative; }
+      .phone-screen img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+      .phone-notch { position: absolute; top: 12px; left: 50%; margin-left: -48px; width: 96px; height: 26px; border-radius: 14px; background: #000; z-index: 2; }
+
+      .chip { display: inline-flex; align-items: center; gap: 14px; padding: 16px 28px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); font-size: 32px; font-weight: 600; color: var(--text); }
+      .dot { width: 18px; height: 18px; border-radius: 50%; display: inline-block; }
+
+      /* ── Scene 1: Hook ── */
+      #s1-pad { position: absolute; left: 190px; top: 170px; width: 560px; height: 740px; border-radius: 10px; background: #f3ecd9; box-shadow: 0 40px 90px rgba(0, 0, 0, 0.6); padding: 56px 54px; color: #2a2419;
+        background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 61px, rgba(60, 90, 170, 0.22) 61px, rgba(60, 90, 170, 0.22) 63px); background-position: 0 118px; }
+      #s1-pad h4 { font-family: "DM Serif Display", serif; font-size: 44px; font-weight: 400; margin-bottom: 30px; font-style: italic; }
+      .pad-row { display: flex; justify-content: space-between; font-family: "DM Serif Display", serif; font-style: italic; font-size: 38px; height: 63px; align-items: flex-end; padding-bottom: 6px; }
+      .pad-row.cut span { text-decoration: line-through; text-decoration-color: #c0392b; text-decoration-thickness: 4px; }
+      .pad-total { margin-top: 26px; font-size: 48px; color: #c0392b; }
+      #s1-copy { position: absolute; left: 880px; top: 330px; width: 900px; }
+      #s1-h1 { font-size: 108px; line-height: 1.16; letter-spacing: -1px; }
+      #s1-h2 { margin-top: 36px; font-size: 44px; font-weight: 500; color: var(--muted); }
+
+      /* ── Scene 2: Reveal ── */
+      #s2-logo { position: absolute; top: 60px; left: 0; right: 0; display: flex; justify-content: center; }
+      #s2-logo img { height: 150px; }
+      #s2-phone { left: 770px; top: 250px; }
+      .s2-side { position: absolute; top: 540px; width: 560px; font-size: 76px; line-height: 1.16; }
+      #s2-left { left: 150px; text-align: right; }
+      #s2-right { right: 150px; }
+
+      /* ── Scene 3: Tap Tap Bill ── */
+      #s3-steps { position: absolute; left: 100px; top: 210px; width: 400px; }
+      .step { display: flex; align-items: center; gap: 24px; margin-bottom: 44px; }
+      .step-num { width: 96px; height: 96px; border-radius: 28px; background: var(--surface); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 52px; font-weight: 800; color: var(--muted); }
+      .step-txt { font-size: 46px; font-weight: 700; line-height: 1.15; white-space: nowrap; }
+      .step-sub { font-size: 24px; color: var(--muted); margin-top: 8px; font-weight: 500; }
+      #s3-frame { left: 540px; top: 150px; width: 1280px; }
+      #s3-canvas { position: relative; width: 1280px; height: 627px; overflow: hidden; }
+      #s3-native { position: absolute; left: 0; top: 0; width: 1914px; height: 938px; transform: scale(0.66876); transform-origin: 0 0; }
+      #s3-native > img { width: 1914px; height: 938px; display: block; }
+      .ripple { position: absolute; width: 150px; height: 150px; border-radius: 50%; border: 6px solid #fff; background: rgba(255, 255, 255, 0.25); opacity: 0; }
+      #s3-finger { position: absolute; width: 64px; height: 64px; border-radius: 50%; background: rgba(255, 255, 255, 0.92); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); opacity: 0; left: 0; top: 0; }
+      #s3-cart { position: absolute; left: 1540px; top: 228px; width: 362px; height: 260px; background: #0f0f11; padding: 14px 10px; }
+      .cart-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 16px; margin-bottom: 12px; border-radius: 14px; background: #1a1a1d; border: 1px solid #2a2a2e; font-size: 24px; font-weight: 600; opacity: 0; }
+      .cart-row b { color: var(--red); }
+      #s3-total { position: absolute; left: 1790px; top: 776px; width: 118px; height: 44px; background: #0f0f11; color: var(--red); font-size: 34px; font-weight: 800; text-align: right; opacity: 0; }
+      #s3-receipt { position: absolute; left: 1290px; top: 540px; width: 380px; padding: 30px 30px 36px; background: #fbfaf6; color: #1b1b1b; border-radius: 6px; box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6); font-family: "Courier New", monospace; font-size: 21px; opacity: 0; }
+      #s3-receipt h5 { font-family: "Outfit", sans-serif; font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 4px; }
+      #s3-receipt .rc { text-align: center; font-size: 16px; color: #666; margin-bottom: 16px; }
+      .rr { display: flex; justify-content: space-between; margin: 6px 0; }
+      .rr.tot { font-weight: 700; font-size: 26px; border-top: 2px dashed #999; padding-top: 12px; margin-top: 14px; }
+      #s3-paid { margin-top: 16px; text-align: center; font-family: "Outfit", sans-serif; font-weight: 800; color: #16a34a; font-size: 24px; }
+      #s3-line { position: absolute; left: 100px; right: 100px; bottom: 70px; text-align: center; font-size: 50px; }
+
+      /* ── Scene 4: Tables ── */
+      #s4-copy { position: absolute; left: 130px; top: 290px; width: 760px; }
+      #s4-h { font-size: 100px; line-height: 1.16; }
+      #s4-legend { margin-top: 56px; display: flex; flex-direction: column; gap: 22px; align-items: flex-start; }
+      #s4-p1 { left: 980px; top: 130px; }
+      #s4-p2 { left: 1420px; top: 130px; }
+
+      /* ── Scene 5: Kitchen ── */
+      #s5-head { position: absolute; left: 130px; top: 110px; width: 700px; }
+      #s5-h { font-size: 90px; line-height: 1.16; }
+      #s5-sub { margin-top: 36px; display: flex; flex-direction: column; gap: 20px; align-items: flex-start; }
+      #s5-orders { left: 800px; top: 120px; width: 1000px; }
+      #s5-kds { left: 620px; top: 520px; width: 820px; }
+
+      /* ── Scene 6: Money ── */
+      #s6-head { position: absolute; left: 130px; top: 80px; width: 1300px; }
+      #s6-h { font-size: 84px; line-height: 1.16; }
+      #s6-dash { left: 130px; top: 290px; width: 1300px; }
+      #s6-phone { left: 1440px; top: 180px; }
+      #s6-badge { position: absolute; left: 820px; top: 740px; padding: 26px 38px; border-radius: 26px; background: linear-gradient(135deg, #6d1020, #3b0b14); border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6); }
+      #s6-badge .lbl { margin-bottom: 10px; font-size: 24px; color: #f3c3c8; font-weight: 600; letter-spacing: 1px; }
+      #s6-amt { font-size: 84px; font-weight: 800; line-height: 1.15; }
+
+      /* ── Scene 7: Price ── */
+      #s7-wrap { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+      #s7-price { display: flex; align-items: baseline; gap: 18px; }
+      #s7-amt { font-size: 230px; line-height: 1.2; }
+      #s7-per { font-size: 64px; color: var(--muted); }
+      #s7-day { margin-top: 30px; font-size: 64px; font-weight: 600; }
+      #s7-chips { margin-top: 70px; display: flex; gap: 26px; }
+
+      /* ── Scene 8: Outro ── */
+      #s8-wrap { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+      #s8-logo { height: 260px; }
+      #s8-tag { margin-top: 52px; font-size: 64px; line-height: 1.1; }
+      #s8-cta { margin-top: 56px; display: flex; gap: 24px; }
+      .cta-red { background: var(--red); border-color: var(--red); color: #fff; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="easybillbro-simple" data-width="1920" data-height="1080" data-duration="60">
+      <div id="bg-grid"></div>
+      <div id="glow-wrap"><div id="glow"></div></div>
+
+      <!-- Scene 1: Hook -->
+      <section class="clip" id="scene-1" data-start="0" data-duration="7" data-track-index="1">
+        <div class="fill" id="s1-inner">
+          <div id="s1-pad">
+            <h4>Sharma Dhaba</h4>
+            <div class="pad-row"><span>2 × Chai</span><span>20</span></div>
+            <div class="pad-row cut"><span>Dal Tadka</span><span>140</span></div>
+            <div class="pad-row"><span>Dal Tadka</span><span>120</span></div>
+            <div class="pad-row"><span>4 × Roti</span><span>40</span></div>
+            <div class="pad-row cut"><span>Paneer</span><span>160</span></div>
+            <div class="pad-row"><span>Paneer Tikka</span><span>180</span></div>
+            <div class="pad-row pad-total"><span>Total</span><span>3?0 ??</span></div>
+          </div>
+          <div id="s1-copy">
+            <div class="kicker" id="s1-kick">Dhabas · Hotels · Restaurants</div>
+            <div id="s1-h1" class="serif"><div id="s1-l1">Still writing bills</div><div id="s1-l2" class="red">by hand?</div></div>
+            <div id="s1-h2">No computer course needed.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 2: Reveal -->
+      <section class="clip" id="scene-2" data-start="7" data-duration="5.5" data-track-index="1">
+        <div class="fill" id="s2-inner">
+          <div id="s2-logo"><img id="s2-logo-img" src="assets/brand/easybillbro_logo_white.png" alt="EasyBillBro" /></div>
+          <div class="s2-side serif" id="s2-left">Your whole restaurant.</div>
+          <div class="phone" id="s2-phone"><div class="phone-screen"><div class="phone-notch"></div><img src="assets/shots/7.png" alt="Dashboard on phone" /></div></div>
+          <div class="s2-side serif" id="s2-right"><span class="red">In your pocket.</span></div>
+        </div>
+      </section>
+
+      <!-- Scene 3: Tap, tap, bill -->
+      <section class="clip" id="scene-3" data-start="12.5" data-duration="10.5" data-track-index="1">
+        <div class="fill" id="s3-inner">
+          <div id="s3-steps">
+            <div class="step" id="s3-st1"><div class="step-num" id="s3-n1">1</div><div><div class="step-txt">Tap the dish</div><div class="step-sub">Food pictures, clear prices</div></div></div>
+            <div class="step" id="s3-st2"><div class="step-num" id="s3-n2">2</div><div><div class="step-txt">Tap bill</div><div class="step-sub">One big red button</div></div></div>
+            <div class="step" id="s3-st3"><div class="step-num" id="s3-n3">3</div><div><div class="step-txt">Done ✓</div><div class="step-sub">GST bill prints instantly</div></div></div>
+          </div>
+          <div class="browser" id="s3-frame">
+            <div class="browser-bar"><i></i><i></i><i></i><span class="browser-url">easybillbro.in · POS Billing</span></div>
+            <div id="s3-canvas">
+              <div id="s3-cam" class="fill">
+                <div id="s3-native">
+                  <img src="assets/shots/3.png" alt="Point of Sale screen" />
+                  <div id="s3-cart">
+                    <div class="cart-row" id="s3-c1"><span>Paneer Tikka ×1</span><b>₹180</b></div>
+                    <div class="cart-row" id="s3-c2"><span>Dal Makhani ×1</span><b>₹180</b></div>
+                  </div>
+                  <div id="s3-total">₹378</div>
+                  <div class="ripple" id="s3-r1" style="left: 628px; top: 442px"></div>
+                  <div class="ripple" id="s3-r2" style="left: 374px; top: 710px"></div>
+                  <div class="ripple" id="s3-r3" style="left: 1738px; top: 829px"></div>
+                  <div id="s3-finger"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="s3-receipt">
+            <h5>Sharma Dhaba</h5>
+            <div class="rc">GSTIN 29ABCDE1234F1Z5 · Table T1</div>
+            <div class="rr"><span>Paneer Tikka</span><span>180.00</span></div>
+            <div class="rr"><span>Dal Makhani</span><span>180.00</span></div>
+            <div class="rr"><span>GST 5%</span><span>18.00</span></div>
+            <div class="rr tot"><span>TOTAL</span><span>₹378.00</span></div>
+            <div id="s3-paid">✓ PAID · UPI</div>
+          </div>
+          <div id="s3-line" class="serif">If you can use <span class="red">WhatsApp</span>, you can use EasyBillBro.</div>
+        </div>
+      </section>
+
+      <!-- Scene 4: Tables -->
+      <section class="clip" id="scene-4" data-start="23" data-duration="6.5" data-track-index="1">
+        <div class="fill" id="s4-inner">
+          <div id="s4-copy">
+            <div class="kicker" id="s4-kick">Live tables</div>
+            <div id="s4-h" class="serif"><div id="s4-l1">See every table</div><div id="s4-l2" class="red">at a glance.</div></div>
+            <div id="s4-legend">
+              <div class="chip" id="s4-c1"><span class="dot" style="background: #22c55e"></span>Green = Free</div>
+              <div class="chip" id="s4-c2"><span class="dot" style="background: #fa7327"></span>Orange = Busy</div>
+            </div>
+          </div>
+          <div class="phone" id="s4-p1"><div class="phone-screen"><div class="phone-notch"></div><img src="assets/shots/9.png" alt="Floor plan on phone" /></div></div>
+          <div class="phone" id="s4-p2"><div class="phone-screen"><div class="phone-notch"></div><img src="assets/shots/8.png" alt="All tables on phone" /></div></div>
+        </div>
+      </section>
+
+      <!-- Scene 5: Kitchen -->
+      <section class="clip" id="scene-5" data-start="29.5" data-duration="6" data-track-index="1">
+        <div class="fill" id="s5-inner">
+          <div id="s5-head">
+            <div class="kicker" id="s5-kick">Orders → Kitchen</div>
+            <div id="s5-h" class="serif"><div id="s5-l1">Straight to</div><div id="s5-l2" class="red">the kitchen.</div></div>
+            <div id="s5-sub">
+              <div class="chip" id="s5-c1">🔇 No shouting</div>
+              <div class="chip" id="s5-c2">🧾 No lost slips</div>
+            </div>
+          </div>
+          <div class="browser" id="s5-orders"><div class="browser-bar"><i></i><i></i><i></i><span class="browser-url">Orders</span></div><img src="assets/shots/4.png" alt="Orders screen" /></div>
+          <div class="browser" id="s5-kds"><div class="browser-bar"><i></i><i></i><i></i><span class="browser-url">Kitchen Display</span></div><img src="assets/shots/5.png" alt="Kitchen display" /></div>
+        </div>
+      </section>
+
+      <!-- Scene 6: Money -->
+      <section class="clip" id="scene-6" data-start="35.5" data-duration="7" data-track-index="1">
+        <div class="fill" id="s6-inner">
+          <div id="s6-head">
+            <div class="kicker" id="s6-kick">Every night</div>
+            <div id="s6-h" class="serif">Know exactly what you <span class="red">earned.</span></div>
+          </div>
+          <div class="browser" id="s6-dash"><div class="browser-bar"><i></i><i></i><i></i><span class="browser-url">Dashboard</span></div><img src="assets/shots/2.png" alt="Dashboard" /></div>
+          <div class="phone" id="s6-phone"><div class="phone-screen"><div class="phone-notch"></div><img src="assets/shots/10.png" alt="Order history on phone" /></div></div>
+          <div id="s6-badge"><div class="lbl">TODAY'S REVENUE · CASH + UPI</div><div id="s6-amt">₹0</div></div>
+        </div>
+      </section>
+
+      <!-- Scene 7: Price -->
+      <section class="clip" id="scene-7" data-start="42.5" data-duration="8.5" data-track-index="1">
+        <div id="s7-wrap">
+          <div class="kicker" id="s7-kick">Very low price</div>
+          <div id="s7-price"><span id="s7-amt" class="serif">₹999</span><span id="s7-per">/ month</span></div>
+          <div id="s7-day">That's about <span class="red">₹33 a day.</span></div>
+          <div id="s7-chips">
+            <div class="chip" id="s7-c1">₹0 setup fee</div>
+            <div class="chip" id="s7-c2">No contract</div>
+            <div class="chip" id="s7-c3">Any Android phone</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 8: Outro -->
+      <section class="clip" id="scene-8" data-start="51" data-duration="9" data-track-index="1">
+        <div id="s8-wrap">
+          <img id="s8-logo" src="assets/brand/easybillbro_logo_white.png" alt="EasyBillBro" />
+          <div id="s8-tag" class="serif">Simple billing for every <span class="red">dhaba, hotel &amp; restaurant.</span></div>
+          <div id="s8-cta">
+            <div class="chip" id="s8-url">easybillbro.in</div>
+            <div class="chip cta-red" id="s8-demo">Book a free demo</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Music bed (ducks under voice via volume automation below) -->
+      <audio id="bg-music" src="assets/music/music-ducked.mp3" data-start="0" data-duration="60" data-track-index="10" data-volume="0.42"></audio>
+
+      <!-- Voiceover (Kokoro af_heart) -->
+      <audio id="vo-1" src="assets/voice/vo1.wav" data-start="0.6" data-duration="5.568" data-track-index="3" data-volume="1"></audio>
+      <audio id="vo-2" src="assets/voice/vo2.wav" data-start="7.4" data-duration="4.373" data-track-index="4" data-volume="1"></audio>
+      <audio id="vo-3" src="assets/voice/vo3.wav" data-start="12.9" data-duration="8.085" data-track-index="5" data-volume="1"></audio>
+      <audio id="vo-4" src="assets/voice/vo4.wav" data-start="23.4" data-duration="4.949" data-track-index="6" data-volume="1"></audio>
+      <audio id="vo-5" src="assets/voice/vo5.wav" data-start="29.9" data-duration="3.797" data-track-index="7" data-volume="1"></audio>
+      <audio id="vo-6" src="assets/voice/vo6.wav" data-start="35.9" data-duration="5.035" data-track-index="8" data-volume="1"></audio>
+      <audio id="vo-7" src="assets/voice/vo7.wav" data-start="42.9" data-duration="6.635" data-track-index="9" data-volume="1"></audio>
+      <audio id="vo-8" src="assets/voice/vo8.wav" data-start="51.5" data-duration="4.501" data-track-index="11" data-volume="1"></audio>
+
+      <!-- SFX -->
+      <audio id="sfx-pad" src="assets/sfx/drop_001.ogg" data-start="0.3" data-duration="0.5" data-track-index="20" data-volume="0.55"></audio>
+      <audio id="sfx-phone" src="assets/sfx/impactSoft_medium_002.ogg" data-start="7.75" data-duration="0.5" data-track-index="21" data-volume="0.55"></audio>
+      <audio id="sfx-tap1" src="assets/sfx/click_002.ogg" data-start="13.2" data-duration="0.3" data-track-index="22" data-volume="0.7"></audio>
+      <audio id="sfx-tap2" src="assets/sfx/click_002.ogg" data-start="13.75" data-duration="0.3" data-track-index="23" data-volume="0.7"></audio>
+      <audio id="sfx-tap3" src="assets/sfx/click_002.ogg" data-start="14.45" data-duration="0.3" data-track-index="24" data-volume="0.75"></audio>
+      <audio id="sfx-receipt" src="assets/sfx/drop_001.ogg" data-start="15.0" data-duration="0.5" data-track-index="25" data-volume="0.55"></audio>
+      <audio id="sfx-money" src="assets/sfx/chips-collide-1.ogg" data-start="38.6" data-duration="0.8" data-track-index="26" data-volume="0.5"></audio>
+      <audio id="sfx-price" src="assets/sfx/impactSoft_medium_002.ogg" data-start="42.75" data-duration="0.5" data-track-index="27" data-volume="0.6"></audio>
+      <audio id="sfx-logo" src="assets/sfx/impactBell_heavy_000.ogg" data-start="51.2" data-duration="2" data-track-index="28" data-volume="0.45"></audio>
+    </div>
+
+    <script>
+      window.addEventListener("load", function () {
+        var tl = gsap.timeline({ paused: true });
+        var up = function (sel, t, d, y) {
+          tl.fromTo(sel, { y: y == null ? 30 : y, opacity: 0 }, { y: 0, opacity: 1, duration: d || 0.6, ease: "power3.out" }, t);
+        };
+        var out = function (sel, t) {
+          tl.to(sel, { opacity: 0, duration: 0.45, ease: "power2.in" }, t);
+        };
+
+        // ── Scene 1: Hook (0–7) ──
+        tl.fromTo("#s1-pad", { y: 80, rotation: -8, opacity: 0 }, { y: 0, rotation: -3, opacity: 1, duration: 0.9, ease: "power3.out" }, 0.25);
+        up("#s1-kick", 0.9);
+        up("#s1-l1", 1.2, 0.7);
+        up("#s1-l2", 1.6, 0.7); // beat-locked: 1.60s
+        up("#s1-h2", 3.4);
+        tl.to("#s1-pad", { x: -900, rotation: -18, duration: 0.8, ease: "power3.in" }, 6.0);
+        out("#s1-copy", 6.4);
+
+        // ── Scene 2: Reveal (7–12.5) ──
+        tl.fromTo("#s2-logo-img", { scale: 0.85, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.7, ease: "power3.out" }, 7.1);
+        tl.fromTo("#s2-phone", { y: 700 }, { y: 0, duration: 1.1, ease: "power4.out" }, 7.4); // lands near 5.80-cue region feel
+        up("#s2-left", 8.2, 0.7, 20);
+        up("#s2-right", 9.2, 0.7, 20);
+        tl.to("#s2-phone", { y: -14, duration: 3, ease: "sine.inOut" }, 8.6);
+        out("#s2-inner", 12.05);
+
+        // ── Scene 3: Tap, tap, bill (12.5–23) ──
+        tl.fromTo("#s3-frame", { x: 80, opacity: 0 }, { x: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 12.5);
+        up("#s3-st1", 12.7, 0.5, 20);
+        up("#s3-st2", 12.85, 0.5, 20);
+        up("#s3-st3", 13.0, 0.5, 20);
+        // camera: slight punch toward the menu grid, then toward the bill buttons
+        tl.fromTo("#s3-cam", { scale: 1, x: 0, y: 0 }, { scale: 1.12, x: 40, y: 10, duration: 1.2, ease: "power2.inOut" }, 12.6);
+        tl.to("#s3-cam", { scale: 1.12, x: -150, y: -60, duration: 0.8, ease: "power2.inOut" }, 13.9);
+        tl.to("#s3-cam", { scale: 1, x: 0, y: 0, duration: 1, ease: "power2.inOut" }, 16.6);
+
+        var tap = function (n, fx, fy, t) {
+          tl.fromTo("#s3-finger", { x: fx - 32, y: fy - 32 + 40, opacity: 0 }, { x: fx - 32, y: fy - 32, opacity: 1, duration: 0.25, ease: "power2.out" }, t - 0.25);
+          tl.fromTo("#s3-r" + n, { scale: 0.3, opacity: 1 }, { scale: 1.6, opacity: 0, duration: 0.6, ease: "power2.out" }, t);
+          tl.to("#s3-finger", { opacity: 0, duration: 0.15 }, t + 0.25);
+        };
+        tap(1, 703, 517, 13.2);
+        tl.to("#s3-n1", { backgroundColor: "#ec2734", borderColor: "#ec2734", color: "#ffffff", duration: 0.2 }, 13.2);
+        tl.fromTo("#s3-c1", { x: 30, opacity: 0 }, { x: 0, opacity: 1, duration: 0.35, ease: "power2.out" }, 13.3);
+        tap(2, 449, 785, 13.75);
+        tl.fromTo("#s3-c2", { x: 30, opacity: 0 }, { x: 0, opacity: 1, duration: 0.35, ease: "power2.out" }, 13.85);
+        tl.to("#s3-total", { opacity: 1, duration: 0.2 }, 13.85);
+        tap(3, 1813, 904, 14.45);
+        tl.to("#s3-n2", { backgroundColor: "#ec2734", borderColor: "#ec2734", color: "#ffffff", duration: 0.2 }, 14.45);
+        tl.fromTo("#s3-receipt", { y: 120, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "back.out(1.4)" }, 15.0);
+        tl.to("#s3-n3", { backgroundColor: "#15803d", borderColor: "#15803d", color: "#ffffff", duration: 0.2 }, 15.0);
+        up("#s3-line", 17.6, 0.6, 20);
+        out("#s3-inner", 22.55);
+
+        // ── Scene 4: Tables (23–29.5) ──
+        up("#s4-kick", 23.1);
+        up("#s4-l1", 23.3, 0.7);
+        up("#s4-l2", 23.6, 0.7);
+        tl.fromTo("#s4-p1", { y: 500, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, ease: "power4.out" }, 23.2);
+        tl.fromTo("#s4-p2", { y: 500, opacity: 0 }, { y: 40, opacity: 1, duration: 0.9, ease: "power4.out" }, 23.45);
+        tl.fromTo("#s4-c1", { x: -30, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 25.1);
+        tl.fromTo("#s4-c2", { x: -30, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 25.9);
+        tl.to("#s4-p1", { y: -20, duration: 4, ease: "sine.inOut" }, 24.2);
+        tl.to("#s4-p2", { y: 10, duration: 4, ease: "sine.inOut" }, 24.4);
+        out("#s4-inner", 29.05);
+
+        // ── Scene 5: Kitchen (29.5–35.5) ──
+        up("#s5-kick", 29.6);
+        up("#s5-l1", 29.8, 0.7);
+        up("#s5-l2", 30.1, 0.7);
+        tl.fromTo("#s5-orders", { x: 120, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8, ease: "power3.out" }, 29.7);
+        tl.fromTo("#s5-kds", { y: 160, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }, 31.0);
+        tl.fromTo("#s5-c1", { x: -30, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 31.9);
+        tl.fromTo("#s5-c2", { x: -30, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 32.6);
+        tl.to("#s5-orders", { x: -20, duration: 4, ease: "sine.inOut" }, 30.5);
+        out("#s5-inner", 35.05);
+
+        // ── Scene 6: Money (35.5–42.5) ──
+        up("#s6-kick", 35.6);
+        up("#s6-h", 35.8, 0.7);
+        tl.fromTo("#s6-dash", { y: 120, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, ease: "power3.out" }, 35.8);
+        tl.fromTo("#s6-phone", { x: 300, opacity: 0 }, { x: 0, opacity: 1, duration: 0.9, ease: "power3.out" }, 36.6);
+        tl.fromTo("#s6-badge", { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, ease: "back.out(1.6)" }, 37.3);
+        var money = { v: 0 };
+        tl.to(money, {
+          v: 3284, duration: 1.3, ease: "power2.out",
+          onUpdate: function () { document.getElementById("s6-amt").textContent = "₹" + Math.round(money.v).toLocaleString("en-IN"); },
+        }, 37.4);
+        tl.to("#s6-dash", { scale: 1.03, duration: 5, ease: "sine.inOut" }, 36.8);
+        out("#s6-inner", 42.05);
+
+        // ── Scene 7: Price (42.5–51) ──
+        up("#s7-kick", 42.6);
+        tl.fromTo("#s7-price", { scale: 0.7, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.8, ease: "back.out(1.5)" }, 42.75);
+        up("#s7-day", 44.4, 0.7);
+        up("#s7-c1", 45.8, 0.5, 24);
+        up("#s7-c2", 46.6, 0.5, 24);
+        up("#s7-c3", 47.4, 0.5, 24);
+        out("#s7-wrap", 50.55);
+
+        // ── Scene 8: Outro (51–60) ──
+        tl.fromTo("#s8-logo", { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.9, ease: "power3.out" }, 51.1);
+        up("#s8-tag", 52.2, 0.8);
+        up("#s8-url", 53.6, 0.6, 20);
+        up("#s8-demo", 53.9, 0.6, 20);
+
+        // ── Audio-reactive: background glow breathes with music RMS ──
+        if (typeof AUDIO_RMS !== "undefined") {
+          AUDIO_RMS.rms.forEach(function (r, i) {
+            tl.set("#glow", { opacity: 0.55 + r * 0.45, scale: 0.96 + r * 0.08 }, i / AUDIO_RMS.fps);
+          });
+        }
+
+        tl.set({}, {}, 60);
+        window.__timelines["easybillbro-simple"] = tl;
+      });
+    </script>
+  </body>
+</html>

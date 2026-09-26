@@ -33,6 +33,7 @@ from django.db import transaction
 from django.db.models import Count, Prefetch, Q, Sum
 from django.http import Http404, JsonResponse
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
@@ -216,82 +217,22 @@ def token_dashboard(request):
 def create_and_go_to_billing(request):
     """
     One-tap shortcut for tenants with direct_billing_mode enabled.
-    Creates a new counter token order and immediately redirects to its
-    billing screen - skips the token dashboard entirely.
+    Opens an unsaved billing draft and skips the token dashboard. The real
+    order and counter token are created only after a non-empty cart is sent
+    to the normal create-order endpoint.
     Used by the owner dashboard "Core Ops" card when the feature flag is on.
     """
     if request.user.role not in _STAFF_CAN_CREATE and not request.user.is_superuser:
         return JsonResponse({"error": "Permission denied"}, status=403)
 
-    tenant = request.user.tenant
-    outlet = request.user.outlet
-
-    try:
-        body = json.loads(request.body) if request.body else {}
-    except json.JSONDecodeError:
-        body = {}
-
-    customer_name  = (body.get("customer_name",  "") or "").strip() or None
-    from core.validators import normalize_phone
-    from django.core.exceptions import ValidationError as _PhoneError
-    try:
-        customer_phone = normalize_phone(body.get("customer_phone"))
-    except _PhoneError:
-        return JsonResponse(
-            {"error": "Enter a valid 10-digit mobile number."}, status=400
-        )
-
-    try:
-        with transaction.atomic():
-            business_date = get_business_date(timezone.now(), outlet)
-
-            counter, created = (
-                DailyTokenCounter.objects
-                .select_for_update()
-                .get_or_create(
-                    outlet=outlet, tenant=tenant,
-                    date=business_date, defaults={"value": 0},
-                )
-            )
-            if created:
-                from django.db.models import Max
-                max_existing = TokenOrder.objects.filter(
-                    outlet=outlet, date=business_date, is_online=False
-                ).aggregate(max_val=Max("token_number"))["max_val"]
-                if max_existing:
-                    counter.value = max_existing
-
-            counter.value += 1
-            counter.save(update_fields=["value"])
-            next_token = counter.value
-
-            order = Order.objects.create(
-                tenant=tenant, outlet=outlet, table=None,
-                created_by=request.user, status="open", source="counter",
-                customer_name=customer_name, customer_phone=customer_phone,
-            )
-
-            TokenOrder.objects.create(
-                tenant=tenant, outlet=outlet, order=order,
-                token_number=next_token, date=business_date, is_online=False,
-            )
-
-        logger.info(
-            "Direct-billing token #%s created | order=%s | outlet=%s | user=%s",
-            next_token, order.id, outlet.id, request.user.username,
-        )
-        return JsonResponse({
-            "success": True,
-            "order_id": order.id,
-            "token_number": next_token,
-            "redirect": f"/token/{order.id}/bill/",
-        })
-
-    except Exception:
-        logger.exception("Direct billing token creation failed")
-        return JsonResponse(
-            {"error": "Could not start billing. Please try again."}, status=400
-        )
+    # Opening the billing screen is not an order. Keep this as an unsaved
+    # draft and let /create-order/ create the Order + TokenOrder atomically
+    # after the cashier submits a non-empty cart. That endpoint already
+    # rejects empty carts and rolls the transaction back if any item fails.
+    return JsonResponse({
+        "success": True,
+        "redirect": reverse("new-token-bill"),
+    })
 
 
 # ------------------------------------------------------------------
@@ -470,7 +411,7 @@ def assign_online_token(order, outlet, tenant, business_date):
 @login_required
 @tenant_required
 @feature_required("token_system")
-def token_billing(request, order_id):
+def token_billing(request, order_id=None):
     """
     Billing screen for a token order.
     Simplified - no table selection, no floor plan.
@@ -480,14 +421,25 @@ def token_billing(request, order_id):
     outlet = request.user.outlet
     today  = get_business_date(timezone.now(), outlet)
 
-    try:
-        order = Order.objects.get(
-            id=order_id,
+    if order_id is None:
+        # An in-memory draft gives the template its normal status/source
+        # fields without inserting a zero-value Order into the database.
+        order = Order(
             tenant=request.user.tenant,
             outlet=outlet,
+            created_by=request.user,
+            status="open",
+            source="counter",
         )
-    except Order.DoesNotExist:
-        raise Http404("Order not found")
+    else:
+        try:
+            order = Order.objects.get(
+                id=order_id,
+                tenant=request.user.tenant,
+                outlet=outlet,
+            )
+        except Order.DoesNotExist:
+            raise Http404("Order not found")
 
     token = getattr(order, "token", None)
 
@@ -518,6 +470,7 @@ def token_billing(request, order_id):
         order.payments
         .exclude(method="refund")
         .aggregate(total=Sum("amount"))["total"] or Decimal("0")
+        if order.pk else Decimal("0")
     )
     remaining = max(Decimal("0"), order.grand_total - total_paid)
 

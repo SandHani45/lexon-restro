@@ -834,6 +834,53 @@ class SyncFallbackAIImportTests(TestCase):
         item = MenuItem.objects.get(tenant=self.tenant, name="Chicken Biryani")
         self.assertFalse(item.is_veg)
 
+    def test_image_upload_reaches_parser_for_current_and_legacy_field_names(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from unittest.mock import patch
+
+        for field_name in ("file", "image"):
+            with self.subTest(field_name=field_name), \
+                 patch("menu.views.ai_views.dispatch", side_effect=Exception("Celery down")), \
+                 patch(
+                     "core.ai_service.AIService.parse_menu",
+                     return_value=[{
+                         "category": "Smoke Test",
+                         "items": [{"name": "Test Dish", "price": 10, "is_veg": True}],
+                     }],
+                 ) as mock_parse:
+                upload = SimpleUploadedFile(
+                    "menu.jpg", b"test-image-bytes", content_type="image/jpeg"
+                )
+                resp = self.client.post(
+                    reverse("ai_menu_importer"), {field_name: upload}
+                )
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertEqual(mock_parse.call_args.kwargs["image_bytes"], b"test-image-bytes")
+            self.assertEqual(mock_parse.call_args.kwargs["mime_type"], "image/jpeg")
+
+    def test_empty_import_is_rejected_before_ai_dispatch(self):
+        from unittest.mock import patch
+
+        with patch("menu.views.ai_views.dispatch") as mock_dispatch:
+            resp = self.client.post(reverse("ai_menu_importer"), {})
+
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("Upload a menu image", resp.json()["error"])
+        mock_dispatch.assert_not_called()
+
+    def test_zero_items_from_ai_is_reported_as_an_image_quality_error(self):
+        from unittest.mock import patch
+
+        with patch("menu.views.ai_views.dispatch", side_effect=Exception("Celery down")), \
+             patch("core.ai_service.AIService.parse_menu", return_value=[]):
+            resp = self.client.post(
+                reverse("ai_menu_importer"), {"text": "unreadable menu"}
+            )
+
+        self.assertEqual(resp.status_code, 422)
+        self.assertIn("No menu items could be read", resp.json()["error"])
+
     def test_sync_path_times_out_cleanly_instead_of_hanging(self):
         from unittest.mock import patch
         import time

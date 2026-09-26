@@ -5,6 +5,36 @@
 
 {% block extra_css %}
 <style>
+    /* Top bar: only the History icon lives in the default overflow menu,
+       so there's no reason to hide it behind a "..." tap on mobile --
+       expose it directly instead, same as Dashboard/Orders/Live Tables. */
+    #pos-topbar .topbar-more-btn {
+        display: none !important;
+    }
+    #pos-topbar .topbar-more-wrap,
+    #pos-topbar .topbar-more-menu {
+        display: contents !important;
+    }
+    @media (max-width: 767px) {
+        #pos-topbar .topbar-more-menu {
+            position: static !important;
+            width: auto !important;
+            max-width: none !important;
+            padding: 0 !important;
+            border: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: none !important;
+        }
+        #pos-topbar .topbar-more-menu .btn-icon {
+            width: 34px;
+            height: 34px;
+            font-size: 1.1rem;
+        }
+    }
+
     /* ══════════════════════════════════════════════════════════════
        KIMIPOS LUXURY WAITER DASHBOARD DESIGN SYSTEM
        ══════════════════════════════════════════════════════════════ */
@@ -206,6 +236,13 @@
         font-weight: 800;
         color: var(--text-main);
         font-family: var(--font-main, 'Outfit', sans-serif);
+    }
+    /* "Live Active" is a phrase, not a single digit like the other three
+       cards' values -- at the same font-size as those it reads as much
+       bigger/heavier and throws off the row. Sized down to sit visually
+       level with them instead. */
+    .kpi-value-status {
+        font-size: 1.02rem;
     }
     .kpi-sub {
         font-size: 0.68rem;
@@ -548,6 +585,146 @@
         70%  { box-shadow: 0 0 0 6px color-mix(in srgb, var(--pos-green) 0%, transparent); }
         100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--pos-green) 0%, transparent); }
     }
+
+    /* ══════════════════════════════════════════════════════════════
+       MOBILE: compact, touch-friendly, app-like layout -- matches the
+       Dashboard's mobile treatment (dense 2-col tiles, tighter cards,
+       press feedback instead of hover) instead of just letting the
+       desktop grid reflow on its own. Placed last so it wins over the
+       looser 900px/500px/480px tweaks above at the same specificity.
+       ══════════════════════════════════════════════════════════════ */
+    @media (max-width: 767.98px) {
+        .pos-subbar {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 0.85rem 0.9rem 0.75rem;
+            gap: 0.85rem;
+        }
+        .pos-subbar-title {
+            font-size: 1.1rem;
+        }
+        .pos-breadcrumbs {
+            display: none;
+        }
+
+        /* Quick-action row becomes a 2-col grid of icon-top tiles,
+           matching Dashboard's Quick Ops tiles instead of a wrapping
+           row of text pills. */
+        .subbar-actions {
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.5rem !important;
+            width: 100%;
+        }
+        .subbar-actions .btn-subbar-pill {
+            flex-direction: column;
+            justify-content: center;
+            min-height: 60px;
+            padding: 0.55rem 0.4rem;
+            gap: 0.3rem;
+            font-size: 0.68rem;
+            text-align: center;
+            border-radius: 14px;
+        }
+        .subbar-actions .btn-subbar-pill i {
+            font-size: 1.15rem;
+        }
+        .kbd-hint {
+            display: none;
+        }
+
+        .waiter-wrap {
+            padding: 0.6rem 0.9rem calc(3rem + env(safe-area-inset-bottom));
+        }
+
+        /* Dense 2-col app-style grid at every phone width, not just
+           500-900px -- 1 column wastes space and reads less like a
+           native dashboard. */
+        .kpi-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+        }
+        .kpi-card {
+            border-radius: 16px;
+            padding: 0.8rem 0.85rem;
+            gap: 0.6rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        .kpi-card:hover {
+            transform: none;
+        }
+        .kpi-icon-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 11px;
+            font-size: 1rem;
+        }
+        .kpi-label {
+            font-size: 0.62rem;
+        }
+        .kpi-value {
+            font-size: 1.05rem;
+        }
+        .kpi-value-status {
+            font-size: 0.78rem;
+            gap: 5px !important;
+        }
+        .kpi-sub {
+            font-size: 0.6rem;
+        }
+
+        .controls-bar {
+            margin-bottom: 0.9rem;
+            gap: 0.5rem;
+        }
+        .filter-pills-wrap {
+            width: 100%;
+        }
+        .filter-pill {
+            font-size: 0.72rem;
+            padding: 6px 11px;
+        }
+        .audio-toggle-btn {
+            font-size: 0.72rem;
+            padding: 6px 11px;
+        }
+
+        /* Touch press feedback instead of a hover-lift that a finger
+           can't trigger. */
+        .alert-card {
+            border-radius: 18px;
+            padding: 1.05rem;
+        }
+        .alert-card:hover {
+            transform: none;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+        }
+        .alert-card:active {
+            transform: scale(0.98);
+        }
+        .call-table-title {
+            font-size: 1.35rem;
+        }
+        .btn-resolve-success:active,
+        .btn-resolve-amber:active {
+            transform: scale(0.97);
+        }
+
+        .empty-state-card {
+            border-radius: 20px;
+            padding: 2.5rem 1.25rem;
+        }
+        .empty-icon-badge {
+            width: 60px;
+            height: 60px;
+            font-size: 1.7rem;
+            border-radius: 18px;
+        }
+        .empty-title {
+            font-size: 1.2rem;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -564,18 +741,18 @@
             <span class="current">Waiter Calls</span>
         </div>
     </div>
-    <div class="d-flex align-items-center gap-2 flex-wrap">
+    <div class="d-flex align-items-center gap-2 flex-wrap subbar-actions">
         <a href="/tables/live/" class="btn-subbar-pill">
-            <i class="bi bi-broadcast-pin"></i> Live Floor <span class="badge bg-warning text-dark ms-1" style="font-size:0.55rem;padding:2px 5px;font-weight:700;border-radius:999px;">F3</span>
+            <i class="bi bi-broadcast-pin"></i> <span class="subbar-action-label">Live Floor</span> <span class="badge bg-warning text-dark ms-1 kbd-hint" style="font-size:0.55rem;padding:2px 5px;font-weight:700;border-radius:999px;">F3</span>
         </a>
         <a href="/tables/" class="btn-subbar-pill">
-            <i class="bi bi-grid-3x3-gap"></i> Tables
+            <i class="bi bi-grid-3x3-gap"></i> <span class="subbar-action-label">Tables</span>
         </a>
         <a href="/billing/" class="btn-subbar-pill btn-subbar-pill-primary">
-            <i class="bi bi-laptop"></i> POS Billing
+            <i class="bi bi-laptop"></i> <span class="subbar-action-label">POS Billing</span>
         </a>
         <a href="/kitchen/" class="btn-subbar-pill">
-            <i class="bi bi-egg-fried"></i> Kitchen (KDS)
+            <i class="bi bi-egg-fried"></i> <span class="subbar-action-label">Kitchen (KDS)</span>
         </a>
     </div>
 </div>
@@ -623,7 +800,7 @@
             </div>
             <div class="kpi-info">
                 <div class="kpi-label">Floor Monitoring</div>
-                <div class="kpi-value d-flex align-items-center gap-2" style="font-size:1.05rem;">
+                <div class="kpi-value kpi-value-status d-flex align-items-center gap-2">
                     <span class="live-dot"></span> Live Active
                 </div>
                 <div class="kpi-sub">Auto-syncs every 8s</div>
@@ -875,7 +1052,12 @@
             const url = "{% url 'resolve-kitchen-message' 0 %}".replace('0', msgId);
             const data = await apiClient.post(url, {});
             if (data.success) {
-                ui.toast('Kitchen alert acknowledged', 'success');
+                ui.toast('Kitchen alert acknowledged', 'success', {
+                    className: 'lux-toast-kitchen lux-toast-acknowledged',
+                    containerClass: 'lux-toast-kitchen-container',
+                    position: window.innerWidth < 992 ? 'top' : 'bottom-end',
+                    timer: 5000
+                });
                 setTimeout(() => {
                     if (card) card.remove();
                     updateCountsAfterDismissal('kitchen');

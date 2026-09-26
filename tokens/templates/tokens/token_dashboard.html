@@ -28,45 +28,59 @@
     .btn-luxury.btn-luxury-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
 
-    /* ── Stats row — bold KPI tiles ── */
+    /* ── Stats row — same gradient hero-kpi-card recipe as the main
+       Dashboard (accounts/templates/accounts/owner_dashboard.html), so
+       this page's KPI row reads as the same design system instead of
+       its own flat-color/serif-font look. ── */
     .stats-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1rem; margin-bottom: 2rem; }
     @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 480px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
     .stat-card {
-        background: var(--accent-gold);
-        border: none;
-        border-radius: 20px;
-        padding: 1.1rem 1rem;
-        text-align: center;
+        border-radius: 18px;
+        padding: 1.1rem 1.15rem;
         position: relative;
-        color: #fff;
         overflow: hidden;
-    }
-    /* Rotate the three brand tones across tiles so a row of KPIs still
-       reads as distinct cards rather than one solid strip. */
-    .stat-card:nth-child(3n+2) { background: #a3182a; }
-    .stat-card:nth-child(3n)   { background: var(--accent-orange); }
-    .stat-icon-badge {
-        width: 34px;
-        height: 34px;
-        border-radius: 10px;
-        background: rgba(255,255,255,0.2);
+        min-height: 108px;
         display: flex;
+        flex-direction: column;
+        justify-content: center;
+        color: #ffffff;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+        transition: transform 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                    box-shadow 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    /* Reuses the Dashboard's exact gradient tokens, cycled across 6 tiles
+       instead of 4, so the palette is identical, not just similar. */
+    .stat-card:nth-child(6n+1) { background: linear-gradient(135deg, #c2381e 0%, #d84524 50%, #e85532 100%); }
+    .stat-card:nth-child(6n+2) { background: linear-gradient(135deg, #440d18 0%, #5d1221 50%, #72162a 100%); }
+    .stat-card:nth-child(6n+3) { background: linear-gradient(135deg, #ea580c 0%, #f97316 50%, #fb923c 100%); }
+    .stat-card:nth-child(6n+4) { background: linear-gradient(135deg, #181820 0%, #252534 50%, #353548 100%); }
+    .stat-card:nth-child(6n+5) { background: linear-gradient(135deg, #c2381e 0%, #d84524 50%, #e85532 100%); }
+    .stat-card:nth-child(6n+6) { background: linear-gradient(135deg, #440d18 0%, #5d1221 50%, #72162a 100%); }
+    .stat-icon-badge {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 0.6rem;
+        margin-bottom: 0.4rem;
         color: #fff;
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
-    .stat-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.8); margin-bottom: 0.3rem; }
-    .stat-value { font-family: 'DM Serif Display', serif; font-size: 1.7rem; font-weight: 700; color: #fff; line-height: 1; }
+    .stat-label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: rgba(255, 255, 255, 0.85); margin-bottom: 2px; }
+    .stat-value { font-family: var(--font-main, 'Outfit', sans-serif); font-size: 1.7rem; font-weight: 800; color: #fff; line-height: 1.1; letter-spacing: -0.5px; }
     .stat-value.neutral { color: #fff; }
     .stat-value.online-color { color: #fff; }
-    .stat-card.stat-card--ring { box-shadow: 0 0 0 3px rgba(255,255,255,0.55) inset; }
+    .stat-card.stat-card--ring { box-shadow: 0 0 0 3px rgba(255,255,255,0.55) inset, 0 4px 18px rgba(0, 0, 0, 0.08); }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18); }
 
     /* ── Section header ── */
     .section-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 1rem; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; }
-    .section-header h2 { font-family: 'DM Serif Display', serif; font-size: 1.3rem; display: flex; align-items: center; gap: 0.5rem; margin: 0; }
+    .section-header h2 { font-family: var(--font-main, 'Outfit', sans-serif); font-weight: 800; font-size: 1.3rem; display: flex; align-items: center; gap: 0.5rem; margin: 0; }
     .section-tag { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; padding: 0.2rem 0.6rem; border-radius: var(--radius-pill); font-family: 'Outfit', sans-serif; font-weight: 600; }
     .section-tag.counter { background: rgba(236,39,52,0.12); color: var(--accent-gold); }
     .section-tag.online-tag { background: rgba(252,128,25,0.12); color: var(--online); }
@@ -83,7 +97,7 @@
     .token-card.is-online { border-left: 3px solid var(--online); }
     .token-card.is-online:hover { border-color: var(--online); }
 
-    .token-number { font-family: 'DM Serif Display', serif; font-size: 2.2rem; line-height: 1; margin-bottom: 0.4rem; }
+    .token-number { font-family: var(--font-main, 'Outfit', sans-serif); font-weight: 800; font-size: 2.2rem; line-height: 1; margin-bottom: 0.4rem; }
     .token-amount { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.4rem; }
     .token-badge { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; padding: 0.15rem 0.6rem; border: none; border-radius: var(--radius-pill); display: inline-block; background: rgba(138,125,116,0.12); color: var(--muted); }
     .token-badge.billing { background: rgba(245,158,11,0.12); color: var(--warning); }
@@ -113,19 +127,76 @@
     .refresh-bar { height: 2px; background: var(--border); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1000; }
     .refresh-bar-fill { height: 100%; background: var(--accent-gold); width: 100%; transform-origin: left; animation: countdown 15s linear infinite; }
     @keyframes countdown { from { transform: scaleX(1); } to { transform: scaleX(0); } }
-</style>
-{% endblock %}
 
-{% block header_left %}
-<a href="/tokens/" class="d-flex align-items-center gap-2 text-decoration-none" style="color:inherit;">
-    <div style="width:34px;height:34px;border-radius:10px;background:rgba(236,39,52,0.12);border:1px solid rgba(236,39,52,0.3);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex-shrink:0;">
-        <i class="bi bi-123" style="font-size:1.15rem;"></i>
-    </div>
-    <div>
-        <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.5px;color:var(--text-main);">Tokens Dashboard</h1>
-        <div class="text-muted" style="font-size:0.72rem;letter-spacing:0.5px;">{{ request.user.outlet.name }}</div>
-    </div>
-</a>
+    /* ══════════════════════════════════════════════════════════════
+       MOBILE ONLY -- native-app feel. Everything here is additive and
+       scoped to this breakpoint; tablet/desktop rules above are
+       untouched. Placed last so it wins ties over the existing 768px/
+       480px grid-column tweaks above at equal specificity.
+       ══════════════════════════════════════════════════════════════ */
+    @media (max-width: 767.98px) {
+        /* Top bar: Cash Register lives in the default overflow menu, so
+           there's no reason to hide it behind a "..." tap -- expose it
+           directly, same as every other page this pass. */
+        #pos-topbar .topbar-more-btn { display: none !important; }
+        #pos-topbar .topbar-more-wrap,
+        #pos-topbar .topbar-more-menu { display: contents !important; }
+        #pos-topbar .topbar-more-menu {
+            position: static !important;
+            width: auto !important;
+            max-width: none !important;
+            padding: 0 !important;
+            border: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: none !important;
+        }
+        #pos-topbar .topbar-more-menu .btn-icon { width: 34px; height: 34px; font-size: 1.1rem; }
+
+        .dashboard-container { padding: 0.9rem 0.85rem calc(2.5rem + env(safe-area-inset-bottom)); }
+
+        /* Denser, app-like KPI tiles. */
+        .stats-row { gap: 0.55rem; margin-bottom: 1.1rem; }
+        .stat-card { border-radius: 15px; padding: 0.75rem 0.5rem; }
+        .stat-card:active { transform: scale(0.96); }
+        .stat-icon-badge { width: 26px; height: 26px; border-radius: 8px; font-size: 0.78rem; margin-bottom: 0.4rem; }
+        .stat-label { font-size: 0.56rem; letter-spacing: 1px; margin-bottom: 0.15rem; }
+        .stat-value { font-size: 1.25rem; }
+
+        .section-header { padding-bottom: 0.7rem; margin-bottom: 1rem; }
+        .section-header h2 { font-size: 1.05rem; }
+        /* "New Order" is the primary action on this screen -- give it
+           full width so it's a real thumb-width target (height already
+           comes from .btn-luxury's shared --min-tap-target: 48px, same
+           as every button elsewhere in the app). */
+        .section-header .btn-luxury-primary {
+            width: 100%;
+            justify-content: center;
+            margin-top: 0.6rem;
+        }
+        .section-header { flex-wrap: wrap; }
+
+        .token-grid { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 0.6rem; }
+        .token-card { border-radius: 14px; padding: 0.85rem 0.6rem; }
+        .token-card:active { transform: scale(0.96); }
+        .token-number { font-size: 1.6rem; }
+        .token-amount { font-size: 0.76rem; }
+
+        /* Hover-to-reveal doesn't exist on touch, so this cancel button
+           was effectively unreachable on a phone (opacity:0 with no
+           hover to trigger it). Keep it dimly visible always, full
+           opacity on press. */
+        .btn-cancel-token { opacity: 0.55 !important; top: 2px; right: 2px; width: 26px; height: 26px; font-size: 0.85rem; }
+        .btn-cancel-token:active { opacity: 1 !important; color: var(--danger); }
+
+        .empty-state { padding: 2.25rem 1rem; }
+        .empty-state i { font-size: 2rem; }
+
+        .online-section { margin-top: 1.6rem; }
+    }
+</style>
 {% endblock %}
 
 {% block header_right %}

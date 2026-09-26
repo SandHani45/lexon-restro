@@ -936,12 +936,264 @@
   }
 
   @media (max-width: 768px) {
-    .hist-wrap { padding: 0.5rem 1rem 4rem; }
-    .pos-subbar { padding: 0.85rem 1rem; }
-    .hist-table th:nth-child(3),
-    .hist-table td:nth-child(3) { display: none; }
+    .hist-wrap { padding: 0.35rem 0.75rem 4rem; }
+    .pos-subbar { padding: 0.65rem 0.75rem 0.35rem; gap: 8px; }
     .f-group { min-width: 100%; }
-    .detail-panel { width: 100vw; border-radius: 0; }
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     MOBILE: the 9-column table -- even with the tablet-width column
+     hides above -- still needed horizontal scroll to reach Grand
+     Total/Payment/Status on a phone, which is the opposite of a native
+     app feel. Below 767.98px it becomes a stacked card list instead,
+     using the data-label attributes added to each <td> to reconstruct
+     a "label: value" row per field. Desktop/tablet table markup and
+     the 992px column-hide above are untouched.
+     ══════════════════════════════════════════════════════════════ */
+  @media (max-width: 767.98px) {
+    #pos-topbar .topbar-more-btn { display: none !important; }
+    #pos-topbar .topbar-more-wrap,
+    #pos-topbar .topbar-more-menu { display: contents !important; }
+
+    .pos-subbar-title { font-size: 1.08rem; letter-spacing: -0.25px; gap: 6px; }
+    .pos-breadcrumbs { font-size: 0.66rem; gap: 4px; white-space: nowrap; }
+    .history-page-actions {
+      width: 100%;
+      display: flex !important;
+      flex-wrap: nowrap !important;
+      gap: 6px !important;
+      overflow-x: auto;
+      padding: 1px 1px 4px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x proximity;
+    }
+    .history-page-actions::-webkit-scrollbar { display: none; }
+    .history-page-actions .btn-subbar-pill,
+    .history-page-actions .btn-subbar-new {
+      flex: 0 0 auto;
+      min-height: 38px;
+      padding: 6px 10px;
+      font-size: 0.7rem;
+      box-shadow: none;
+      scroll-snap-align: start;
+    }
+    .history-page-actions .btn-subbar-new { order: -1; }
+
+    .kpi-row {
+      --bs-gutter-x: 0.6rem;
+      --bs-gutter-y: 0.6rem;
+      margin-bottom: 0.75rem;
+    }
+    .kpi-row > [class*="col-"] { width: 50%; }
+    .kpi-card {
+      min-height: 102px;
+      padding: 0.72rem;
+      border-radius: 16px;
+      align-items: flex-start;
+      gap: 4px;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.035);
+    }
+    .kpi-card:hover { transform: none; }
+    .kpi-info { padding-right: 25px; }
+    .kpi-label { font-size: 0.58rem; letter-spacing: 0.35px; margin-bottom: 0.18rem; }
+    .kpi-val { font-size: 1.28rem; margin-bottom: 0; line-height: 1.05; }
+    .kpi-sub { display: none; }
+    .kpi-icon-wrap {
+      position: absolute;
+      top: 0.7rem;
+      right: 0.65rem;
+      width: 29px;
+      height: 29px;
+      border-radius: 9px;
+      font-size: 0.85rem;
+    }
+    .kpi-payment .kpi-info { padding-right: 0; }
+    .kpi-payment .kpi-label { margin-bottom: 0.3rem !important; }
+    .kpi-payment .d-flex.flex-column { gap: 2px !important; }
+    .kpi-payment .d-flex.justify-content-between { font-size: 0.62rem !important; }
+    .kpi-payment .dot-badge { width: 6px; height: 6px; }
+
+    .filter-card {
+      padding: 0.5rem;
+      margin-bottom: 0.75rem;
+      border-radius: 16px;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.035);
+    }
+    .history-filter-toggle {
+      width: 100%;
+      min-height: 42px;
+      border: 0;
+      background: transparent;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 0.35rem 0.45rem;
+      font-family: var(--font-main, 'Outfit', sans-serif);
+      font-size: 0.78rem;
+      font-weight: 750;
+      text-align: left;
+    }
+    .history-filter-toggle > i:first-child {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background: var(--pos-red-soft);
+      color: var(--pos-red);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .history-filter-toggle small {
+      display: block;
+      color: var(--text-muted);
+      font-size: 0.61rem;
+      font-weight: 500;
+      margin-top: 1px;
+    }
+    .history-filter-toggle .filter-chevron { margin-left: auto; transition: transform 0.2s ease; }
+    .filter-card.filter-open .filter-chevron { transform: rotate(180deg); }
+    .filter-card .filter-grid { display: none; }
+    .filter-card.filter-open .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      padding: 0.45rem 0.4rem 0.35rem;
+      border-top: 1px solid var(--border-color);
+    }
+    .filter-card .f-group { min-width: 0 !important; gap: 3px; }
+    .filter-card .f-group:nth-last-of-type(1) { grid-column: 1 / -1; }
+    .f-group label { font-size: 0.58rem; }
+    .f-group input, .f-group select {
+      min-width: 0;
+      width: 100%;
+      min-height: 40px;
+      padding: 0.42rem 0.55rem;
+      border-radius: 10px;
+      font-size: 0.72rem;
+    }
+    .filter-grid > .d-flex { grid-column: 1 / -1; width: 100%; }
+    .btn-filter-apply, .btn-filter-clear {
+      flex: 1;
+      min-height: 40px;
+      justify-content: center;
+      padding: 0.48rem 0.7rem;
+      font-size: 0.72rem;
+    }
+
+    .table-card { background: transparent; border: 0; box-shadow: none; overflow: visible; }
+    .table-responsive { overflow: visible; }
+    .hist-table thead { display: none; }
+    .hist-table, .hist-table tbody {
+      display: block;
+      width: 100%;
+    }
+    .hist-table tr {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+      width: 100%;
+      margin-bottom: 0.65rem;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 0.65rem;
+      background: var(--panel-bg);
+      box-shadow: 0 3px 14px rgba(0, 0, 0, 0.04);
+    }
+    .hist-table tr:active {
+      transform: scale(0.985);
+    }
+    .hist-table td {
+      display: block;
+      width: 100%;
+      min-width: 0;
+      min-height: 54px;
+      padding: 0.5rem 0.55rem;
+      border: 0;
+      border-radius: 11px;
+      background: var(--surface-2);
+      text-align: left !important;
+      font-size: 0.75rem;
+    }
+    .hist-table td::before {
+      display: block;
+      content: attr(data-label);
+      font-size: 0.55rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+    .hist-table td[data-label="Order #"] {
+      grid-column: 1 / -1;
+      min-height: 0;
+      background: transparent;
+      border-bottom: 1px solid var(--border-color);
+      border-radius: 0;
+      padding: 0.05rem 0.1rem 0.6rem;
+    }
+    .hist-table td[data-label="Order #"]::before { display: none; }
+    .hist-table .order-num { font-size: 0.86rem; }
+    .hist-table td[data-label="Grand Total"] { color: var(--pos-red) !important; font-size: 0.95rem !important; }
+    .hist-table td[data-label="Date & Time"] div:first-child { font-size: 0.72rem; }
+    .hist-table td[data-label="Date & Time"] div:last-child { font-size: 0.64rem !important; }
+    .location-badge, .method-tag, .status-pill { font-size: 0.66rem; }
+    .hist-table tr::after {
+      content: 'Tap to view details  ›';
+      grid-column: 1 / -1;
+      color: var(--pos-red);
+      font-size: 0.61rem;
+      font-weight: 700;
+      text-align: right;
+      padding: 0 0.15rem;
+    }
+    .pag {
+      padding: 0.6rem !important;
+      gap: 6px;
+      border: 1px solid var(--border-color) !important;
+      border-radius: 14px;
+      background: var(--panel-bg);
+      justify-content: center;
+    }
+    .pag > .me-auto { width: 100%; margin: 0 !important; text-align: center; font-size: 0.68rem !important; }
+    .pag a, .pag span { min-height: 36px; padding: 0.4rem 0.7rem; font-size: 0.7rem; }
+
+    .detail-panel {
+      top: auto;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: min(92dvh, 760px);
+      border: 1px solid var(--border-color);
+      border-bottom: 0;
+      border-radius: 24px 24px 0 0;
+      transform: translateY(105%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 -14px 40px rgba(0, 0, 0, 0.24);
+    }
+    .detail-panel.open { right: 0; transform: translateY(0); }
+    .detail-panel-head { padding: 1.3rem 1rem 0.85rem; }
+    .detail-panel-head::before {
+      top: 7px;
+      left: 50%;
+      right: auto;
+      width: 38px;
+      height: 4px;
+      border-radius: 999px;
+      transform: translateX(-50%);
+      background: var(--border-color);
+    }
+    .detail-panel-body { padding: 0.85rem; }
+    .detail-section { border-radius: 15px; padding: 0.85rem; margin-bottom: 0.75rem; }
+    .refund-modal {
+      width: calc(100% - 1.5rem);
+      max-height: 92dvh;
+      overflow-y: auto;
+      border-radius: 22px;
+      padding: 1rem;
+    }
   }
 </style>
 {% endblock %}
@@ -966,7 +1218,7 @@
       <span class="current">Order History</span>
     </div>
   </div>
-  <div class="d-flex align-items-center gap-2 flex-wrap">
+  <div class="d-flex align-items-center gap-2 flex-wrap history-page-actions">
     {% if not is_restricted %}
     <a href="{% url 'pending-refunds' %}" class="btn-subbar-pill no-print">
       <i class="bi bi-arrow-counterclockwise"></i> Pending Refunds
@@ -1055,6 +1307,11 @@
 
   <!-- Filter Bar Card -->
   <div class="filter-card no-print">
+    <button type="button" class="history-filter-toggle d-md-none" onclick="toggleHistoryFilters(this)" aria-expanded="false">
+      <i class="bi bi-sliders2"></i>
+      <span>Filters<small>Refine date, status and payment</small></span>
+      <i class="bi bi-chevron-down filter-chevron"></i>
+    </button>
     <form method="get" class="filter-grid">
       <div class="f-group">
         <label>From Date</label>
@@ -1153,14 +1410,14 @@
           {% for order in page.object_list %}
           <tr onclick="openDetail({{ order.id }})"
               class="{% if order.status == 'cancelled' %}cancelled{% endif %}">
-            <td>
+            <td data-label="Order #">
               <span class="order-num">{{ order.order_number|default:order.id }}</span>
             </td>
-            <td>
+            <td data-label="Date &amp; Time">
               <div style="font-weight:700;color:var(--text-main);">{{ order.created_at|date:"d M Y" }}</div>
               <div style="font-size:0.75rem;color:var(--text-muted);"><i class="bi bi-clock me-1"></i>{{ order.created_at|date:"H:i" }}</div>
             </td>
-            <td>
+            <td data-label="Dining / Table">
               <div class="location-badge">
                 {% if order.table %}
                   <i class="bi bi-grid-3x3-gap text-danger"></i>
@@ -1171,7 +1428,7 @@
                 {% endif %}
               </div>
             </td>
-            <td>
+            <td data-label="Channel">
               {% if order.source == "zomato" %}
                 <span style="color:#e23744;font-weight:700;font-size:0.78rem;"><i class="bi bi-bag me-1"></i>Zomato</span>
               {% elif order.source == "swiggy" %}
@@ -1186,22 +1443,22 @@
                 <span style="font-weight:600;font-size:0.78rem;color:var(--text-muted);">{{ order.source|title|cut:"_" }}</span>
               {% endif %}
             </td>
-            <td>
+            <td data-label="Staff">
               {% if order.created_by %}
                 <span style="font-weight:600;color:var(--text-main);">{{ order.created_by.first_name|default:order.created_by.username }}</span>
               {% else %}
                 <span style="color:var(--text-muted);">—</span>
               {% endif %}
             </td>
-            <td>
+            <td data-label="Items">
               <span style="font-weight:700;font-size:0.82rem;background:var(--panel-bg);padding:3px 8px;border-radius:6px;border:1px solid var(--border-color);">
                 {{ order.items.count }} item{{ order.items.count|pluralize }}
               </span>
             </td>
-            <td style="text-align:right;font-weight:800;font-size:0.95rem;color:var(--text-main);">
+            <td data-label="Grand Total" style="text-align:right;font-weight:800;font-size:0.95rem;color:var(--text-main);">
               {{ CURRENCY_SYMBOL }}{{ order.grand_total|floatformat:0 }}
             </td>
-            <td>
+            <td data-label="Payment">
               {% for p in order.payments.all %}
                 {% if p.method != "refund" %}
                   <span class="method-tag">{{ p.method|upper }}</span>
@@ -1210,7 +1467,7 @@
                 {% if order.grand_total == 0 %}<span class="method-tag" style="background:var(--pos-green-soft);color:#059669;border-color:var(--pos-green-border);">COMP</span>{% endif %}
               {% endfor %}
             </td>
-            <td>
+            <td data-label="Status">
               <span class="status-pill
                 {% if order.status == 'closed' %}pill-closed
                 {% elif order.status == 'cancelled' %}pill-cancelled
@@ -1310,6 +1567,12 @@
 {% block extra_js %}
 <script>
 const CURRENCY_SYMBOL = "{{ request.user.outlet.currency_symbol|default:'₹'|escapejs }}";
+function toggleHistoryFilters(button) {
+  const card = button.closest('.filter-card');
+  const isOpen = card.classList.toggle('filter-open');
+  button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+}
+
 function getCookie(name) {
   const v = document.cookie.match("(^|;) ?" + name + "=([^;]*)(;|$)");
   return v ? v[2] : null;

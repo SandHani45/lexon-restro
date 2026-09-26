@@ -89,13 +89,49 @@ class DashboardPermissionTest(TestCase):
             outlet=self.outlet
         )
 
+        self.superuser = User.objects.create_superuser(
+            username="platform_admin",
+            password="pass123",
+        )
+
     def test_owner_can_access_dashboard(self):
 
         self.client.login(username="owner1", password="pass123")
 
-        response = self.client.get(reverse("dashboard"))
+        response = self.client.get("/dashboard/")
 
         self.assertEqual(response.status_code, 200)
+
+    def test_empty_dashboard_does_not_show_sample_activity(self):
+        self.client.force_login(self.owner)
+        session = self.client.session
+        session["onboarding_done"] = True
+        session.save()
+
+        # An abandoned draft created before the lazy-order fix must not be
+        # presented as a real recent order.
+        from orders.models import Order
+        empty_draft = Order.objects.create(
+            tenant=self.tenant,
+            outlet=self.outlet,
+            created_by=self.owner,
+            status="open",
+            source="counter",
+        )
+
+        response = self.client.get("/dashboard/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No selling data yet")
+        self.assertContains(response, "No recent orders yet")
+        for sample_item in (
+            "Chicken Burger", "Margherita Pizza", "Loaded French Fries",
+            "Caesar Salad", "Chocolate Lava Cake",
+        ):
+            self.assertNotContains(response, sample_item)
+        for sample_customer in ("Sarah Johnson", "Mike Chen", "Emma Wilson", "James Brown"):
+            self.assertNotContains(response, sample_customer)
+        self.assertNotContains(response, empty_draft.order_number)
 
     def test_chef_cannot_access_dashboard(self):
 
@@ -120,6 +156,25 @@ class DashboardPermissionTest(TestCase):
         response = self.client.get(reverse("dashboard"))
 
         self.assertIn(response.status_code, [302, 403])
+
+    def test_superuser_dashboard_redirects_to_portal_home(self):
+        self.client.force_login(self.superuser)
+
+        response = self.client.get("/dashboard/")
+
+        self.assertRedirects(response, reverse("portal:home"), fetch_redirect_response=False)
+
+    def test_feature_flags_navigation_returns_superuser_home(self):
+        self.client.force_login(self.superuser)
+
+        response = self.client.get(
+            reverse("feature_flags"),
+            {"tenant_id": self.tenant.id},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, reverse("portal:home"))
+        self.assertContains(response, "Superuser Home")
 
 
 class LoginErrorTest(TestCase):

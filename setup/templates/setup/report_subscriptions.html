@@ -680,11 +680,7 @@ async function createSubscription() {
     const btn = document.getElementById('btn-add-sub');
 
     if (!rawEmails || !rawEmails.trim()) {
-        if (typeof ui !== 'undefined' && ui.toast) {
-            ui.toast('Please enter at least one recipient email address.', 'error');
-        } else {
-            alert('Please enter at least one recipient email address.');
-        }
+        ui.toast('Please enter at least one recipient email address.', 'error');
         return;
     }
 
@@ -699,9 +695,7 @@ async function createSubscription() {
     };
     try {
         await apiClient.post('/setup/report-subscriptions/create/', payload);
-        if (typeof ui !== 'undefined' && ui.toast) {
-            ui.toast('Report subscription created successfully.', 'success');
-        }
+        ui.toast('Report subscription created successfully.', 'success');
         setTimeout(() => location.reload(), 600);
     } catch (err) {
         if (btn) {
@@ -714,9 +708,7 @@ async function createSubscription() {
 async function toggleSubscription(subId) {
     try {
         await apiClient.post(`/setup/report-subscriptions/${subId}/toggle/`, {});
-        if (typeof ui !== 'undefined' && ui.toast) {
-            ui.toast('Subscription status updated.', 'success');
-        }
+        ui.toast('Subscription status updated.', 'success');
         setTimeout(() => location.reload(), 300);
     } catch (err) {
         // apiClient notifies on error
@@ -748,9 +740,7 @@ async function deleteSubscription(subId) {
         await apiClient.post(`/setup/report-subscriptions/${subId}/delete/`, {});
         const row = document.getElementById(`sub-row-${subId}`);
         if (row) row.remove();
-        if (typeof ui !== 'undefined' && ui.toast) {
-            ui.toast('Subscription deleted successfully.', 'success');
-        }
+        ui.toast('Subscription deleted successfully.', 'success');
     } catch (err) {
         // apiClient notifies on error
     }

@@ -1808,7 +1808,7 @@
         const groups = ITEM_MODIFIERS[String(pendingModifierItem.id)] || [];
         for (const group of groups) {
             if (group.is_required && (!selectedModifiers[group.id] || selectedModifiers[group.id].length === 0)) {
-                alert(`Please select an option for "${group.name}"`);
+                ui.toast(`Please select an option for "${group.name}"`, "warning");
                 return;
             }
         }
@@ -2169,7 +2169,7 @@
         const tableToken = _tableToken;
 
         if(!tableToken && !tableId) {
-            alert("No table detected. Please scan a valid table QR.");
+            ui.toast("No table detected. Please scan a valid table QR.", "error");
             return;
         }
 
@@ -2266,12 +2266,12 @@
             } else if (!ok && (data.error || '').includes('does not belong')) {
                 // Very rare: stale/mismatched stored id — drop it and retry once.
                 clearStoredOrderId();
-                alert("Starting a new order for this table — please tap Place Order again.");
+                ui.toast("Starting a new order for this table — please tap Place Order again.", "warning");
                 btn.disabled = false;
                 btn.innerHTML = 'PLACE ORDER <i class="bi bi-arrow-right"></i>';
             } else if (!ok && (data.error || '').includes('already been billed')) {
                 clearStoredOrderId();
-                alert("Your table's bill is already being prepared — please ask a waiter for more items.");
+                ui.toast("Your table's bill is already being prepared — please ask a waiter for more items.", "warning");
                 btn.disabled = false;
                 btn.innerHTML = 'PLACE ORDER <i class="bi bi-arrow-right"></i>';
             } else if (!ok && (data.error || '').toLowerCase().includes('enter your name')) {
@@ -2283,18 +2283,18 @@
                 const gnErrEl = document.getElementById('guestNameError');
                 gnEl.classList.add('input-error');
                 if (gnErrEl) gnErrEl.classList.add('show');
-                alert(data.error);
+                ui.toast(data.error, "error");
                 btn.disabled = false;
                 btn.innerHTML = 'PLACE ORDER <i class="bi bi-arrow-right"></i>';
             } else {
-                alert("Error: " + (data.error || "Could not place order."));
+                ui.toast("Error: " + (data.error || "Could not place order."), "error");
                 btn.disabled = false;
                 btn.innerHTML = 'PLACE ORDER <i class="bi bi-arrow-right"></i>';
             }
         })
         .catch(err => {
             console.error(err);
-            alert("Network error. Please try again.");
+            ui.toast("Network error. Please try again.", "error");
             btn.disabled = false;
             btn.innerHTML = 'PLACE ORDER <i class="bi bi-arrow-right"></i>';
         });

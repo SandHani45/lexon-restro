@@ -4,6 +4,52 @@
 
 {% block extra_css %}
 <style>
+    /* Top bar: only Print/Thermal Print live in the default overflow
+       menu, so there's no reason to hide them behind a "..." tap on
+       mobile -- expose them directly instead, same as Dashboard/Orders/
+       Live Tables/Waiter Calls. */
+    #pos-topbar .topbar-more-btn {
+        display: none !important;
+    }
+    #pos-topbar .topbar-more-wrap,
+    #pos-topbar .topbar-more-menu {
+        display: contents !important;
+    }
+    @media (max-width: 767.98px) {
+        #pos-topbar .topbar-more-menu {
+            position: static !important;
+            width: auto !important;
+            max-width: none !important;
+            padding: 0 !important;
+            border: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: none !important;
+        }
+        #pos-topbar .topbar-more-menu .btn-icon {
+            width: 34px;
+            height: 34px;
+            font-size: 1.1rem;
+        }
+        /* "Thermal Print" text would crowd the icons already in the top
+           bar (History/bell/basket/alert/role badge) on a phone -- keep
+           just its icon there, same space-saving approach as elsewhere. */
+        .bill-thermal-print-btn {
+            padding: 0 !important;
+            width: 34px;
+            height: 34px;
+            justify-content: center;
+        }
+        .bill-thermal-print-btn i {
+            margin: 0 !important;
+        }
+        .bill-thermal-print-label {
+            display: none;
+        }
+    }
+
     /* ── Bill page: centre a receipt card in the viewport ─── */
     .bill-page {
         display: flex;
@@ -148,17 +194,11 @@
 </style>
 {% endblock %}
 
-{% block header_left %}
-<span style="font-family:'DM Serif Display',serif;font-size:1.1rem;">
-    <i class="bi bi-receipt me-2" style="color:var(--accent-gold)"></i>Invoice
-</span>
-{% endblock %}
-
 {% block header_right %}
 <button class="btn-icon" onclick="window.print()" title="Print this page (full)"><i class="bi bi-printer"></i></button>
 <a href="{% url 'thermal-receipt' order.id %}" target="_blank"
-   class="btn-luxury ms-2 no-print" title="Open thermal receipt (80mm printer)">
-  <i class="bi bi-receipt me-1"></i>Thermal Print
+   class="btn-luxury ms-2 no-print bill-thermal-print-btn" title="Open thermal receipt (80mm printer)">
+  <i class="bi bi-receipt me-1"></i><span class="bill-thermal-print-label">Thermal Print</span>
 </a>
 {% endblock %}
 
@@ -986,11 +1026,10 @@ renderUpiQR({{ remaining }});
         try {
             const res = await apiClient.post(`/log-bypass/${orderId}/`, {});
             if (res && res.error) {
-                if (typeof ui !== 'undefined' && ui.toast) ui.toast(res.error, 'error');
-                else alert(res.error);
+                ui.toast(res.error, 'error');
                 return;
             }
-            if (typeof ui !== 'undefined' && ui.toast) ui.toast('Payment gate bypassed', 'info');
+            ui.toast('Payment gate bypassed', 'info');
         } catch(e) {
             console.error('Bypass error:', e);
         }

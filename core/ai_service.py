@@ -18,9 +18,16 @@ logger = logging.getLogger("pos.ai")
 # hardcoded as a literal string in four separate call sites, meaning
 # switching models (e.g. pinning a specific version instead of "-latest",
 # or trying a cheaper/newer one later) needed a code change in each. Now
-# it's an env var, defaulting to the same "-latest" alias as before, so
-# nothing changes unless GEMINI_MODEL_NAME is actually set.
-GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL_NAME", "gemini-flash-latest")
+# it's an env var pinned to a stable multimodal release by default.
+GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL_NAME", "gemini-3.7-flash")
+GEMINI_FALLBACK_MODEL_NAMES = tuple(
+    name.strip()
+    for name in os.getenv(
+        "GEMINI_FALLBACK_MODEL_NAMES",
+        "gemini-3.7-flash,gemini-3.6-flash",
+    ).split(",")
+    if name.strip()
+)
 
 
 class AIService:
@@ -95,11 +102,75 @@ class AIService:
         working unchanged."""
         try:
             return self.client.models.generate_content(model=model, contents=contents)
-        except Exception as e:
-            if not self.fallback_client:
-                raise
-            logger.warning("Primary Gemini key failed (%s) -- retrying on fallback key.", e)
-            return self.fallback_client.models.generate_content(model=model, contents=contents)
+        except Exception as primary_error:
+            last_error = primary_error
+
+            if self.fallback_client:
+                logger.warning(
+                    "Primary Gemini key failed on %s (%s) -- retrying on fallback key.",
+                    model,
+                    primary_error,
+                )
+                try:
+                    return self.fallback_client.models.generate_content(
+                        model=model, contents=contents
+                    )
+                except Exception as fallback_key_error:
+                    last_error = fallback_key_error
+
+            # The SDK already retries transient failures with exponential
+            # backoff. If a 429/5xx still escapes, the selected alias/model is
+            # unavailable for this request. Try stable Flash generations so an
+            # onboarding import is not held hostage by one overloaded model.
+            if not self._is_transient_error(last_error):
+                raise last_error
+
+            for fallback_model in GEMINI_FALLBACK_MODEL_NAMES:
+                if fallback_model == model:
+                    continue
+                for client_name, client in (
+                    ("primary", self.client),
+                    ("fallback", self.fallback_client),
+                ):
+                    if client is None:
+                        continue
+                    logger.warning(
+                        "Gemini %s unavailable; trying %s with the %s key.",
+                        model,
+                        fallback_model,
+                        client_name,
+                    )
+                    try:
+                        return client.models.generate_content(
+                            model=fallback_model, contents=contents
+                        )
+                    except Exception as model_error:
+                        last_error = model_error
+                        if not self._is_transient_error(model_error):
+                            break
+
+            raise last_error
+
+    @staticmethod
+    def _is_transient_error(error):
+        """Return True only for failures where retrying another model can help."""
+        status = getattr(error, "status_code", None) or getattr(error, "code", None)
+        if status in {408, 429, 500, 502, 503, 504}:
+            return True
+        message = str(error).lower()
+        return any(marker in message for marker in (
+            "resource_exhausted",
+            "rate limit",
+            "high demand",
+            "unavailable",
+            "service unavailable",
+            "timed out",
+            "timeout",
+            "disconnected",
+            "connection reset",
+            "connection aborted",
+            "remoteprotocolerror",
+        ))
 
     def _resize_image(self, image_bytes, max_size=(1024, 1024)):
         """Re-encode any image to a clean, right-sized RGB JPEG.

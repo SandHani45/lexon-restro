@@ -96,88 +96,26 @@
     gap: 12px;
     min-width: 0;
   }
+  /* Matches Token Billing's .token-pos-back (tokens/templates/tokens/token_billing.html)
+     so the back button looks the same everywhere in the app. */
   .pos-subbar-back-btn {
-    width: 38px;
-    height: 38px;
-    min-width: 38px;
-    border-radius: 50%;
-    background: var(--panel-bg, #ffffff);
-    border: 1.5px solid var(--border-color, #ECE7E2);
-    color: var(--text-main, #2C170E);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    font-size: 1.05rem;
-    font-weight: 700;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    width: 42px; height: 42px; min-width: 42px; border-radius: 14px;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--text-main); background: var(--panel-bg);
+    border: 1px solid var(--border-color); text-decoration: none;
+    font-size: 1.02rem;
+    transition: all .18s ease;
     flex-shrink: 0;
   }
   .pos-subbar-back-btn:hover {
-    background: var(--pos-red-soft, #FFF4F4);
-    border-color: var(--pos-red, #EC2734);
-    color: var(--pos-red, #EC2734);
+    color: var(--pos-red);
+    border-color: var(--pos-red);
     transform: translateX(-2px);
-    box-shadow: 0 4px 12px rgba(236, 39, 52, 0.18);
-  }
-  html.dark .pos-subbar-back-btn {
-    background: #18181b;
-    border-color: rgba(255, 255, 255, 0.1);
-    color: #f4f4f6;
-  }
-  html.dark .pos-subbar-back-btn:hover {
-    background: rgba(236, 39, 52, 0.15);
-    border-color: var(--pos-red, #EC2734);
-    color: #ff6b75;
   }
   .pos-subbar-headings {
     display: flex;
     flex-direction: column;
     min-width: 0;
-  }
-  .pos-subbar-clock {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    background: var(--panel-bg, #ffffff);
-    border: 1.5px solid var(--border-color, #ECE7E2);
-    border-radius: 999px;
-    padding: 6px 14px;
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: var(--text-main, #2C170E);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-    user-select: none;
-    flex-shrink: 0;
-    letter-spacing: 0.2px;
-  }
-  html.dark .pos-subbar-clock {
-    background: #18181b;
-    border-color: rgba(255, 255, 255, 0.1);
-    color: #f4f4f6;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  }
-  .pos-subbar-clock i {
-    color: var(--pos-red, #EC2734);
-    font-size: 0.9rem;
-  }
-  .pos-subbar-clock .pos-clock-time {
-    font-family: var(--font-mono, monospace);
-    font-size: 0.85rem;
-    font-weight: 800;
-    letter-spacing: 0.3px;
-  }
-  .pos-subbar-clock .pos-clock-date {
-    color: var(--text-muted, #8a7d74);
-    font-weight: 500;
-    font-size: 0.76rem;
-    padding-left: 6px;
-    border-left: 1px solid var(--border-color, #ECE7E2);
-  }
-  html.dark .pos-subbar-clock .pos-clock-date {
-    color: #9ca3af;
-    border-left-color: rgba(255, 255, 255, 0.12);
   }
   .pos-subbar-title {
     font-size: 1.35rem;
@@ -1220,30 +1158,7 @@
     box-shadow: 0 4px 14px rgba(0,0,0,0.3);
   }
 
-  .toast-minimal {
-    position: fixed;
-    top: 24px;
-    right: 24px;
-    background: #1e293b;
-    color: #ffffff;
-    border-radius: 12px;
-    padding: 0.85rem 1.4rem;
-    z-index: 1070;
-    opacity: 0;
-    transform: translateY(-10px);
-    transition: all 0.25s ease;
-    pointer-events: none;
-    font-weight: 600;
-    font-size: 0.85rem;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-  }
-  .toast-minimal.show {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-  }
-
-  /* ── Mobile Page Search (below the "Point of Sale (POS)" title) ── */
+  /* ── Mobile Page Search (below the "Point of Sale" title) ── */
   .pos-mobile-search-wrap {
     position: relative;
     width: 100%;
@@ -1288,6 +1203,158 @@
     display: none;
     cursor: pointer;
     padding: 4px;
+  }
+
+  /* ── Kitchen Notes Prompt ─────────────────────────────── */
+  .kitchen-note-backdrop.swal2-container {
+    z-index: 13000 !important;
+    padding: 1rem !important;
+    background: rgba(15, 18, 26, 0.58) !important;
+    backdrop-filter: blur(8px) saturate(130%);
+    -webkit-backdrop-filter: blur(8px) saturate(130%);
+  }
+  .kitchen-note-sheet.swal2-popup {
+    width: min(480px, calc(100vw - 2rem)) !important;
+    padding: 1.35rem !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 24px !important;
+    background: var(--panel-bg) !important;
+    color: var(--text-main) !important;
+    box-shadow: 0 24px 64px rgba(15, 18, 26, 0.28) !important;
+    text-align: left !important;
+  }
+  .kitchen-note-title.swal2-title {
+    margin: 0 !important;
+    padding: 0 2.25rem 0 0 !important;
+    color: var(--text-main) !important;
+    font-family: var(--font-main, 'Outfit', sans-serif) !important;
+    font-size: 1.18rem !important;
+    font-weight: 800 !important;
+    line-height: 1.25 !important;
+    text-align: left !important;
+  }
+  .kitchen-note-sheet .swal2-html-container {
+    margin: 0.45rem 0 0 !important;
+    padding: 0 !important;
+    text-align: left !important;
+  }
+  .kitchen-note-helper {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--text-muted);
+    font-size: 0.74rem;
+    line-height: 1.35;
+  }
+  .kitchen-note-helper i { color: var(--pos-red); }
+  .kitchen-note-input.swal2-textarea {
+    width: 100% !important;
+    min-height: 112px !important;
+    margin: 0.9rem 0 0 !important;
+    padding: 0.85rem 0.95rem !important;
+    resize: vertical !important;
+    border: 1.5px solid var(--border-color) !important;
+    border-radius: 15px !important;
+    background: var(--surface-2) !important;
+    color: var(--text-main) !important;
+    box-shadow: none !important;
+    font-family: var(--font-main, 'Outfit', sans-serif) !important;
+    font-size: 0.9rem !important;
+    line-height: 1.45 !important;
+  }
+  .kitchen-note-input.swal2-textarea:focus {
+    border-color: var(--pos-red) !important;
+    box-shadow: 0 0 0 3px rgba(236, 39, 52, 0.12) !important;
+  }
+  .kitchen-note-actions.swal2-actions {
+    display: grid !important;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr);
+    gap: 0.65rem !important;
+    width: 100% !important;
+    margin: 1rem 0 0 !important;
+  }
+  .kitchen-note-save,
+  .kitchen-note-cancel {
+    min-height: 46px;
+    margin: 0 !important;
+    border-radius: 13px;
+    font-family: var(--font-main, 'Outfit', sans-serif);
+    font-size: 0.82rem;
+    font-weight: 800;
+  }
+  .kitchen-note-save {
+    border: 1px solid var(--pos-red);
+    background: var(--pos-red);
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(236, 39, 52, 0.22);
+  }
+  .kitchen-note-cancel {
+    border: 1px solid var(--border-color);
+    background: var(--surface-2);
+    color: var(--text-main);
+  }
+  .kitchen-note-close.swal2-close {
+    top: 0.75rem !important;
+    right: 0.75rem !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 11px !important;
+    color: var(--text-muted) !important;
+    font-size: 1.5rem !important;
+  }
+
+  @media (max-width: 991px) {
+    .lux-toast-container.swal2-container {
+      padding-bottom: calc(76px + env(safe-area-inset-bottom)) !important;
+    }
+    body:has(.mobile-cart-page.show) .lux-toast-container.swal2-container {
+      padding-bottom: calc(260px + env(safe-area-inset-bottom)) !important;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .kitchen-note-backdrop.swal2-container {
+      align-items: flex-end !important;
+      grid-template-rows: 1fr auto 0 !important;
+      padding: 0 !important;
+    }
+    .kitchen-note-sheet.swal2-popup {
+      width: 100% !important;
+      max-width: 100% !important;
+      max-height: calc(100dvh - 8px) !important;
+      margin: 0 !important;
+      padding: 1.15rem 1rem calc(1rem + env(safe-area-inset-bottom)) !important;
+      overflow-y: auto !important;
+      border-width: 1px 0 0 !important;
+      border-radius: 24px 24px 0 0 !important;
+      box-shadow: 0 -18px 48px rgba(15, 18, 26, 0.24) !important;
+    }
+    .kitchen-note-sheet.swal2-popup::before {
+      content: '';
+      display: block;
+      width: 38px;
+      height: 4px;
+      margin: -0.45rem auto 0.8rem;
+      border-radius: 999px;
+      background: var(--border-color);
+    }
+    .kitchen-note-title.swal2-title {
+      font-size: 1.02rem !important;
+      padding-right: 2rem !important;
+    }
+    .kitchen-note-helper { font-size: 0.7rem; }
+    .kitchen-note-input.swal2-textarea {
+      min-height: 96px !important;
+      padding: 0.75rem 0.8rem !important;
+      border-radius: 13px !important;
+      font-size: 0.84rem !important;
+    }
+    .kitchen-note-save,
+    .kitchen-note-cancel {
+      min-height: 48px;
+      border-radius: 13px;
+      font-size: 0.8rem;
+    }
   }
 
   /* ── Responsive Adaptations ── */
@@ -1335,7 +1402,7 @@
     #pos-topbar::-webkit-scrollbar { display: none; }
     #pos-topbar .topbar-right { flex-shrink: 0; }
 
-    /* Mobile subbar header row with back button, title, and clock */
+    /* Compact mobile subbar header row */
     .pos-subbar-header-row {
       margin-bottom: 8px;
     }
@@ -1343,41 +1410,258 @@
       font-size: 1.15rem;
     }
     .pos-subbar-back-btn {
-      width: 36px;
-      height: 36px;
-      min-width: 36px;
-      font-size: 0.95rem;
-    }
-    .pos-subbar-clock {
-      padding: 4px 10px;
-      font-size: 0.76rem;
-      gap: 5px;
-    }
-    .pos-subbar-clock .pos-clock-time {
-      font-size: 0.8rem;
+      width: 38px;
+      height: 38px;
+      min-width: 38px;
+      border-radius: 13px;
+      font-size: 0.98rem;
     }
   }
 
   @media (max-width: 480px) {
+    .pos-subbar,
+    .pos-category-section,
+    .pos-menu-heading-row {
+      padding-left: 0.7rem;
+      padding-right: 0.7rem;
+    }
+    .pos-subbar {
+      padding-top: 0.55rem;
+      padding-bottom: 0.45rem;
+    }
+    .pos-subbar-header-row { margin-bottom: 6px; }
+    .pos-subbar-title { font-size: 1.05rem; }
+    .pos-subbar-back-btn {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      border-radius: 12px;
+    }
+    .pos-mobile-search-input { height: 36px; }
+    .pos-subbar-right { gap: 6px; }
+    .btn-subbar-new,
+    .btn-subbar-pill {
+      height: 32px;
+      padding-left: 10px;
+      padding-right: 10px;
+      font-size: 0.72rem;
+    }
+    .pos-category-section { padding-top: 0.2rem; padding-bottom: 0.25rem; }
+    .pos-category-scroll-container {
+      gap: 7px;
+      padding-top: 2px;
+      padding-bottom: 6px;
+    }
     .pos-items-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 5px;
     }
     .pos-cat-card {
-      width: 82px;
-      height: 76px;
-      border-radius: 14px;
+      width: 68px;
+      height: 62px;
+      padding: 4px;
+      border-radius: 12px;
     }
-    .pos-cat-icon { font-size: 1.35rem; }
-    .pos-cat-name { font-size: 0.72rem; }
-    .pos-item-thumb { height: 90px; }
+    .pos-cat-icon-wrap {
+      width: 32px;
+      height: 32px;
+      margin-bottom: 1px;
+    }
+    .pos-cat-icon,
+    .pos-cat-card.active .pos-cat-icon { font-size: 1.1rem; }
+    .pos-cat-name { font-size: 0.65rem; }
+    .pos-menu-heading-row { padding-top: 0.2rem; padding-bottom: 0.25rem; }
+    .pos-menu-heading-title { font-size: 1rem; }
+    .pos-menu-scroll-area { padding: 0.2rem 0.5rem 1.5rem; }
+    .pos-section-header { margin: 0.55rem 0 0.45rem; }
+    .pos-section-title { font-size: 0.92rem; }
+    .pos-item-card {
+      padding: 5px;
+      border-radius: 11px;
+    }
+    .pos-item-thumb {
+      height: 56px;
+      border-radius: 8px;
+      margin-bottom: 3px;
+    }
+    .pos-item-emoji-box { font-size: 1.65rem; }
+    .fssai-mark {
+      top: 4px;
+      left: 4px;
+      width: 13px;
+      height: 13px;
+      border-radius: 3px;
+    }
+    .fssai-mark.veg::after {
+      width: 5px;
+      height: 5px;
+    }
+    .fssai-mark.nonveg::after {
+      border-left-width: 3px;
+      border-right-width: 3px;
+      border-bottom-width: 5px;
+    }
+    .pos-prep-chip {
+      top: 4px;
+      right: 4px;
+      gap: 2px;
+      padding: 1px 4px;
+      font-size: 0.52rem;
+    }
+    .pos-item-body { padding: 1px 1px 2px; }
+    .pos-item-name {
+      min-height: 2.15em;
+      font-size: 0.67rem;
+      line-height: 1.08;
+    }
+    .pos-item-footer { padding: 1px 1px 0; }
+    .pos-item-price {
+      min-width: 0;
+      font-size: 0.74rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .btn-pos-add {
+      width: 26px;
+      height: 26px;
+      min-width: 26px;
+      font-size: 0.9rem;
+    }
 
     /* Trim secondary header chrome on very small phones so the essentials
-       (menu, page title, theme toggle, avatar) fit without scrolling. */
+       (menu, page title, theme toggle, role) fit without scrolling. */
     #pos-topbar { padding: 0 0.65rem; gap: 0.4rem; }
-    #pos-topbar .user-role-badge .user-role-tag,
-    #pos-topbar .user-role-badge .user-name-text { display: none !important; }
-    #pos-topbar .user-role-badge { padding: 0 0.5rem 0 0.35rem; gap: 0; }
+    #pos-topbar .user-role-badge { padding: 0 0.3rem; gap: 0; }
+    #pos-topbar .user-role-tag { font-size: 0.58rem; }
+
+    /* Premium mobile control system: consistent sizing by control role. */
+    .btn-subbar-new,
+    .btn-subbar-pill,
+    .pos-see-all-btn {
+      min-height: 36px !important;
+      height: 36px !important;
+      padding: 0 11px !important;
+      border-radius: 12px !important;
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-size: 0.7rem !important;
+      font-weight: 750 !important;
+      line-height: 1 !important;
+      white-space: nowrap;
+      box-shadow: 0 3px 10px rgba(20, 20, 30, 0.055);
+    }
+    .btn-subbar-new {
+      box-shadow: 0 7px 16px rgba(236, 39, 52, 0.22);
+    }
+    .btn-subbar-new:active,
+    .btn-subbar-pill:active,
+    .pos-see-all-btn:active,
+    .pos-fab-cart:active,
+    .btn-pos-kot:active,
+    .btn-pos-draft:active,
+    .btn-pos-pay:active,
+    .btn-pos-print:active,
+    .pos-parcel-btn:active {
+      transform: scale(0.975) !important;
+    }
+    .pos-item-card .btn-pos-add {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      border-radius: 9px;
+      font-size: 0.9rem;
+      box-shadow: 0 3px 9px rgba(236, 39, 52, 0.12);
+    }
+    .mobile-cart-header .btn-icon {
+      width: 36px !important;
+      height: 36px !important;
+      min-width: 36px !important;
+      border-radius: 12px !important;
+    }
+    .pos-cart-nav-tabs {
+      width: 100%;
+      padding: 3px;
+      border-radius: 13px;
+    }
+    .pos-cart-tab {
+      min-height: 36px;
+      flex: 1;
+      padding: 0 8px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+    }
+    .btn-cart-trash {
+      width: 30px;
+      height: 30px;
+      min-width: 30px;
+      padding: 0;
+      border-radius: 9px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(239, 68, 68, 0.08);
+    }
+    .pos-stepper {
+      min-height: 34px;
+      padding: 2px 3px;
+      border-radius: 11px;
+    }
+    .btn-step {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      border-radius: 8px;
+    }
+    .btn-cart-add-notes {
+      min-height: 32px;
+      padding: 0 10px;
+      border-radius: 10px;
+      font-size: 0.68rem;
+    }
+    .pos-parcel-btn {
+      height: 42px;
+      min-height: 42px;
+      border-radius: 12px;
+      margin-bottom: 0.65rem;
+      font-size: 0.76rem;
+    }
+    .pos-action-row { gap: 8px; }
+    .btn-pos-kot,
+    .btn-pos-draft,
+    .btn-pos-pay,
+    .btn-pos-print {
+      width: 100%;
+      height: 46px;
+      min-height: 46px;
+      padding: 0 8px;
+      border-radius: 13px;
+      gap: 5px;
+      font-size: 0.76rem;
+      line-height: 1.15;
+      box-shadow: 0 5px 14px rgba(20, 20, 30, 0.08);
+    }
+    .btn-pos-kot { box-shadow: 0 6px 15px rgba(16, 185, 129, 0.22); }
+    .btn-pos-pay { box-shadow: 0 7px 17px rgba(236, 39, 52, 0.22); }
+    .pos-fab-cart {
+      bottom: calc(12px + env(safe-area-inset-bottom));
+      left: 12px;
+      right: 12px;
+      height: 56px;
+      border-radius: 16px;
+      padding: 0 1rem;
+      box-shadow: 0 10px 28px rgba(236, 39, 52, 0.3);
+    }
+    .modal-footer .btn-luxury {
+      min-height: 46px !important;
+      border-radius: 13px !important;
+      font-size: 0.78rem !important;
+    }
   }
 
   @media (min-width: 992px) {
@@ -1594,14 +1878,6 @@
 
 {% block header_left %}
 <div class="d-flex align-items-center gap-3">
-  <a href="/billing/" class="d-flex align-items-center gap-2 text-decoration-none text-reset" title="POS Billing">
-    <div style="width:34px;height:34px;border-radius:10px;background:rgba(236,39,52,0.12);border:1px solid rgba(236,39,52,0.3);display:flex;align-items:center;justify-content:center;color:var(--pos-red);flex-shrink:0;">
-      <i class="bi bi-calculator" style="font-size:1.05rem;"></i>
-    </div>
-    <div class="d-none d-lg-block">
-      <div class="text-muted fw-semibold" style="font-size:0.75rem;letter-spacing:0.3px;">{{ request.user.outlet.name }}</div>
-    </div>
-  </a>
   <div class="d-none d-md-flex align-items-center position-relative" style="width:280px;">
     <i class="bi bi-search" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.88rem;pointer-events:none;"></i>
     <input type="text" id="menuSearch" class="form-control" placeholder="Search menu dishes... (Press /)" autocomplete="off" style="padding-left:36px;padding-right:30px;height:38px;border-radius:999px;background:var(--surface-2);border:1.5px solid var(--border-color);font-size:0.82rem;color:var(--text-main);">
@@ -1612,11 +1888,6 @@
 
 {% block header_right %}
 <div class="d-flex align-items-center gap-2">
-  {% if 'kitchen_display' in tenant_features %}
-  <a href="/kitchen/" class="btn btn-sm d-none d-sm-inline-flex align-items-center gap-1" style="background:var(--surface-2);border:1px solid var(--border-color);border-radius:999px;padding:6px 14px;font-size:0.82rem;font-weight:700;color:var(--text-main);">
-    <i class="bi bi-fire text-danger"></i> Kitchen KDS
-  </a>
-  {% endif %}
   <a href="{% url 'order-history' %}" class="btn btn-sm d-none d-md-inline-flex align-items-center gap-1" style="background:var(--surface-2);border:1px solid var(--border-color);border-radius:999px;padding:6px 14px;font-size:0.82rem;font-weight:700;color:var(--text-main);">
     <i class="bi bi-clock-history"></i> History
   </a>
@@ -1624,12 +1895,10 @@
 {% endblock %}
 
 {% block header_notifications %}
-{% include "core/_notif_badges_luxury.html" %}
+{% include "core/_notif_badges_luxury.html" with hide_system_alert=True %}
 {% endblock %}
 
 {% block content %}
-<div id="toastBox" class="toast-minimal">Message</div>
-
 <div id="printer-error-banner">
   <i class="bi bi-printer-fill"></i>
   <span id="printer-error-text">Kitchen printer is not responding — check the connection or call the manager.</span>
@@ -1649,23 +1918,17 @@
       <div class="pos-subbar-left">
         <div class="pos-subbar-header-row">
           <div class="pos-subbar-title-group">
-            <a href="/dashboard/" class="pos-subbar-back-btn" title="Back to Dashboard">
-              <i class="bi bi-arrow-left"></i>
+            <a href="/dashboard/" class="pos-subbar-back-btn" title="Back to Dashboard" aria-label="Back to Dashboard">
+              <i class="bi bi-arrow-left" aria-hidden="true"></i>
             </a>
             <div class="pos-subbar-headings">
-              <h1 class="pos-subbar-title">Point of Sale (POS)</h1>
+              <h1 class="pos-subbar-title">Point of Sale</h1>
               <div class="pos-subbar-breadcrumb">
                 <a href="/dashboard/">Dashboard</a>
                 <span class="sep">&gt;</span>
                 <span class="active">POS</span>
               </div>
             </div>
-          </div>
-          <!-- Live Clock Badge -->
-          <div class="pos-subbar-clock" id="posLiveClock" title="Current Time">
-            <i class="bi bi-clock"></i>
-            <span class="pos-clock-time" id="posClockTime">--:--</span>
-            <span class="pos-clock-date" id="posClockDate">---</span>
           </div>
         </div>
         <!-- Mobile-only page search, directly under the title (desktop keeps
@@ -2246,24 +2509,9 @@
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').catch(() => {});
+      navigator.serviceWorker.register('/sw.js?v=6', { scope: '/' }).catch(() => {});
     });
   }
-
-  /* ── Live POS Digital Clock ── */
-  function updatePOSLiveClock() {
-    const now = new Date();
-    const timeEl = document.getElementById('posClockTime');
-    const dateEl = document.getElementById('posClockDate');
-    if (timeEl) {
-      timeEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-    }
-    if (dateEl) {
-      dateEl.textContent = now.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' });
-    }
-  }
-  updatePOSLiveClock();
-  setInterval(updatePOSLiveClock, 1000);
 
   /* ── Category Scrolling & Filtering ── */
   function scrollCategoryNav(delta) {
@@ -2430,12 +2678,33 @@
   });
 
   /* ── Toast Notifications ── */
-  function showToast(msg) {
-    const t = document.getElementById("toastBox");
-    if (!t) return;
-    t.innerText = msg;
-    t.classList.add("show");
-    setTimeout(() => t.classList.remove("show"), 3000);
+  function showToast(msg, icon = 'info', options = {}) {
+    if (typeof ui !== 'undefined' && ui.toast) {
+      if (icon === 'info') {
+        const normalized = String(msg).toLowerCase();
+        if (/sent|saved|restored|cancelled|success/.test(normalized)) icon = 'success';
+        else if (/empty|nothing to|add items|enter amount|no active|offline mode/.test(normalized)) icon = 'warning';
+        else if (/failed|error|could not|network|unavailable|invalid|denied|rejected|not responding|not found/.test(normalized)) icon = 'error';
+      }
+      ui.toast(msg, icon, options);
+    }
+  }
+
+  function showKitchenDispatchToast(message, icon = 'success') {
+    const mobileCart = document.getElementById('mobileCartPage');
+    const cartWasOpen = window.innerWidth < 992 && mobileCart?.classList.contains('show');
+
+    // Close the cart first, then paint the confirmation at the top of the next
+    // frame. Its top placement is independent of the cart transition, so it
+    // appears immediately without jumping near the fixed bottom controls.
+    if (cartWasOpen) closeCartMobile();
+    const reveal = () => showToast(message, icon, {
+      className: icon === 'success' ? 'lux-toast-kitchen' : '',
+      containerClass: icon === 'success' ? 'lux-toast-kitchen-container' : '',
+      position: icon === 'success' && window.innerWidth < 992 ? 'top' : 'bottom-end',
+      timer: icon === 'success' ? 4200 : 5000
+    });
+    window.requestAnimationFrame(reveal);
   }
 
   /* ── Tab Switchers (Order vs Active) ── */
@@ -2700,13 +2969,34 @@
     if (!item) return;
     const { value: note } = await Swal.fire({
       title: 'Kitchen Notes: ' + item.name,
-      input: 'text',
+      html: '<div class="kitchen-note-helper"><i class="bi bi-fire"></i><span>Add clear preparation instructions for the kitchen.</span></div>',
+      input: 'textarea',
       inputValue: item.note || '',
       inputPlaceholder: 'e.g. Less spicy, extra sauce, no onions...',
+      inputAttributes: {
+        maxlength: '180',
+        rows: '4',
+        'aria-label': 'Kitchen preparation notes',
+        autocapitalize: 'sentences'
+      },
       showCancelButton: true,
-      confirmButtonColor: '#EC2734',
+      showCloseButton: true,
       confirmButtonText: 'Save Note',
-      cancelButtonText: 'Cancel'
+      cancelButtonText: 'Cancel',
+      buttonsStyling: false,
+      focusConfirm: false,
+      returnFocus: false,
+      customClass: {
+        container: 'kitchen-note-backdrop',
+        popup: 'kitchen-note-sheet',
+        title: 'kitchen-note-title',
+        input: 'kitchen-note-input',
+        actions: 'kitchen-note-actions',
+        confirmButton: 'kitchen-note-save',
+        cancelButton: 'kitchen-note-cancel',
+        closeButton: 'kitchen-note-close'
+      },
+      preConfirm: value => value.trim()
     });
     if (note !== undefined) {
       cart[idx].note = note.trim();
@@ -2881,16 +3171,16 @@
         applyParcel.then(() => afterCreate())
           .then(r => r.json())
           .then(k => {
-            showToast(k.error && k.error !== "No items to send to kitchen" ? k.error : "Order Sent to Kitchen!");
+            const kitchenError = k.error && k.error !== "No items to send to kitchen" ? k.error : null;
             clearCart();
             clearDraftForCurrentTable();
             resetSendBtn();
+            showKitchenDispatchToast(kitchenError || "Order Sent to Kitchen!", kitchenError ? 'error' : 'success');
             if (source !== 'dine_in' || !tableId) {
               generateBill(d.order_id);
             } else {
               loadRunningOrder();
             }
-            closeCartMobile();
           }).catch(() => resetSendBtn());
       })
       .catch(err => {

@@ -210,6 +210,274 @@
     .chart-bar-rect:hover {
         fill: var(--accent-gold) !important;
     }
+
+    /* Dashboard top bar: keep the role visible and expose actions directly. */
+    #pos-topbar .topbar-more-btn {
+        display: none !important;
+    }
+    #pos-topbar .topbar-more-wrap,
+    #pos-topbar .topbar-more-menu {
+        display: contents !important;
+    }
+
+    @media (max-width: 767px) {
+        #pos-topbar .topbar-more-menu {
+            position: static !important;
+            width: auto !important;
+            max-width: none !important;
+            padding: 0 !important;
+            border: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: none !important;
+        }
+        #pos-topbar .topbar-more-menu .btn-icon {
+            width: 34px;
+            height: 34px;
+            font-size: 1.1rem;
+        }
+    }
+
+    /* Dashboard primary button styling & icon spacing */
+    .dashboard-primary-action {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 0 !important;
+    }
+    .dashboard-primary-action i {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        font-size: 1.05em;
+        margin-right: 0.45rem !important;
+        margin-inline-end: 0.45rem !important;
+    }
+    [dir="rtl"] .dashboard-primary-action i {
+        margin-right: 0 !important;
+        margin-left: 0.45rem !important;
+    }
+
+    /* Mobile dashboard: compact, touch-friendly, app-like layout. */
+    @media (max-width: 767.98px) {
+        .dashboard-page {
+            padding: 0.8rem 0.7rem 1.6rem !important;
+            overflow-x: hidden;
+        }
+        .dashboard-welcome {
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            gap: 0.65rem !important;
+            margin-bottom: 0.9rem !important;
+        }
+        .dashboard-welcome-copy {
+            min-width: 0;
+            flex: 1;
+        }
+        .dashboard-welcome h2 {
+            font-size: 1.18rem !important;
+            letter-spacing: -0.25px;
+        }
+        .dashboard-welcome-meta {
+            display: block;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 0.66rem !important;
+        }
+        .dashboard-primary-action {
+            min-height: 36px;
+            padding: 0.48rem 0.72rem !important;
+            border-radius: 12px !important;
+            font-size: 0.68rem !important;
+            line-height: 1;
+            white-space: nowrap;
+            gap: 0 !important;
+            box-shadow: 0 7px 16px rgba(236, 39, 52, 0.2);
+        }
+        .dashboard-primary-action i {
+            margin-right: 0.42rem !important;
+            margin-inline-end: 0.42rem !important;
+        }
+        [dir="rtl"] .dashboard-primary-action i {
+            margin-right: 0 !important;
+            margin-left: 0.42rem !important;
+        }
+        .dashboard-kpi-grid,
+        .dashboard-analytics-row,
+        .dashboard-activity-row {
+            --bs-gutter-x: 0.55rem;
+            --bs-gutter-y: 0.55rem;
+            margin-bottom: 0.75rem !important;
+        }
+        .dashboard-kpi-grid > [class*="col-"] {
+            width: 50%;
+            flex: 0 0 auto;
+        }
+        .hero-kpi-card {
+            min-height: 108px;
+            border-radius: 15px;
+            padding: 0.72rem 0.7rem;
+            box-shadow: 0 5px 14px rgba(20, 20, 30, 0.11);
+        }
+        .hero-kpi-card:hover {
+            transform: none;
+        }
+        .hero-icon-box {
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            margin-bottom: 0.28rem;
+        }
+        .hero-stat-val {
+            max-width: 104px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 1.22rem;
+            letter-spacing: -0.35px;
+        }
+        .hero-stat-label {
+            font-size: 0.66rem;
+            line-height: 1.2;
+        }
+        .hero-stat-sub {
+            max-width: 105px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-top: 2px;
+            font-size: 0.52rem;
+        }
+        .hero-food-badge {
+            width: 35px;
+            height: 35px;
+            min-width: 35px;
+            border-width: 1px;
+            font-size: 1.1rem;
+            align-self: flex-start;
+            margin-top: 0.3rem;
+        }
+        .dash-panel {
+            border-radius: 15px;
+            padding: 0.9rem;
+            box-shadow: 0 5px 16px rgba(20, 20, 30, 0.055);
+        }
+        .dash-panel:hover {
+            transform: none;
+        }
+        .dash-panel-header {
+            gap: 0.5rem;
+            margin-bottom: 0.7rem;
+        }
+        .dash-panel-title {
+            font-size: 0.86rem;
+        }
+        .dash-panel-sub,
+        .dash-panel-link {
+            font-size: 0.63rem;
+        }
+        .weekly-chart-wrap {
+            min-height: 138px !important;
+        }
+        .order-types-body {
+            gap: 0.75rem;
+            padding: 0 !important;
+        }
+        .order-types-legend {
+            gap: 0.55rem !important;
+            min-width: 0;
+        }
+        .order-types-chart {
+            width: 94px !important;
+            height: 94px !important;
+            min-width: 94px;
+        }
+        .dash-item-row {
+            gap: 0.6rem;
+            min-height: 44px;
+            padding: 0.48rem 0;
+            font-size: 0.74rem;
+        }
+        .item-icon-squircle {
+            width: 29px;
+            height: 29px;
+            min-width: 29px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+        .quick-op-list {
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.5rem !important;
+        }
+        .quick-op-btn {
+            min-width: 0;
+            min-height: 64px;
+            flex-direction: column;
+            justify-content: center;
+            gap: 0.28rem;
+            padding: 0.55rem 0.42rem;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 0.66rem;
+            line-height: 1.15;
+        }
+        .quick-op-btn > i:first-child {
+            font-size: 1.05rem;
+        }
+        .quick-op-btn div[style*="font-size:0.65rem"],
+        .quick-op-btn > i:last-child,
+        .quick-op-btn > .badge {
+            display: none;
+        }
+    }
+
+    @media (max-width: 359.98px) {
+        #pos-topbar {
+            padding-inline: 0.45rem !important;
+        }
+        #pos-topbar .topbar-right,
+        #pos-topbar .topbar-notif-slot {
+            gap: 0.18rem !important;
+        }
+        #pos-topbar .btn-icon {
+            width: 30px;
+            height: 30px;
+            font-size: 0.95rem;
+        }
+        #pos-topbar .user-role-badge {
+            padding: 0.2rem 0.35rem !important;
+        }
+        #pos-topbar .user-role-tag {
+            font-size: 0.58rem !important;
+        }
+        .dashboard-page {
+            padding-inline: 0.5rem !important;
+        }
+        .hero-kpi-card {
+            min-height: 102px;
+            padding: 0.65rem 0.58rem;
+        }
+        .hero-food-badge {
+            width: 30px;
+            height: 30px;
+            min-width: 30px;
+            font-size: 0.95rem;
+        }
+        .hero-stat-val {
+            max-width: 86px;
+            font-size: 1.08rem;
+        }
+        .hero-stat-sub {
+            max-width: 88px;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -225,24 +493,24 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid py-3 px-3 px-md-4" style="max-width:1600px;margin:0 auto;">
+<div class="container-fluid py-3 px-3 px-md-4 dashboard-page" style="max-width:1600px;margin:0 auto;">
 
     <!-- ══ HEADER / WELCOME ROW ═════════════════════════════ -->
-    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-        <div>
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2 dashboard-welcome">
+        <div class="dashboard-welcome-copy">
             <h2 class="fw-bold mb-0" style="font-family:var(--font-main,'Outfit',sans-serif);font-size:1.5rem;color:var(--text-main);">Dashboard</h2>
-            <div style="font-size:0.82rem;margin-top:2px;color:var(--text-muted);">
+            <div class="dashboard-welcome-meta" style="font-size:0.82rem;margin-top:2px;color:var(--text-muted);">
                 <i class="bi bi-calendar-event me-1"></i>{% now "l, F j, Y" %} • <span class="fw-semibold" style="color:var(--accent-gold);">{{ request.user.outlet.name|default:"Riverside Restaurant" }}</span>
             </div>
         </div>
         <div class="d-flex align-items-center gap-2">
             {% if direct_billing_mode %}
-            <button onclick="createAndBill()" class="btn-luxury btn-luxury-primary" id="directBillBtn">
-                <i class="bi bi-plus-circle-fill"></i> New Order
+            <button onclick="createAndBill()" class="btn-luxury btn-luxury-primary dashboard-primary-action" id="directBillBtn">
+                <i class="bi bi-plus-circle-fill me-1"></i> New Order
             </button>
             {% else %}
-            <a href="/billing/" class="btn-luxury btn-luxury-primary">
-                <i class="bi bi-cart-plus-fill"></i> Open POS
+            <a href="/billing/" class="btn-luxury btn-luxury-primary dashboard-primary-action">
+                <i class="bi bi-cart-plus-fill me-1"></i> Open POS
             </a>
             {% endif %}
         </div>
@@ -250,7 +518,7 @@
 
     <!-- ══ 4 HERO KPI CARDS (KimiPoS Reference) ═════════════ -->
     {% with m=metrics.0 %}
-    <div class="row g-3 mb-4">
+    <div class="row g-3 mb-4 dashboard-kpi-grid">
 
         <!-- Card 1: Active Tables -->
         <div class="col-12 col-sm-6 col-xl-3">
@@ -316,7 +584,7 @@
     {% endwith %}
 
     <!-- ══ MIDDLE ANALYTICS ROW (Charts) ════════════════════ -->
-    <div class="row g-3 mb-4">
+    <div class="row g-3 mb-4 dashboard-analytics-row">
 
         <!-- Weekly Revenue Bar Chart (SVG) — real data from weekly_revenue_series(), not hardcoded -->
         <div class="col-12 col-lg-8">
@@ -334,7 +602,7 @@
                 </div>
 
                 <!-- Interactive SVG Bar Chart -->
-                <div style="flex:1;min-height:180px;display:flex;align-items:flex-end;position:relative;">
+                <div class="weekly-chart-wrap" style="flex:1;min-height:180px;display:flex;align-items:flex-end;position:relative;">
                     {% if weekly_revenue.days %}
                     <svg viewBox="0 0 700 170" style="width:100%;height:100%;overflow:visible;">
                         <!-- Grid lines -->
@@ -377,9 +645,9 @@
                 </div>
 
                 {% if order_type_total %}
-                <div class="d-flex align-items-center justify-content-between h-100 py-2">
+                <div class="d-flex align-items-center justify-content-between h-100 py-2 order-types-body">
                     <!-- Legend breakdown -->
-                    <div class="d-flex flex-column gap-3">
+                    <div class="d-flex flex-column gap-3 order-types-legend">
                         {% for seg in order_type_breakdown %}
                         <div class="d-flex align-items-center gap-2">
                             <span style="width:10px;height:10px;border-radius:50%;background:{{ seg.color }};"></span>
@@ -390,7 +658,7 @@
                     </div>
 
                     <!-- Clean SVG Donut Chart -->
-                    <div style="width:130px;height:130px;position:relative;display:flex;align-items:center;justify-content:center;">
+                    <div class="order-types-chart" style="width:130px;height:130px;position:relative;display:flex;align-items:center;justify-content:center;">
                         <svg viewBox="0 0 100 100" style="width:100%;height:100%;transform:rotate(-90deg);">
                             <!-- Background ring -->
                             <circle cx="50" cy="50" r="38" fill="transparent" stroke="var(--surface-2)" stroke-width="14" />
@@ -415,7 +683,7 @@
     </div>
 
     <!-- ══ LOWER CONTENT ROW (4 Activity Cards) ═════════════ -->
-    <div class="row g-3">
+    <div class="row g-3 dashboard-activity-row">
 
         <!-- Card 1: Top Selling Items -->
         <div class="col-12 col-md-6 col-xl-3">
@@ -448,61 +716,12 @@
                         </div>
                         {% endfor %}
                     {% else %}
-                        <!-- Visual representation matching screenshot -->
-                        <div class="dash-item-row">
-                            <span class="rank-num">#1</span>
-                            <div class="item-icon-squircle">🍔</div>
-                            <div style="flex:1;min-width:0;">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="fw-semibold text-truncate" style="color:var(--text-main);">Chicken Burger</span>
-                                    <span class="fw-bold" style="color:var(--accent-gold);">48</span>
-                                </div>
-                                <div class="item-progress-track"><div class="item-progress-fill" style="width:88%;"></div></div>
+                        <div class="text-center text-muted" style="padding:2.5rem 1rem;">
+                            <div class="item-icon-squircle mx-auto mb-2">
+                                <i class="bi bi-bar-chart"></i>
                             </div>
-                        </div>
-                        <div class="dash-item-row">
-                            <span class="rank-num">#2</span>
-                            <div class="item-icon-squircle">🍕</div>
-                            <div style="flex:1;min-width:0;">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="fw-semibold text-truncate" style="color:var(--text-main);">Margherita Pizza</span>
-                                    <span class="fw-bold" style="color:var(--accent-gold);">36</span>
-                                </div>
-                                <div class="item-progress-track"><div class="item-progress-fill" style="width:72%;"></div></div>
-                            </div>
-                        </div>
-                        <div class="dash-item-row">
-                            <span class="rank-num">#3</span>
-                            <div class="item-icon-squircle">🍟</div>
-                            <div style="flex:1;min-width:0;">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="fw-semibold text-truncate" style="color:var(--text-main);">Loaded French Fries</span>
-                                    <span class="fw-bold" style="color:var(--accent-gold);">29</span>
-                                </div>
-                                <div class="item-progress-track"><div class="item-progress-fill" style="width:58%;"></div></div>
-                            </div>
-                        </div>
-                        <div class="dash-item-row">
-                            <span class="rank-num">#4</span>
-                            <div class="item-icon-squircle">🥗</div>
-                            <div style="flex:1;min-width:0;">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="fw-semibold text-truncate" style="color:var(--text-main);">Caesar Salad</span>
-                                    <span class="fw-bold" style="color:var(--accent-gold);">21</span>
-                                </div>
-                                <div class="item-progress-track"><div class="item-progress-fill" style="width:42%;"></div></div>
-                            </div>
-                        </div>
-                        <div class="dash-item-row">
-                            <span class="rank-num">#5</span>
-                            <div class="item-icon-squircle">🍰</div>
-                            <div style="flex:1;min-width:0;">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="fw-semibold text-truncate" style="color:var(--text-main);">Chocolate Lava Cake</span>
-                                    <span class="fw-bold" style="color:var(--accent-gold);">18</span>
-                                </div>
-                                <div class="item-progress-track"><div class="item-progress-fill" style="width:34%;"></div></div>
-                            </div>
+                            <div class="fw-semibold" style="color:var(--text-main);font-size:0.85rem;">No selling data yet</div>
+                            <div style="font-size:0.72rem;">Completed orders will appear here.</div>
                         </div>
                     {% endif %}
                 </div>
@@ -544,34 +763,12 @@
                         </div>
                         {% endfor %}
                     {% else %}
-                        <!-- Sample recent orders matching reference -->
-                        <div class="dash-item-row">
-                            <div class="item-icon-squircle" style="color:var(--accent-gold);background:rgba(236,39,52,0.1);"><i class="bi bi-person-fill"></i></div>
-                            <div style="flex:1;min-width:0;">
-                                <div class="d-flex justify-content-between"><span class="fw-semibold">Sarah Johnson</span><span class="fw-bold" style="color:var(--accent-gold);">{{ request.user.outlet.currency_symbol }}840</span></div>
-                                <div class="d-flex justify-content-between text-muted" style="font-size:0.68rem;"><span>ORD-1039 • Table 4</span><span class="status-pill served" style="font-size:0.6rem;padding:2px 6px;">SERVED</span></div>
+                        <div class="text-center text-muted" style="padding:2.5rem 1rem;">
+                            <div class="item-icon-squircle mx-auto mb-2" style="color:var(--accent-gold);background:rgba(236,39,52,0.1);">
+                                <i class="bi bi-receipt"></i>
                             </div>
-                        </div>
-                        <div class="dash-item-row">
-                            <div class="item-icon-squircle" style="color:var(--accent-gold);background:rgba(236,39,52,0.1);"><i class="bi bi-person-fill"></i></div>
-                            <div style="flex:1;min-width:0;">
-                                <div class="d-flex justify-content-between"><span class="fw-semibold">Mike Chen</span><span class="fw-bold" style="color:var(--accent-gold);">{{ request.user.outlet.currency_symbol }}1,250</span></div>
-                                <div class="d-flex justify-content-between text-muted" style="font-size:0.68rem;"><span>ORD-1040 • Table 1</span><span class="status-pill pending" style="font-size:0.6rem;padding:2px 6px;">PREPARING</span></div>
-                            </div>
-                        </div>
-                        <div class="dash-item-row">
-                            <div class="item-icon-squircle" style="color:var(--accent-gold);background:rgba(236,39,52,0.1);"><i class="bi bi-person-fill"></i></div>
-                            <div style="flex:1;min-width:0;">
-                                <div class="d-flex justify-content-between"><span class="fw-semibold">Emma Wilson</span><span class="fw-bold" style="color:var(--accent-gold);">{{ request.user.outlet.currency_symbol }}420</span></div>
-                                <div class="d-flex justify-content-between text-muted" style="font-size:0.68rem;"><span>ORD-1041 • Takeaway</span><span class="status-pill served" style="font-size:0.6rem;padding:2px 6px;">READY</span></div>
-                            </div>
-                        </div>
-                        <div class="dash-item-row">
-                            <div class="item-icon-squircle" style="color:var(--accent-gold);background:rgba(236,39,52,0.1);"><i class="bi bi-person-fill"></i></div>
-                            <div style="flex:1;min-width:0;">
-                                <div class="d-flex justify-content-between"><span class="fw-semibold">James Brown</span><span class="fw-bold" style="color:var(--accent-gold);">{{ request.user.outlet.currency_symbol }}1,890</span></div>
-                                <div class="d-flex justify-content-between text-muted" style="font-size:0.68rem;"><span>ORD-1042 • Table 7</span><span class="status-pill new" style="font-size:0.6rem;padding:2px 6px;">NEW</span></div>
-                            </div>
+                            <div class="fw-semibold" style="color:var(--text-main);font-size:0.85rem;">No recent orders yet</div>
+                            <div style="font-size:0.72rem;">New orders will appear here.</div>
                         </div>
                     {% endif %}
                 </div>
@@ -639,7 +836,7 @@
                     <span class="text-muted" style="font-size:0.75rem;"><i class="bi bi-lightning-charge-fill text-warning"></i></span>
                 </div>
 
-                <div class="d-flex flex-column gap-2">
+                <div class="d-flex flex-column gap-2 quick-op-list">
                     <a href="/tables/live/" class="quick-op-btn">
                         <i class="bi bi-broadcast-pin"></i>
                         <div style="flex:1;">
@@ -715,10 +912,10 @@
             if (data.success && data.redirect) {
                 window.location.href = data.redirect;
             } else {
-                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-plus-circle-fill"></i> New Order'; }
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-plus-circle-fill me-1"></i> New Order'; }
             }
         } catch (e) {
-            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-plus-circle-fill"></i> New Order'; }
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-plus-circle-fill me-1"></i> New Order'; }
         }
     }
 

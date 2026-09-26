@@ -10,30 +10,6 @@
         --radius: 8px;
     }
 
-    /* ── TOAST ── */
-    .toast-float {
-        position: fixed;
-        bottom: 1.5rem;
-        left: 50%;
-        transform: translateX(-50%) translateY(100px);
-        background: var(--panel-bg);
-        border: 1px solid var(--border-color);
-        color: var(--text-main);
-        padding: 0.75rem 1.5rem;
-        border-radius: 50px;
-        font-size: 0.82rem;
-        letter-spacing: 0.3px;
-        transition: transform 0.3s ease;
-        z-index: 9999;
-        white-space: nowrap;
-        max-width: 90vw;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .toast-float.show { transform: translateX(-50%) translateY(0); }
-    .toast-float.success { border-color: var(--success); color: var(--success); }
-    .toast-float.error   { border-color: var(--danger);  color: var(--danger); }
-
     /* ── MAIN ── */
     .gst-main { padding: 1.5rem; max-width: 720px; margin: 0 auto; }
 
@@ -191,7 +167,6 @@
 
 </main>
 
-<div class="toast-float" id="gst-toast"></div>
 {% endblock %}
 
 {% block extra_js %}
@@ -216,8 +191,8 @@ async function updateItemGST(itemId, gstValue) {
             body: JSON.stringify({ gst_percentage: gstValue })
         });
         const data = await res.json();
-        showToast(data.success ? data.message : (data.error || 'Update failed'), data.success ? 'success' : 'error');
-    } catch (e) { showToast('Connection error', 'error'); }
+        ui.toast(data.success ? data.message : (data.error || 'Update failed'), data.success ? 'success' : 'error');
+    } catch (e) { ui.toast('Connection error', 'error'); }
     finally { dot.style.display = 'none'; }
 }
 
@@ -232,18 +207,9 @@ async function applyBulkGST(categoryId) {
         const data = await res.json();
         if (data.success) {
             document.getElementById(`cat-${categoryId}`).querySelectorAll('select[id^="gst-"]').forEach(sel => { sel.value = gstValue; });
-            showToast(data.message, 'success');
-        } else { showToast(data.error || 'Bulk update failed', 'error'); }
-    } catch (e) { showToast('Connection error', 'error'); }
-}
-
-let toastTimer;
-function showToast(msg, type = '') {
-    const toast = document.getElementById('gst-toast');
-    toast.textContent = msg;
-    toast.className = `toast-float ${type} show`;
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { toast.className = 'toast-float'; }, 3000);
+            ui.toast(data.message, 'success');
+        } else { ui.toast(data.error || 'Bulk update failed', 'error'); }
+    } catch (e) { ui.toast('Connection error', 'error'); }
 }
 </script>
 {% endblock %}

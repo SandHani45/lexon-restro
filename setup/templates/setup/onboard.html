@@ -239,7 +239,7 @@
             <div class="field">
                 <label>Your POS Web Address</label>
                 <div class="subdomain-preview" id="subdomainPreview">
-                    <span class="subdomain-val" id="subdomainDisplay">{{ tenant.slug }}</span><span class="subdomain-suffix">.lexnorax.net</span>
+                    <span class="subdomain-val" id="subdomainDisplay">{{ tenant.slug }}</span><span class="subdomain-suffix">.easybillbro.com</span>
                     <button type="button" class="subdomain-edit-btn" onclick="toggleSlugEdit()">
                         <i class="bi bi-pencil"></i> Change
                     </button>
@@ -252,7 +252,7 @@
                                oninput="checkSlug(this.value)"
                                pattern="[a-z0-9-]+"
                                autocomplete="off">
-                        <span class="subdomain-suffix">.lexnorax.net</span>
+                        <span class="subdomain-suffix">.easybillbro.com</span>
                     </div>
                     <div class="slug-status" id="slugStatus"></div>
                 </div>
@@ -329,7 +329,7 @@
                             .then(r => r.json())
                             .then(d => {
                                 if (d.available) {
-                                    status.textContent = `✓ ${d.slug}.lexnorax.net is available`;
+                                    status.textContent = `✓ ${d.slug}.easybillbro.com is available`;
                                     status.className = 'slug-status slug-ok';
                                 } else {
                                     status.textContent = `✗ ${d.reason}`;
@@ -578,35 +578,74 @@ function previewLogo(input) {
 (function() {
     const fileInput = document.getElementById('ai-file-input');
     if (!fileInput) return;
+
+    const status = document.getElementById('ai-status');
+    const spinner = document.getElementById('ai-spinner');
+    const success = document.getElementById('ai-success');
+
+    function showError(message) {
+        spinner.style.display = 'block';
+        spinner.style.color = '#ef4444';
+        spinner.textContent = message || 'Import failed. Try again.';
+        success.style.display = 'none';
+        fileInput.value = '';
+    }
+
+    function showSuccess(message) {
+        spinner.style.display = 'none';
+        document.getElementById('ai-success-msg').textContent = message + ' ✓';
+        success.style.display = 'block';
+    }
+
+    function pollImport(taskId, attemptsLeft = 100) {
+        if (attemptsLeft <= 0) {
+            showError('The import is taking too long. Please try again.');
+            return;
+        }
+        setTimeout(() => {
+            fetch(`/menu/ai-import-status/${encodeURIComponent(taskId)}/`)
+                .then(r => r.json().then(data => ({ ok: r.ok, data })))
+                .then(({ ok, data }) => {
+                    if (data.status === 'done') {
+                        showSuccess(data.message);
+                    } else if (data.status === 'error') {
+                        showError(data.error || 'Import failed. Try again.');
+                    } else if (ok || data.status === 'not_found') {
+                        pollImport(taskId, attemptsLeft - 1);
+                    } else {
+                        showError(data.error || 'Could not check the import status.');
+                    }
+                })
+                .catch(() => showError('Network error. Please try again.'));
+        }, 2000);
+    }
+
     fileInput.addEventListener('change', function() {
         if (!this.files || !this.files[0]) return;
-        const status = document.getElementById('ai-status');
-        const spinner = document.getElementById('ai-spinner');
-        const success = document.getElementById('ai-success');
         status.style.display = 'block';
         spinner.style.display = 'block';
+        spinner.style.color = 'var(--muted)';
+        spinner.innerHTML = '<i class="bi bi-arrow-repeat" style="animation:spin 1s linear infinite;display:inline-block;"></i> Importing your menu…';
         success.style.display = 'none';
 
         const fd = new FormData();
-        fd.append('image', this.files[0]);
+        fd.append('file', this.files[0]);
         fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
 
         fetch('/menu/ai-import/', { method: 'POST', body: fd })
-            .then(r => r.json())
-            .then(data => {
-                spinner.style.display = 'none';
-                if (data.success) {
-                    document.getElementById('ai-success-msg').textContent = data.message + ' ✓';
-                    success.style.display = 'block';
+            .then(r => r.json().then(data => ({ ok: r.ok, data })))
+            .then(({ ok, data }) => {
+                if (!ok || data.error) {
+                    showError(data.error || 'Import failed. Try again.');
+                } else if (data.queued && data.task_id) {
+                    pollImport(data.task_id);
+                } else if (data.success) {
+                    showSuccess(data.message);
                 } else {
-                    spinner.style.display = 'block';
-                    spinner.innerHTML = '<span style="color:#ef4444;">' + (data.message || 'Import failed. Try again.') + '</span>';
+                    showError(data.message || 'Import failed. Try again.');
                 }
             })
-            .catch(() => {
-                spinner.style.display = 'block';
-                spinner.innerHTML = '<span style="color:#ef4444;">Network error. Please try again.</span>';
-            });
+            .catch(() => showError('Network error. Please try again.'));
     });
 })();
 

@@ -35,8 +35,17 @@ def ai_menu_importer(request):
 
     try:
         text      = request.POST.get("text")
-        file      = request.FILES.get("file")
+        # The menu-management modal sends ``file``. Older onboarding pages
+        # sent ``image``; accept both so cached clients and existing tabs keep
+        # working while the frontend contract is corrected.
+        file      = request.FILES.get("file") or request.FILES.get("image")
         image_b64 = mime_type = None
+
+        if not (text and text.strip()) and not file:
+            return JsonResponse(
+                {"error": "Upload a menu image or enter menu text first."},
+                status=400,
+            )
 
         if file:
             if file.size > 15 * 1024 * 1024:
@@ -63,9 +72,27 @@ def ai_menu_importer(request):
             logger.warning("Celery unavailable for AI import — running synchronously")
             return _run_sync(request, text, image_b64, mime_type)
 
-    except Exception:
+    except Exception as error:
         logger.exception("AI Import error")
-        return JsonResponse({"error": "Could not import the menu. Please try again."}, status=400)
+        message = str(error).lower()
+        if "503" in message or "unavailable" in message or "high demand" in message:
+            user_message = (
+                "Gemini is temporarily busy. EasyBillBro tried the backup models too; "
+                "please wait a minute and try again."
+            )
+        elif "429" in message or "resource_exhausted" in message or "quota" in message:
+            user_message = (
+                "The Gemini usage limit has been reached. Please try again after the "
+                "quota resets or use a Gemini project with available quota."
+            )
+        elif "api key" in message or "activation key" in message or "permission_denied" in message:
+            user_message = (
+                "The Gemini API key is missing or was rejected. Check GOOGLE_API_KEY "
+                "and restart the server."
+            )
+        else:
+            user_message = "Could not import this menu image. Try a clear JPG or PNG under 15 MB."
+        return JsonResponse({"error": user_message}, status=400)
 
 
 @login_required
@@ -124,6 +151,17 @@ def _run_sync(request, text, image_b64, mime_type):
     except Exception:
         pool.shutdown(wait=False)
         raise
+
+    has_readable_items = any(
+        (item.get("name") or "").strip()
+        for entry in structured_data
+        for item in entry.get("items", [])
+    )
+    if not has_readable_items:
+        return JsonResponse({
+            "error": "No menu items could be read from this image. Use a clear, "
+                     "well-lit photo with the item names and prices in focus."
+        }, status=422)
 
     tenant = request.user.tenant
     outlet = request.user.outlet

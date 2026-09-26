@@ -1,5 +1,6 @@
 # inventory/urls.py
 from django.urls import path
+from django.views.generic import RedirectView
 from . import views
 from .central_kitchen_views import (
     central_kitchen_dashboard, create_batch, batch_detail,
@@ -18,6 +19,9 @@ from .recipe_import_views import (
 )
 
 urlpatterns = [
+    # Stable landing URL used by the sidebar, bookmarks and older links.
+    path("", RedirectView.as_view(pattern_name="inventory_board", permanent=False), name="inventory_home"),
+
     # Inventory board + reports
     path("board/", views.inventory_board, name="inventory_board"),
     path("consumption/", views.consumption_report, name="inventory_consumption"),

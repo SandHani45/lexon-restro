@@ -15,6 +15,12 @@ from menu.models import MenuItem
 @tenant_required
 @role_required("owner", "manager", "cashier")
 def owner_dashboard(request):
+    # Platform superusers are not attached to one tenant/outlet, so the
+    # restaurant dashboard cannot build its tenant-scoped metrics for them.
+    # Send them to their actual home instead of dereferencing tenant=None.
+    if request.user.is_superuser:
+        return redirect("portal:home")
+
     metrics       = owner_dashboard_metrics(request.user)
     weekly_revenue = weekly_revenue_series(request.user)
     notifications = Notification.objects.filter(
@@ -65,7 +71,11 @@ def owner_dashboard(request):
     from orders.models import Order
 
     recent_orders = list(
-        Order.objects.filter(tenant=tenant, outlet=request.user.outlet)
+        Order.objects.filter(
+            tenant=tenant,
+            outlet=request.user.outlet,
+            grand_total__gt=0,
+        )
         .select_related("table")
         .order_by("-created_at")[:6]
     )

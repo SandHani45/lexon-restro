@@ -142,12 +142,183 @@
   .subnav-btn.gold:hover { background: var(--accent-gold); color: #fff; }
 
   @media (max-width: 768px) {
-    .report-subnav { padding: 0 1rem; }
-    .report-subnav-right { gap: 0.35rem; }
+    .report-subnav {
+      display: block;
+      padding: 0.55rem 0 0.5rem;
+      overflow: hidden;
+    }
+    .report-subnav-left {
+      width: 100%;
+      gap: 0.35rem;
+      padding: 0 0.75rem 0.35rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+      scroll-snap-type: x proximity;
+      -webkit-overflow-scrolling: touch;
+    }
+    .report-subnav-left::-webkit-scrollbar,
+    .report-subnav-right::-webkit-scrollbar { display: none; }
+    .report-tab {
+      flex: 0 0 auto;
+      min-height: 35px;
+      margin: 0;
+      padding: 0.45rem 0.75rem;
+      font-size: 0.64rem;
+      letter-spacing: 0.55px;
+      scroll-snap-align: start;
+    }
+    .report-subnav-right {
+      width: 100%;
+      flex-wrap: nowrap;
+      gap: 0.42rem;
+      padding: 0.35rem 0.75rem 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .report-subnav-right > *,
+    .report-subnav-right form { flex: 0 0 auto; }
+    .report-subnav-right form { flex-wrap: nowrap !important; }
+    .report-subnav-right .report-tab {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      padding: 0;
+    }
+    .subnav-sep { display: none; }
+    .subnav-select {
+      min-height: 36px;
+      max-width: 128px;
+      padding: 0.4rem 1.55rem 0.4rem 0.7rem;
+      background: var(--surface-2);
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      font-size: 0.72rem;
+    }
+    .subnav-btn,
+    .report-subnav-right .btn-icon {
+      min-height: 36px;
+      min-width: 36px;
+      justify-content: center;
+      padding: 0.4rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.66rem;
+      letter-spacing: 0.45px;
+    }
+    #customDates {
+      flex-direction: row !important;
+      padding: 0.4rem;
+      background: var(--surface-2);
+      border: 1px solid var(--border-color);
+      border-radius: 15px;
+    }
+    #customDates .subnav-select { width: 112px !important; background: var(--panel-bg); }
+
+    .reports-page {
+      width: 100%;
+      padding: 0.7rem 0.75rem calc(4rem + env(safe-area-inset-bottom)) !important;
+      overflow-x: clip;
+    }
+    .context-info {
+      margin: 0 0 0.7rem;
+      padding: 0.7rem 0.8rem;
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      font-size: 0.6rem;
+      line-height: 1.55;
+      letter-spacing: 0.7px;
+      text-align: left;
+    }
+    .context-info .mx-3 { margin-inline: 0.35rem !important; }
+    .context-info .ms-3 {
+      display: inline-flex;
+      margin: 0.35rem 0 0 !important;
+    }
+    .reports-page > div[style*="background:rgba(16,185,129"] {
+      padding: 0.7rem 0.8rem !important;
+      margin-bottom: 0.75rem !important;
+      border-radius: 12px;
+      font-size: 0.68rem !important;
+    }
+
+    .report-kpi-grid {
+      --bs-gutter-x: 0.55rem;
+      --bs-gutter-y: 0.55rem;
+      margin-bottom: 0.8rem !important;
+    }
+    .report-kpi-grid > [class*="col-"] { width: 50%; }
+    .kpi-tile {
+      min-height: 104px;
+      padding: 0.8rem;
+      border-radius: 16px;
+      box-shadow: 0 5px 16px rgba(0,0,0,0.09);
+    }
+    .kpi-tile:hover { transform: none; }
+    .kpi-icon-badge {
+      width: 28px;
+      height: 28px;
+      margin-bottom: 0.38rem;
+      border-radius: 9px;
+      font-size: 0.82rem;
+    }
+    .kpi-val { font-size: 1.25rem; }
+    .kpi-label {
+      margin-top: 3px;
+      font-size: 0.55rem;
+      line-height: 1.25;
+      letter-spacing: 0.6px;
+    }
+    .kpi-sub { font-size: 0.55rem; line-height: 1.25; }
+
+    .reports-page .mb-5 { margin-bottom: 0.8rem !important; }
+    .reports-page .row.g-4 {
+      --bs-gutter-x: 0.65rem;
+      --bs-gutter-y: 0.65rem;
+    }
+    .card-elegant,
+    .reports-page .card-elegant[style] {
+      height: auto;
+      padding: 0.9rem !important;
+      border-radius: 16px;
+    }
+    .section-title,
+    .reports-page .section-title[style] {
+      margin: 0 0 0.8rem !important;
+      font-size: 0.82rem !important;
+      line-height: 1.25;
+      letter-spacing: 1.2px;
+      text-align: left !important;
+    }
+    .section-title::after { display: none; }
+    .reports-page [style*="grid-template-columns:repeat(auto-fit"] {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 0.55rem !important;
+    }
+    .reports-page [style*="grid-template-columns:repeat(auto-fit"] > div {
+      min-width: 0;
+      padding: 0.65rem !important;
+    }
+    .report-chart-grid [style*="height:350px"] {
+      height: 230px !important;
+    }
+    .report-chart-grid .col-12 { min-width: 0; }
+    .table-minimal { table-layout: fixed; }
+    .table-minimal th {
+      padding: 0.55rem 0.25rem;
+      font-size: 0.56rem;
+      letter-spacing: 0.65px;
+    }
+    .table-minimal td {
+      padding: 0.72rem 0.25rem;
+      font-size: 0.72rem;
+      overflow-wrap: anywhere;
+    }
+    .report-data-grid .card-elegant { padding: 0.85rem !important; }
+    .reports-page .offcanvas { width: min(92vw, 360px) !important; }
+    .reports-page > .text-center.pb-5 { padding: 0.8rem 0 0 !important; }
     .metric-value { font-size: 2rem; }
-    .card-elegant { padding: 1.5rem 1.25rem; }
-    .context-info { font-size: 0.7rem; margin-bottom: 1.5rem; }
-    #customDates { flex-direction: column !important; }
     .subnav-hide-mobile { display: none !important; }
   }
   @media (max-width: 480px) {
@@ -156,13 +327,7 @@
 </style>
 {% endblock %}
 
-{% block header_left %}
-<a href="/dashboard/" class="brand-title">
-  <i class="bi bi-diamond-half"></i>
-  <span>{{ request.user.tenant.name }}</span>
-</a>
-<p class="brand-subtitle"><i class="bi bi-geo-alt me-1"></i>{{ request.user.outlet.name }}</p>
-{% endblock %}
+{% block header_left %}{% endblock %}
 
 {% block content %}
 {{ sales.payments|json_script:"payments-data" }}
@@ -253,7 +418,7 @@
 </nav>
 <!-- ── END SUB-NAV ────────────────────────────────────────────── -->
 
-<div class="container-fluid mx-auto py-4" style="max-width:1400px; padding-left:2rem; padding-right:2rem;">
+<div class="container-fluid mx-auto py-4 reports-page" style="max-width:1400px; padding-left:2rem; padding-right:2rem;">
 
   <!-- CONTEXT -->
   <div class="context-info">
@@ -290,7 +455,7 @@
   {% endif %}
 
   <!-- HIGH LEVEL METRICS -->
-  <div class="row g-4 mb-5">
+  <div class="row g-4 mb-5 report-kpi-grid">
     <div class="col-12 col-md-6 col-xl-3">
       <div class="kpi-tile t1">
         <div class="kpi-icon-badge"><i class="bi bi-currency-rupee"></i></div>
@@ -513,7 +678,7 @@
   {% endif %}
 
   <!-- CHARTS -->
-  <div class="row g-4 mb-5">
+  <div class="row g-4 mb-5 report-chart-grid">
     <div class="col-12 {% if is_limited_view %}col-xl-12{% else %}col-xl-8{% endif %}">
       <div class="card-elegant">
         <h5 class="section-title">Revenue Trajectory</h5>
@@ -534,7 +699,7 @@
 
   {% if not is_limited_view %}
   <!-- DATA TABLES -->
-  <div class="row g-4 mb-5">
+  <div class="row g-4 mb-5 report-data-grid">
     <div class="col-12 col-lg-4">
       <div class="card-elegant">
         <h5 class="section-title">Signature Dishes</h5>

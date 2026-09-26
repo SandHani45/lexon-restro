@@ -271,6 +271,41 @@ class GenerateContentFallbackTests(TestCase):
             model="some-model", contents=["prompt"]
         )
 
+    def test_transient_failure_uses_stable_fallback_model(self):
+        def generate_content(*, model, contents):
+            if model == "gemini-flash-latest":
+                raise Exception("503 UNAVAILABLE: high demand")
+            return "stable model response"
+
+        self.svc.client.models.generate_content.side_effect = generate_content
+        self.svc.fallback_client = None
+
+        with patch(
+            "core.ai_service.GEMINI_FALLBACK_MODEL_NAMES",
+            ("gemini-3.7-flash",),
+        ):
+            result = self.svc._generate_content("gemini-flash-latest", ["prompt"])
+
+        self.assertEqual(result, "stable model response")
+        self.assertEqual(
+            self.svc.client.models.generate_content.call_args_list[-1].kwargs["model"],
+            "gemini-3.7-flash",
+        )
+
+    def test_non_transient_failure_does_not_switch_models(self):
+        self.svc.client.models.generate_content.side_effect = Exception(
+            "400 INVALID_ARGUMENT"
+        )
+        self.svc.fallback_client = None
+
+        with patch(
+            "core.ai_service.GEMINI_FALLBACK_MODEL_NAMES",
+            ("gemini-3.7-flash",),
+        ), self.assertRaises(Exception):
+            self.svc._generate_content("gemini-flash-latest", ["prompt"])
+
+        self.svc.client.models.generate_content.assert_called_once()
+
     def test_primary_and_fallback_both_fail_raises(self):
         self.svc.client.models.generate_content.side_effect = Exception("primary down")
         self.svc.fallback_client = MagicMock()

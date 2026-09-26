@@ -540,26 +540,165 @@
         .menu-card { padding: 0.75rem; }
         .item-name { font-size: 0.9rem; }
     }
+
+    /* ── Current POS visual system ───────────────────────────────── */
+    :root {
+        --pos-red: #EC2734;
+        --pos-red-hover: #d81f2f;
+        --pos-red-soft: rgba(236, 39, 52, 0.08);
+    }
+    .workspace { background: var(--bg-color); }
+    .category-sidebar,
+    .panel-handle { display: none !important; }
+    .token-menu-column {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        background: var(--bg-color);
+    }
+    .token-pos-subbar {
+        padding: 1rem 1.4rem 0.65rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+        flex-shrink: 0;
+    }
+    .token-pos-title-row { display:flex; align-items:center; gap:12px; min-width:0; }
+    .token-pos-back {
+        width: 38px; height: 38px; border-radius: 12px;
+        display: inline-flex; align-items:center; justify-content:center;
+        color: var(--text-main); background:var(--panel-bg);
+        border:1px solid var(--border-color); text-decoration:none;
+        transition: all .18s ease;
+    }
+    .token-pos-back:hover { color:var(--pos-red); border-color:var(--pos-red); transform:translateX(-2px); }
+    .token-pos-title { margin:0; font-size:1.35rem; line-height:1.15; font-weight:800; color:var(--text-main); }
+    .token-pos-crumbs { margin-top:3px; font-size:.76rem; color:var(--text-muted); }
+    .token-pos-crumbs a { color:inherit; text-decoration:none; }
+    .token-pos-crumbs .active { color:var(--pos-red); font-weight:700; }
+    .token-pos-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .token-pos-action {
+        height:36px; padding:0 14px; border-radius:999px;
+        display:inline-flex; align-items:center; gap:6px;
+        background:var(--panel-bg); color:var(--text-main);
+        border:1px solid var(--border-color); text-decoration:none;
+        font-size:.8rem; font-weight:700; transition:all .18s ease;
+    }
+    .token-pos-action:hover { color:var(--pos-red); border-color:rgba(236,39,52,.35); }
+    .token-pos-action.primary { background:var(--pos-red); border-color:var(--pos-red); color:#fff; box-shadow:0 4px 12px rgba(236,39,52,.25); }
+    .token-pos-action.primary:hover { background:var(--pos-red-hover); color:#fff; transform:translateY(-1px); }
+
+    .mobile-category-nav {
+        display:flex !important; position:relative; top:auto; z-index:2;
+        gap:10px; padding:.35rem 1.4rem .75rem; background:var(--bg-color);
+        border:0; overflow-x:auto; flex-shrink:0;
+    }
+    .mobile-category-nav .category-item {
+        min-width:106px; height:64px; padding:0 14px; margin:0;
+        display:inline-flex; align-items:center; justify-content:center;
+        border-radius:14px; border:1px solid var(--border-color);
+        background:var(--panel-bg); color:var(--text-main);
+        font-family:inherit; font-size:.82rem; font-weight:700;
+        box-shadow:0 3px 12px rgba(0,0,0,.035);
+    }
+    .mobile-category-nav .category-item.active,
+    .mobile-category-nav .category-item:hover {
+        background:var(--pos-red-soft); color:var(--pos-red);
+        border-color:rgba(236,39,52,.35);
+    }
+    .menu-area { padding:.15rem 1.4rem 1.5rem; background:var(--bg-color); }
+    .search-box { display:none; }
+    .menu-section-title {
+        margin:1rem 0 .65rem; color:var(--text-main); letter-spacing:0;
+        font-size:1rem; font-weight:800; text-transform:none;
+    }
+    #menuCardsContainer .row {
+        display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px;
+        margin:0 0 1rem !important;
+    }
+    #menuCardsContainer .menu-item-searchable { width:auto !important; padding:0 !important; }
+    .menu-card {
+        min-height:178px; height:100%; padding:0; gap:0; overflow:hidden;
+        display:flex; flex-direction:column; align-items:stretch;
+        border-radius:16px; border:1px solid var(--border-color);
+        background:var(--panel-bg); box-shadow:0 5px 18px rgba(0,0,0,.045);
+    }
+    .menu-card:hover { transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.08); }
+    .menu-card:active { transform:scale(.98); }
+    .token-item-thumb {
+        height:96px; position:relative; display:flex; align-items:center; justify-content:center;
+        overflow:hidden; background:linear-gradient(145deg,#fff7f5,#f5eee9);
+    }
+    html.dark .token-item-thumb { background:linear-gradient(145deg,#27272a,#18181b); }
+    .token-item-thumb img { width:100%; height:100%; object-fit:cover; }
+    .token-item-emoji { font-size:2.65rem; filter:drop-shadow(0 5px 8px rgba(0,0,0,.10)); }
+    .token-food-mark {
+        position:absolute; top:9px; left:9px; width:13px; height:13px;
+        border:2px solid currentColor; background:#fff; display:flex; align-items:center; justify-content:center;
+    }
+    .token-food-mark::after { content:''; width:5px; height:5px; border-radius:50%; background:currentColor; }
+    .token-food-mark.veg { color:#16a34a; }
+    .token-food-mark.nonveg { color:#dc2626; }
+    .token-item-body { flex:1; padding:10px 12px 4px; }
+    .menu-card .item-name { font-family:inherit; font-size:.88rem; font-weight:750; line-height:1.25; }
+    .token-item-footer { padding:4px 10px 10px 12px; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .menu-card .item-price { font-size:.9rem; font-weight:800; color:var(--pos-red); }
+    .token-add-btn {
+        width:30px; height:30px; border-radius:9px; border:0;
+        display:flex; align-items:center; justify-content:center;
+        background:var(--pos-red); color:#fff; pointer-events:none;
+    }
+    .menu-card .cart-badge { background:var(--pos-red); color:#fff; top:7px; right:7px; }
+
+    .context-sidebar { width:370px; max-height:none; height:calc(100vh - var(--header-h)); height:calc(100dvh - var(--header-h)); }
+    .context-tabs { padding:.7rem .8rem; }
+    .context-tab { font-family:inherit; font-size:.78rem; font-weight:750; }
+    .context-body { padding:1rem 1.2rem; }
+    .cart-summary { padding:1rem 1.2rem 1.2rem; }
+    .summary-total { font-family:inherit; font-weight:850; }
+    .btn-checkout { background:var(--pos-red); font-size:.92rem; min-height:56px; box-shadow:0 7px 18px rgba(236,39,52,.24); }
+    .btn-checkout:hover { background:var(--pos-red-hover); }
+    .cart-item-name, .aoi-token { font-family:inherit; }
+
+    @media (max-width:1199px) { #menuCardsContainer .row { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+    @media (max-width:991px) {
+        .token-pos-subbar { padding:.85rem 1rem .55rem; }
+        .token-pos-actions { width:100%; overflow-x:auto; flex-wrap:nowrap; padding-bottom:2px; }
+        .token-pos-action { white-space:nowrap; }
+        .mobile-category-nav { padding:.35rem 1rem .65rem; position:sticky; top:var(--header-h); }
+        .menu-area { padding:.25rem 1rem 1.25rem; }
+        .search-box { display:block; border-radius:12px; margin-bottom:.8rem; }
+        #menuCardsContainer .row { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    }
+    @media (max-width:700px) { #menuCardsContainer .row { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media (max-width:420px) {
+        .token-pos-title { font-size:1.1rem; }
+        .token-pos-back { width:34px; height:34px; }
+        .menu-card { min-height:164px; }
+        .token-item-thumb { height:86px; }
+    }
 </style>
 {% endblock %}
 
 {% block header_left %}
-<a href="/billing/" class="d-flex align-items-center gap-2 text-decoration-none" style="color:inherit;">
-    <div style="width:34px;height:34px;border-radius:10px;background:rgba(236,39,52,0.12);border:1px solid rgba(236,39,52,0.3);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);flex-shrink:0;">
-        <i class="bi bi-receipt" style="font-size:1.1rem;"></i>
-    </div>
-    <div>
-        <h1 class="h6 mb-0 fw-bold" style="letter-spacing:0.5px;color:var(--text-main);">POS Billing</h1>
-        <div class="text-muted" style="font-size:0.72rem;letter-spacing:0.5px;">{{ request.user.outlet.name }}</div>
-    </div>
-</a>
+<div class="d-none d-md-flex align-items-center position-relative" style="width:280px;">
+    <i class="bi bi-search" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:.88rem;pointer-events:none;"></i>
+    <input type="text" id="menuSearch" class="form-control" placeholder="Search menu dishes..." autocomplete="off" style="padding-left:36px;height:38px;border-radius:999px;background:var(--surface-2);border:1.5px solid var(--border-color);font-size:.82rem;color:var(--text-main);">
+</div>
 {% endblock %}
 
 {% block header_right %}
-{% include "core/_notif_badges.html" %}
-<button class="btn-icon" onclick="toggleLargeText()" title="Large Text Mode" id="largeTextBtn">
-    <i class="bi bi-type-h1" id="largeTextIcon"></i>
-</button>
+<a href="{% url 'order-history' %}" class="btn btn-sm d-none d-md-inline-flex align-items-center gap-1" style="background:var(--surface-2);border:1px solid var(--border-color);border-radius:999px;padding:6px 14px;font-size:.82rem;font-weight:700;color:var(--text-main);">
+    <i class="bi bi-clock-history"></i> History
+</a>
+{% endblock %}
+
+{% block header_notifications %}
+{% include "core/_notif_badges_luxury.html" with hide_system_alert=True %}
 {% endblock %}
 
 {% block content %}
@@ -585,7 +724,21 @@
     <div class="panel-handle" id="handleLeft" data-panel="category-sidebar"></div>
 
     <!-- MOBILE: Horizontal category strip + menu -->
-    <div class="d-flex flex-column flex-grow-1" style="min-width:0; overflow:hidden;">
+    <div class="token-menu-column">
+        <div class="token-pos-subbar">
+            <div class="token-pos-title-row">
+                <a href="{% url 'token-dashboard' %}" class="token-pos-back" title="Back to Tokens"><i class="bi bi-arrow-left"></i></a>
+                <div>
+                    <h1 class="token-pos-title">Token Point of Sale</h1>
+                    <div class="token-pos-crumbs"><a href="/dashboard/">Dashboard</a> &nbsp;&gt;&nbsp; <a href="{% url 'token-dashboard' %}">Tokens</a> &nbsp;&gt;&nbsp; <span class="active">{% if token %}{{ token.display_number }}{% else %}New Order{% endif %}</span></div>
+                </div>
+            </div>
+            <div class="token-pos-actions">
+                <a href="{% url 'new-token-bill' %}" class="token-pos-action primary"><i class="bi bi-plus-lg"></i> New Token</a>
+                <a href="{% url 'token-dashboard' %}" class="token-pos-action"><i class="bi bi-ticket-perforated"></i> All Tokens</a>
+                <a href="/billing/" class="token-pos-action"><i class="bi bi-calculator"></i> POS Billing</a>
+            </div>
+        </div>
         <div class="mobile-category-nav">
             {% if popular_items %}
             <div class="category-item" onclick="scrollToCategory('cat-popular', this)" style="color:var(--accent-gold);font-weight:700;">
@@ -601,7 +754,7 @@
 
         <!-- Menu items -->
         <main class="menu-area">
-            <input type="text" id="menuSearch" class="search-box" placeholder="Search the menu...">
+            <input type="text" id="menuSearchMobile" class="search-box" placeholder="Search menu dishes...">
 
             <div id="menuCardsContainer">
 
@@ -613,12 +766,18 @@
                         <div class="menu-card" id="card-{{ item.id }}"
                             onclick="addDirectly('{{ item.id }}', '{{ item.name|escapejs }}', {{ item.price }}, {{ item.gst_percentage|default:0 }}, {{ item.is_veg|lower }})">
                             <span class="cart-badge" id="badge-{{ item.id }}">0</span>
-                            <div class="item-name">
-                                {% if item.is_veg %}<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;margin-right:5px;vertical-align:middle;flex-shrink:0;"></span>
-                                {% else %}<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;margin-right:5px;vertical-align:middle;flex-shrink:0;"></span>{% endif %}
-                                {{ item.name }}
+                            <div class="token-item-thumb">
+                                <span class="token-food-mark {% if item.is_veg %}veg{% else %}nonveg{% endif %}"></span>
+                                {% if item.image %}<img src="{{ item.image.url }}" alt="{{ item.name }}" loading="lazy">
+                                {% else %}<span class="token-item-emoji">🍽️</span>{% endif %}
                             </div>
-                            <div class="item-price">{{ CURRENCY_SYMBOL }}{{ item.price|floatformat:0 }}</div>
+                            <div class="token-item-body">
+                                <div class="item-name">{{ item.name }}</div>
+                            </div>
+                            <div class="token-item-footer">
+                                <div class="item-price">{{ CURRENCY_SYMBOL }}{{ item.price|floatformat:0 }}</div>
+                                <span class="token-add-btn"><i class="bi bi-plus-lg"></i></span>
+                            </div>
                         </div>
                     </div>
                     {% endfor %}
@@ -633,12 +792,18 @@
                         <div class="menu-card" id="card-{{ item.id }}"
                             onclick="addDirectly('{{ item.id }}', '{{ item.name|escapejs }}', {{ item.price }}, {{ item.gst_percentage|default:0 }}, {{ item.is_veg|lower }})">
                             <span class="cart-badge" id="badge-{{ item.id }}">0</span>
-                            <div class="item-name">
-                                {% if item.is_veg %}<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;margin-right:5px;vertical-align:middle;flex-shrink:0;"></span>
-                                {% else %}<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;margin-right:5px;vertical-align:middle;flex-shrink:0;"></span>{% endif %}
-                                {{ item.name }}
+                            <div class="token-item-thumb">
+                                <span class="token-food-mark {% if item.is_veg %}veg{% else %}nonveg{% endif %}"></span>
+                                {% if item.image %}<img src="{{ item.image.url }}" alt="{{ item.name }}" loading="lazy">
+                                {% else %}<span class="token-item-emoji">🍽️</span>{% endif %}
                             </div>
-                            <div class="item-price">{{ CURRENCY_SYMBOL }}{{ item.price|floatformat:0 }}</div>
+                            <div class="token-item-body">
+                                <div class="item-name">{{ item.name }}</div>
+                            </div>
+                            <div class="token-item-footer">
+                                <div class="item-price">{{ CURRENCY_SYMBOL }}{{ item.price|floatformat:0 }}</div>
+                                <span class="token-add-btn"><i class="bi bi-plus-lg"></i></span>
+                            </div>
                         </div>
                     </div>
                     {% endfor %}
@@ -674,7 +839,7 @@
                     {{ order.get_status_display }}
                 </div>
             </div>
-            <script>window.addEventListener('DOMContentLoaded', () => { currentOrderId = {{ order.id }}; });</script>
+            <script>window.addEventListener('DOMContentLoaded', () => { currentOrderId = {{ order.id|default:"null" }}; });</script>
             <div id="runningItemsDesktop" class="mb-3"></div>
 
             <div id="orderActionButtonDesktop">
@@ -1062,10 +1227,19 @@
     let activeModal = null;
 
     /* ── Menu search ─────────────────────────────────────────────────── */
-    document.getElementById('menuSearch').addEventListener('input', function () {
-        const t = this.value.toLowerCase();
+    function filterTokenMenu(value) {
+        const t = value.toLowerCase();
         document.querySelectorAll('.menu-item-searchable').forEach(c => {
             c.style.display = c.querySelector('.item-name').textContent.toLowerCase().includes(t) ? '' : 'none';
+        });
+    }
+    ['menuSearch', 'menuSearchMobile'].forEach(id => {
+        const input = document.getElementById(id);
+        if (input) input.addEventListener('input', function () {
+            filterTokenMenu(this.value);
+            const otherId = id === 'menuSearch' ? 'menuSearchMobile' : 'menuSearch';
+            const other = document.getElementById(otherId);
+            if (other && other.value !== this.value) other.value = this.value;
         });
     });
 
@@ -1662,8 +1836,17 @@
     document.addEventListener('DOMContentLoaded', () => {
         renderCart();
         syncCardBadges();
-        showRunningOrderLoading();
-        loadRunningOrder();
+        if (currentOrderId) {
+            showRunningOrderLoading();
+            loadRunningOrder();
+        } else {
+            const draftMessage = `<div class="text-center text-muted mt-4" style="text-transform:uppercase;letter-spacing:2px;font-size:0.7rem;">
+                Add an item to create this order
+            </div>`;
+            ['runningItemsDesktop', 'runningItemsMobile'].forEach(id => {
+                const el = document.getElementById(id); if (el) el.innerHTML = draftMessage;
+            });
+        }
         setInterval(loadRunningOrder, 5000);
         const f1 = document.querySelector('.category-sidebar .category-item'); if (f1) f1.classList.add('active');
         const f2 = document.querySelector('.mobile-category-nav .category-item'); if (f2) f2.classList.add('active');

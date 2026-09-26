@@ -1000,7 +1000,7 @@ function runAiImport() {
     const fileInput = document.getElementById("aiMenuFile");
     const btn       = document.getElementById("aiProcessBtn");
     if (!text.trim() && !fileInput.files[0]) {
-        alert("Please provide menu text or upload a file.");
+        ui.toast("Please provide menu text or upload a file.", "warning");
         return;
     }
 
@@ -1019,7 +1019,7 @@ function runAiImport() {
     .then(res => res.json())
     .then(data => {
         if (data.error) {
-            alert(data.error);
+            ui.toast(data.error, "error");
             btn.disabled = false;
             btn.innerHTML = '<i class="bi bi-stars me-1"></i> Transcribe with Smart AI';
             return;
@@ -1028,12 +1028,12 @@ function runAiImport() {
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>AI is transcribing…';
             pollAiImport(data.task_id, btn);
         } else if (data.success) {
-            alert(data.message);
+            ui.toast(data.message, "success");
             location.reload();
         }
     })
     .catch(() => {
-        alert("Error connecting to AI service.");
+        ui.toast("Error connecting to AI service.", "error");
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-stars me-1"></i> Transcribe with Smart AI';
     });
@@ -1046,11 +1046,11 @@ function pollAiImport(taskId, btn) {
             .then(data => {
                 if (data.status === "done") {
                     clearInterval(interval);
-                    alert(data.message);
+                    ui.toast(data.message, "success");
                     location.reload();
                 } else if (data.status === "error") {
                     clearInterval(interval);
-                    alert("AI import failed: " + (data.error || "unknown error"));
+                    ui.toast("AI import failed: " + (data.error || "unknown error"), "error");
                     btn.disabled = false;
                     btn.innerHTML = '<i class="bi bi-stars me-1"></i> Transcribe with Smart AI';
                 }
@@ -1078,7 +1078,7 @@ function runRecipeImport() {
     const fileInput = document.getElementById("recipeImportFile");
     const btn       = document.getElementById("recipeImportBtn");
     if (!text.trim() && !fileInput.files[0]) {
-        alert("Please provide text or upload a file.");
+        ui.toast("Please provide text or upload a file.", "warning");
         return;
     }
 
@@ -1098,7 +1098,7 @@ function runRecipeImport() {
     .then(res => res.json())
     .then(data => {
         if (data.error) {
-            alert(data.error);
+            ui.toast(data.error, "error");
             btn.disabled = false;
             btn.innerText = "Extract Ingredients";
             return;
@@ -1107,7 +1107,7 @@ function runRecipeImport() {
         pollRecipeImport(data.job_id, btn);
     })
     .catch(() => {
-        alert("Error connecting to AI service.");
+        ui.toast("Error connecting to AI service.", "error");
         btn.disabled = false;
         btn.innerText = "Extract Ingredients";
     });
@@ -1123,7 +1123,7 @@ function pollRecipeImport(jobId, btn) {
                     window.location.href = `/inventory/recipe-import/${jobId}/review/`;
                 } else if (data.status === "failed") {
                     clearInterval(interval);
-                    alert("Recipe import failed: " + (data.error || "unknown error"));
+                    ui.toast("Recipe import failed: " + (data.error || "unknown error"), "error");
                     btn.disabled = false;
                     btn.innerText = "Extract Ingredients";
                 }
@@ -1160,7 +1160,7 @@ function saveItem() {
     const price = document.getElementById("itemPrice").value;
 
     if (!name || !price) {
-        alert("Dish name and price are required.");
+        ui.toast("Dish name and price are required.", "warning");
         return;
     }
 
@@ -1184,7 +1184,7 @@ function saveItem() {
         body: formData
     }).then(r => r.json()).then(d => {
         if (d.success) location.reload();
-        else alert(d.error || "Failed to save item.");
+        else ui.toast(d.error || "Failed to save item.", "error");
     }).catch(() => location.reload());
 }
 
